@@ -1,7 +1,9 @@
 /* The navbar container */
 .topnav {
-    background: black;
+    background-color: black;
     width:100%;
+    display:block;
+    overflow:hidden;
 }
 
 /* Navbar links */
