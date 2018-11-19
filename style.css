@@ -1,19 +1,44 @@
-.header {
-	position: fixed;
-	top: 0;
-	width: 100%;
-	text-align: center;
-	background: black;
-	color: white;
-	font-size: 30px;
-	padding: 0px;
-	left: 0;
+/* The navbar container */
+.topnav {
+    background: black;
+    width:100%;
 }
 
-.link {
-	color: white;
-	font-size: 30px;
-	text-align: center;
-	margin-top: 100px;
-	padding-top: 30px; 
+/* Navbar links */
+.topnav a {
+    float: left;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+   	padding: 14px 16px;
+    text-decoration: none;
+}
+
+.links a {
+	float: right;
+    display: block;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+
+}
+
+.links a:hover {
+    background-color: #ddd;
+    color: black;
+}
+/* Links - change color on hover */
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.footer {
+	position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    color: white;
+    text-align: center;
 }
