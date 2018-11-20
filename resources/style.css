@@ -36,6 +36,17 @@
     color: black;
 }
 
+.welcometext {
+    font-family: 'Rubik', sans-serif;
+    font-size: 32px;
+    text-shadow: 4px 4px 4px #aaa;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
 .footer {
 	position: fixed;
     left: 0;
