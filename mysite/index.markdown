@@ -5,8 +5,3 @@
 layout: home
 ---
 
-# Welcome
-
-```
-{% giphy nerdy welcome %}
-```
