@@ -1,4 +1,8 @@
-# Coursework
+<div>
+<h1> Coursework </h1>
+</div>
+
+
 
 `Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom.
 
