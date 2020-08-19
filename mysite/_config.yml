@@ -1,0 +1,33 @@
+# Permalinks
+#
+# Use of `relative_permalinks` ensures post links from the index work properly.
+permalink:           pretty
+
+gems: [jekyll-paginate]
+paginate: 5
+paginate_path: "page:num"
+
+# Setup
+title:               Poole
+tagline:             The Jekyll Butler
+url:            
+paginate:            1
+baseurl:             ""
+
+# Assets
+#
+# We specify the directory for Jekyll so we can use @imports.
+sass:
+  sass_dir:          _sass
+  style:            :compressed
+
+# About/contact
+author:
+  name:              Wyatt Walsh
+  url:               
+  email:             wyattowalsh@gmail.com
+
+# Custom vars
+version:             2.0.0
+github:
+  repo:              

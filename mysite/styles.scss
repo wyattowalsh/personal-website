@@ -17,7 +17,6 @@
 // Designed, built, and released under MIT license by @mdo. Learn more at
 // https://github.com/poole/poole.
 
-@import "variables";
 @import "base";
 @import "type";
 @import "syntax";
@@ -27,21 +26,3 @@
 @import "posts";
 @import "pagination";
 @import "message";
-@import "toc";
-
-// Sass for creating the swatches
-.colors {
-  display: grid;
-  grid-template-columns: max-content 1fr;
-
-  dt {
-    width: 3rem;
-    height: 3rem;
-    border-radius: var(--border-radius);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
-  }
-
-  dd {
-    margin-left: var(--spacer);
-  }
-}
