@@ -1,3 +1,5 @@
+# Coursework
+
 `Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom.
 
 ## Table of Contents
@@ -17,7 +19,7 @@
 ### Programming, Computer Science, and Data Science
 
 <div>
-<table style="width:100%">
+<table border="1" width="100%" ID="Table1" style="margin: 0px;">
     <tr>
         <th>Title</th>
         <th>Number</th>
@@ -309,7 +311,7 @@
 [Back to Top](#table-of-contents)
 
 <div>
-  <p id="footnote-1">[1] <a href="guide.berkeley.edu">source</a></p>
+  <p id="footnote-1">[1] <a href="http://guide.berkeley.edu/">source</a></p>
 </div>
 
 <div>
