@@ -1,11 +1,4 @@
----
-layout: page
-permalink: /coursework/
----
-
-# Coursework
-
-`Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom. 
+`Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom.
 
 ## Table of Contents
 
@@ -21,85 +14,308 @@ permalink: /coursework/
 
 - [Science](#science)
 
-- [Comprehensive List](#full-list)
-
 ### Programming, Computer Science, and Data Science
 
-| Title                                                             | Number      | Term        | Description[^1]                                                                                                                                                                                                                                                                                                                                                                      | Notes                                                                                                                                                                                                                                                                                                                          |
-| ----------------------------------------------------------------- | ----------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Introduction to Computer Programming for Scientists and Engineers | Engin7      | Spring 2018 | Elements of procedural and object-oriented programming. Induction, iteration, and recursion. Real functions and floating-point computations for engineering analysis. Introduction to data structures. Representative examples are drawn from mathematics, science, and engineering. The course uses the MATLAB programming language.                                                |                                                                                                                                                                                                                                                                                                                                |
-| Data Structures and Programming Methodology                       | CS61B       | Summer 2019 | Fundamental dynamic data structures, including linear lists, queues, trees, and other linked structures; arrays strings, and hash tables. Storage management. Elementary principles of software engineering. Abstract data types. Algorithms for sorting and searching. Introduction to the Java programming language.                                                               |                                                                                                                                                                                                                                                                                                                                |
-| Introduction to Machine Learning and Data Analytics               | Ind Eng 142 | Fall 2019   | Linear regression, logistic regression, classification and regression trees, random forests, boosting, text mining, data cleaning and manipulation, data visualization, network analysis, time series modeling, clustering, principal component analysis, regularization, and large-scale learning..                                                                                 | Successfully built a machine learning pipeline in order to predict stadium attendance at NBA games. This pipeline began with scraping NBA game data from the internet, and concluded with the application of a diverse set of trained regressors for attendance prediction: [github.com/wyattowalsh/NBA-attendance-prediction](github.com/wyattowalsh/NBA-attendance-prediction)|
-| Simulation for Enterprise-Scale Systems                           | Ind Eng 174 | Spring 2020 | Introductory course on design, programming, and statistical analysis of simulation methods and tools for enterprise-scale systems such as traffic and computer networks, health-care and financial systems, and factories. Theory behind random variable generation for a variety of common variables. Variance reduction, simulation optimization, or meta-modeling are considered. |                                                                                                                                                                                                                                                                                                                                |
+<div>
+<table style="width:100%">
+    <tr>
+        <th>Title</th>
+        <th>Number</th>
+        <th>Term</th>
+        <th>Description<sup><a href="#footnote-1">[1]</a></sup></th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>Introduction to Computer Programming for Scientists and Engineers</td>
+        <td>Engin7</td>
+        <td>Spring 2018</td>
+        <td>Elements of procedural and object-oriented programming. Induction, iteration, and recursion. Real functions and floating-point computations for engineering analysis. Introduction to data structures. Representative examples are drawn from mathematics, science, and engineering. The course uses the MATLAB programming language.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Data Structures and Programming Methodology</td>
+        <td>CS61B</td>
+        <td>Summer 2019</td>
+        <td>Fundamental dynamic data structures, including linear lists, queues, trees, and other linked structures; arrays strings, and hash tables. Storage management. Elementary principles of software engineering. Abstract data types. Algorithms for sorting and searching. Introduction to the Java programming language.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Introduction to Machine Learning and Data Analytics</td>
+        <td>Ind Eng 142</td>
+        <td>Fall 2019</td>
+        <td>Linear regression, logistic regression, classification and regression trees, random forests, boosting, text mining, data cleaning and manipulation, data visualization, network analysis, time series modeling, clustering, principal component analysis, regularization, and large-scale learning..</td>
+        <td>Successfully built a machine learning pipeline in order to predict stadium attendance at NBA games. This pipeline began with scraping NBA game data from the internet, and concluded with the application of a diverse set of trained regressors for attendance prediction: <a href="github.com/wyattowalsh/NBA-attendance-prediction">Project Link</a> 
+      </td>
+    </tr>
+    <tr>
+        <td>Simulation for Enterprise-Scale Systems</td>
+        <td>Ind Eng 174</td>
+        <td>Spring 2020</td>
+        <td>Introductory course on design, programming, and statistical analysis of simulation methods and tools for enterprise-scale systems such as traffic and computer networks, health-care and financial systems, and factories. Theory behind random variable generation for a variety of common variables. Variance reduction, simulation optimization, or meta-modeling are considered.</td>
+        <td></td>
+    </tr>
+</table>
+</div>
+
+
 
 [Back to Top](#table-of-contents)
 
 ### Optimization
 
-| Title                                | Number      | Term        | Description[^1]                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Notes                                                                                                                                                                                 |
-| ------------------------------------ | ----------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Nonlinear and Discrete Optimization  | Ind Eng 160 | Fall 2018   | Unconstrained and constrained optimization with continuous and discrete domains. Convex sets and convex functions; local optimality; KKT conditions; Lagrangian duality; steepest descent and Newton's method. Modeling with integer variables; branch-and-bound method; cutting planes. Models on production/inventory planning, logistics, portfolio optimization, factor modeling, classification with support vector machines.                                                                                     | Explored implementing both Gradient Method and Newton's Method in Matlab: [github.com/wyattowalsh/introduction-to-discrete-optimization](github.com/wyattowalsh/introduction-to-discrete-optimization)                                             |
-| Linear Programming and Network Flows | Ind Eng 162 | Fall 2018   | Addresses modeling and algorithms for optimization of linear constrained optimization problems. The simplex method; theorems of duality; complementary slackness. Production planning and resource allocation. Graph and network problems as linear programs with integer solutions. Algorithms for selected network flow problems. Transportation and logistics problems. Dynamic programming and its role in applications to shortest paths, project management and equipment replacement.                           |                                                                                                                                                                                       |
-| Integer Optimization                 | Ind Eng 169 | Spring 2020 | Addresses modeling and algorithms for integer programming problems. Flexibility of integer optimization formulations; if-then constraints, fixed-costs, etc. Branch and Bound; Cutting plane methods; polyhedral theory. Applications in production planning, resource allocation, power generation, network design. Alternate formulations for integer optimization: strength of Linear Programming relaxations. Algorithms for integer optimization problems. Specialized strategies by integer programming solvers. | Analyzed Fair Division problems through the lens of "Envy-Freeness" given several assumptions and synthetic data sets: [github.com/wyattowalsh/explorations-in-envy-free-allocations](github.com/wyattowalsh/explorations-in-envy-free-allocations) |
+<div>
+<table style="width:100%">
+    <tr>
+        <th>Title</th>
+        <th>Number</th>
+        <th>Term</th>
+        <th>Description</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>Nonlinear and Discrete Optimization</td>
+        <td>Ind Eng 160</td>
+        <td>Fall 2018</td>
+        <td>Unconstrained and constrained optimization with continuous and discrete domains. Convex sets and convex functions; local optimality; KKT conditions; Lagrangian duality; steepest descent and Newton's method. Modeling with integer variables; branch-and-bound method; cutting planes. Models on production/inventory planning, logistics, portfolio optimization, factor modeling, classification with support vector machines.</td>
+        <td>Explored implementing both Gradient Method and Newton's Method in Matlab: <a href="github.com/wyattowalsh/introduction-to-discrete-optimization">Project Link</a></td>
+    </tr>
+    <tr>
+        <td>Linear Programming and Network Flows</td>
+        <td>Ind Eng 162</td>
+        <td>Fall 2018</td>
+        <td>Addresses modeling and algorithms for optimization of linear constrained optimization problems. The simplex method; theorems of duality; complementary slackness. Production planning and resource allocation. Graph and network problems as linear programs with integer solutions. Algorithms for selected network flow problems. Transportation and logistics problems. Dynamic programming and its role in applications to shortest paths, project management and equipment replacement.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Integer Optimization</td>
+        <td>Ind Eng 169</td>
+        <td>Spring 2020</td>
+        <td>Addresses modeling and algorithms for integer programming problems. Flexibility of integer optimization formulations; if-then constraints, fixed-costs, etc. Branch and Bound; Cutting plane methods; polyhedral theory. Applications in production planning, resource allocation, power generation, network design. Alternate formulations for integer optimization: strength of Linear Programming relaxations. Algorithms for integer optimization problems. Specialized strategies by integer programming solvers.</td>
+        <td>Analyzed Fair Division problems through the lens of "Envy-Freeness" given several assumptions and synthetic data sets: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Project Link</a></td>
+    </tr>
+</table>
+</div>
 
 [Back to Top](#table-of-contents)
 
 ### Business, Operations, and Economics
 
-| Title                                                    | Number      | Term        | Description[^1]                                                                                                                                                                                                                                                                                                                                                                                                       | Notes                                                                                                                                                                                                                    |
-| -------------------------------------------------------- | ----------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Introduction to Economics                                | Econ1       | Spring 2015 | Survey of economics                                                                                                                                                                                                                                                                                                                                                                                                   | My first ever economics course!                                                                                                                                                                                          |
-| Principles of Business                                   | UGBA10      | Fall 2015   | Mixed compilation from the following categories: Finance & Accounting, Marketing, Operations & Sustainability, and Leadership                                                                                                                                                                                                                                                                                         |                                                                                                                                                                                                                          |
-| Microeconomic Analysis for Business Decisions            | UGBA101A    | Fall 2015   | Economic analysis with emphasis on the determination of the level of prices, outputs, and inputs; effects of the state of the competitive environment on business and government policies.                                                                                                                                                                                                                            |                                                                                                                                                                                                                          |
-| Leading People (Introduction to Organizational Behavior) | UGBA105     | Summer 2018 | Problems of motivation, leadership, morale, social structure, groups, communications, hierarchy, and control in complex organizations. Interaction among technology, environment, and human behavior.                                                                                                                                                                                                                 |                                                                                                                                                                                                                          |
-| Negotiation and Conflict Resolution                      | UGBA152     | Summer 2019 | Theory and processes of negotiation as practiced in a variety of settings. Relevant to the broad spectrum of negotiation problems faced by managers and professionals. Through the use of live negotiation simulations, was able to acquire hands-on negotiation practice.                                                                                                                                            | Due to the fact this was a summer course, there were many international students. Was able to gain exposure negotiating with people from Asia (Japan), Europe (France), and other places scattered throughout the globe! |
-| Principles of Engineering Economics                      | Engin120    | Fall 2019   | Economic analysis for engineering decision making: Capital flows, effect of time and interest rate. Minimum-cost life and replacement analysis. Depreciation and taxes. Uncertainty; preference under risk; decision analysis. Capital sources and their effects. Economic studies.                                                                                                                                   |                                                                                                                                                                                                                          |
-| Decision Analytics                                       | Ind Eng 166 | Fall 2019   | A systematic evaluation of decision-making problems under uncertainty. Emphasis on the formulation, analysis, and use of decision-making techniques in engineering, operations research and systems analysis. Includes formulation of risk problems and probabilistic risk assessments. Graphical methods and computer software using event trees, decision trees, and influence diagrams that focus on model design. |                                                                                                                                                                                                                          |
-| Service Operations Design and Analysis                   | Ind Eng 151 | Fall 2019   | Design of service processes, layout and location of service facilities, demand forecasting, demand management, employee scheduling, service quality management, and capacity planning.                                                                                                                                                                                                                                | Final overall grade: A                                                                                                                                                                                                   |
+<div>
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Number</th>
+        <th>Term</th>
+        <th>Description</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>Introduction to Economics</td>
+        <td>Econ1</td>
+        <td>Spring 2015</td>
+        <td>Survey of economics</td>
+        <td>My first ever economics course!</td>
+    </tr>
+    <tr>
+        <td>Principles of Business</td>
+        <td>UGBA10</td>
+        <td>Fall 2015</td>
+        <td>Mixed compilation from the following categories: Finance & Accounting, Marketing, Operations & Sustainability, and Leadership</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Microeconomic Analysis for Business Decisions</td>
+        <td>UGBA101A</td>
+        <td>Fall 2015</td>
+        <td>Economic analysis with emphasis on the determination of the level of prices, outputs, and inputs; effects of the state of the competitive environment on business and government policies.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Leading People (Introduction to Organizational Behavior)</td>
+        <td>UGBA105</td>
+        <td>Summer 2018</td>
+        <td>Problems of motivation, leadership, morale, social structure, groups, communications, hierarchy, and control in complex organizations. Interaction among technology, environment, and human behavior.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Negotiation and Conflict Resolution</td>
+        <td>UGBA152</td>
+        <td>Summer 2019</td>
+        <td>Theory and processes of negotiation as practiced in a variety of settings. Relevant to the broad spectrum of negotiation problems faced by managers and professionals. Through the use of live negotiation simulations, was able to acquire hands-on negotiation practice.</td>
+        <td>Due to the fact this was a summer course, there were many international students. Was able to gain exposure negotiating with people from Asia (Japan), Europe (France), and other places scattered throughout the globe!</td>
+    </tr>
+    <tr>
+        <td>Principles of Engineering Economics</td>
+        <td>Engin120</td>
+        <td>Fall 2019</td>
+        <td>Economic analysis for engineering decision making: Capital flows, effect of time and interest rate. Minimum-cost life and replacement analysis. Depreciation and taxes. Uncertainty; preference under risk; decision analysis. Capital sources and their effects. Economic studies.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Decision Analytics</td>
+        <td>Ind Eng 166</td>
+        <td>Fall 2019</td>
+        <td>A systematic evaluation of decision-making problems under uncertainty. Emphasis on the formulation, analysis, and use of decision-making techniques in engineering, operations research and systems analysis. Includes formulation of risk problems and probabilistic risk assessments. Graphical methods and computer software using event trees, decision trees, and influence diagrams that focus on model design.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Service Operations Design and Analysis</td>
+        <td>Ind Eng 151</td>
+        <td>Fall 2019</td>
+        <td>Design of service processes, layout and location of service facilities, demand forecasting, demand management, employee scheduling, service quality management, and capacity planning.</td>
+        <td>Final overall grade: A</td>
+    </tr>
+</table>
+</div>
 
 [Back to Top](#table-of-contents)
 
 ### Statistics
 
-| Title                                                    | Number      | Term        | Description[^1]                                                                                                                                                                                                                                                                                                                                                                                                 | Notes                                                                                                                                                                                                                                                              |
-| -------------------------------------------------------- | ----------- | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Introduction to Probability and Statistics               | Stat20      | Spring 2015 | Relative frequencies, discrete probability, random variables, expectation. Testing hypotheses. Estimation. Illustrations from various fields.                                                                                                                                                                                                                                                                   | My first ever statistics course!                                                                                                                                                                                                                                   |
-| Foundations of Data Science                              | Data8       | Spring 2017 | Inferential thinking, computational thinking, and real-world relevance. Critical concepts and skills in computer programming and statistical inference, in conjunction with hands-on analysis of real-world datasets, including economic data, document collections, geographical data, and social networks. Social and legal issues surrounding data analysis, including issues of privacy and data ownership. | My first ever data science course! Implemented a single layer neural network for binary classification using Keras as a final project extension from the required K-Nearest-Neighbor algorithm. `Overall grade was above the 95th percentile and earned an A+`[^2] |
-| Probability and Risk Analysis for Engineers              | Ind Eng 172 | Fall 2018   | Understanding of uncertain phenomena and the mathematical tools used to model and analyze it. Applications will be given in such areas as reliability theory, risk theory, inventory theory, financial models, and computer science, among others. Also covers the basics of stochastic simulation.                                                                                                             | Taught by Professor Rhonda Righter, who was a PhD student under the author of many different statistics texts, Sheldon Mark Ross[^3].                                                                                                                              |
-| Engineering Statistics, Quality Control, and Forecasting | Ind Eng 165 | Spring 2019 | Parameter estimation, hypothesis testing, regression analysis, analysis of variance. Applications in forecasting and quality control.                                                                                                                                                                                                                                                                           | Implemented Coordinate Descent for Regularized Linear Regression in Python using only basic libraries (no use of Sci-Kit Learn): [github.com/wyattowalsh/regularized-regression-from-scratch](github.com/wyattowalsh/regularized-regression-from-scratch)                                                                    |
-| Introduction to Stochastic Processes                     | Ind Eng 173 | Spring 2019 | Discrete-time Markov chains, Poisson process, continuous-time Markov chains, and renewal theory. It also discusses applications to queueing theory, risk analysis and reliability theory.                                                                                                                                                                                                                       |                                                                                                                                                                                                                                                                    |
+<div>
+<table>
+    <tr>
+        <th>Title</th>
+        <th>Number</th>
+        <th>Term</th>
+        <th>Description</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>Introduction to Probability and Statistics</td>
+        <td>Stat20</td>
+        <td>Spring 2015</td>
+        <td>Relative frequencies, discrete probability, random variables, expectation. Testing hypotheses. Estimation. Illustrations from various fields.</td>
+        <td>My first ever statistics course!</td>
+    </tr>
+    <tr>
+        <td>Foundations of Data Science</td>
+        <td>Data8</td>
+        <td>Spring 2017</td>
+        <td>Inferential thinking, computational thinking, and real-world relevance. Critical concepts and skills in computer programming and statistical inference, in conjunction with hands-on analysis of real-world datasets, including economic data, document collections, geographical data, and social networks. Social and legal issues surrounding data analysis, including issues of privacy and data ownership.</td>
+        <td>My first ever data science course! Implemented a single layer neural network for binary classification using Keras as a final project extension from the required K-Nearest-Neighbor algorithm. Overall grade was above the 95th percentile and earned an A+<sup><a href="#footnote-2">[2]</a></sup></td>
+    </tr>
+    <tr>
+        <td>Probability and Risk Analysis for Engineers</td>
+        <td>Ind Eng 172</td>
+        <td>Fall 2018</td>
+        <td>Understanding of uncertain phenomena and the mathematical tools used to model and analyze it. Applications will be given in such areas as reliability theory, risk theory, inventory theory, financial models, and computer science, among others. Also covers the basics of stochastic simulation.</td>
+        <td>Taught by Professor Rhonda Righter, who was a PhD student under the author of many different statistics texts, Sheldon Mark Ross<sup><a href="#footnote-3">[3]</a></sup></td>
+    </tr>
+    <tr>
+        <td>Engineering Statistics, Quality Control, and Forecasting</td>
+        <td>Ind Eng 165</td>
+        <td>Spring 2019</td>
+        <td>Parameter estimation, hypothesis testing, regression analysis, analysis of variance. Applications in forecasting and quality control.</td>
+        <td>Implemented Coordinate Descent for Regularized Linear Regression in Python using only basic libraries (math, NumPy, and pandas): <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Project Link</a></td>
+    </tr>
+    <tr>
+        <td>Introduction to Stochastic Processes</td>
+        <td>Ind Eng 173</td>
+        <td>Spring 2019</td>
+        <td>Discrete-time Markov chains, Poisson process, continuous-time Markov chains, and renewal theory. It also discusses applications to queueing theory, risk analysis and reliability theory.</td>
+        <td></td>
+    </tr>
+</table>
+</div>
 
 [Back to Top](#table-of-contents)
 
 ### Mathematics
 
-| Title                                     | Number | Term        | Description[^1]                                                                                                                                                                                                                                                                                                        | Notes                                                                                                                                                                                  |
-| ----------------------------------------- | ------ | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Calculus                                  | Math1A | Fall 2014   | An introduction to differential and integral calculus of functions of one variable, with applications and an introduction to transcendental functions.                                                                                                                                                                 | At the time of taking this course, I was a pre-medical student retaking the material.                                                                                                  |
-| Multivariable Calculus                    | Math53 | Spring 2017 | Parametric equations and polar coordinates. Vectors in 2- and 3-dimensional Euclidean spaces. Partial derivatives. Multiple integrals. Vector calculus. Theorems of Green, Gauss, and Stokes.                                                                                                                          |                                                                                                                                                                                        |
-| Calculus                                  | Math1B | Summer 2017 | Continuation of 1A. Techniques of integration; applications of integration. Infinite sequences and series. First-order ordinary differential equations. Second-order ordinary differential equations; oscillation and damping; series solutions of ordinary differential equations.                                    | I had previously taken an analog of this course at a community college in high school, but it was missing the differential equations portion so the units would not transfer correctly |
-| Linear Algebra and Differential Equations | Math54 | Summer 2017 | Basic linear algebra; matrix arithmetic and determinants. Vector spaces; inner product as spaces. Eigenvalues and eigenvectors; linear transformations. Homogeneous ordinary differential equations; first-order differential equations with constant coefficients. Fourier series and partial differential equations. |                                                                                                                                                                                        |
+<div>
+<table style="width:100%">
+    <tr>
+        <th>Title</th>
+        <th>Number</th>
+        <th>Term</th>
+        <th>Description</th>
+        <th>Notes</th>
+    </tr>
+    <tr>
+        <td>Calculus</td>
+        <td>Math1A</td>
+        <td>Fall 2014</td>
+        <td>An introduction to differential and integral calculus of functions of one variable, with applications and an introduction to transcendental functions.</td>
+        <td>At the time of taking this course, I was a pre-medical student retaking the material.</td>
+    </tr>
+    <tr>
+        <td>Multivariable Calculus</td>
+        <td>Math53</td>
+        <td>Spring 2017</td>
+        <td>Parametric equations and polar coordinates. Vectors in 2- and 3-dimensional Euclidean spaces. Partial derivatives. Multiple integrals. Vector calculus. Theorems of Green, Gauss, and Stokes.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Calculus</td>
+        <td>Math1B</td>
+        <td>Summer 2017</td>
+        <td>Continuation of 1A. Techniques of integration; applications of integration. Infinite sequences and series. First-order ordinary differential equations. Second-order ordinary differential equations; oscillation and damping; series solutions of ordinary differential equations.</td>
+        <td>I had previously taken an analog of this course at a community college in high school, but it was missing the differential equations portion so the units would not transfer correctly</td>
+    </tr>
+    <tr>
+        <td>Linear Algebra and Differential Equations</td>
+        <td>Math54</td>
+        <td>Summer 2017</td>
+        <td>Basic linear algebra; matrix arithmetic and determinants. Vector spaces; inner product as spaces. Eigenvalues and eigenvectors; linear transformations. Homogeneous ordinary differential equations; first-order differential equations with constant coefficients. Fourier series and partial differential equations.</td>
+        <td></td>
+    </tr>
+</table>
+</div>
 
 [Back to Top](#table-of-contents)
 
 ### Science
 
-| Title                                                 | Number    | Term        | Description[^1]                                                                                                                                                                                                                                                                                                                                | Notes                                                                                                                                                                                                                                                                                                                                                               |
-| ----------------------------------------------------- | --------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| General Chemistry                                     | Chem1A    | Fall 2014   | Stoichiometry of chemical reactions, quantum mechanical description of atoms, the elements and periodic table, chemical bonding, real and ideal gases, thermochemistry, introduction to thermodynamics and equilibrium, acid-base and solubility equilibria, introduction to oxidation-reduction reactions, introduction to chemical kinetics. | At the time of taking this course, I was a pre-medical student retaking the material.                                                                                                                                                                                                                                                                               |
-| Chemical Structure and Reactivity (Organic Chemistry) | Chem3A    | Spring 2015 | Introduction to organic chemical structures, bonding, and chemical reactivity. The organic chemistry of alkanes, alkyl halides, alcohols, alkenes, alkynes, and organometallics.                                                                                                                                                               |                                                                                                                                                                                                                                                                                                                                                                     |
-| Physics for Scientists and Engineers                  | Physics7A | Spring 2015 | Mechanics and wave motion.                                                                                                                                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                                                                     |
-| Physics for Scientists and Engineers                  | Physics7B | Spring 2017 | Heat, electricity, and magnetism.                                                                                                                                                                                                                                                                                                              | |
+<div>
+<table style="width:100%">
+    <tr>
+        <th>Title</th>
+        <th>Number</th>
+        <th>Term</th>
+        <th>Description</th>
+        <th>Notes</th>
+    </tr>
+        <td>General Chemistry</td>
+        <td>Chem1A</td>
+        <td>Fall 2014</td>
+        <td>Stoichiometry of chemical reactions, quantum mechanical description of atoms, the elements and periodic table, chemical bonding, real and ideal gases, thermochemistry, introduction to thermodynamics and equilibrium, acid-base and solubility equilibria, introduction to oxidation-reduction reactions, introduction to chemical kinetics.</td>
+        <td>At the time of taking this course, I was a pre-medical student retaking the material.</td>
+    </tr>
+    <tr>
+        <td>Chemical Structure and Reactivity (Organic Chemistry)</td>
+        <td>Chem3A</td>
+        <td>Spring 2015</td>
+        <td>Introduction to organic chemical structures, bonding, and chemical reactivity. The organic chemistry of alkanes, alkyl halides, alcohols, alkenes, alkynes, and organometallics.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Physics for Scientists and Engineers</td>
+        <td>Physics7A</td>
+        <td>Spring 2015</td>
+        <td>Mechanics and wave motion.</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Physics for Scientists and Engineers</td>
+        <td>Physics7B</td>
+        <td>Spring 2017</td>
+        <td>Heat, electricity, and magnetism.</td>
+        <td></td>
+    </tr>
+</table>
+</div>
 
 [Back to Top](#table-of-contents)
 
-### Comprehensive List
+<div>
+  <p id="footnote-1">[1] <a href="guide.berkeley.edu">source</a></p>
+</div>
 
+<div>
+ <p id="footnote-2">[2] <a href="https://www.berkeleytime.com/grades/0-9403-summer-2018-nolan">source</a></p>
+</div>
 
-
-[Back to Top](#table-of-contents)
-
-
-[^1]: [source](http://guide.berkeley.edu/ "Berkeley Class Guide")
-[^2]: [source](https://www.berkeleytime.com/grades/0-9403-summer-2018-nolan,-d-_-1 "Summer 2018 Data 8 Grade Distribution")
-[^3]: [source](https://www.genealogy.math.ndsu.nodak.edu/id.php?id=136869 "Rhonda Righter's Academic Genealogy")
+<div>
+ <p id="footnote-3">[3] <a href="https://www.genealogy.math.ndsu.nodak.edu/id.php?id=136869">source</a></p>
+</div>
