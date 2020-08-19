@@ -1,5 +1,5 @@
 <div>
-<h1> Coursework </h1>
+<h2> Coursework </h2>
 </div>
 
 
