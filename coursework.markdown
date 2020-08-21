@@ -33,8 +33,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description<sup><a href="#footnote-1">[1]</a></sup></th> <!-- style="width:40%" -->
-        <th>Notes</th> <!-- %style="width:30%" -->
+        <th style="width:40%">Description<sup><a href="#footnote-1">[1]</a></sup></th> <!--  -->
+        <th style="width:30%">Notes</th> <!-- % -->
     </tr>
     <tr>
         <td>Introduction to Computer Programming for Scientists and Engineers</td>
@@ -80,8 +80,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description</th>
-        <th>Notes</th>
+        <th style="width:40%">Description</th>
+        <th style="width:30%">Notes</th>
     </tr>
     <tr>
         <td>Nonlinear and Discrete Optimization</td>
@@ -117,8 +117,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description</th>
-        <th>Notes</th>
+        <th style="width:40%">Description</th>
+        <th style="width:30%">Notes</th>
     </tr>
     <tr>
         <td>Introduction to Economics</td>
@@ -189,8 +189,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description</th>
-        <th>Notes</th>
+        <th style="width:40%">Description</th>
+        <th style="width:30%">Notes</th>
     </tr>
     <tr>
         <td>Introduction to Probability and Statistics</td>
@@ -240,8 +240,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description</th>
-        <th>Notes</th>
+        <th style="width:40%">Description</th>
+        <th style="width:30%">Notes</th>
     </tr>
     <tr>
         <td>Calculus</td>
@@ -284,8 +284,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description</th>
-        <th>Notes</th>
+        <th style="width:40%">Description</th>
+        <th style="width:30%">Notes</th>
     </tr>
         <td>General Chemistry</td>
         <td>Chem1A</td>
