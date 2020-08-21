@@ -13,11 +13,11 @@ title: 'Coursework'
 
 ## Table of Contents
 
-- [Programming, Computer Science, and Data Science](#Programming,-Computer-Science,-and-Data-Science)
+- [Programming, Computer Science, and Data Science](#programming,-computer-science,-and-data-science)
 
 - [Optimization](#optimization)
 
-- [Business, Operations, and Economics](#Business,-Operations,-and-Economics)
+- [Business, Operations, and Economics](#business,-operations,-and-economics)
 
 - [Statistics](#statistics)
 
