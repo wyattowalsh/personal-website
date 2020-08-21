@@ -54,7 +54,7 @@ title: 'Coursework'
         <td>Introduction to Machine Learning and Data Analytics</td>
         <td>Ind Eng 142</td>
         <td>Fall 2019</td>
-        <td>Linear regression, logistic regression, classification and regression trees, random forests, boosting, text mining, data cleaning and manipulation, data visualization, network analysis, time series modeling, clustering, principal component analysis, regularization, and large-scale learning..</td>
+        <td>Linear regression, logistic regression, classification and regression trees, random forests, boosting, text mining, data cleaning and manipulation, data visualization, network analysis, time series modeling, clustering, principal component analysis, regularization, and large-scale learning.</td>
         <td>Successfully built a machine learning pipeline in order to predict stadium attendance at NBA games. This pipeline began with scraping NBA game data from the internet, and concluded with the application of a diverse set of trained regressors for attendance prediction: <a href="github.com/wyattowalsh/NBA-attendance-prediction">Project Link</a> 
       </td>
     </tr>
