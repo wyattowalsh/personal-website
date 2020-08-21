@@ -28,7 +28,7 @@ title: 'Coursework'
 ## Programming, Computer Science, and Data Science
 
 <div>
-<table>  <!-- border="1" width="100%" ID="Table1" style="margin: 0px; padding:0px;" -->
+<table border="1" width="100%" ID="Table1" style="margin: 0px; padding:0px;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
