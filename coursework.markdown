@@ -287,6 +287,7 @@ title: 'Coursework'
         <th style="width:40%">Description</th>
         <th style="width:30%">Notes</th>
     </tr>
+    <tr>
         <td>General Chemistry</td>
         <td>Chem1A</td>
         <td>Fall 2014</td>
