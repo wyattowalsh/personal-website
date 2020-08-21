@@ -25,7 +25,7 @@ title: 'Coursework'
 
 - [Science](#science)
 
-### Programming, Computer Science, and Data Science
+## Programming, Computer Science, and Data Science
 
 <div>
 <table border="1" width="100%" ID="Table1" style="margin: 0px; padding:0px;">
@@ -72,7 +72,7 @@ title: 'Coursework'
 
 [Back to Top](#table-of-contents)
 
-### Optimization
+## Optimization
 
 <div>
 <table style="width:100%">
@@ -109,7 +109,7 @@ title: 'Coursework'
 
 [Back to Top](#table-of-contents)
 
-### Business, Operations, and Economics
+## Business, Operations, and Economics
 
 <div>
 <table>
@@ -181,7 +181,7 @@ title: 'Coursework'
 
 [Back to Top](#table-of-contents)
 
-### Statistics
+## Statistics
 
 <div>
 <table>
@@ -232,7 +232,7 @@ title: 'Coursework'
 
 [Back to Top](#table-of-contents)
 
-### Mathematics
+## Mathematics
 
 <div>
 <table style="width:100%">
@@ -276,7 +276,7 @@ title: 'Coursework'
 
 [Back to Top](#table-of-contents)
 
-### Science
+## Science
 
 <div>
 <table style="width:100%">
