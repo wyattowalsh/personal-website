@@ -1,27 +1,27 @@
 ---
 layout: page
-title: "Coursework"
+title: 'Coursework'
 ---
 
 <!-- <div>
 <h2> Coursework </h2>
-</div>
- -->
+</div> -->
+
 
 
 `Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom.
 
 ## Table of Contents
 
-- [Programming, Computer Science, and Data Science](#computers)
+- [Programming, Computer Science, and Data Science](#Programming,-Computer-Science,-and-Data-Science)
 
 - [Optimization](#optimization)
 
-- [Business, Operations, and Economics](#biz-op-econ)
+- [Business, Operations, and Economics](#Business,-Operations,-and-Economics)
 
-- [Statistics](#stats)
+- [Statistics](#statistics)
 
-- [Mathematics](#math)
+- [Mathematics](#mathematics)
 
 - [Science](#science)
 
@@ -33,7 +33,7 @@ title: "Coursework"
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th style="width:42%">Description<sup><a href="#footnote-1">[1]</a></sup></th>
+        <th style="width:40%">Description<sup><a href="#footnote-1">[1]</a></sup></th>
         <th>Notes</th>
     </tr>
     <tr>
