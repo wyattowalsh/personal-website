@@ -30,7 +30,7 @@ title: 'Coursework'
 <div>
 <table border="1" width="100%" ID="Table1" style="margin: 0px; padding:0px;">
     <tr>
-        <th>Title</th>
+        <th style="width:17%">Title</th>
         <th>Number</th>
         <th>Term</th>
         <th style="width:40%">Description<sup><a href="#footnote-1">[1]</a></sup></th> <!--  -->
@@ -77,7 +77,7 @@ title: 'Coursework'
 <div>
 <table style="width:100%">
     <tr>
-        <th>Title</th>
+        <th style="width:17%">Title</th>
         <th>Number</th>
         <th>Term</th>
         <th style="width:40%">Description</th>
@@ -114,7 +114,7 @@ title: 'Coursework'
 <div>
 <table>
     <tr>
-        <th>Title</th>
+        <th style="width:17%">Title</th>
         <th>Number</th>
         <th>Term</th>
         <th style="width:40%">Description</th>
@@ -186,7 +186,7 @@ title: 'Coursework'
 <div>
 <table>
     <tr>
-        <th>Title</th>
+        <th style="width:17%">Title</th>
         <th>Number</th>
         <th>Term</th>
         <th style="width:40%">Description</th>
@@ -237,7 +237,7 @@ title: 'Coursework'
 <div>
 <table style="width:100%">
     <tr>
-        <th>Title</th>
+        <th style="width:17%">Title</th>
         <th>Number</th>
         <th>Term</th>
         <th style="width:40%">Description</th>
@@ -281,7 +281,7 @@ title: 'Coursework'
 <div>
 <table style="width:100%">
     <tr>
-        <th>Title</th>
+        <th style="width:17%">Title</th>
         <th>Number</th>
         <th>Term</th>
         <th style="width:40%">Description</th>
