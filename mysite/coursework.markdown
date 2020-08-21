@@ -28,7 +28,7 @@
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th>Description<sup><a href="#footnote-1">[1]</a></sup></th>
+        <th style="width:500px">Description<sup><a href="#footnote-1">[1]</a></sup></th>
         <th>Notes</th>
     </tr>
     <tr>
