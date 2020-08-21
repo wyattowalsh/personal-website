@@ -1,4 +1,12 @@
-# Skills
+---
+layout: page
+title: "Skills"
+---
+
+
+<div>
+<h2> Skills </h2>
+</div>
 
 - [Programming Languages](#languages)
 

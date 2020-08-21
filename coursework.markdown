@@ -1,7 +1,12 @@
-<div>
+---
+layout: page
+title: "Coursework"
+---
+
+<!-- <div>
 <h2> Coursework </h2>
 </div>
-
+ -->
 
 
 `Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom.
@@ -28,7 +33,7 @@
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th style="width:40%">Description<sup><a href="#footnote-1">[1]</a></sup></th>
+        <th style="width:42%">Description<sup><a href="#footnote-1">[1]</a></sup></th>
         <th>Notes</th>
     </tr>
     <tr>
