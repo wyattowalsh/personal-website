@@ -33,8 +33,8 @@ title: 'Coursework'
         <th>Title</th>
         <th>Number</th>
         <th>Term</th>
-        <th style="width:40%">Description<sup><a href="#footnote-1">[1]</a></sup></th>
-        <th style="width:30%">Notes</th>
+        <th>Description<sup><a href="#footnote-1">[1]</a></sup></th> %style="width:40%"
+        <th>Notes</th> %style="width:30%"
     </tr>
     <tr>
         <td>Introduction to Computer Programming for Scientists and Engineers</td>
