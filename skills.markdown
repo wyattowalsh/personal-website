@@ -26,11 +26,11 @@ title: "Skills"
 
 <table>
     <tr>
-        <th>Language</th>
-        <th style="width:17%">Skill Level</th>
-        <th>Work Experience</th>
-        <th>Associated Projects</th>
-        <th>Notes</th>
+        <th style="width:10%">Language</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
     </tr>
     <tr>
         <td>Python</td>
