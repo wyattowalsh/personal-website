@@ -57,10 +57,12 @@ title: "Skills"
         <td>Matlab</td>
         <td>★★★★☆</td>
         <td></td>
-        <td>1. <a href="github.com/wyattowalsh/introduction-to-discrete-optimization">Introduction to Discrete Optimization</td>
+        <td>1. <a href="github.com/wyattowalsh/introduction-to-discrete-optimization">Introduction to Discrete Optimization</a></td>
         <td>First programming language!</td>
     </tr>
 </table>
+
+
 ## Data Analysis
 
 | Apache Spark | ★★★★☆ |     |     |     |
