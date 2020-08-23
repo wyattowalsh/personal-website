@@ -3,24 +3,24 @@ layout: page
 title: "Skills"
 ---
 
-
+<!-- 
 <div>
 <h2> Skills </h2>
-</div>
+</div> -->
 
-- [Programming Languages](#languages)
+- [Programming Languages](#programming-languages)
 
-- [Data Analysis and Visualization Tools](#data)
+- [Data Analysis and Visualization Tools](#data-analysis-and-visualization-tools)
 
-- [Workflow Technologies](#ops)
+- [Workflow Technologies](#workflow-technologies)
 
-- [Optimization Tools](#optimization)
+- [Optimization Tools](#optimization-tools)
 
-- [Cloud Technologies](#cloud)
+- [Cloud Technologies](#cloud-technologies)
 
-- [Machine Learning / Artificial Intelligence](#ml/ai)
+- [Machine Learning & Artificial Intelligence](#machine-learning-&-artificial-intelligence)
   
-  ---
+---
 
 ## Programming Languages
 

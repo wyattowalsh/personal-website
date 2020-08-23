@@ -25,6 +25,8 @@ title: 'Coursework'
 
 - [Science](#science)
 
+---
+
 ## Programming, Computer Science, and Data Science
 
 <div>
