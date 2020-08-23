@@ -43,7 +43,7 @@ title: "Skills"
         <td>R</td>
         <td>★★★★★</td>
         <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
-        <td>1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA-attendance-prediction</a> <br/> 2: All assignments for my machine learning course (IEOR 142)</td>
+        <td>1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 2: All assignments for my machine learning course (IEOR 142)</td>
         <td>Comfortable utilizing state-of-the-art packages for cutting edge algorithms developed in research papers (i.e. Grouped Lasso)</td>
     </tr>
     <tr>
