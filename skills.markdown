@@ -36,7 +36,7 @@ title: "Skills"
         <td>Python</td>
         <td>★★★★★</td>
         <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
-        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">regularized-regression-from-scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA-attendance-prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">explorations-in-envy-free-allocations</a></td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
         <td>My go-to programming language <br/>  Comfortable with object oriented programming as well as other paradigms. </td>
     </tr>
     <tr>
@@ -44,7 +44,7 @@ title: "Skills"
         <td>★★★★★</td>
         <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
         <td>1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA-attendance-prediction</a> <br/> 2: All assignments for my machine learning course (IEOR 142)</td>
-        <td>Comfortable utilizing state-of-the-art packages for cutting edge algorithms developed in research papers (i.e. `Grouped Lasso`)</td>
+        <td>Comfortable utilizing state-of-the-art packages for cutting edge algorithms developed in research papers (i.e. Grouped Lasso)</td>
     </tr>
     <tr>
         <td>Java</td>
