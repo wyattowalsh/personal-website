@@ -30,7 +30,7 @@ title: 'Coursework'
 ## Programming, Computer Science, and Data Science
 
 <div>
-<table>
+<table style="font-size: 10pt;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
@@ -75,7 +75,7 @@ title: 'Coursework'
 ## Optimization
 
 <div>
-<table style="width:100%">
+<table style="font-size: 10pt;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
@@ -112,7 +112,7 @@ title: 'Coursework'
 ## Business, Operations, and Economics
 
 <div>
-<table>
+<table style="font-size: 10pt;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
@@ -184,7 +184,7 @@ title: 'Coursework'
 ## Statistics
 
 <div>
-<table>
+<table style="font-size: 10pt;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
@@ -235,7 +235,7 @@ title: 'Coursework'
 ## Mathematics
 
 <div>
-<table style="width:100%">
+<table style="font-size: 10pt;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
@@ -279,7 +279,7 @@ title: 'Coursework'
 ## Science
 
 <div>
-<table style="width:100%">
+<table style="font-size: 10pt;">
     <tr>
         <th style="width:17%">Title</th>
         <th>Number</th>
