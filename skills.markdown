@@ -24,7 +24,7 @@ title: "Skills"
 
 ## Programming Languages
 
-<table>
+<table style="font-size: 12pt;">
     <tr>
         <th style="width:10%">Language</th>
         <th>Skill Level</th>
