@@ -24,12 +24,44 @@ title: "Skills"
 
 ## Programming Languages
 
-| Language | Skill Level | Work Experience                                       | Associated Projects                                                                                                                                                                                                                                                                                                    | Notes                                                                                                                           |
-| -------- | ----------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Python   | ★★★★★       | 1: Gap Inc. Externship (Data Processing and Analysis) | 1: [regularized-regression-from-scratch](https://github.com/wyattowalsh/regularized-regression-from-scratch) 2: [NBA-attendance-prediction](https://github.com/wyattowalsh/NBA-attendance-prediction) 3: [explorations-in-envy-free-allocations](https://github.com/wyattowalsh/explorations-in-envy-free-allocations) | My go-to programming language.  Comfortable with object oriented programming  as well as other paradigms                        |
-| R        | ★★★★★       | 1: Gap Inc. Externship (Data Processing and Analysis) | 1: [NBA-attendance-prediction](https://github.com/wyattowalsh/NBA-attendance-prediction) 2: All assignments for my machine learning course (IEOR 142)                                                                                                                                                                  | Comfortable utilizing state-of-the-art packages for cutting edge algorithms developed in research papers (i.e. `Grouped Lasso`) |
-| Java     | ★★★★☆       |                                                       | 1. Created a mini-version control system based off of Git with branching and merging functionality                                                                                                                                                                                                                     |                                                                                                                                 |
-| Matlab   | ★★★★☆       |                                                       | 1. [Introduction to Discrete Optimization](https://github.com/wyattowalsh/introduction-to-discrete-optimization)                                                                                                                                                                                                       | First programming language!                                                                                                     |
+<table>
+    <tr>
+        <th style="width:10%">Language</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>Python</td>
+        <td>★★★★★</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td>My go-to programming language <br/>  Comfortable with object oriented programming as well as other paradigms. </td>
+    </tr>
+    <tr>
+        <td>R</td>
+        <td>★★★★★</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 2: All assignments for my machine learning course (IEOR 142)</td>
+        <td>Comfortable utilizing state-of-the-art packages for cutting edge algorithms developed in research papers (i.e. Grouped Lasso)</td>
+    </tr>
+    <tr>
+        <td>Java</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1. Created a mini-version control system based off of Git with branching and merging functionality</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Matlab</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1. <a href="github.com/wyattowalsh/introduction-to-discrete-optimization">Introduction to Discrete Optimization</a></td>
+        <td>First programming language!</td>
+    </tr>
+</table>
+
 
 ## Data Analysis
 
