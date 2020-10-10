@@ -8,6 +8,8 @@ title: "Skills"
 <h2> Skills </h2>
 </div> -->
 
+## Table of Contents
+
 - [Programming Languages](#programming-languages)
 
 - [Data Analysis and Visualization Tools](#data-analysis-and-visualization-tools)
@@ -18,8 +20,8 @@ title: "Skills"
 
 - [Cloud Technologies](#cloud-technologies)
 
-- [Machine Learning & Artificial Intelligence](#machine-learning-&-artificial-intelligence)
-  
+- [Miscellaneous](#miscellaneous)
+
 ---
 
 ## Programming Languages
@@ -62,48 +64,316 @@ title: "Skills"
     </tr>
 </table>
 
+[Back to Top](#table-of-contents)
 
-## Data Analysis
+## Data Collection and Processing
 
-| Apache Spark | ★★★★☆ |     |     |     |
-| ------------ | ----- | --- | --- | --- |
-| pandas       |       |     |     |     |
-| Statsmodels  |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
-|              |       |     |     |     |
+<table style="font-size: 12pt;">
+    <tr>
+        <th style="width:10%">Skill / Library</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>Web Crawling</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>
+        1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> </td>
+        <td> </td>
+    </tr>
+    <tr>
+        <td>Web Scraping</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Apache Spark</td>
+        <td>★★★★☆</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>pandas</td>
+        <td>★★★★★</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+</table>
 
-## Data Visualization
+[Back to Top](#table-of-contents)
 
-|            |     |     |     |     |
-| ---------- | --- | --- | --- | --- |
-| matplotlib |     |     |     |     |
-| seaborn    |     |     |     |     |
-| plotly     |     |     |     |     |
-| ggplot2    |     |     |     |     |
-| Tableau    |     |     |     |     |
+## Data Modeling & Visualization
+
+<table style="font-size: 12pt;">
+    <tr>
+        <th style="width:10%">Skill / Library</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>Keras</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>
+        1: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> </td>
+        <td> </td>
+    </tr>
+    <tr>
+        <td>Scikit-Learn</td>
+        <td>★★★★★</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Sci-Py</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Statsmodels</td>
+        <td>★★★★☆</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Tableau</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Matplotlib</td>
+        <td>★★★★★</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Jupyter Notebooks</td>
+        <td>★★★★★</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+</table>
+
+[Back to Top](#table-of-contents)
 
 ## Workflow Technologies
 
+<table style="font-size: 12pt;">
+    <tr>
+        <th style="width:10%">Skill / Library</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>Git</td>
+        <td>★★★★☆</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a> <br/>
+        4: Gitlet -- Mini version control system for CS 61b at UC Berkeley</td>
+        <td> </td>
+    </tr>
+    <tr>
+        <td>Data Version Control</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Linux</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: Personal website </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>BASH</td>
+        <td>★★★★☆</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Virtual Environments</td>
+        <td>★★★★★</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Virtual Machines</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: Personal Website</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>APIs</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+</table>
+
+[Back to Top](#table-of-contents)
+
 ## Optimization Tools
+
+<table style="font-size: 12pt;">
+    <tr>
+        <th style="width:10%">Skill / Library</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>AMPL</td>
+        <td>★★★★★</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td> </td>
+    </tr>
+    <tr>
+        <td>CPLEX</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Gurobi</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>PuLP</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Metaheuristics</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+</table>
+
+[Back to Top](#table-of-contents)
 
 ## Cloud Technologies
 
-## Machine Learning / Artificial Intelligence
+<table style="font-size: 12pt;">
+    <tr>
+        <th style="width:10%">Skill / Library</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>Docker</td>
+        <td>★★★☆☆</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td></td>
+        <td> </td>
+    </tr>
+    <tr>
+        <td>Kubernetes</td>
+        <td>★★★☆☆</td>
+        <td>1: Gap Inc. Externship (Data Processing and Analysis)</td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Google Cloud</td>
+        <td>★★★☆☆</td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>IBM Cloud</td>
+        <td>★★★☆☆</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+</table>
+
+[Back to Top](#table-of-contents)                                                                                                  
+
+## Miscellaneous
+
+<table style="font-size: 12pt;">
+    <tr>
+        <th style="width:10%">Skill / Library</th>
+        <th>Skill Level</th>
+        <th style="width:28%">Work Experience</th>
+        <th style="width:28%">Associated Projects</th>
+        <th style="width:28%">Notes</th>
+    </tr>
+    <tr>
+        <td>3D Modeling</td>
+        <td>★★★★☆</td>
+        <td></td>
+        <td>An entire course on Solidworks</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Web Developement</td>
+        <td>★★★☆☆</td>
+        <td></td>
+        <td>1: www.wwalsh.io </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>LATEX</td>
+        <td>★★★★★</td>
+        <td></td>
+        <td>1: <a href="github.com/wyattowalsh/regularized-regression-from-scratch">Regularized Regression from Scratch</a> <br/> 2: <a href="github.com/wyattowalsh/NBA-attendance-prediction">NBA Attendance Prediction</a> <br/> 3: <a href="github.com/wyattowalsh/explorations-in-envy-free-allocations">Explorations in Envy-Free Allocations</a></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>Markdown</td>
+        <td>★★★★★</td>
+        <td></td>
+        <td>1: www.wwalsh.io</td>
+        <td>I take most of my notes in Markdown!</td>
+    </tr>
+</table>
+
+[Back to Top](#table-of-contents) 
 
 Explanation of notation used:
 
-- ★☆☆☆☆ (1 star): Introductory knowledge (i.e. understand skill's role and purpose but with little to no experience)
-
-- ★★☆☆☆ (2 stars): Significant knowledge of skill, but little applied experience (i.e. only written a few scripts to understand possible future implementation and usage)
-
-- ★★★☆☆ (3 stars): Knowledge and experience (i.e. skill was used as an ancillary role to a project)
-
-- ★★★★☆ (4 stars): Knowledge and significant experience (i.e. skill was focus of an extended project).
-
 - ★★★★★ (5 stars): Created or conducted significant applied research in the area or repeated experience over time
+- ★★★★☆ (4 stars): Knowledge and significant experience (i.e. skill was focus of an extended project).
+- ★★★☆☆ (3 stars): Knowledge and experience (i.e. skill was used as an ancillary role to a project)
+- ★★☆☆☆ (2 stars): Significant knowledge of skill, but little applied experience (i.e. only written a few scripts to understand possible future implementation and usage)
+- ★☆☆☆☆ (1 star): Introductory knowledge (i.e. understand skill's role and purpose but with little to no experience)

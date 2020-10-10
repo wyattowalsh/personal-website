@@ -7,8 +7,6 @@ title: 'Coursework'
 <h2> Coursework </h2>
 </div> -->
 
-
-
 `Note:` Unless otherwise specified all coursework was completed during my time as an undergraduate at University of California, Berkeley (UCB). I have arranged classes by topic as found below, as well as a comprehensive chronological list at the bottom.
 
 ## Table of Contents
@@ -330,4 +328,4 @@ title: 'Coursework'
 
 <div>
  <p id="footnote-3">[3] <a href="https://www.genealogy.math.ndsu.nodak.edu/id.php?id=136869">source</a></p>
-</div>
+</div>q
