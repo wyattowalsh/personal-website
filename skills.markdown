@@ -12,7 +12,9 @@ title: "Skills"
 
 - [Programming Languages](#programming-languages)
 
-- [Data Analysis and Visualization Tools](#data-analysis-and-visualization-tools)
+- [Data Collection & Processing](#data-collection-&-processing)
+
+- [Data Modeling & Visualization](#data-modeling-&-visualization)
 
 - [Workflow Technologies](#workflow-technologies)
 
@@ -66,7 +68,7 @@ title: "Skills"
 
 [Back to Top](#table-of-contents)
 
-## Data Collection and Processing
+## Data Collection & Processing
 
 <table style="font-size: 12pt;">
     <tr>
