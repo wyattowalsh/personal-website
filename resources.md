@@ -4,7 +4,7 @@ title: 'Learning Resources'
 
 ---
 
-`Note:` This resource list is an accumulation of _Stack Overflow__, _Reddit__, and blogging posts as well as personal resources.
+`Note:` This resource list is an accumulation of _Stack Overflow_, _Reddit_, and blogging posts as well as personal resources.
 
 ## Table of Contents
 

@@ -328,4 +328,4 @@ title: 'Coursework'
 
 <div>
  <p id="footnote-3">[3] <a href="https://www.genealogy.math.ndsu.nodak.edu/id.php?id=136869">source</a></p>
-</div>q
+</div>
