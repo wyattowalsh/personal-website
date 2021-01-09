@@ -1,6 +1,6 @@
 # Setup
-title:               Wyatt Walsh 
-tagline:            
+title:              Wyatt Walsh
+tagline:            Reach out, let's build some cool stuff! 
 description:         
 url:                 
 baseurl:             ''
@@ -12,17 +12,20 @@ author:
   name:              Wyatt Walsh
   url:               wwalsh.io
   email:             wyattowalsh@gmail.com
-  github: wyattowalsh
-  twitter: wyattowalsh
-  linkedin: wyattowalsh
-  spotify: wyattowalsh
-  # google_analytics_id: UA-27104497-1
-  # google_analytics_url: patricksteadman.ca
+  github:            wyattowalsh
+  twitter:           wyattowalsh
+  linkedin:          wyattowalsh
+  spotify:           wyattowalsh
+  stack-overflow:     wyattowalsh
+  kaggle:            wyattowalsh
+  medium:            wyattowalsh
   bio: BS in Industrial Engineering and Operations Research from UC Berkeley
 
 # Gems
 plugins:
   - jekyll-paginate
+  - jekyll-spaceship
+  - jekyll-google-photos
 
 # Custom vars
 version:             1.1.0

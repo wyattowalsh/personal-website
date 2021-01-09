@@ -1,10 +1,13 @@
- <h2> Latest Blog Posts </h2>
+---
+layout: page
+title: "Blog"
+---
 
 {% for e in site.medium_posts %}
 
 <div class="row">
   <h3>{{e.title}}</h3>
-  <p>{{e.feed_content}}</p>
+  <p>{{e.feed_content}}</p >
 
   {% endfor %}
 
