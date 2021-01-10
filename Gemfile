@@ -10,4 +10,5 @@ group :jekyll_plugins do
   gem "jekyll-display-medium-posts"
   gem 'jekyll-spaceship'
   gem "jekyll-google-photos"
+  gem 'jekyll-seo-tag'
 end

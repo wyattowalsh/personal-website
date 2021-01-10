@@ -65,23 +65,28 @@
         </span>
   {% endif %}
 </div>
-
+ <img align="middle" src="/public/favicon/android-chrome-512x512.png" style="text-align: center; padding-top:0;"/>
   
  -->
-<div id="contact-list" style="text-align:center; font-size: 250%">
-  <br>
-  <p> Wyatt Walsh </p>
-  {% include social-media-links.html %}
+<div class="sidebar-item" id="contact-list" style="text-align:center; font-size: 275%; padding-bottom: 0">
+  <!-- <p> Wyatt Walsh </p> -->
+  <p align='center' style="margin:0; ">Wyatt Walsh</p>
 </div>
+<!-- <hr style="width:85%; line-height:30px; margin: auto;"> -->
+<br>
 
-
-
+<!-- 
   <div class="sidebar-item">
     <p>{{ site.description }}</p>
+  </div> -->
+    <!-- 
+  <div class="sidebar-item">
+    
   </div>
-  
-
-  <nav class="sidebar-nav">
+ -->
+  <nav class="sidebar-nav"> 
+    <p style="font-size:110%; text-align:center; padding-bottom:0; margin-bottom:0;"><u><b> Sections </b></u></p>
+    <hr style="width:100%; margin: auto; border: 0.25px solid;">
     <a class="sidebar-nav-item{% if page.title == 'Home' %} active{% endif %}" href="{{ '/' | absolute_url }}">&#127968; Home</a>
 
     {% comment %}
@@ -106,8 +111,18 @@
     <span class="sidebar-nav-item">Currently v{{ site.version }}</span> -->
   </nav>
 
+
+  <div style="text-align:center; font-size: 225%;">
+    <hr style="width:100%; margin: auto; border: 0.25px solid;">
+  <!--   <hr style="width:85%; margin: auto; padding-top:0;">
+ -->    {% include social-media-links.html %}
+    <p style="font-size: 42%; padding-bottom:3pt; margin-bottom:3pt;"> ~ Click Above to Connect With Me ~ </p>
+    <hr style="width:100%; margin: auto; border: 0.25px solid;">
+  </div>
+
+
   <div class="sidebar-item">
-    <p>
+    <p style="position: fixed; bottom: 0;">
       &copy; {{ site.time | date: '%Y' }}. All rights reserved.
     </p>
   </div>

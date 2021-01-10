@@ -1,12 +1,21 @@
 # Setup
 title:              Wyatt Walsh
 tagline:            Reach out, let's build some cool stuff! 
-description:         
-url:                 
+description:        Personal website of Wyatt Walsh. Here, you can find more information about me, see my blog writings, view my data science notes, or see examples of my favorite media.
+url:                https://wwalsh.io/
+logo:               /public/favicon/favicon-32x32.png
 baseurl:             ''
 paginate:            5
 permalink:           pretty
-
+social:
+  name: Wyatt Walsh
+  links:
+    - https://twitter.com/wyattowalsh
+    - https://www.linkedin.com/in/wyattowalsh
+    - https://github.com/wyattowalsh
+    - https://medium.com/@wyattowalsh
+    - https://www.kaggle.com/wyattowalsh
+    - 
 # About/contact
 author:
   name:              Wyatt Walsh
@@ -16,9 +25,9 @@ author:
   twitter:           wyattowalsh
   linkedin:          wyattowalsh
   spotify:           wyattowalsh
-  stack-overflow:     wyattowalsh
+  stack-overflow:    wyattowalsh
   kaggle:            wyattowalsh
-  medium:            wyattowalsh
+  medium:            @wyattowalsh
   bio: BS in Industrial Engineering and Operations Research from UC Berkeley
 
 # Gems
@@ -26,6 +35,7 @@ plugins:
   - jekyll-paginate
   - jekyll-spaceship
   - jekyll-google-photos
+  - jekyll-seo-tag
 
 # Custom vars
 version:             1.1.0
