@@ -38,7 +38,7 @@ plugins:
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-last-modified-at
-  - jekyll-twitter-plugin 
+ 
 
 # Custom vars
 version:             1.1.0
