@@ -27,7 +27,7 @@ author:
   spotify:           wyattowalsh
   stack-overflow:    wyattowalsh
   kaggle:            wyattowalsh
-  medium:            @wyattowalsh
+  medium:            wyattowalsh
   bio: BS in Industrial Engineering and Operations Research from UC Berkeley
 
 # Gems
@@ -36,6 +36,9 @@ plugins:
   - jekyll-spaceship
   - jekyll-google-photos
   - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-last-modified-at
+  - jekyll-twitter-plugin 
 
 # Custom vars
 version:             1.1.0
@@ -45,3 +48,6 @@ remote-theme: poole/lanyon
 
 collections:
   - medium_posts
+
+last-modified-at:
+    date-format: 'Last modified: %d-%b-%y'
