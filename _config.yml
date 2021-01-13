@@ -2,7 +2,7 @@
 title:              Wyatt Walsh
 tagline:            Reach out, let's build some cool stuff! 
 description:        Personal website of Wyatt Walsh. Here, you can find more information about me, see my blog writings, view my data science notes, or see examples of my favorite media.
-url:                https://wwalsh.io
+url:                "https://wwalsh.io"
 logo:               /public/favicon/favicon-32x32.png
 baseurl:             ''
 paginate:            5
@@ -15,7 +15,7 @@ social:
     - https://github.com/wyattowalsh
     - https://medium.com/@wyattowalsh
     - https://www.kaggle.com/wyattowalsh
-    - 
+google_site_verification: 
 # About/contact
 author:
   name:              Wyatt Walsh
@@ -51,3 +51,7 @@ collections:
 
 last-modified-at:
     date-format: 'Last modified: %d-%b-%y'
+
+twitter:
+  username: wyattowalsh
+  card: summary
