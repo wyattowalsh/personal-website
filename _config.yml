@@ -4,7 +4,7 @@ tagline:            Reach out, let's build some cool stuff!
 description:        Personal website of Wyatt Walsh. Here, you can find more information about me, see my blog writings, view my data science notes, or see examples of my favorite media.
 url:                "https://wwalsh.io"
 logo:               /public/favicon/favicon-32x32.png
-baseurl:             ''
+# baseurl:             ''
 paginate:            5
 permalink:           pretty
 social:
@@ -15,6 +15,9 @@ social:
     - https://github.com/wyattowalsh
     - https://medium.com/@wyattowalsh
     - https://www.kaggle.com/wyattowalsh
+
+blog_xml: https://medium.com/feed/@wyattowalsh
+
 google_site_verification: 
 # About/contact
 author:
@@ -27,17 +30,18 @@ author:
   spotify:           wyattowalsh
   stack-overflow:    wyattowalsh
   kaggle:            wyattowalsh
-  medium:            wyattowalsh
+  medium:            "@wyattowalsh"
   bio: BS in Industrial Engineering and Operations Research from UC Berkeley
 
 # Gems
 plugins:
   - jekyll-paginate
-  - jekyll-spaceship
+  # - jekyll-spaceship
   - jekyll-google-photos
   - jekyll-seo-tag
   - jekyll-sitemap
-  - jekyll-last-modified-at
+  - jekyll-display-medium-posts
+  # - jekyll-last-modified-at
  
 
 # Custom vars
@@ -49,8 +53,8 @@ remote-theme: poole/lanyon
 collections:
   - medium_posts
 
-last-modified-at:
-    date-format: 'Last modified: %d-%b-%y'
+# last-modified-at:
+#     date-format: 'Last modified: %d-%b-%y'
 
 twitter:
   username: wyattowalsh
