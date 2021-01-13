@@ -2,7 +2,7 @@ language: ruby
 cache: bundler
 branches:
   only:
-  - release
+  - master
 script:
   - JEKYLL_ENV=production bundle exec jekyll build --destination site
 deploy:
