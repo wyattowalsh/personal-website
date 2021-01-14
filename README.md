@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io.svg?branch=master)](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io)
+
 # Personal Website: wwalsh.io
 
 ```
