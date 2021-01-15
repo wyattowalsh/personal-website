@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io.svg?branch=master)](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io)
 
-![](public/gif.gif)
+![](public/site_gif.gif)
 # Personal Website: wwalsh.io
 
 ```
