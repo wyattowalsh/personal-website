@@ -1,8 +1,13 @@
+# Files for My Personal Website: [wwalsh.io](https://wwalsh.io)
+
 [![Build Status](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io.svg?branch=master)](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io)
+
+## Site Preview
 
 ![](public/site_gif.gif)
 
-# Files for My Personal Website: [wwalsh.io](https://wwalsh.io)
+
+## Technical Information
 
 This site is a static site built with [Jekyll](https://github.com/jekyll/jekyll). 
 
