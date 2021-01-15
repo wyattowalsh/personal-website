@@ -36,11 +36,11 @@ author:
 # Gems
 plugins:
   - jekyll-paginate
-  # - jekyll-spaceship
   - jekyll-google-photos
   - jekyll-seo-tag
   - jekyll-sitemap
   - jekyll-display-medium-posts
+  # - jekyll-spaceship
   # - jekyll-last-modified-at
  
 
