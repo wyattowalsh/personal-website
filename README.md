@@ -11,7 +11,7 @@ I utilize the [Lanyon](https://github.com/poole/lanyon) theme with custom colori
 - [jekyll-seo-tag](https://github.com/jekyll/jekyll-seo-tag)
 - [jekyll-sitemap](https://github.com/jekyll/jekyll-sitemap)
 
-I also embed **_Spotify_**, **_Flickr_**, **_Twitter_** media into my homepage as well include social media links across a multitude of different platforms with icons in the sidebar. Also in the sidebar, I redirect to my my other site: [MakeUseofData.com](https://makeuseofdata.com). 
+I also embed **_Spotify_**, **_Flickr_**, and **_Twitter_** media into my homepage as well include social media links across a multitude of different platforms with icons in the sidebar. Also in the sidebar, I redirect to my my other site: [MakeUseofData.com](https://makeuseofdata.com). 
 
 Reach out if you would any help in building a similar site or using similar features!
 
