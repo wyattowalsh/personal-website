@@ -1,6 +1,6 @@
 # Files for My Personal Website: [wwalsh.io](https://wwalsh.io)
 
-[![Build Status](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io.svg?branch=master)](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io)
+[![Build Status](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io.svg?branch=master)](https://travis-ci.com/wyattowalsh/wyattowalsh.github.io) ![Website](https://img.shields.io/website?down_color=red&down_message=down%20%F0%9F%98%A8&up_color=green&up_message=online%20%F0%9F%91%8D&url=https%3A%2F%2Fwwalsh.io)
 
 ## Site Preview
 
