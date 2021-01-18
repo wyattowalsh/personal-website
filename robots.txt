@@ -1,1 +1,1 @@
-Sitemap: wwalsh.io/sitemap.xml
+Sitemap: https://wwalsh.io//sitemap.xml

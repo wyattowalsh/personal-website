@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>Wyatt Walsh</title>
- <link href="wwalsh.io/atom.xml" rel="self"/>
- <link href="wwalsh.io/"/>
- <updated>2021-01-18T04:05:17+00:00</updated>
- <id>wwalsh.io</id>
+ <link href="https://wwalsh.io//atom.xml" rel="self"/>
+ <link href="https://wwalsh.io//"/>
+ <updated>2021-01-18T04:08:08+00:00</updated>
+ <id>https://wwalsh.io/</id>
  <author>
    <name>Wyatt Walsh</name>
    <email>wyattowalsh@gmail.com</email>
