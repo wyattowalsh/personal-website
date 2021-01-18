@@ -7,7 +7,6 @@ gem "kramdown-parser-gfm"
 
 group :jekyll_plugins do
   gem "jekyll-display-medium-posts"
-  gem "jekyll-google-photos"
   gem 'jekyll-seo-tag'
   gem 'jekyll-sitemap'
   # gem 'jekyll-spaceship'
