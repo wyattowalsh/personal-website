@@ -36,7 +36,7 @@ author:
 # Gems
 plugins:
   - jekyll-paginate
-  - jekyll-google-photos
+  # - jekyll-google-photos
   - jekyll-seo-tag
   - jekyll-display-medium-posts
   - jekyll-sitemap
