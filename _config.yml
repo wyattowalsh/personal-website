@@ -5,7 +5,22 @@ description:        Personal website of Wyatt Walsh. Here, you can find more inf
 url:                https://wwalsh.io/
 logo:               /public/favicon/favicon-32x32.png
 # baseurl:             ''
-paginate:            5
+# paginate:            2
+# paginate_path:      "/blog/page:num/"
+pagination:
+  enabled: true
+  debug: true
+  collection: 'medium_posts'
+  category: 'posts'
+  per_page: 1
+  permalink: '../post/:num/'
+  limit: 0
+  sort_field: 'date'
+  sort_reverse: false
+  trail: 
+    before: 2
+    after: 2
+
 permalink:           pretty
 social:
   name: Wyatt Walsh
@@ -35,7 +50,7 @@ author:
 
 # Gems
 plugins:
-  - jekyll-paginate
+  - jekyll-paginate-v2
   # - jekyll-google-photos
   - jekyll-seo-tag
   - jekyll-display-medium-posts

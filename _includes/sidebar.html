@@ -98,10 +98,16 @@
     {% for node in pages_list %}
       {% if node.title != null %}
         {% if node.layout == "page" %}
+          {% if node.title == "👨‍💻 Blog - page 2" %}
+            {% continue %}
+          {% endif %}
+          {% if node.title == "👨‍💻 Blog - page 3" %}
+            {% continue %}
+          {% endif %}
           <a class="sidebar-nav-item{% if page.url == node.url %} active{% endif %}" href="{{ node.url | absolute_url }}">{{ node.title }}</a>
         {% endif %}
         {% if node.title == "Coursework" %}
-          <a target="_blank" rel="noopener noreferrer" class="sidebar-nav-item" href="https://makeuseofdata.com"> 📔 Notes on Data Science</a>
+          <a target="_blank" rel="noopener noreferrer" class="sidebar-nav-item" href="https://makeuseofdata.com"> 📔 Notes on Data Science </a>
         {% endif %}
       {% endif %}
     {% endfor %}
