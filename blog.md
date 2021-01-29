@@ -12,7 +12,22 @@ pagination:
 
 <div style="background-color:#e1ebf0;">
 	<div class="row" style="margin-left: 25px;margin-right: 25px;">
-		<h3>{{e.title}}</h3>
+		{% if e.medium_link == "https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c?source=rss-4b12137885d8------2" %}
+			{% assign date = "2020-01-13" %}
+			{% assign pub = "Towards Data Science" %}
+		{% elsif e.medium_link == "https://towardsdatascience.com/regularized-linear-regression-models-44572e79a1b5?source=rss-4b12137885d8------2" %}
+			{% assign date = "2020-01-14" %}
+			{% assign pub = "Towards Data Science" %}
+		{% elsif e.medium_link == "https://towardsdatascience.com/regularized-linear-regression-models-dcf5aa662ab9?source=rss-4b12137885d8------2" %}
+			{% assign date = "2020-01-15" %}
+			{% assign pub = "Towards Data Science" %}
+		{% else %}
+			{% assign date = "" %}
+			{% assign pub = "" %}
+		{% endif %}
+		<h3>{{date}} | Published in <a target="_blank" rel="noopener noreferrer" href="https://towardsdatascience.com/"><b><i>{{pub}}</i></b> </a></h3>
+		<hr>
+		<h3> {{e.title}}</h3>
 		<p>{{e.feed_content}}</p>
 		<br>
 	</div>
