@@ -1,0 +1,75 @@
+<section class="resume-section p-3 p-lg-5 d-flex flex-column" id="skills">
+  <div class="my-auto" id="skills-content">
+    <h2 class="mb-5">Skills</h2>
+    {{ range $.Site.Data.skills }}
+      <div class="subheading mb-3 skills-heading">{{ .grouping }}</div>
+          <ul>
+          {{ range .skills }}
+            <li class="list-inline-item">
+              {{ if or (eq (lower .name) "r") (eq (lower .name) "matlab")}}
+                <i class="devicons devicon-{{.ref}}"></i>
+              {{else if (eq (lower .name) "web scraping")}}
+                <img class='devicons' src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE4LjAuMCwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPCFET0NUWVBFIHN2ZyBQVUJMSUMgIi0vL1czQy8vRFREIFNWRyAxLjEvL0VOIiAiaHR0cDovL3d3dy53My5vcmcvR3JhcGhpY3MvU1ZHLzEuMS9EVEQvc3ZnMTEuZHRkIj4NCjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2FwYV8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiB4PSIwcHgiIHk9IjBweCINCgkgdmlld0JveD0iMCAwIDI5Ny4wMDMgMjk3LjAwMyIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMjk3LjAwMyAyOTcuMDAzOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+DQo8Zz4NCgk8cGF0aCBkPSJNMTM1Ljk4NSwyMDYuNDI5YzQ2LjMxOCwwLDExMi4wMzMtNDkuMjExLDE1OC4wODctOTUuMjY2YzMuOTA3LTMuOTA3LDMuOTA3LTEwLjI0MiwwLTE0LjE0OUwxOTkuOTg4LDIuOTMNCgkJYy0xLjk1NC0xLjk1Mi00LjUxNC0yLjkyOS03LjA3NS0yLjkyOWMtMi41NiwwLTUuMTIsMC45NzYtNy4wNzQsMi45MjljLTM0LjI4OCwzNC4yODctNjIuMjkzLDcwLjg4NC03OC44NTcsMTAzLjA1DQoJCWMtMjUuODA0LDUwLjExMi0xNi4zNjcsNzUuNDg0LTMuOTA3LDg3Ljk0NEMxMTEuMzczLDIwMi4yMjIsMTIyLjQ0NywyMDYuNDI5LDEzNS45ODUsMjA2LjQyOXoiLz4NCgk8cGF0aCBkPSJNOTMuMTcyLDIwMy44MjhjLTguMDMyLTguMDMyLTEzLjI3OS0xOC4zMDgtMTUuNDQxLTMwLjA2N2wtNDkuNTc0LDMyLjdjLTkuMjIsNi4wODEtMTguOTM5LDE4LjUyMi0yMi42MDcsMjguOTQxDQoJCWwtMy43ODksMTAuNzYxYy00LjIyMywxMS45OTQtMC42MjcsMjcuODIxLDguMzY1LDM2LjgxM2wzLjg5OCwzLjg5OGM2LjQ1Myw2LjQ1MywxNi40MjUsMTAuMTI2LDI1Ljk3NSwxMC4xMjYNCgkJYzMuNzU4LDAsNy40NTEtMC41NjksMTAuODM5LTEuNzYxbDEwLjc2My0zLjc4OWMxMC40MTgtMy42NjksMjIuODYtMTMuMzg3LDI4Ljk0LTIyLjYwNmwzMi42ODQtNDkuNTUxDQoJCUMxMTEuNDc1LDIxNy4xMjcsMTAxLjIzNiwyMTEuODkyLDkzLjE3MiwyMDMuODI4eiBNNTYuOTE5LDI1NC4yMzVjLTEuODYsMS44NjEtNC40NDEsMi45MjEtNy4wNzIsMi45MjENCgkJYy0yLjYzMiwwLTUuMjEzLTEuMDYtNy4wNzMtMi45MjFjLTEuODYxLTEuODcxLTIuOTMxLTQuNDQyLTIuOTMxLTcuMDczYzAtMi42NDEsMS4wNy01LjIxMiwyLjkzMS03LjA4Mw0KCQljMS44Ni0xLjg2LDQuNDQxLTIuOTMxLDcuMDczLTIuOTMxYzIuNjMxLDAsNS4yMTIsMS4wNzEsNy4wNzIsMi45MzFjMS44NjEsMS44NjEsMi45MzIsNC40NDIsMi45MzIsNy4wODMNCgkJQzU5Ljg1MSwyNDkuNzkzLDU4Ljc4LDI1Mi4zNjQsNTYuOTE5LDI1NC4yMzV6Ii8+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==" style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "apis (rest)")}}
+                <i class="fa fa-dog"></i>
+              {{else if (eq (lower .ref) "dbs")}}
+                <i class="fas fa-database"></i>
+              {{else if (eq (lower .ref) "serialization")}}
+                <i class="fas fa-save"></i>
+              {{else if (eq (lower .name) "matplotlib")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/8/84/Matplotlib_icon.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "seaborn")}}
+                <img class="devicons" src='https://raw.githubusercontent.com/mwaskom/seaborn/e04b07eb3df135511e71e556c2bd34ef59ba08ba/doc/_static/logo-tall-lightbg.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "plotly (dash)")}}
+                <img class="devicons" src='https://www.vectorlogo.zone/logos/plot_ly/plot_ly-official.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "tableau")}}
+                <img class="devicons" src='https://cdn.worldvectorlogo.com/logos/tableau-software.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "folium")}}
+                <img class="devicons" src='https://warehouse-camo.ingress.cmh1.psfhosted.org/a1cecb3cdad8b27da8b7cd1a6622bc900ef79907/687474703a2f2f6661726d332e737461746963666c69636b722e636f6d2f323836302f383735343636313038315f633430653561323134635f6f2e6a7067' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "bokeh")}}
+                <img class="devicons" src='https://static.bokeh.org/branding/icons/bokeh-icon.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .name) "ggplot2")}}
+                <img class="devicons" src='https://github.com/tidyverse/ggplot2/raw/master/man/figures/logo.png' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "apachespark")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/f/f3/Apache_Spark_logo.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "pandas")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/e/ed/Pandas_logo.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "numpy")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/3/31/NumPy_logo_2020.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "apachehadoop")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/0/0e/Hadoop_logo.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "dask")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/1/1d/Dask_logo.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "multiprocessing")}}
+                <i class="fas fa-microchip"></i>
+              {{else if (eq (lower .ref) "scikit-learn")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "tensorflow")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/2/2d/Tensorflow_logo.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "statsmodels")}}
+                <img class="devicons" src='https://raw.githubusercontent.com/statsmodels/statsmodels/77bb1d276c7d11bc8657497b4307aa7575c3e65c/docs/source/images/statsmodels-logo-v2.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "huggingface")}}
+                <img class="devicons" src='https://raw.githubusercontent.com/huggingface/neuralcoref-viz/master/assets/icon.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "scipy")}}
+                <img class="devicons" src='https://upload.wikimedia.org/wikipedia/commons/b/b2/SCIPY_2.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "fastai")}}
+                <img class="devicons" src='https://github.com/fastai/nbdev-jekyll-theme/raw/066adb9096299860a8135ec4f29a5b341fdb94d5/assets/images/company_logo_big.png' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "mlflow")}}
+                <img class="devicons" src='https://github.com/mlflow/mlflow/blob/c635d1aa12e1749ab1321128ac61c0f3e6309c1d/mlflow/server/js/src/common/static/home-logo.png?raw=true' style="vertical-align:middle; height: 1em;"/>
+              {{else if (eq (lower .ref) "amazonsagemaker")}}
+                <img class="devicons" src='..../images/Arch_Amazon-SageMaker_64.svg' style="vertical-align:middle; height: 1em;"/>
+              {{else}}
+                {{ $devicon := cond (in $.Site.Data.devicons (lower .icon)) (lower .icon) (cond (in $.Site.Data.devicons (lower .ref)) (lower .ref) "terminal_badge") }}
+                <i class="devicons devicons-{{ $devicon }}"></i>
+              {{end}}
+              {{if isset . "link"}}
+                <a href="{{.link}}">{{ .name }}</a>
+              {{ else }}
+                  {{ .name }}
+              {{end}}
+            </li>
+          {{ end }}
+          </ul>
+    {{ end }}
+  </div>
+</section>

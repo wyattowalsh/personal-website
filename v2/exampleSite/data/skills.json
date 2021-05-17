@@ -1,0 +1,68 @@
+[
+  {
+      "grouping":"Programming Languages",
+      "skills":[
+          {"name":"Python", "ref": "python", "link":"https://www.python.org/"},
+          {"name":"SQLite", "ref": "sqllite","link":"https://www.sqlite.org/"},
+          {"name":"R", "ref": "r-original","link":"https://www.r-project.org/"},
+          {"name":"Java", "ref": "java","link":"https://go.java/"},
+          {"name":"MATLAB", "ref": "matlab-plain","link":"https://www.mathworks.com/products/matlab.html"}, 
+          {"name":"HTML5", "ref": "html5", "link":"https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5"}, 
+          {"name":"CSS3", "ref": "css3","link":"https://developer.mozilla.org/en-US/docs/Web/CSS"}
+      ]
+  }, 
+  {
+      "grouping":"Data Collection",
+      "skills":[
+          {"name":"Web scraping", "ref": "webscraping", "link":""},
+          {"name":"APIs (REST)", "ref": "apis","link":""},
+          {"name":"Databases (SQL & NoSQL)", "ref": "dbs","link":""},
+          {"name":"Data Serialization", "ref": "serialization","link":""}
+      ]
+  }, 
+  {
+      "grouping":"Data Visualization",
+      "skills":[
+          {"name":"Matplotlib", "ref": "matplotlib", "link":"https://matplotlib.org/"},
+          {"name":"Seaborn", "ref": "seaborn","link":"https://seaborn.pydata.org/"},
+          {"name":"Plotly (Dash)", "ref": "plotly","link":"https://plotly.com/"},
+          {"name":"Tableau", "ref": "tableau","link":"https://www.tableau.com/"},
+          {"name":"Folium", "ref": "folium","link":"https://python-visualization.github.io/folium/"},
+          {"name":"Bokeh", "ref": "bokeh","link":"https://docs.bokeh.org/en/latest/index.html"},
+          {"name":"ggplot2", "ref": "ggplot2","link":"https://ggplot2.tidyverse.org/"}
+      ]
+  },
+  {
+      "grouping":"Data Processing",
+      "skills":[
+          {"name":"Apache Spark", "ref": "apachespark", "link":"https://spark.apache.org/"},
+          {"name":"pandas", "ref": "pandas","link":"https://pandas.pydata.org/"},
+          {"name":"NumPy", "ref": "numpy","link":"https://numpy.org/"},
+          {"name":"Apache Hadoop", "ref": "apachehadoop","link":"https://hadoop.apache.org/"},
+          {"name":"Dask", "ref": "dask","link":"https://dask.org/"},
+          {"name":"Multiprocessing", "ref": "multiprocessing","link":"https://docs.python.org/3/library/multiprocessing.html"}
+      ]
+  },
+  {
+      "grouping":"Data Modeling",
+      "skills":[
+          {"name":"scikit-learn", "ref": "scikit-learn", "link":"https://scikit-learn.org/"},
+          {"name":"Tensorflow", "ref": "tensorflow","link":"https://www.tensorflow.org/"},
+          {"name":"statsmodels", "ref": "statsmodels","link":"https://www.statsmodels.org/"},
+          {"name":"Hugging Face", "ref": "huggingface","link":"https://huggingface.co/"},
+          {"name":"SciPy", "ref": "scipy","link":"https://www.scipy.org/"},
+          {"name":"Fast.ai", "ref": "fastai","link":"https://www.fast.ai/"}
+      ]
+  },
+  {
+      "grouping":"Data Deployment",
+      "skills":[
+          {"name":"MLflow", "ref": "mlflow", "link":"https://mlflow.org/"},
+          {"name":"Amazon Sagemaker", "ref": "amazonsagemaker","link":"https://aws.amazon.com/sagemaker/"},
+          {"name":"statsmodels", "ref": "statsmodels","link":"https://www.statsmodels.org/"},
+          {"name":"Hugging Face", "ref": "huggingface","link":"https://huggingface.co/"},
+          {"name":"SciPy", "ref": "scipy","link":"https://www.scipy.org/"},
+          {"name":"Fast.ai", "ref": "fastai","link":"https://www.fast.ai/"}
+      ]
+  }
+]
