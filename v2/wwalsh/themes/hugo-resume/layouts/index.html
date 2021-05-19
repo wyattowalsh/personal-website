@@ -21,6 +21,12 @@
          {{ partial "sectionSummary" . }}
       {{ end }}
    {{ end }}
+   {{ if .Site.Params.showInterests }}
+      {{ with .Site.GetPage "section" "interests" }}
+         {{ .Scratch.Set "sectionId" "interests" }}
+         {{ partial "sectionSummary" . }}
+      {{ end }}
+   {{ end }}
    {{ if .Site.Params.showExperience }}
        {{ partial "portfolio/experience.html" . }}
    {{ end }}

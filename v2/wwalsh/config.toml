@@ -1,11 +1,22 @@
 title = "Wyatt Walsh"
 baseURL = "https://wwalsh.io/"
-theme = "hugo-resume"
+# theme = "hugo-resume"
 languageCode = "en-us"
 PygmentsCodeFences = true
 PygmentsCodeFencesGuessSyntax = true
 PygmentsStyle = "monokai"
 enableGitInfo = true
+
+[module]
+
+  [[module.imports]]
+    disable = false
+    ignoreConfig = false
+    ignoreImports = false
+    path = "hugo-resume/"
+
+#  [[module.imports]]
+#    path = "my-shortcodes"
 
 [params]
 address = "Eastern Sierras, California"

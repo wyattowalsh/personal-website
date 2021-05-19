@@ -1,15 +1,17 @@
 ---
-title: "Easter Eggs"
-date: 2020-04-20T16:47:30.077Z
+title: Easter Eggs
+link: NA
 image: NA
-description: "A few extra tidbits"
+description: NA
+weight: 10
 sitemap:
-  priority : 1.0
-
-outputs:
-- html
-- rss
-- json
+  priority: 0.6
+  weight: 0.5
 ---
+<!--
 
-<img align='right' src='https://spotify-github-profile.vercel.app/api/view?uid=122096382&cover_image=true&theme=default'/>
+This page represents the landing page for "publications" section. It is also shown under the homepage header for "publications". It should be therefore relatively short and sweet.
+
+\-->
+
+A few things to keep you on your toes

@@ -9,4 +9,12 @@ outputs:
 - rss
 - json
 ---
-#### Problem solver with an educational background in industrial engineering and operations research, interested in data science, machine learning, simulation, and blockchain.
+#### Problem solver scientist educated in industrial engineering and operations research with manifold interests spanning data science, artificial intelligence, simulation, and blockchain.
+
+<!-- ---
+
+> If you happen to have any overlapping interests, reach out!
+
+---
+
+> Who knows what we could build together! -->

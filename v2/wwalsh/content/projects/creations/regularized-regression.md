@@ -2,7 +2,7 @@
     "title":" Regularized Linear Regression Deep Dive",
     "date": "2021-01-01T15:00:28.528Z", 
     "link":"https://github.com/wyattowalsh/regularized-linear-regression-deep-dive",
-    "image":"img/deep-dive.jpeg",
+    "image":"https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/deep-dive.jpeg",
     "description":"Explanations and Python implementations of Ordinary Least Squares regression, Ridge regression, Lasso regression (solved via Coordinate Descent), and Elastic Net regression (also solved via Coordinate Descent) applied to assess wine quality given numerous numerical features. Additional data analysis and visualization in Python is included.",
     "tags":[
           "Data Science",

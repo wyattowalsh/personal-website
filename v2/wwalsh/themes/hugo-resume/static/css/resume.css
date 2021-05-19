@@ -4,6 +4,24 @@ body {
   color: #868e96;
 }
 
+@mixin horizontal-list-span-width {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+
+  text-align: justify;
+
+  &:after {
+    content: '';
+    width: 100%;
+    display: inline-block;
+  }
+
+  & > li {
+    display: inline-block;
+  }
+}
+
 @media (min-width: 992px) {
   body {
     padding-top: 0;
@@ -20,6 +38,8 @@ h6 {
   font-family: 'Saira Extra Condensed', serif;
   font-weight: 700;
   color: #343a40;
+  padding: 0em;
+  margin: 0em;
 }
 
 
@@ -43,6 +63,11 @@ h2 {
   font-size: 1.35rem;
 }
 
+.items {
+  @include horizontal-list-span-width;
+  height: 1.2em;
+}
+
 .list-social-icons a {
   color: #495057;
 }
@@ -63,6 +88,11 @@ h2 {
   color: #6a9fb5;
 }
 
+.skill-list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
 #sideNav .navbar-nav .nav-item .nav-link {
   font-weight: 600;
   text-transform: uppercase;
@@ -153,3 +183,5 @@ a:hover, a:focus, a:active {
 img {
   max-width:80%;
 }
+
+img[alt=drawing] { width: 100%; }

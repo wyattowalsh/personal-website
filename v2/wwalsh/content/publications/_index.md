@@ -15,4 +15,4 @@ This page represents the landing page for "publications" section. It is also sho
 
 \-->
 
-A collection of my articles, presentations or talks
+A collection of my published articles

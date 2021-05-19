@@ -23,14 +23,19 @@
             <a class="nav-link js-scroll-trigger" href="/#projects">Projects</a>
           </li>
       {{ end }}
-      {{ if .Site.Params.showOpenSource }}
+     <!--  {{ if .Site.Params.showOpenSource }}
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="/#open">Open Source</a>
           </li>
-      {{ end }}
+      {{ end }} -->
       {{ if .Site.Params.showPublications }}
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="/#{{ default "Publications" .Site.Params.publicationsAlternateName }}">{{ default "Publications" .Site.Params.publicationsAlternateName }}</a>
+          </li>
+      {{ end }}
+      {{ if .Site.Params.showInterests }}
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="/#interests">Interests</a>
           </li>
       {{ end }}
       {{ if .Site.Params.showExperience }}
@@ -46,6 +51,11 @@
       {{ if .Site.Params.showBlog }}
           <li class="nav-item">
             <a class="nav-link js-scroll-trigger" href="/#blog">Blog</a>
+          </li>
+      {{ end }}
+      {{ if .Site.Params.showEasterEggs }}
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="/easter-eggs"><img width="12em" src="https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/easter.svg"/></a>
           </li>
       {{ end }}
     </ul>

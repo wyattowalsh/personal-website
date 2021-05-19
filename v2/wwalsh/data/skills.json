@@ -1,105 +1,100 @@
 [
   {
       "grouping":"Programming Languages",
-      "subgroupings": "",
       "skills":[
-          {"name":"Python", "ref": "python", "link":"https://www.python.org/"},
-          {"name":"SQLite", "ref": "sqlite","link":"https://www.sqlite.org/"},
-          {"name":"R", "ref": "r-language","link":"https://www.r-project.org/"},
-          {"name":"Java", "ref": "java","link":"https://go.java/"},
-          {"name":"MATLAB", "ref": "matlab","link":"https://www.mathworks.com/products/matlab.html"}, 
-          {"name":"HTML5", "ref": "html5", "link":"https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5"}, 
-          {"name":"CSS3", "ref": "css3","link":"https://developer.mozilla.org/en-US/docs/Web/CSS"}
+          {"name":"Python", "ref": "python", "link":"https://www.python.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/python-icon.svg"},
+          {"name":"SQLite", "ref": "sqlite","link":"https://www.sqlite.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/sqlite-icon.svg"},
+          {"name":"R", "ref": "r-language","link":"https://www.r-project.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/r-language-icon.svg"},
+          {"name":"Java", "ref": "java","link":"https://go.java/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/java-programming-language-icon.svg"},
+          {"name":"MATLAB", "ref": "matlab","link":"https://www.mathworks.com/products/matlab.html", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/matlab-256-icon.png"}, 
+          {"name":"HTML5", "ref": "html5", "link":"https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/html5-icon.svg"}, 
+          {"name":"CSS3", "ref": "css3","link":"https://developer.mozilla.org/en-US/docs/Web/CSS", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/css3-icon.svg"}
       ]
   }, 
   {
-      "grouping":"Data-related",
+      "grouping":"Data-related Expertises",
       "subgroupings": [
         {"name": "Collection", "skills": [
-          {"name":"Web scraping", "ref": "webscraping", "link":""},
-          {"name":"APIs (REST)", "ref": "apis","link":""},
-          {"name":"Databases (SQL & NoSQL)", "ref": "dbs","link":""},
-          {"name":"Data Serialization", "ref": "serialization","link":""}
+          {"name":"Web scraping", "ref": "webscraping", "link":"", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/web-scraping-icon.svg"},
+          {"name":"APIs (REST)", "ref": "apis","icon":"https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/api-icon.svg"},
+          {"name":"Databases (SQL & NoSQL)", "ref": "dbs","link":"", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/databases-icon.svg"},
+          {"name":"Data Serialization", "ref": "serialization","link":"", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/serialization-icon.svg"}
         ]},
         {"name": "Visualization", "skills": [
-          {"name":"Matplotlib", "ref": "matplotlib", "link":"https://matplotlib.org/"},
-          {"name":"Seaborn", "ref": "seaborn","link":"https://seaborn.pydata.org/"},
-          {"name":"Plotly (Dash)", "ref": "plotly","link":"https://plotly.com/"},
-          {"name":"Tableau", "ref": "tableau","link":"https://www.tableau.com/"},
-          {"name":"Folium", "ref": "folium","link":"https://python-visualization.github.io/folium/"},
-          {"name":"Bokeh", "ref": "bokeh","link":"https://docs.bokeh.org/en/latest/index.html"},
-          {"name":"ggplot2", "ref": "ggplot2","link":"https://ggplot2.tidyverse.org/"}
+          {"name":"Matplotlib", "ref": "matplotlib", "link":"https://matplotlib.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/matplotlib-icon.svg"},
+          {"name":"Seaborn", "ref": "seaborn","link":"https://seaborn.pydata.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/seaborn-icon.svg"},
+          {"name":"Plotly (Dash)", "ref": "plotly","link":"https://plotly.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/plotly-icon.svg"},
+          {"name":"Tableau", "ref": "tableau","link":"https://www.tableau.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/tableau-icon.svg"},
+          {"name":"Folium", "ref": "folium","link":"https://python-visualization.github.io/folium/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/folium-icon.jpeg"},
+          {"name":"Bokeh", "ref": "bokeh","link":"https://docs.bokeh.org/en/latest/index.html", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/bokeh-icon.svg"},
+          {"name":"ggplot2", "ref": "ggplot2","link":"https://ggplot2.tidyverse.org/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/ggplot2-icon.png"}
         ]},
         {"name": "Processing", "skills": [
-          {"name":"Apache Spark", "ref": "apachespark", "link":"https://spark.apache.org/"},
-          {"name":"pandas", "ref": "pandas","link":"https://pandas.pydata.org/"},
-          {"name":"NumPy", "ref": "numpy","link":"https://numpy.org/"},
-          {"name":"Apache Hadoop", "ref": "apachehadoop","link":"https://hadoop.apache.org/"},
-          {"name":"Dask", "ref": "dask","link":"https://dask.org/"},
-          {"name":"Multiprocessing", "ref": "multiprocessing","link":"https://docs.python.org/3/library/multiprocessing.html"}
+          {"name":"Apache Spark", "ref": "apachespark", "link":"https://spark.apache.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/apache-spark-icon.svg"},
+          {"name":"pandas", "ref": "pandas","link":"https://pandas.pydata.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/pandas-icon.svg"},
+          {"name":"NumPy", "ref": "numpy","link":"https://numpy.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/numpy-icon.svg"},
+          {"name":"Apache Hadoop", "ref": "apachehadoop","link":"https://hadoop.apache.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/apache-hadoop-icon.svg"},
+          {"name":"Dask", "ref": "dask","link":"https://dask.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/dask-icon.svg"},
+          {"name":"Multiprocessing", "ref": "multiprocessing","link":"https://docs.python.org/3/library/multiprocessing.html", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/multiprocessing-icon.svg"}
         ]},
         {"name": "Modeling", "skills": [
-          {"name":"scikit-learn", "ref": "scikit-learn", "link":"https://scikit-learn.org/"},
-          {"name":"Tensorflow", "ref": "tensorflow","link":"https://www.tensorflow.org/"},
-          {"name":"statsmodels", "ref": "statsmodels","link":"https://www.statsmodels.org/"},
-          {"name":"Hugging Face", "ref": "huggingface","link":"https://huggingface.co/"},
-          {"name":"SciPy", "ref": "scipy","link":"https://www.scipy.org/"},
-          {"name":"Fast.ai", "ref": "fastai","link":"https://www.fast.ai/"}
+          {"name":"scikit-learn", "ref": "scikit-learn", "link":"https://scikit-learn.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/scikit-learn-icon.svg"},
+          {"name":"Tensorflow", "ref": "tensorflow","link":"https://www.tensorflow.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/tensorflow-icon.svg"},
+          {"name":"statsmodels", "ref": "statsmodels","link":"https://www.statsmodels.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/statsmodels-icon.svg"},
+          {"name":"Hugging Face", "ref": "huggingface","link":"https://huggingface.co/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/huggingface-icon.svg"},
+          {"name":"SciPy", "ref": "scipy","link":"https://www.scipy.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/scipy-icon.svg"},
+          {"name":"Fast.ai", "ref": "fastai","link":"https://www.fast.ai/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/fastai-icon.png"}
         ]},
         {"name": "Deployment", "skills": [
-          {"name":"MLflow", "ref": "mlflow", "link":"https://mlflow.org/"},
-          {"name":"Amazon Sagemaker", "ref": "amazonsagemaker","link":"https://aws.amazon.com/sagemaker/"},
-          {"name":"Data Version Control (DVC)", "ref": "dvc","link":"https://dvc.org/"},
-          {"name":"Apache Airflow", "ref": "apacheairflow","link":"http://airflow.apache.org/"},
-          {"name":"Flask", "ref": "flask","link":"https://flask.palletsprojects.com/en/2.0.x/"}
+          {"name":"MLflow", "ref": "mlflow", "link":"https://mlflow.org/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/mlflow-icon.png"},
+          {"name":"Amazon Sagemaker", "ref": "amazonsagemaker","link":"https://aws.amazon.com/sagemaker/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/sagemaker-icon.svg"},
+          {"name":"Data Version Control (DVC)", "ref": "dvc","link":"https://dvc.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/dvc-icon.svg"},
+          {"name":"Apache Airflow", "ref": "apacheairflow","link":"http://airflow.apache.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/apache-airflow-icon.svg"},
+          {"name":"Flask", "ref": "flask","link":"https://flask.palletsprojects.com/en/2.0.x/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/flask-icon.svg"}
         ]}
       ],
       "skills": ""
   }, 
   {
       "grouping":"Cloud Technologies",
-      "subgroupings": "",
       "skills":[
-          {"name":"Amazon Web Services (AWS)", "ref": "aws", "link":"https://aws.amazon.com/"},
-          {"name":"Google Cloud Platform (GCP)", "ref": "gcp","link":"https://cloud.google.com/"},
-          {"name":"GitHub Actions", "ref": "githubactions","link":"https://docs.github.com/en/actions"},
-          {"name":"Travis CI", "ref": "travisci","link":"https://travis-ci.org/"},
-          {"name":"Kaggle", "ref": "matlab-plain","link":"https://www.kaggle.com/"}, 
-          {"name":"Google Colab", "ref": "googlecolab", "link":"https://colab.research.google.com/"}
+          {"name":"Google Cloud Platform (GCP)", "ref": "gcp","link":"https://cloud.google.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/gcp-icon.svg"},
+          {"name":"Amazon Web Services (AWS)", "ref": "aws", "link":"https://aws.amazon.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/aws-icon.svg"},
+          {"name":"GitHub Actions", "ref": "githubactions","link":"https://docs.github.com/en/actions", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/github-actions-icon.svg"},
+          {"name":"Travis CI", "ref": "travisci","link":"https://travis-ci.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/travis-ci-icon.svg"},
+          {"name":"Kaggle", "ref": "matlab-plain","link":"https://www.kaggle.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/kaggle-icon.svg"}, 
+          {"name":"Google Colab", "ref": "googlecolab", "link":"https://colab.research.google.com/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/google-colab-icon.png"}
       ]
   }, 
   {
       "grouping":"Workflow",
-      "subgroupings": "",
       "skills":[
-          {"name":"Git", "ref": "git", "link":"https://git-scm.com/"},
-          {"name":"Linux", "ref": "linux","link":"https://www.linux.org/"},
-          {"name":"BASH", "ref": "bash","link":"https://www.gnu.org/software/bash/"},
-          {"name":"Docker", "ref": "docker","link":"https://www.docker.com/"},
-          {"name":"Virtual Environments (Conda)", "ref": "virtualenv","link":"https://docs.conda.io/en/latest/"}, 
-          {"name":"Virtual Machines", "ref": "virtualmachines", "link":"https://en.wikipedia.org/wiki/Virtual_machine/"}, 
-          {"name":"Jupyter", "ref": "jupyternotebooks", "link":"https://jupyter.org/"}
+          {"name":"Git", "ref": "git", "link":"https://git-scm.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/git-icon.svg"},
+          {"name":"Linux", "ref": "linux","link":"https://www.linux.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/linux-icon.svg"},
+          {"name":"BASH", "ref": "bash","link":"https://www.gnu.org/software/bash/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/bash-icon.svg"},
+          {"name":"Docker", "ref": "docker","link":"https://www.docker.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/docker-icon.svg"},
+          {"name":"Virtual Environments (Conda)", "ref": "virtualenv","link":"https://docs.conda.io/en/latest/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/conda-icon.svg"}, 
+          {"name":"Virtual Machines", "ref": "virtualmachines", "link":"https://en.wikipedia.org/wiki/Virtual_machine/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/vmware-icon.svg"}, 
+          {"name":"Jupyter", "ref": "jupyternotebooks", "link":"https://jupyter.org/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/jupyter-icon.svg"}
       ]
   }, 
   {
       "grouping":"Optimization Tools",
-      "subgroupings": "",
       "skills":[
-          {"name":"AMPL", "ref": "ampl", "link":"https://ampl.com/"},
-          {"name":"IBM CPLEX", "ref": "cplex","link":"https://www.ibm.com/analytics/cplex-optimizer"},
-          {"name":"Gurobi", "ref": "gurobi","link":"https://www.gurobi.com/"},
-          {"name":"PuLP", "ref": "pulp","link":"https://coin-or.github.io/pulp/"},
-          {"name":"Metaheuristics", "ref": "metaheuristics","link":"https://en.wikipedia.org/wiki/Metaheuristic"}
+          {"name":"AMPL", "ref": "ampl", "link":"https://ampl.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/ampl-icon.svg"},
+          {"name":"IBM CPLEX", "ref": "cplex","link":"https://www.ibm.com/analytics/cplex-optimizer", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/cplex-icon.png"},
+          {"name":"Gurobi", "ref": "gurobi","link":"https://www.gurobi.com/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/gurobi-icon.png"},
+          {"name":"PuLP", "ref": "pulp","link":"https://coin-or.github.io/pulp/", "icon": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/pulp-icon.png"},
+          {"name":"Metaheuristics", "ref": "metaheuristics","link":"https://en.wikipedia.org/wiki/Metaheuristic", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/ant-icon.svg"}
       ]
   }, 
   {
       "grouping":"Miscellaneous",
-      "subgroupings": "",
       "skills":[
-          {"name":"3D Modeling (Autodesk & Solidworks)", "ref": "3dmodeling", "link":"https://www.solidworks.com/"},
-          {"name":"Microsoft Office Suite", "ref": "microsoftoffice","link":"https://www.microsoft.com/en-us/microsoft-365?rtc=1"},
-          {"name":"Typesetting (LaTeX & Markdown)", "ref": "typesetting","link":"https://www.gnu.org/software/bash/"},
-          {"name":"Web Development", "ref": "webdev","link":"https://www.docker.com/"}
+          {"name":"3D Modeling (Autodesk & Solidworks)", "ref": "3dmodeling", "link":"https://www.solidworks.com/", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/solidworks.svg"},
+          {"name":"Microsoft Office Suite", "ref": "microsoftoffice","link":"https://www.microsoft.com/en-us/microsoft-365?rtc=1", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/microsoft-office-icon.svg"},
+          {"name":"Typesetting (LaTeX & Markdown)", "ref": "typesetting","link":"", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/tex-icon.svg"},
+          {"name":"Web Development", "ref": "webdev","link":"", "icon": "https://raw.githubusercontent.com/wyattowalsh/wyattowalsh.github.io/master/v2/wwalsh/static/img/web-developement-icon.svg"}
       ]
   }
 ]
