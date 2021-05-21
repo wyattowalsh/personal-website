@@ -1,0 +1,42 @@
+<section class="resume-section p-3 p-lg-5 d-flex flex-column" id="skills">
+  <div class="my-auto" id="skills-content">
+    <h2 class="mb-5">Skills</h2>
+    {{ range $.Site.Data.skills }}
+      <div class="subheading mb-3 skills-heading"><u>{{ .grouping }}</u></div>
+        {{ if isset . "subgroupings" }}
+          {{ range .subgroupings}}
+            <div class="subsubheading mb-3 skills-heading">{{ .name }}</div>
+            <div class="skill-list">
+              <ul>
+                  {{ range .skills}}
+                      <li class="list-inline-item">
+                        <img class="devicons" src="{{ .icon }}" style="vertical-align: middle; height: 1.5em;"/>
+                        {{if isset . "link"}}
+                          <a href="{{.link}}"> &hairsp; {{ .name }} </a> &nbsp; &nbsp; &nbsp; &nbsp; 
+                        {{ else }}
+                            &hairsp; {{ .name }}  &nbsp; &nbsp; &nbsp; &nbsp; 
+                        {{end}}
+                      </li>
+                  {{ end }}
+                </ul> 
+            </div> 
+          {{ end }}
+        {{ else }}
+          <div class="skill-list">
+            <ul>
+                {{ range .skills}}
+                    <li class="list-inline-item">
+                      <img class="devicons" src="{{ .icon }}" style="vertical-align: middle; height: 1.5em;"/>
+                      {{if isset . "link"}}
+                        &hairsp; <a href="{{.link}}"> {{ .name }} </a>  &nbsp; &nbsp; &nbsp; &nbsp; 
+                      {{ else }}
+                          &hairsp; {{ .name }}  &nbsp; &nbsp; &nbsp; &nbsp; 
+                      {{end}}
+                    </li>
+                {{ end }}
+              </ul>
+          </div> 
+        {{ end }}
+    {{ end }}
+  </div>
+</section>
