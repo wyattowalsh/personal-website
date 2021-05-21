@@ -21,9 +21,6 @@ jobs:
           hugo-version: 'latest'
           extended: true
           
-      - name: Copy Files
-        run: cp v2/ ./
-        
       - name: Build
         run: hugo --minify -s v2/wwalsh/
 
@@ -32,4 +29,5 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./v2
           publish_branch: gh-pages2  # default: gh-pages
