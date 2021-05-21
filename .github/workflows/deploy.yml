@@ -29,5 +29,5 @@ jobs:
         if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./v2/wwalsh
+          publish_dir: ./v2/wwalsh/public
           publish_branch: gh-pages2  # default: gh-pages
