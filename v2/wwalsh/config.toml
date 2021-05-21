@@ -41,7 +41,7 @@ showEasterEggs = true
 [params.google]
 
 [params.google.analytics]
-trackerID = "XX-123446-01"
+trackerID = "G-FJCYWXT2WF"
 
 [[params.handles]]
 link = "https://twitter.com/wyattowalsh"

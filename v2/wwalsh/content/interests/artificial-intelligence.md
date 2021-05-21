@@ -3,7 +3,7 @@
   "date": "2021-04-01T15:00:28.528Z",
   "image": "https://github.com/wyattowalsh/wyattowalsh.github.io/raw/master/v2/wwalsh/static/img/ai-image-1.png",
   "link": "",
-  "description": "Smart, but like Synthetic Smart",
+  "description": "Nerdy, but like Synthetic Nerdy",
   "tags": ["Artificial Intelligence", "Machine Learning", "Reinforcement Learning", "Generative Models", "Super Resolution", "Unsupervised Learning"],
   "fact": "",
   "featured":true
