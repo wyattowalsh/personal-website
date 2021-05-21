@@ -14,7 +14,7 @@ This page represents the landing page for "publications" section. It is also sho
 
 \-->
 
-A few things to keep you on your toes
+A few things to keep you on your toes!
 
 ---
 
