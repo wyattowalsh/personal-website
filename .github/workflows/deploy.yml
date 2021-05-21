@@ -20,9 +20,11 @@ jobs:
         with:
           hugo-version: 'latest'
           extended: true
-
-      - name: Build
+          
+      - name: Copy Files
         run: cp v2/ ./
+        
+      - name: Build
         run: hugo --minify -s v2/wwalsh/
 
       - name: Deploy
