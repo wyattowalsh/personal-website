@@ -22,12 +22,12 @@ jobs:
           extended: true
           
       - name: Build
-        run: hugo --minify -s v2/wwalsh/
+        run: hugo --minify -s v2/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/master'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./v2
+          publish_dir: ./v2/wwalsh
           publish_branch: gh-pages2  # default: gh-pages
