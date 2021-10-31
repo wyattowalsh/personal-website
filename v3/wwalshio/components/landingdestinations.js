@@ -3,87 +3,86 @@
 
 /** Imports  */
 import React from "react";
+import Image from 'next/image';
 import styles from "./landingdestinations";
+import { styled } from '@mui/material/styles';
 import NextLink from 'next/link';
 import Link from '@mui/material/Link';
-import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faFolderOpen} from '@fortawesome/free-solid-svg-icons';
+import {faDumpsterFire} from '@fortawesome/free-solid-svg-icons';
+import Direction from '../public/images/direction.svg';
+import Projects from "../public/images/projects.svg";
 import { Typography } from "@material-ui/core";
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+import Icon from '@material-ui/core/Icon';
+import { makeStyles } from '@material-ui/styles';
+import SvgIcon from '@material-ui/core/SvgIcon';
+import "bootstrap-icons/font/bootstrap-icons.css";
+import { Fade } from '@mui/material';
 
 export default function LandingDestinations() {
-
-
-  const siteMap = [{
+  const siteMap = [{ 
       name: "Interests",
       url: "/interests",
       description: "A collection of my interests and hobbies.",
-      icon: <span role = "img" aria-label = "hmm" > 🤔 </span>,
+      icon: <i class="bi bi-signpost-2" style={{p:0,m:0}}></i>,
       image: "/static/images/interests.jpg"
     },
     {
       name: "Projects",
       url: "/projects",
       description: "A collection of my projects.",
-      icon: < FontAwesomeIcon icon = {
-        ['far', 'folder-open']
-      }
-      />,
+      icon: <i class="bi bi-kanban" style={{p:0,m:0}}></i>,
       image: "/static/images/projects.jpg"
     },
     {
       name: "Career",
       url: "/career",
       description: "A collection of my career experiences.",
-      icon: < FontAwesomeIcon icon = {
-        ['fas', 'briefcase']
-      }
-      />,
+      icon: <i class="bi bi-person-badge"></i>,
       image: "/static/images/career.jpg"
     },
     {
       name: "More",
       url: "/more",
       description: "A bit more content for the web-based world!",
-      icon: <span role = "img" aria-label = "hmm">🤷</span>,
+      icon: <i class="bi bi-minecart-loaded"></i>,
       image: "/static/images/more.jpg"
     }
-  ]
+  ];
 
   const siteMapButtons = [];
   siteMap.forEach(function (item, index) {
-    siteMapButtons.push( 
-    <Link
-        href={item.url} sx={{
-            textDecoration: 'none',
-        }}
-        passHref>
-        <Button
-           component="a" sx={{
-            backgroundColor: 'transparent',
-            'color': "primary",
-            '&:hover': {
-                backgroundColor: 'secondary',
-                fontWeight: 'medium',
-            },
-            p: 4,
-            m: 4,
-           }} endIcon={item.icon}>
-            <Typography variant="h4">{item.name}</Typography>
-        </Button>
-    </Link>
+    siteMapButtons.push(
+      <NextLink href={item.url} passHref>
+        <Grid item xs={2}>
+          <Button variant="outlined" endIcon={item.icon} sx={{
+            color: "theme.palette.text.primary",
+            p: 2,
+            fontSize: "1.5rem",
+              backgroundColor: "rgb(92,107,192, 0.1)",
+              '&:hover': {
+                backgroundColor: "rgb(92,107,192, 0.8)",
+                color: "#ffffff",
+            }}}>
+            {item.name}
+          </Button>
+        </Grid>
+      </NextLink>
     )
   });
 
   return (
-    <Stack
-    justifyContent="center"
-    alignItems="center"
-    direction={{ xs: 'column', lg: 'row' }}
-    spacing={{ xs: 1, sm: 2, md: 4 }}
-  >
-      {siteMapButtons}
-      </Stack>
+      <Grid container spacing={1}
+      minWidth="sm"
+      direction={{xs: "column", sm: "row"}}
+      alignItems="center"
+      justifyContent="center">
+        {siteMapButtons}
+      </Grid>
   );
 }

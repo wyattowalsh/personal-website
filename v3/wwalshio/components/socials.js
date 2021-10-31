@@ -4,6 +4,7 @@
 /** Imports  */
 import React from "react";
 import styles from "./landingdestinations";
+import { styled } from '@mui/material/styles';
 import NextLink from 'next/link';
 import Link from '@mui/material/Link';
 import Stack from '@mui/material/Stack';
@@ -11,6 +12,9 @@ import Button from '@mui/material/Button';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { faGithubAlt, faLinkedinIn, faTwitter, faKaggle, faMediumM } from '@fortawesome/free-brands-svg-icons';
 import { Typography } from "@material-ui/core";
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+
 
 export default function Socials() {
 
@@ -73,37 +77,28 @@ export default function Socials() {
 
   const socials = [];
   socials_data.forEach(function (item, index) {
-    socials.push( 
-    <Link
-        href={item.url} sx={{
-            textDecoration: 'none',
-        }}
-        passHref>
-        <Button
-           component="a" sx={{
-            backgroundColor: 'transparent',
-            'color': "primary",
-            '&:hover': {
-                backgroundColor: 'secondary',
-                fontWeight: 'medium',
-            },
-            p: 4,
-            m: 2,
-           }} endIcon={item.icon}>
-            <Typography variant="body1">{item.name}</Typography>
-        </Button>
-    </Link>
+    socials.push(
+      <NextLink href={item.url} passHref>
+        <Grid item xs={4}><Button endIcon={item.icon} sx={{textAlign: 'center',
+  color: "primary",
+  fontSize: {xs:'0.5rem', md:'0.8rem'},
+  px: {xs: 2, md: 4},
+  py: {xs: 2, md: 4},
+  backgroundColor: "rgb(233, 30, 99, 0.25)",
+  '&:hover': {
+    color: "secondary",
+    backgroundColor: "rgb(233, 30, 99, 0.85)"
+}}}>{item.name}</Button></Grid>
+      </NextLink>
     )
   });
 
   return (
-    <Stack
-    justifyContent="center"
+    <Grid container spacing={4}
+    direction={{xs: "row"}}
     alignItems="center"
-    direction={{ xs: 'column', lg: 'row' }}
-    spacing={{ xs: 1, sm: 2, md: 4 }}
-  >
-      {socials}
-      </Stack>
+    justifyContent="center">
+        {socials}
+      </Grid>
   );
 }

@@ -10,7 +10,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fab } from '@fortawesome/free-brands-svg-icons';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { far } from '@fortawesome/free-regular-svg-icons';
-
+import "font-awesome/css/font-awesome.css";
+import "@fontsource/ubuntu";
+import "@fontsource/open-sans";
+import "@fontsource/roboto";
 
 library.add(fab, fas, far);
 
@@ -28,6 +31,9 @@ export default function MyApp(props: MyAppProps) {
       <Head>
         <title>My page</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
+        <script defer src="../node_modules/font-awesome/brands.js"></script>
+        <script defer src="/your-path-to-fontawesome/js/solid.js"></script>
+        <script defer src="/your-path-to-fontawesome/js/fontawesome.js"></script>
       </Head>
       <ThemeProvider theme={theme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}

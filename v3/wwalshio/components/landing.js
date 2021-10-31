@@ -16,8 +16,6 @@ export default function Landing() {
   return (
     <Particles
     id="tsparticles"
-    init={particlesInit}
-    loaded={particlesLoaded}
     options={particle1}
     />
   );

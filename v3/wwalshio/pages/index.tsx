@@ -1,31 +1,48 @@
 import * as React from 'react';
-import NextLink from 'next/link';
-import Link from '@mui/material/Link';
-import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
 import Landing from "../components/landing";
-import { Typography } from '@material-ui/core';
 import LandingDestinations from '../components/landingdestinations';
-import Socials from "../components/socials"
+import Socials from "../components/socials";
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+
 export default function Index() {
   return ( 
-    <Container  component="div" maxWidth="md" Height="100%" sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      m: "auto"
-    }}>
-      <Container maxWidth="85%" maxHeight= "85%" component="div">
+      <Grid>
+        <Landing />
+        <Container maxWidth="md" sx={{mt: {xs: 2, sm: 8},  mb: {xs: -14, sm: -14}}}>
         <br />
-        <Typography variant="h2" component="div"><b>Hi There</b><span role="img" aria-label="wave">👋</span></Typography >
         <br />
-        <Typography variant="h3" component="div" align="right">Welcome to my site!</Typography>
+        <Typography variant="h2" align="left" color="#ffffff" sx={{ml: {xs: 2, md: 4, lg: 8}, zIndex: 2, backgroundColor: "transparent"}}><b>Hi There</b><span role="img" aria-label="wave">👋</span></Typography>
         <br />
-        <LandingDestinations />
-        <br />
-        <Socials />
-      </Container>, 
-      <br />
-    </Container>
+        <Typography variant="h4" align="right" color="#ffffff" sx={{mr: {xs: 2, md: 4, lg: 8}, zIndex: 2, backgroundColor: "transparent"}}>Welcome to my site!</Typography>
+        </Container>
+      <Grid
+          container
+          spacing={0}
+          direction="column"
+          alignItems="center"
+          justifyContent="center"
+          style={{ minHeight: '100vh' }}
+        >
+        <Grid item xs={12}>
+            <br />
+            <Grid item xs={12} width="100%" style={{ textAlign: 'center' }}
+              alignItems="center"
+              justifyContent="center">
+            <LandingDestinations />
+            </Grid>
+            <br />
+            <br />
+            <br />
+            <Grid item xs={12} width="100%" style={{ textAlign: 'center' }}
+              alignItems="center"
+              justifyContent="center">
+              <Socials />
+            </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
   );
 }
