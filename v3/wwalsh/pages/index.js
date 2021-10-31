@@ -9,6 +9,9 @@ import { faGithubAlt, faLinkedinIn, faTwitter, faKaggle, faMediumM } from '@fort
 export default function index() {
   return (
   <div className={styles.home}>
+    <head>
+      <meta name="viewport" content="initial-scale=1, width=device-width" />
+    </head>
     <Landing />
     <div className={styles.container}>
       <div className={styles.greeting}>
