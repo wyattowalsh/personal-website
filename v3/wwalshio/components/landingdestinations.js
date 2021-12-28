@@ -64,7 +64,7 @@ export default function LandingDestinations() {
             color: "theme.palette.text.primary",
             p: 2,
             fontSize: "1.5rem",
-              backgroundColor: "rgb(92,107,192, 0.1)",
+              backgroundColor: "rgb(92,107,192, 0.65)",
               '&:hover': {
                 backgroundColor: "rgb(92,107,192, 0.8)",
                 color: "#ffffff",

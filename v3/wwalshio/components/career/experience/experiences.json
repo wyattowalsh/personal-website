@@ -1,0 +1,102 @@
+{
+    "experiences": [
+        {
+            "label": "Delving into Trading as a Summer Scout",
+            "name": "Camp Whitsett",
+            "location": "Kernville, CA",
+            "url": "https://www.campwhitsett.org/",
+            "image": "whitsett-medium.jpg",
+            "role": "Trading Post Clerk",
+            "tenure": {
+                "start": "May 2011",
+                "end": "Sep 2011"
+            },
+            "description": "Facilitated trading post operations in all forms (cashier, custodian, and financial)",
+            "highlights": [
+                "First Job",
+                "High School"
+            ],
+            "skills": [
+                "Cashier",
+                "Custodian",
+                "Financial"
+            ]
+        },
+        {
+            "label": "A Sojourn in the Last Frontier",
+            "name": "Intern to the Lieutenant Governor of Alaska",
+            "location": "Anchorage, AK",
+            "url": "https://en.wikipedia.org/wiki/Mead_Treadwell",
+            "image": "alaska.jpg",
+            "role": "Intern",
+            "tenure": {
+                "start": "June 2013",
+                "end": "Aug 2013"
+            },
+            "description": "Began summer internship in Washington DC, helping to draft legislative guidelines to aid in unmanned aerial vehicle (drone) policy generation as a joint endeavor between a local law firm and the ACLU. After a week of far too much reading of parched drone documents, I flew to Anchorage to carry out the remaining three weeks of my internship, where I partnered with Alaska Magazine to create content and help with image organization, visited wildlife preserves, flew in a floatplane to swim next to an iceberg, and much much more!",
+            "highlights": [
+                "Drone Technology",
+                "High School",
+                "Alaska Magazine",
+                "Politics"
+            ],
+            "skills": [
+                "Research",
+                "Summarization",
+                "Creative Writing"
+            ]
+        },
+        {
+            "label": "Entreprenurial Pursuits in Quad Copters",
+            "name": "Bot Systems",
+            "location": "Berkeley, CA",
+            "url": "",
+            "image": "bot.png",
+            "role": "Cofounder",
+            "tenure": {
+                "start": "October 2014",
+                "end": "May 2015"
+            },
+            "description": "Learned some benefits of failure by bootstrapping a hardware startup from prototype creation through investor pitches. After 20+ iterations along the way, created the first cellular operable drone complete with augmented reality and a 360° capture system.",
+            "highlights": [
+                "Drone Technology",
+                "Startups",
+                "Hardware",
+                "Augmented Reality",
+                "Teamwork",
+                "Leadership"
+            ],
+            "skills": [
+                "Research",
+                "Hardware",
+                "Software",
+                "Teamwork"
+            ]
+        },
+        {
+            "label": "Barre Business Ballads",
+            "name": "The Bar Method",
+            "location": "San Francisco, CA",
+            "url": "https://www.thebarmethod.com/",
+            "image": "bar.png",
+            "role": "General Business Intern",
+            "tenure": {
+                "start": "June 2015",
+                "end": "Aug 2015"
+            },
+            "description": "Maximized future equity and fairness among franchisees by developing a franchise territory designation model. To aid this goal, I developed and extracted useful data for modeling by digitizing all currently existing franchise territories (90+).",
+            "highlights": [
+                "Sitewise",
+                "Franchise Business Modeling",
+                "Data Analysis",
+                "Teamwork"
+            ],
+            "skills": [
+                "Data Analysis",
+                "Teamwork",
+                "Time Management"
+
+            ]
+        }
+    ]
+}

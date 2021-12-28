@@ -84,7 +84,7 @@ export default function Socials() {
   fontSize: {xs:'0.5rem', md:'0.8rem'},
   px: {xs: 2, md: 4},
   py: {xs: 2, md: 4},
-  backgroundColor: "rgb(233, 30, 99, 0.25)",
+  backgroundColor: "rgb(233, 30, 99, 0.6)",
   '&:hover': {
     color: "secondary",
     backgroundColor: "rgb(233, 30, 99, 0.85)"
