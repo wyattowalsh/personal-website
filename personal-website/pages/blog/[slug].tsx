@@ -57,8 +57,8 @@ export default function BlogPage({ source, frontMatter }: Props) {
 	);
 }
 
-export const getStaticProps = async ({ frontMatter }: Post) => {
-	const blogFilePath = path.join(BLOG_PATH, `${frontMatter.slug}.mdx`);
+export const getStaticProps = async ({ params }: Post) => {
+	const blogFilePath = path.join(BLOG_PATH, `${params.slug}.mdx`);
 	const source = fs.readFileSync(blogFilePath);
 
 	const { content, data } = matter(source);
