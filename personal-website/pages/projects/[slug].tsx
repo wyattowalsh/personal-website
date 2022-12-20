@@ -51,7 +51,11 @@ export default function ProjectPage({ source, frontMatter }: Props) {
 	);
 }
 
-export const getStaticProps = async ({ params }) => {
+type Params = {
+	params: Project;
+};
+
+export const getStaticProps = async ({ params }: Params) => {
 	const projectFilePath = path.join(PROJECTS_PATH, `${params.slug}.mdx`);
 	const source = fs.readFileSync(projectFilePath);
 
