@@ -42,6 +42,7 @@ export default function BlogPage({ source, frontMatter }: Props) {
 					<Box sx={{ overflow: "hidden" }}>
 						<Image
 							src={frontMatter.image}
+							alt={frontMatter.title}
 							sizes="(min-width: 768px) 80px, 60px"
 							layout="responsive"
 							width={350}
