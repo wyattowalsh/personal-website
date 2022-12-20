@@ -14,10 +14,12 @@ import { serialize } from "next-mdx-remote/serialize";
 import { projectFilePaths, PROJECTS_PATH } from "../../utils/mdxUtils";
 import Project from "../../interfaces/project";
 
-export default function ProjectPage({
-	source,
-	frontMatter,
-}: MDXRemoteSerializeResult & Project) {
+type Props = {
+	source: MDXRemoteSerializeResult;
+	frontMatter: Project;
+};
+
+export default function ProjectPage({ source, frontMatter }: Props) {
 	return (
 		<>
 			<Nav />

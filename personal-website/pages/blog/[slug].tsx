@@ -14,10 +14,12 @@ import { serialize } from "next-mdx-remote/serialize";
 import { blogFilePaths, BLOG_PATH } from "../../utils/mdxUtils";
 import Post from "../../interfaces/post";
 
-export default function BlogPage({
-	source,
-	frontMatter,
-}: MDXRemoteSerializeResult & Post) {
+type Props = {
+	source: MDXRemoteSerializeResult;
+	frontMatter: Post;
+};
+
+export default function BlogPage({ source, frontMatter }: Props) {
 	return (
 		<>
 			<Nav />
