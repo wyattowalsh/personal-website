@@ -1,0 +1,103 @@
+.box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    min-height: 92vh;
+    width: 100vw;
+    // padding: 3vh;
+}
+
+.landing {
+    font-size: 3.5rem;
+    font-weight: 500;
+}
+
+.greeting {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+}
+
+@keyframes wave-animation {
+  0% {
+    transform: rotate(0deg);
+  }
+  10% {
+    transform: rotate(16deg);
+  }
+  20% {
+    transform: rotate(-6deg);
+  }
+  30% {
+    transform: rotate(16deg);
+  }
+  40% {
+    transform: rotate(-4deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+  60% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.wave {
+    margin-left: 1rem;
+    margin-top: 1rem;
+    animation-name: wave-animation;  /* Refers to the name of your @keyframes element below */
+    animation-duration: 2.5s;        /* Change to speed up or slow down */
+    animation-iteration-count: infinite;  /* Never stop waving :) */
+    transform-origin: 70% 70%;       /* Pivot around the bottom-left palm */
+    display: inline-block;
+}
+
+
+.introBQ {
+    border-left: 0.85rem solid #BB2649;
+    line-height: 2rem;
+    margin-left: 1rem;
+    padding-left: 0.5rem;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+.intro {
+    font-size: 2.25rem;
+}
+
+.name {
+    font-size: 2.5rem;
+}
+
+.desc {
+    max-width: 70vw;
+
+}
+
+.welcome {
+    text-decoration: underline;
+}
+
+.socials {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 70vw;
+}
+
+.social {
+}
+
+.caret {
+    font-size: 4rem;
+    --fa-animation-duration: 1.5s;
+    --fa-bounce-rebound: 0;
+    justify-self: end;
+}

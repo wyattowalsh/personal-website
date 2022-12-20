@@ -1,0 +1,35 @@
+.box {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    height: 20vh;
+    background-color: RGBA(231, 220, 209, 1);
+}
+
+.avatar {
+    padding-top: 1rem;
+}
+
+.rule {
+    background: transparent;
+    border-bottom: 1px dashed #c3a7a4;
+    width: 40%; margin: 0 auto;
+
+    &:before {
+        top: 3px;
+        left: 0;
+        padding-right: 2em;
+    }
+}
+
+.socials {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 50vw;
+}
+
+.social {
+}
