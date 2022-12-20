@@ -13,7 +13,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Image from "next/image";
-import Logo from "../public/img/logo.png";
+import Logo from "/img/logo.webp";
 import Scroll from "react-scroll";
 const Link = Scroll.Link;
 import NextLink from "next/link";
