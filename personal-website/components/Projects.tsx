@@ -36,9 +36,8 @@ export default function Projects({ allProjects }: Props) {
 			<br />
 			<Grid container spacing={{ xs: 2, md: 4 }} className={styles.projects}>
 				{allProjects.map((proj) => (
-					<Grid xs={12} sm={8} md={6} lg={4}>
+					<Grid key={proj.filePath} xs={12} sm={8} md={6} lg={4}>
 						<MyCard
-							key={proj.filePath}
 							image={proj.data.image}
 							title={proj.data.title}
 							description={proj.data.description}

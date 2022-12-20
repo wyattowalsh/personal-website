@@ -36,9 +36,8 @@ export default function Blog({ allPosts }: Props) {
 			<br />
 			<Grid container spacing={{ xs: 2, md: 4 }} className={styles.projects}>
 				{allPosts.map((post) => (
-					<Grid xs={12} sm={8} md={6} lg={4}>
+					<Grid key={post.filePath} xs={12} sm={8} md={6} lg={4}>
 						<MyCard
-							key={post.filePath}
 							image={post.data.image}
 							title={post.data.title}
 							description={post.data.description}
