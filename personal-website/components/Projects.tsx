@@ -40,6 +40,7 @@ export default function Projects({ allProjects }: Props) {
 						<MyCard
 							image={proj.data.image}
 							title={proj.data.title}
+							link={`/projects/${proj.filePath.replace(/\.mdx?$/, "")}`}
 							description={proj.data.description}
 							url={proj.data.url}
 							slug={proj.data.slug}

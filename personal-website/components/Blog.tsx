@@ -41,6 +41,7 @@ export default function Blog({ allPosts }: Props) {
 							image={post.data.image}
 							title={post.data.title}
 							description={post.data.description}
+							link={`/blog/${post.filePath.replace(/\.mdx?$/, "")}`}
 							url={post.data.url}
 							slug={post.data.slug}
 						/>

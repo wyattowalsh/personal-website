@@ -9,11 +9,13 @@ import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Tooltip from "@mui/material/Tooltip";
 import styles from "./MyCard.module.scss";
+import Link from "next/link";
 
 type Props = {
 	image: string;
 	title: string;
 	description: string;
+	link: string;
 	url: string;
 	slug: string;
 };
@@ -22,6 +24,7 @@ export default function MyCard({
 	image,
 	title,
 	description,
+	link,
 	url,
 	slug,
 }: Props) {
@@ -44,7 +47,9 @@ export default function MyCard({
 					marginRight: "1rem",
 				}}
 			>
-				<Button size="large">Read More</Button>
+				<Link href={link}>
+					<Button size="large">Read More</Button>
+				</Link>
 				<Tooltip title="View the Project on GitHub" arrow>
 					<a href={url} target="_blank" rel="noreferrer">
 						<FontAwesomeIcon
