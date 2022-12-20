@@ -53,7 +53,7 @@ export default function Nav(props: Props) {
 				))}
 				<ListItem key="Notes Vault" disablePadding>
 					<ListItemButton sx={{ textAlign: "center" }}>
-						<a href="https://www.w4w.dev/notes">
+						<a href="https://www.notes.w4w.dev">
 							<ListItemText primary="Notes Vault" />
 						</a>
 					</ListItemButton>
@@ -109,7 +109,7 @@ export default function Nav(props: Props) {
 							</Button>
 						))}
 						<Button key="Notes Vault" sx={{ color: "#fff" }}>
-							<a href="./notes">Notes Vault</a>
+							<a href="https://www.notes.w4w.dev">Notes Vault</a>
 						</Button>
 					</Box>
 					<Box mt={1.25} sx={{ display: { xs: "block", sm: "none" } }}>
