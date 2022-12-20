@@ -13,7 +13,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Image from "next/image";
-import Logo from "/img/logo.webp";
+import Logo from "../public/img/logo.webp";
 import Scroll from "react-scroll";
 const Link = Scroll.Link;
 import NextLink from "next/link";
@@ -45,15 +45,17 @@ export default function Nav(props: Props) {
 				{navItems.map((item) => (
 					<ListItem key={item} disablePadding>
 						<ListItemButton sx={{ textAlign: "center" }}>
-							<Link to={item} spy={true} smooth={true} duration={500}>
-								<ListItemText primary={item} />
-							</Link>
+							<NextLink href="/">
+								<Link to={item} spy={true} smooth={true} duration={500}>
+									<ListItemText primary={item} />
+								</Link>
+							</NextLink>
 						</ListItemButton>
 					</ListItem>
 				))}
 				<ListItem key="Notes Vault" disablePadding>
 					<ListItemButton sx={{ textAlign: "center" }}>
-						<a href="https://www.notes.w4w.dev">
+						<a href="notes.w4w.dev">
 							<ListItemText primary="Notes Vault" />
 						</a>
 					</ListItemButton>
@@ -103,13 +105,15 @@ export default function Nav(props: Props) {
 					<Box sx={{ display: { xs: "none", sm: "block" } }}>
 						{navItems.map((item) => (
 							<Button key={item} sx={{ color: "#fff" }}>
-								<Link to={item} spy={true} smooth={true} duration={500}>
-									{item}
-								</Link>
+								<NextLink href="/">
+									<Link to={item} spy={true} smooth={true} duration={500}>
+										{item}
+									</Link>
+								</NextLink>
 							</Button>
 						))}
 						<Button key="Notes Vault" sx={{ color: "#fff" }}>
-							<a href="https://www.notes.w4w.dev">Notes Vault</a>
+							<a href="notes.w4w.dev">Notes Vault</a>
 						</Button>
 					</Box>
 					<Box mt={1.25} sx={{ display: { xs: "block", sm: "none" } }}>
