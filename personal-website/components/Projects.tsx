@@ -42,8 +42,7 @@ export default function Projects({ allProjects }: Props) {
 							title={proj.data.title}
 							description={proj.data.description}
 							url={proj.data.url}
-							slug={proj.data.slu}
-							g
+							slug={proj.data.slug}
 						/>
 					</Grid>
 				))}
