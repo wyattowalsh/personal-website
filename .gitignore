@@ -3,7 +3,7 @@
 secrets/
 !secrets/README.md
 
-utils/
+/utils/
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,python,visualstudiocode,react,reactnative,jupyternotebooks,julia,r,ansible,angular,sass,sas,java,node,nextjs,ruby,solidity,soliditytruffle,spark,flask,scala,storybookjs,vuejs,nuxtjs,yarn,homebrew
 # Edit at https://www.toptal.com/developers/gitignore?templates=linux,macos,windows,python,visualstudiocode,react,reactnative,jupyternotebooks,julia,r,ansible,angular,sass,sas,java,node,nextjs,ruby,solidity,soliditytruffle,spark,flask,scala,storybookjs,vuejs,nuxtjs,yarn,homebrew
