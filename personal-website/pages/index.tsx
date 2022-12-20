@@ -42,7 +42,7 @@ export default function Home({ allProjects, allPosts }: Props) {
 	return (
 		<div className={styles.container}>
 			<Head>
-				<title>Wyatt Walsh's Personal Website | Home</title>
+				<title>Wyatt Walsh&#39;s Personal Website | Home</title>
 				<meta
 					name="description"
 					content="Welcome to my personal website, which hosts my projects, blog, and notes."
