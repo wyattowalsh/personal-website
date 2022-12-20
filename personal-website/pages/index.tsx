@@ -20,7 +20,6 @@ import Project from "../interfaces/project";
 import Post from "../interfaces/project";
 import fs from "fs";
 import matter from "gray-matter";
-import Logo from "/img/logo.webp";
 
 type project = {
 	content: string;
@@ -53,7 +52,7 @@ export default function Home({ allProjects, allPosts }: Props) {
 					property="og:description"
 					content="Welcome to my personal website, which hosts my projects, blog, and notes."
 				/>
-				<meta property="og:image" content={Logo} />
+				<meta property="og:image" content="/img/logo.webp" />
 			</Head>
 
 			<main className={styles.main}>
