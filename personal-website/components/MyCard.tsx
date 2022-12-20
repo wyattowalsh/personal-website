@@ -29,7 +29,7 @@ export default function MyCard({
 	slug,
 }: Props) {
 	return (
-		<Card sx={{ maxWidth: 345 }}>
+		<Card sx={{ maxWidth: 345 }} className={styles.card}>
 			<CardMedia component="img" height="140" image={image} alt={title} />
 			<CardContent>
 				<Typography gutterBottom variant="h5" component="div">

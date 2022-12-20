@@ -44,18 +44,18 @@ export default function Nav(props: Props) {
 			<List>
 				{navItems.map((item) => (
 					<ListItem key={item} disablePadding>
-						<ListItemButton sx={{ textAlign: "center" }}>
-							<NextLink href="/">
+						<NextLink href="/">
+							<ListItemButton sx={{ textAlign: "center" }}>
 								<Link to={item} spy={true} smooth={true} duration={500}>
 									<ListItemText primary={item} />
 								</Link>
-							</NextLink>
-						</ListItemButton>
+							</ListItemButton>
+						</NextLink>
 					</ListItem>
 				))}
 				<ListItem key="Notes Vault" disablePadding>
 					<ListItemButton sx={{ textAlign: "center" }}>
-						<a href="notes.w4w.dev">
+						<a href="https://notes.w4w.dev">
 							<ListItemText primary="Notes Vault" />
 						</a>
 					</ListItemButton>
@@ -113,7 +113,7 @@ export default function Nav(props: Props) {
 							</Button>
 						))}
 						<Button key="Notes Vault" sx={{ color: "#fff" }}>
-							<a href="notes.w4w.dev">Notes Vault</a>
+							<a href="https://notes.w4w.dev">Notes Vault</a>
 						</Button>
 					</Box>
 					<Box mt={1.25} sx={{ display: { xs: "block", sm: "none" } }}>
