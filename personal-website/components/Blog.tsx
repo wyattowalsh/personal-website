@@ -43,7 +43,6 @@ export default function Blog({ allPosts }: Props) {
 							description={post.data.description}
 							url={post.data.url}
 							slug={post.data.slug}
-							g
 						/>
 					</Grid>
 				))}
