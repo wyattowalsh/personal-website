@@ -14,7 +14,7 @@ import { serialize } from "next-mdx-remote/serialize";
 import { blogFilePaths, BLOG_PATH } from "../../utils/mdxUtils";
 import Post from "../../interfaces/post";
 
-export default function ProjectPage({
+export default function BlogPage({
 	source,
 	frontMatter,
 }: MDXRemoteSerializeResult & Post) {

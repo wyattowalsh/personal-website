@@ -24,7 +24,7 @@ type post = {
 };
 
 type Props = {
-	allProjects: post[];
+	allPosts: post[];
 };
 
 export default function Blog({ allPosts }: Props) {
@@ -42,7 +42,7 @@ export default function Blog({ allPosts }: Props) {
 							title={post.data.title}
 							description={post.data.description}
 							url={post.data.url}
-							slug={post.data.slu}
+							slug={post.data.slug}
 							g
 						/>
 					</Grid>
