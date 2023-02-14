@@ -92,7 +92,7 @@ export default function LinkTree() {
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
             <Box className={styles.header}>
-                <Typography  className={styles.name} variant="h1" component="h1">
+                <Typography variant="h1" component="h1" className={styles.name}>
                     Wyatt Walsh&apos;s Links
                 </Typography>
                 <Box className={styles.avatar}>
@@ -115,7 +115,7 @@ export default function LinkTree() {
                         <Tooltip title={link.name} placement="bottom" arrow>
                             <Box className={styles.link}>
                                 <FontAwesomeIcon className={styles.icon} icon={link.icon} size="4x" color={link.color} />
-                                <Typography className={styles.linkName} variant="h2" component="h2">{link.name}</Typography>
+                                <Typography variant="h2" component="h2" className={styles.linkName}>{link.name}</Typography>
                             </Box>
                         </Tooltip>
                     </Link>
