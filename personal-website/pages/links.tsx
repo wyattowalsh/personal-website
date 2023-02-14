@@ -90,6 +90,7 @@ export default function LinkTree() {
                 <title>Wyatt Walsh&apos;s Links</title>
                 <meta name="description" content="Wyatt Walsh's links to online profiles" />
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <link rel="icon" href="/favicon/favicon.ico" />
             </Head>
             <Box className={styles.header}>
                 <Typography variant="h1" component="h1" className={styles.name}>
