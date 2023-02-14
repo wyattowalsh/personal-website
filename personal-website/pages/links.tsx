@@ -88,8 +88,9 @@ export default function LinkTree() {
     let theme = createTheme({
         typography: {
             h1: {
-            fontSize: '1.25rem',
-            fontFamily: '"Ubuntu Mono"',
+                fontSize: '1.25rem',
+                fontFamily: '"Ubuntu Mono"',
+                fontWeight: 900,
             },
      },
     });
