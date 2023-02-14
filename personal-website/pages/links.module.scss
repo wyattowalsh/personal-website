@@ -19,7 +19,7 @@
 
 .name {
     font-family: 'Ubuntu Mono';
-    font-size: 1.75rem;
+    font-size: 1.25rem;
     font-weight: 900;
     text-decoration: underline;
     padding: 1rem;
@@ -28,8 +28,8 @@
 
 .avatar {
     padding: 2rem;
-    width: 30vw;
-    height: 30vw;
+    width: 25vw;
+    height: 25vw;
     position: relative;
     box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
 }
@@ -39,7 +39,7 @@
 }
 
 .link {
-    width: 80vw;
+    width: 70vw;
     height: 5vh;
     display: flex;
     flex-direction: row;
@@ -55,13 +55,23 @@
 }
 
 .icon {
-    font-size: 2.5rem;
+    font-size: 1.5rem;
 }
 
 .linkName {
     font-family: 'Ubuntu Mono';
-    font-size: 2rem;
+    font-size: 1.25rem;
     font-weight: 900;
+}
+
+@media (min-width: 320px) {
+    .name {
+        font-size: 2rem;
+    }
+    .avatar {
+        width: 50vw;
+        height: 50vw;
+    }
 }
 
 @media (min-width: 600px) {
@@ -72,8 +82,11 @@
         width: 35vw;
         height: 35vw;
     }
+    .icon {
+        font-size: 2rem;
+    }
     .linkName {
-        font-size: 3rem;
+        font-size: 2rem;
     }
 }
 
@@ -85,6 +98,7 @@
     }
     .header {
         justify-content: space-around;
+        align-content: center;
         min-height: 70vh;
     }
     .name {
@@ -99,9 +113,9 @@
         width: 40vw;
     }
     .icon {
-        font-size: 4rem;
+        font-size: 2.5rem;
     }
     .linkName {
-        font-size: 3rem;
+        font-size: 2.5rem;
     }
 }
