@@ -86,7 +86,12 @@ const links = [
 
 export default function LinkTree() {
     let theme = createTheme({
-
+        typography: {
+            h1: {
+            fontSize: '1.25rem',
+            fontFamily: '"Ubuntu Mono"',
+            },
+     },
     });
     theme = responsiveFontSizes(theme, {"breakpoints": ['xs', 'sm', 'md', 'lg', 'xl'], "factor": 1 });
 
