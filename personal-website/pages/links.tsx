@@ -87,13 +87,13 @@ export default function LinkTree() {
     return (
         <Box className={styles.container}>
             <Head>
-                <title>Wyatt Walsh's Links</title>
+                <title>Wyatt Walsh&apos;s Links</title>
                 <meta name="description" content="Wyatt Walsh's links to online profiles" />
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
             <Box className={styles.header}>
                 <Typography  className={styles.name} variant="h1" component="h1">
-                    Wyatt Walsh's Links
+                    Wyatt Walsh&apos;s Links
                 </Typography>
                 <Box className={styles.avatar}>
                     <Image
