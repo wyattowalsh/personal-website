@@ -32,13 +32,13 @@ const links = [
         name: "Email",
         url: "mailto:wyattowalsh@gmail.com",
         icon: faEnvelope,
-        color: "#6a9fb5"
+        color: "black"
     },
     {
         name: "Resume",
         url: "/resume.pdf",
         icon: faFileAlt,
-        color: "#6a9fb5"
+        color: "black"
     },
     {
         name: "LinkedIn",
