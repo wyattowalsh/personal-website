@@ -85,8 +85,10 @@ const links = [
 ];
 
 export default function LinkTree() {
-    let theme = createTheme();
-    theme = responsiveFontSizes(theme);
+    let theme = createTheme({
+
+    });
+    theme = responsiveFontSizes(theme, {"breakpoints": ['xs', 'sm', 'md', 'lg', 'xl'], "factor": 1 });
 
     return (
         <div>
