@@ -22,7 +22,7 @@ import Typography from "@mui/material/Typography";
 import Head from "next/head";
 import Image from "next/image";
 import Logo from "../public/img/profile-pic-square.webp";
-import styles from "./linktree.module.scss";
+import styles from "./links.module.scss";
 
 // -- Data ---------------------------------------------------------------------
 const links = [
