@@ -1,0 +1,93 @@
+@import "styles/scss/abstracts/__abstracts-dir.scss";
+
+.main {
+	width: 100vw;
+	background-color: $myBlue;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cpolygon fill='%23933131' points='957 450 539 900 1396 900'/%3E%3Cpolygon fill='%238b1a1a' points='957 450 872.9 900 1396 900'/%3E%3Cpolygon fill='%23d8444f' points='-60 900 398 662 816 900'/%3E%3Cpolygon fill='%23b85c61' points='337 900 398 662 816 900'/%3E%3Cpolygon fill='%23c53b58' points='1203 546 1552 900 876 900'/%3E%3Cpolygon fill='%23a55b67' points='1203 546 1552 900 1162 900'/%3E%3Cpolygon fill='%23d07995' points='641 695 886 900 367 900'/%3E%3Cpolygon fill='%23b4486e' points='587 900 641 695 886 900'/%3E%3Cpolygon fill='%23c84898' points='1710 900 1401 632 1096 900'/%3E%3Cpolygon fill='%23c5a3b5' points='1710 900 1401 632 1365 900'/%3E%3Cpolygon fill='%23bc83bc' points='1210 900 971 687 725 900'/%3E%3Cpolygon fill='%238c618c' points='943 900 1210 900 971 687'/%3E%3C/svg%3E");
+	background-attachment: fixed;
+	background-size: cover;
+}
+
+.box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2vh;
+}
+
+.mainHeading {
+	text-decoration: underline;
+}
+
+.left {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+
+.avatar {
+	display: flex;
+	align-items: flex-start;
+	justify-content: flex-start;
+	margin: 2rem;
+	box-shadow: rgba(0, 0, 0, 0.25) 0px 25px 50px -12px;
+	border: 0.4rem double black;
+	border-radius: 50%;
+	overflow: hidden;
+}
+
+.about {
+	padding: 2rem;
+	margin: 1rem;
+	border: 0.4rem double black;
+	background-color: rgba(255, 255, 255, 0.5);
+}
+
+.hi {
+	font-weight: 700;
+}
+
+@keyframes wave-animation {
+	0% {
+		transform: rotate(0deg);
+	}
+	10% {
+		transform: rotate(16deg);
+	}
+	20% {
+		transform: rotate(-6deg);
+	}
+	30% {
+		transform: rotate(16deg);
+	}
+	40% {
+		transform: rotate(-4deg);
+	}
+	50% {
+		transform: rotate(16deg);
+	}
+	60% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
+}
+
+.wave {
+	font-size: 2.5rem;
+	margin-left: 1rem;
+	margin-top: 1rem;
+	animation-name: wave-animation; /* Refers to the name of your @keyframes element below */
+	animation-duration: 2.5s; /* Change to speed up or slow down */
+	animation-iteration-count: infinite; /* Never stop waving :) */
+	transform-origin: 70% 70%; /* Pivot around the bottom-left palm */
+	display: inline-block;
+}
+
+.Download {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

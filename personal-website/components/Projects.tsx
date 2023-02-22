@@ -29,7 +29,7 @@ type Props = {
 
 export default function Projects({ allProjects }: Props) {
 	return (
-		<Box className={styles.section}>
+        <Box className={styles.section}>
 			<Typography variant="h2" className={styles.title}>
 				Projects
 			</Typography>
@@ -49,5 +49,5 @@ export default function Projects({ allProjects }: Props) {
 				))}
 			</Grid>
 		</Box>
-	);
+    );
 }

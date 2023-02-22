@@ -1,21 +1,26 @@
+@import "styles/scss/abstracts/__abstracts-dir.scss";
+
 .box {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
-    height: 20vh;
+    width: 100vw;
     background-color: RGBA(231, 220, 209, 1);
 }
 
 .avatar {
-    padding-top: 1rem;
+    margin-top: 1rem;
+    position: relative;
+    width: 8vh;
+    height: 8vh;
 }
 
 .rule {
     background: transparent;
     border-bottom: 1px dashed #c3a7a4;
-    width: 40%; margin: 0 auto;
-
+    width: 40%;
+    margin: 1rem auto;
     &:before {
         top: 3px;
         left: 0;
@@ -28,8 +33,18 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    width: 50vw;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
 }
 
 .social {
+    width: 3rem;
+    height: 3rem;
+    padding: 0.5rem;
+    margin: 0 1rem;
+    transition: all 0.3s ease-in-out;
+    &:hover {
+        transform: scale(1.1);
+        background-color: $myGold;
+    }
 }

@@ -20,35 +20,35 @@ type Props = {
 };
 
 export default function ProjectPage({ source, frontMatter }: Props) {
-	return (
-		<>
-			<Nav />
-			<main className={styles.main}>
-				<Box sx={{ maxWidth: "70%" }}>
-					<h1>
-						{frontMatter.title} &nbsp;
-						<a href={frontMatter.url} target="_blank" rel="noopener noreferrer">
-							<Tooltip title="Visit the Project on GitHub" arrow>
-								<FontAwesomeIcon icon={faGithub} />
-							</Tooltip>
-						</a>
-					</h1>
-					<Box sx={{ overflow: "hidden" }}>
-						<Image
-							src={frontMatter.image}
-							alt={frontMatter.title}
-							sizes="(min-width: 768px) 80px, 60px"
-							layout="responsive"
-							width={350}
-							height={350}
-						/>
-					</Box>
-					<MDXRemote {...source} />
-				</Box>
-			</main>
-			<Footer />
-		</>
-	);
+	return <>
+        <Nav />
+        <main className={styles.main}>
+            <Box sx={{ maxWidth: "70%" }}>
+                <h1>
+                    {frontMatter.title} &nbsp;
+                    <a href={frontMatter.url} target="_blank" rel="noopener noreferrer">
+                        <Tooltip title="Visit the Project on GitHub" arrow>
+                            <FontAwesomeIcon icon={faGithub} />
+                        </Tooltip>
+                    </a>
+                </h1>
+                <Box sx={{ overflow: "hidden" }}>
+                    <Image
+                        src={frontMatter.image}
+                        alt={frontMatter.title}
+                        width={350}
+                        height={350}
+                        sizes="(min-width: 768px) 80px, 60px"
+                        style={{
+                            width: "100%",
+                            height: "auto"
+                        }} />
+                </Box>
+                <MDXRemote {...source} />
+            </Box>
+        </main>
+        <Footer />
+    </>;
 }
 
 type Params = {
