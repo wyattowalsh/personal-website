@@ -53,7 +53,7 @@ interface LinkTabProps {
   value?: number
   label?: string
   icon?: React.ReactNode
-  iconPosition?: bottom | top | end | start | undefined
+  iconPosition?: 'bottom' | 'end' | 'start' | 'top' | undefined
   className?: string
   onClick?: () => void
 }
