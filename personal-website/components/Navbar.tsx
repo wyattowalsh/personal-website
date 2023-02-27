@@ -49,7 +49,7 @@ interface Props {
 const drawerWidth = 240
 
 interface LinkTabProps {
-  href?: string
+  href?: URL
   value?: number
   label?: string
   icon?: React.ReactNode
