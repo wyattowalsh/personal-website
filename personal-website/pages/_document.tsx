@@ -50,20 +50,7 @@ class MyDocument extends Document {
             href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
             integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0"
             crossOrigin="anonymous"
-          />
-          <script
-            defer
-            src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"
-            integrity="sha384-PwRUT/YqbnEjkZO0zZxNqcxACrXe+j766U2amXcgMg5457rve2Y7I6ZJSm2A0mS4"
-            crossOrigin="anonymous"
-          ></script>
-          <script
-            defer
-            src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/contrib/auto-render.min.js"
-            integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05"
-            crossOrigin="anonymous"
-            onLoad={`renderMathInElement(document.body);`}
-          ></script>
+          ></link>
         </Head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-17PRGFZN0C"
