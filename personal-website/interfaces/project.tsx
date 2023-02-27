@@ -1,11 +1,14 @@
-type ProjectType = {
-	slug: string;
-	content: string;
-	title: string;
-	description: string;
-	date: string;
-	url: string;
-	image: string;
-};
+export type ProjectData = {
+  slug: string
+  title: string
+  description: string
+  date: string
+  url: string
+  image: string
+}
 
-export default ProjectType;
+export type ProjectType = {
+  content: string
+  data: ProjectData
+  filePath: string
+}

@@ -5,10 +5,10 @@ import Button from '@mui/material/Button'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Link from 'next/link'
-import type PostType from '../interfaces/post'
+import type { PostData } from '../interfaces/post'
 import styles from './Post.module.scss'
 
-export default function Post(Post: PostType) {
+export default function Post(Post: PostData) {
   return (
     <Link href={`/blog/${Post.slug}`}>
       <Box className={styles.post}>

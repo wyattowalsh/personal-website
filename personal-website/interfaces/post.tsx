@@ -1,11 +1,14 @@
-type PostType = {
-	slug: string;
-	content: string;
-	title: string;
-	description: string;
-	date: string;
-	url: string;
-	image: string;
-};
+export type PostData = {
+  slug: string
+  title: string
+  description: string
+  date: string
+  url: string
+  image: string
+}
 
-export default PostType;
+export type PostType = {
+  content: string
+  data: PostData
+  filePath: string
+}

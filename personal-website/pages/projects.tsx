@@ -6,9 +6,14 @@ import matter from 'gray-matter'
 import path from 'path'
 import Post from '../components/Post'
 import Layout from '../components/layouts/blog'
+import type { ProjectType } from '../interfaces/project'
 import { PROJECTS_PATH, projectFilePaths } from '../utils/mdxUtils'
 import styles from './blog.module.scss'
-export default function Blog({ allPosts }: Props) {
+
+type Props = {
+  allProjects: ProjectType[]
+}
+export default function Blog({ allProjects }: Props) {
   return (
     <Box className={styles.Container}>
       <Box className={styles.blog}>
@@ -20,9 +25,9 @@ export default function Blog({ allPosts }: Props) {
         </Typography>
         <Typography variant="h2">All Posts:</Typography>
         <Stack spacing={2} direction="column">
-          {allPosts.map((post) => (
-            <Box key={post.filePath}>
-              <Post {...post.data} />
+          {allProjects.map((project) => (
+            <Box key={project.filePath}>
+              <Post {...project.data} />
             </Box>
           ))}
         </Stack>
@@ -31,12 +36,12 @@ export default function Blog({ allPosts }: Props) {
   )
 }
 
-Blog.getLayout = function getLayout(page) {
+Blog.getLayout = function getLayout(page: React.ReactNode) {
   return <Layout>{page}</Layout>
 }
 
 export function getStaticProps() {
-  const allPosts = projectFilePaths.map((filePath) => {
+  const allProjects = projectFilePaths.map((filePath) => {
     const source = fs.readFileSync(path.join(PROJECTS_PATH, filePath))
     const { content, data } = matter(source)
 
@@ -47,5 +52,5 @@ export function getStaticProps() {
     }
   })
 
-  return { props: { allPosts } }
+  return { props: { allProjects } }
 }

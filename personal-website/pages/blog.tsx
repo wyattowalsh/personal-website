@@ -6,8 +6,13 @@ import matter from 'gray-matter'
 import path from 'path'
 import Post from '../components/Post'
 import Layout from '../components/layouts/blog'
+import type { PostType } from '../interfaces/post'
 import { BLOG_PATH, blogFilePaths } from '../utils/mdxUtils'
 import styles from './blog.module.scss'
+
+type Props = {
+  allPosts: PostType[]
+}
 export default function Blog({ allPosts }: Props) {
   return (
     <Box className={styles.Container}>
@@ -31,7 +36,7 @@ export default function Blog({ allPosts }: Props) {
   )
 }
 
-Blog.getLayout = function getLayout(page) {
+Blog.getLayout = function getLayout(page: React.ReactNode) {
   return <Layout>{page}</Layout>
 }
 
