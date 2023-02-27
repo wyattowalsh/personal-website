@@ -31,7 +31,7 @@ theme = responsiveFontSizes(theme, {
   factor: 1,
 })
 
-export default function Layout({ children }) {
+export default function Layout(children: any) {
   return (
     <>
       <Head>
