@@ -15,6 +15,8 @@ import lightTheme from '../components/theme/light'
 import '../styles/main.scss'
 const opensans = Open_Sans({ subsets: ['latin'], preload: true })
 
+import { AppLayoutProps } from 'next/app'
+
 config.autoAddCss = false
 
 const cache = createCache({
@@ -26,8 +28,13 @@ interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
 }
 
-export default function App({ Component, pageProps }: MyAppProps) {
-  const getLayout = Component.getLayout || ((page) => page)
+export default function App({
+  Component,
+  pageProps,
+}: AppLayoutProps & MyAppProps) {
+  // Use getLayout from the page you are navigating to
+  // So if you have a custom layout for that page it will be used
+  const getLayout = Component.getLayout || ((page: React.ReactNode) => page)
 
   const { resolvedTheme } = useTheme()
   const [currentTheme, setCurrentTheme] = React.useState(darkTheme)
