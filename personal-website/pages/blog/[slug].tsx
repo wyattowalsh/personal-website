@@ -6,32 +6,32 @@ import { serialize } from 'next-mdx-remote/serialize'
 import path from 'path'
 import readingTime from 'reading-time'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypeFigure from 'rehype-figure'
 import rehypeFormat from 'rehype-format'
-import rehypeInline from 'rehype-inline'
 import rehypeKatex from 'rehype-katex'
 import rehypeStringify from 'rehype-stringify'
 import codeTitle from 'remark-code-title'
 import remarkDefinitionList from 'remark-definition-list'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
-import remarkHint from 'remark-hint'
 import remarkMath from 'remark-math'
 import remarkMermaid from 'remark-mermaidjs'
 import remarkParse from 'remark-parse'
-import remarkPrism from 'remark-prism'
 import remarkRehype from 'remark-rehype'
 import smartypants from 'remark-smartypants'
 import remarkToc from 'remark-toc'
 import Header from '../../components/BlogHeader'
 import Hero from '../../components/Hero'
 import Layout from '../../components/layouts/blog'
-import type PostType from '../../interfaces/post'
+import type { PostData } from '../../interfaces/post'
 import { BLOG_PATH, blogFilePaths } from '../../utils/mdxUtils'
+const rehypeFigure = require('rehype-figure')
+const rehypeInline = require('rehype-inline')
+const remarkHint = require('remark-hint')
+const remarkPrism = require('remark-prism')
 
 type Props = {
   source: MDXRemoteSerializeResult
-  frontMatter: PostType
+  frontMatter: PostData
   readingTime: {
     text: string
     minutes: number
@@ -54,11 +54,15 @@ export default function BlogPage({ source, frontMatter, readingTime }: Props) {
   )
 }
 
-BlogPage.getLayout = function getLayout(page) {
+BlogPage.getLayout = function getLayout(page: React.ReactNode) {
   return <Layout>{page}</Layout>
 }
 
-export const getStaticProps = async ({ params }) => {
+export const getStaticProps = async ({
+  params,
+}: {
+  params: { slug: string }
+}) => {
   const postFilePath = path.join(BLOG_PATH, `${params.slug}.mdx`)
   const source = fs.readFileSync(postFilePath)
 
