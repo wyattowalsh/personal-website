@@ -73,19 +73,15 @@ Thus the goal of model training is to find an estimate of the coefficient vector
 
 To consider how model error can be minimized, a consideration of model error must first be made. Prediction error for a single prediction can be expressed as:
 
-<figure>
-    <img style={{width: "50vw", backgroundColor: "white", color:"black", padding: "1rem"}}  src='/img/blog/2021-01-13-regularized-linear-regression-models/eq3.png' alt='missing' />
-    <hr/>
-    <figcaption>Equation #3</figcaption>
-</figure>
+$$
+\hat{y}_i = \sum^p_{j=1} x_{i, j}\hat\beta_j \text{, a model prediction of sample } i \text{, has an error (or residual) defined as: } y_i - \hat{y}_i
+$$
 
 Thus, in vector notation, total model error across all predictions can be found as:
 
-<figure>
-    <img style={{width: "50vw", backgroundColor: "white", color:"black", padding: "1rem"}} src='/img/blog/2021-01-13-regularized-linear-regression-models/eq4.png' alt='missing' />
-    <hr/>
-    <figcaption>Equation #4</figcaption>
-</figure>
+$$
+\hat{\textbf{y}} = \textbf{X}\hat\beta \text{, all sample model predictions, has an associated total model error: } \lVert \textbf{y} - \hat{\textbf{y}} \rVert_2
+$$
 
 However, for the uses of finding a minimal overall model error, the ***L₂*** norm above is not a good objective function. This is due to the fact that negative errors and positive errors will cancel out, thus a minimization will find an objective value of zero even though in reality the model error is much higher.
 
