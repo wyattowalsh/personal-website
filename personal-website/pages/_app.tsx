@@ -4,7 +4,6 @@ import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 import CssBaseline from '@mui/material/CssBaseline'
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
-import useMediaQuery from '@mui/material/useMediaQuery'
 import { Open_Sans } from '@next/font/google'
 import 'katex/dist/katex.min.css'
 import { ThemeProvider, useTheme } from 'next-themes'
@@ -30,20 +29,13 @@ interface MyAppProps extends AppProps {
 export default function App({ Component, pageProps }: MyAppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const { resolvedTheme } = useTheme()
   const [currentTheme, setCurrentTheme] = React.useState(darkTheme)
 
   React.useEffect(() => {
-    if (prefersDarkMode) {
-      setCurrentTheme(darkTheme)
-    } else {
-      if (resolvedTheme === 'light') {
-        setCurrentTheme(lightTheme)
-      } else {
-        setCurrentTheme(darkTheme)
-      }
-    }
+    resolvedTheme === 'light'
+      ? setCurrentTheme(lightTheme)
+      : setCurrentTheme(darkTheme)
   }, [resolvedTheme])
 
   return (
