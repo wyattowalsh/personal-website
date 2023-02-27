@@ -1,18 +1,12 @@
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import Grid from '@mui/material/Unstable_Grid2'
-import PostType from '../interfaces/post'
+import type { PostType } from '../interfaces/post'
 import MyCard from './MyCard'
 import styles from './Projects.module.scss'
 
-type post = {
-  content: string
-  data: PostType
-  filePath: string
-}
-
 type Props = {
-  allPosts: post[]
+  allPosts: PostType[]
 }
 
 export default function Blog({ allPosts }: Props) {
