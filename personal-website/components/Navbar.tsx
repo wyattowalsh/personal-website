@@ -61,7 +61,7 @@ interface LinkTabProps {
 function LinkTab(props: LinkTabProps) {
   return (
     <Link href={props.href} passHref>
-      <Tab onClick={props.onClick} {...props} />
+      <Tab onClick={props.onClick} component="a" {...props} />
     </Link>
   )
 }
