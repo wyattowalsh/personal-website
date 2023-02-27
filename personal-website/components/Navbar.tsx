@@ -53,7 +53,7 @@ interface LinkTabProps {
   value?: number
   label?: string
   icon?: React.ReactNode
-  iconPosition?: string
+  iconPosition?: bottom | top | end | start | undefined
   className?: string
   onClick?: () => void
 }
@@ -61,7 +61,14 @@ interface LinkTabProps {
 function LinkTab(props: LinkTabProps) {
   return (
     <Link href={`${props.href}`} passHref>
-      <Tab onClick={props.onClick} {...props} />
+      <Tab
+        onClick={props.onClick}
+        value={props.value}
+        label={props.label}
+        icon={props.icon}
+        iconPosition={props.iconPosition}
+        className={props.className}
+      />
     </Link>
   )
 }
@@ -316,6 +323,12 @@ export default function Navbar(props: Props) {
     </Box>
   )
 
+  const [value, setValue] = React.useState('one')
+
+  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    setValue(newValue)
+  }
+
   return (
     <AppBar
       enableColorOnDark
@@ -377,7 +390,8 @@ export default function Navbar(props: Props) {
           sx={{ display: { xs: 'none', sm: 'block' } }}
         >
           <Tabs
-            value={0}
+            value={value}
+            onChange={handleChange}
             aria-label="Site Navigation Tabs"
             textColor="primary"
             variant="fullWidth"
@@ -385,7 +399,7 @@ export default function Navbar(props: Props) {
             className={styles.tabs}
           >
             <LinkTab
-              value={0}
+              value="one"
               href="/"
               label="About"
               icon={
@@ -398,7 +412,7 @@ export default function Navbar(props: Props) {
               className={styles.tab}
             />
             <LinkTab
-              value={1}
+              value="two"
               href="/blog"
               label="Blog"
               icon={<FontAwesomeIcon icon={faBlog} className={styles.social} />}
@@ -406,7 +420,7 @@ export default function Navbar(props: Props) {
               className={styles.tab}
             />
             <LinkTab
-              value={2}
+              value="three"
               href="/projects"
               label="Projects"
               icon={<Kanban size="2rem" />}
