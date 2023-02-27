@@ -17,10 +17,14 @@ import Link from '@mui/material/Link'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Image from 'next/image'
+import Particles from 'react-particles'
 import styles from 'styles/scss/pages/links.module.scss'
+import { loadFull } from 'tsparticles'
+import type { Engine } from 'tsparticles-engine'
+import { ISourceOptions } from 'tsparticles-engine'
 import Layout from '../components/layouts/links'
 import Logo from '../public/img/profile-pic-square.webp'
-
+import particlesOptions from '../utils/particles.json'
 // -- Data ---------------------------------------------------------------------
 const links = [
   {
@@ -80,15 +84,32 @@ const links = [
 ]
 
 export default function LinkTree() {
+  const particlesInit = async (main: Engine) => {
+    // you can initialize the tsParticles instance (main) here, adding custom shapes or presets
+    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
+    // starting from v2 you can add only the features you need reducing the bundle size
+    await loadFull(main)
+  }
   return (
     <Box className={styles.container}>
+      <Particles
+        className={styles.particles}
+        options={particlesOptions as ISourceOptions}
+        init={particlesInit}
+      />
       <Box className={styles.header}>
-        <Typography variant="h1" component="h1" className={styles.name}>
+        <Box className={styles.avatar}>
+          <Image
+            src={Logo}
+            alt="Wyatt Walsh"
+            layout="responsive"
+            width="100"
+            height="100"
+          />
+        </Box>
+        <Typography variant="h1" className={styles.name}>
           Wyatt Walsh&apos;s Links
         </Typography>
-        <Box className={styles.avatar}>
-          <Image src={Logo} alt="Wyatt Walsh" quality={100} fill />
-        </Box>
       </Box>
       <Box className={styles.links}>
         {links.map((link) => (
@@ -107,9 +128,7 @@ export default function LinkTree() {
                   size="4x"
                   color={link.color}
                 />
-                <Typography variant="h2" className={styles.linkName}>
-                  {link.name}
-                </Typography>
+                <Typography className={styles.linkName}>{link.name}</Typography>
               </Box>
             </Tooltip>
           </Link>
