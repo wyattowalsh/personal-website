@@ -138,7 +138,7 @@ Home.getLayout = function getLayout(page) {
   return (
     <>
       <Head>
-        <title>Wyatt Walsh's Personal Website | Home</title>
+        <title>Wyatt Walsh&apos;s Personal Website | Home</title>
         <meta
           name="description"
           content="Welcome to my personal website, which hosts my projects, blog, and notes."
@@ -154,10 +154,7 @@ Home.getLayout = function getLayout(page) {
         <meta name="twitter:card" content="summary" />
         <meta name="twitter:creator" content="@wyattowalsh" />
         <meta name="twitter:image" content="/img/logo.webp" />
-        <meta
-          name="twitter:title"
-          content="Wyatt Walsh&#39;s Personal Website"
-        />
+        <meta name="twitter:title" content="Wyatt Walsh's Personal Website" />
         <meta name="twitter:url" content="https://www.w4w.dev" />
         <link rel="icon" href="/favicon/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
