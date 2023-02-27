@@ -31,7 +31,7 @@ theme = responsiveFontSizes(theme, {
   factor: 1,
 })
 
-export default function LinksLayout({ children }) {
+export default function Layout({ children }) {
   return (
     <>
       <Head>

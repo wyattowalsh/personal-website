@@ -1,69 +1,55 @@
-import { faMedium } from '@fortawesome/free-brands-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import Box from '@mui/material/Box'
-import Tooltip from '@mui/material/Tooltip'
+import Typography from '@mui/material/Typography'
 import fs from 'fs'
 import matter from 'gray-matter'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import Head from 'next/head'
-import Image from 'next/image'
 import path from 'path'
-import Layout from '../../components/Layout'
-import Post from '../../interfaces/post'
+import readingTime from 'reading-time'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypeFigure from 'rehype-figure'
+import rehypeFormat from 'rehype-format'
+import rehypeInline from 'rehype-inline'
+import rehypeKatex from 'rehype-katex'
+import rehypeStringify from 'rehype-stringify'
+import codeTitle from 'remark-code-title'
+import remarkDefinitionList from 'remark-definition-list'
+import remarkFrontmatter from 'remark-frontmatter'
+import remarkGfm from 'remark-gfm'
+import remarkHint from 'remark-hint'
+import remarkMath from 'remark-math'
+import remarkMermaid from 'remark-mermaidjs'
+import remarkParse from 'remark-parse'
+import remarkPrism from 'remark-prism'
+import remarkRehype from 'remark-rehype'
+import smartypants from 'remark-smartypants'
+import remarkToc from 'remark-toc'
+import Header from '../../components/BlogHeader'
+import Hero from '../../components/Hero'
+import Layout from '../../components/layouts/blog'
+import type PostType from '../../interfaces/post'
 import { BLOG_PATH, blogFilePaths } from '../../utils/mdxUtils'
-import styles from './[slug].module.scss'
 
 type Props = {
   source: MDXRemoteSerializeResult
-  frontMatter: Post
+  frontMatter: PostType
+  readingTime: {
+    text: string
+    minutes: number
+    time: number
+    words: number
+  }
 }
 
-export default function BlogPage({ source, frontMatter }: Props) {
+const components = {
+  Hero,
+  Typography,
+  Header,
+}
+
+export default function BlogPage({ source, frontMatter, readingTime }: Props) {
   return (
     <>
-      <Head>
-        <title>Wyatt Walsh&#39;s Blog | {frontMatter.title}</title>
-        <meta
-          name="description"
-          content="Welcome to my personal website, which hosts my projects, blog, and notes."
-        />
-        <meta
-          property="og:description"
-          content="Welcome to my personal website, which hosts my projects, blog, and notes."
-        />
-        <meta property="og:image" content="/img/logo.webp" />
-      </Head>
-      <Box sx={{ maxWidth: '70%' }} className={styles.main}>
-        <h1>
-          {frontMatter.title} &nbsp;
-          <a href={frontMatter.url} target="_blank" rel="noopener noreferrer">
-            <Tooltip title="See the post on Medium" arrow>
-              <a href={frontMatter.url} target="_blank" rel="noreferrer">
-                <FontAwesomeIcon
-                  icon={faMedium}
-                  className={styles.social}
-                  color="#000000"
-                />
-              </a>
-            </Tooltip>
-          </a>
-        </h1>
-        <Box sx={{ overflow: 'hidden' }}>
-          <Image
-            src={frontMatter.image}
-            alt={frontMatter.title}
-            width={350}
-            height={350}
-            sizes="(min-width: 768px) 80px, 60px"
-            style={{
-              width: '100%',
-              height: 'auto',
-            }}
-          />
-        </Box>
-        <MDXRemote {...source} />
-      </Box>
+      <MDXRemote {...source} components={components} lazy />
     </>
   )
 }
@@ -72,29 +58,53 @@ BlogPage.getLayout = function getLayout(page) {
   return <Layout>{page}</Layout>
 }
 
-type Params = {
-  params: Post
-}
-
-export const getStaticProps = async ({ params }: Params) => {
-  const blogFilePath = path.join(BLOG_PATH, `${params.slug}.mdx`)
-  const source = fs.readFileSync(blogFilePath)
+export const getStaticProps = async ({ params }) => {
+  const postFilePath = path.join(BLOG_PATH, `${params.slug}.mdx`)
+  const source = fs.readFileSync(postFilePath)
 
   const { content, data } = matter(source)
 
   const mdxSource = await serialize(content, {
     // Optionally pass remark/rehype plugins
     mdxOptions: {
-      remarkPlugins: [],
-      rehypePlugins: [],
+      remarkPlugins: [
+        [remarkRehype],
+        [remarkDefinitionList],
+        [remarkFrontmatter],
+        [remarkGfm],
+        [remarkHint],
+        [remarkParse],
+        [remarkMath],
+        [
+          remarkMermaid,
+          {
+            theme: 'dark',
+            launchOptions: { executablePath: '/usr/bin/chromium-browser' },
+          },
+        ],
+        [remarkPrism],
+        [smartypants],
+        [remarkToc],
+        [codeTitle],
+      ],
+      rehypePlugins: [
+        [rehypeStringify],
+        [rehypeKatex],
+        [rehypeAutolinkHeadings],
+        [rehypeFormat],
+        [rehypeFigure],
+        [rehypeInline],
+      ],
     },
-    scope: data,
   })
+
+  const stats = readingTime(content)
 
   return {
     props: {
       source: mdxSource,
       frontMatter: data,
+      readingTime: stats,
     },
   }
 }

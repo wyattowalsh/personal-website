@@ -6,7 +6,9 @@
     justify-content: space-around;
     align-items: center;
     width: 100vw;
-    background-color: RGBA(231, 220, 209, 1);
+    // background-color: RGBA(231, 220, 209, 1);
+    background-color: $myBrown;
+    position: relative;
 }
 
 .avatar {
@@ -44,7 +46,8 @@
     margin: 0 1rem;
     transition: all 0.3s ease-in-out;
     &:hover {
-        transform: scale(1.1);
+        transform: scale(1.3);
         background-color: $myGold;
+        border-radius: 70%;
     }
 }

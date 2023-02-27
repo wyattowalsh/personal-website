@@ -4,19 +4,24 @@ description: "Part one of a three-part series on regularized linear regression"
 date: "2021-01-13"
 url: "https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c"
 image: "/img/blog/2021-01-13-regularized-linear-regression-models/cover.png"
+slug: "2021-01-13-regularized-linear-regression-models"
 ---
-import "2021-01-13-regularized-linear-regression-models.module.scss";
 
-## Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.0/dist/katex.min.css" integrity="sha384-Xi8rHCmBmhbuyyhbI88391ZKP2dmfnOl4rT9ZfRI7mLTdk1wblIUnrIq35nqwEvC" crossOrigin="anonymous"/>
 
-<figure>
-    <img style={{width: "50vw"}} src='/img/blog/2021-01-13-regularized-linear-regression-models/cover.png' alt='missing' />
-    <figcaption>Model Coefficient Value Changes With Growing Regularization Penalty Values</figcaption>
-</figure>
 
-Hey 👋
+<Header
+    kicker="REGULARIZED LINEAR REGRESSION MODELS"
+    title="Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)"
+    subTitle="Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy"
+/>
 
-Welcome to part one of a three-part deep-dive on **regularized linear regression modeling —** some of the most popular algorithms for supervised learning tasks**.**
+<Hero imgSrc="/img/blog/2021-01-13-regularized-linear-regression-models/cover.png" imgAlt="Blog post cover image" caption="Model Coefficient Value Changes With Growing Regularization Penalty Values" />
+
+
+### Hey 👋
+
+Welcome to part one of a three-part deep-dive on **regularized linear regression modeling —** some of the most popular algorithms for supervised learning tasks.
 
 Before hopping into the equations and code, let us first discuss what will be covered in this series.
 
@@ -28,29 +33,37 @@ Drawbacks of the OLS model and some possible remedies will be discussed in **[pa
 
 The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository **[here](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**
 
-# Introduction
+---
+
+## Introduction
 
 Managerial decision making, organizational efficiency, and revenue generation are all areas that can be improved through the utilization of data-based insights. Currently, these insights are being more readily sought out as technological accessibility stretches further and competitive advantages in the market are harder to acquire. One field that seeks to realize value within collected data samples is predictive analytics. By leveraging mathematical/statistical techniques and programming, practitioners are able to identify patterns within data allowing for the generation of valuable insights.
 
 ***Regression*** is one technique within predictive analytics that is used to predict the value of a continuous response variable given one or many related feature variables. Algorithms of this class accomplish this task by learning the relationships between the input (feature) variables and the output (response) variable through training on a sample dataset. How these relationships are learned, and furthermore used for prediction varies from algorithm to algorithm. The practitioner is faced with options for regression modeling algorithms, however, linear regression models tend to be explored early on in the process due to their ease of application and high explainability.
 
-# Linear Regression Modeling
+## Linear Regression Modeling
 
-A linear regression model learns the input-output relationships by fitting a linear function to the sample data. This can be mathematically formalized as:
+A linear regression model learns the input-output relationships by fitting a linear function to the sample data. This can be mathematically formalized as: 
 
-<figure>
-    <img style={{width: "50vw", backgroundColor: "white", color:"black", padding: "1rem"}} src='/img/blog/2021-01-13-regularized-linear-regression-models/eq1.png' alt='missing' />
-    <hr/>
-    <figcaption>Equation #1</figcaption>
-</figure>
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \dots + \beta_n x_n + \epsilon_i \; \forall \; i \in \{1,\dots,n\}
+$$
+
+where:
+    - p is the number of features
+    - n is the number of samples
+    - ε is an error term with mean of zero and finite variance
 
 Thus, the response is modeled as a weighted sum of the input variables multiplied by linear coefficients with an error term included. It will prove useful in future steps involving optimization to use vector notation. The linear modeling equation can be expressed this way as:
 
-<figure >
-    <img style={{width: "50vw", backgroundColor: "white", color:"black", padding: "1rem"}}  src='/img/blog/2021-01-13-regularized-linear-regression-models/eq2.png' alt='missing' />
-    <hr/>
-    <figcaption>Equation #2</figcaption>
-</figure>
+$$
+y = X\beta + \epsilon
+$$
+
+where:
+    - $y$ is a response vector $[y_1, y_2, \dots, y_n]$ of length $n$
+    - $X$ is a $n \times (p + 1)$ design matrix of features $[\textbf{1}, x_1, x_2, \dots, x_p]$
+    - $\beta$ is a length $(p+1)$ coefficient vector $[\beta_0, \beta_1, \beta_2, \dots, \beta_p]$
 
 An important aspect of the above equation to note is that there is a column of **1**’s appended to the design matrix. This is such that the first coefficient of the coefficient vector can serve as an intercept term. In cases where an intercept is not sought after this column can be omitted.
 

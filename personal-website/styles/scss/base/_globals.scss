@@ -4,10 +4,5 @@ body {
     Droid Sans, Helvetica Neue, sans-serif;
   -webkit-font-smoothing: auto;
   -moz-osx-font-smoothing: auto;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+  color: inherit;
 }

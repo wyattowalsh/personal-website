@@ -1,0 +1,26 @@
+.post {
+    padding: 1rem;
+    margin: 1rem;
+    border: 1px solid #eaeaea;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.title {
+    text-decoration: underline;
+}
+
+.date {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.mediumIcon {
+    width: 3rem;
+    height: 3rem;
+    margin-left: 1rem;
+}

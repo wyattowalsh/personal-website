@@ -18,7 +18,7 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Image from 'next/image'
 import styles from 'styles/scss/pages/links.module.scss'
-import LinksLayout from '../components/LinksLayout'
+import Layout from '../components/layouts/links'
 import Logo from '../public/img/profile-pic-square.webp'
 
 // -- Data ---------------------------------------------------------------------
@@ -120,5 +120,5 @@ export default function LinkTree() {
 }
 
 LinkTree.getLayout = function getLayout(page) {
-  return <LinksLayout>{page}</LinksLayout>
+  return <Layout>{page}</Layout>
 }

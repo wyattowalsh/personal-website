@@ -1,38 +1,42 @@
+import { Typography } from '@mui/material'
+import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import fs from 'fs'
+import matter from 'gray-matter'
 import path from 'path'
-import Layout from '../components/Layout'
-
-export const PROJECTS_PATH = path.join(process.cwd(), 'projects')
-
-export const projectFilePaths = fs
-  .readdirSync(PROJECTS_PATH)
-  // Only include md(x) files
-  .filter((path) => /\.mdx?$/.test(path))
-
-type Project = {
-  slug: string
-  content: string
-  title: string
-  description: string
-  date: string
-  url: string
-  image: string
+import Post from '../components/Post'
+import Layout from '../components/layouts/blog'
+import { PROJECTS_PATH, projectFilePaths } from '../utils/mdxUtils'
+import styles from './blog.module.scss'
+export default function Blog({ allPosts }: Props) {
+  return (
+    <Box className={styles.Container}>
+      <Box className={styles.blog}>
+        <Typography
+          variant="h1"
+          sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
+        >
+          Projects
+        </Typography>
+        <Typography variant="h2">All Posts:</Typography>
+        <Stack spacing={2} direction="column">
+          {allPosts.map((post) => (
+            <Box key={post.filePath}>
+              <Post {...post.data} />
+            </Box>
+          ))}
+        </Stack>
+      </Box>
+    </Box>
+  )
 }
 
-type project = {
-  content: string
-  data: Project
-  filePath: string
+Blog.getLayout = function getLayout(page) {
+  return <Layout>{page}</Layout>
 }
-
-type Props = {
-  allProjects: project[]
-}
-
-export default function Projects({ allProjects }: Props) {}
 
 export function getStaticProps() {
-  const allProjects = projectFilePaths.map((filePath) => {
+  const allPosts = projectFilePaths.map((filePath) => {
     const source = fs.readFileSync(path.join(PROJECTS_PATH, filePath))
     const { content, data } = matter(source)
 
@@ -42,9 +46,6 @@ export function getStaticProps() {
       filePath,
     }
   })
-  return { props: { allProjects } }
-}
 
-Projects.getLayout = function getLayout(page) {
-  return <Layout>{page}</Layout>
+  return { props: { allPosts } }
 }

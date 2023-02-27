@@ -2,7 +2,7 @@
 # Ignore secrets folder
 secrets/
 !secrets/README.md
-
+node_modules/
 /utils/
 
 # Created by https://www.toptal.com/developers/gitignore/api/linux,macos,windows,python,visualstudiocode,react,reactnative,jupyternotebooks,julia,r,ansible,angular,sass,sas,java,node,nextjs,ruby,solidity,soliditytruffle,spark,flask,scala,storybookjs,vuejs,nuxtjs,yarn,homebrew
@@ -17,7 +17,7 @@ app/**/*.js
 app/**/*.js.map
 
 # dependencies
-node_modules/
+# node_modules/
 bower_components/
 
 # IDEs and editors
@@ -64,7 +64,6 @@ develop-eggs/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
@@ -519,7 +518,7 @@ po/*~
 **/*.backup.*
 **/*.back.*
 
-node_modules
+# node_modules
 
 *.sublime*
 
@@ -959,7 +958,6 @@ package-lock.json
 .pydevproject
 .scala_dependencies
 .settings
-/lib/
 R-unit-tests.log
 R/unit-tests.out
 R/cran-check.out

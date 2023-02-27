@@ -1,23 +1,37 @@
+import { Typography } from '@mui/material'
 import Box from '@mui/material/Box'
+import Stack from '@mui/material/Stack'
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
-import Layout from '../components/Layout'
-
+import Layout from '../components/layouts/blog'
+import { BLOG_PATH, blogFilePaths } from '../utils/mdxUtils'
+import styles from './blog.module.scss'
 export default function Blog({ allPosts }: Props) {
   return (
-    <Box>
-      {allPosts.map((post) => (
-        <Box key={post.filePath}>
-          <Box>{post.data.title}</Box>
-          <Box>{post.data.description}</Box>
-          <Box>{post.data.date}</Box>
-          <Box>{post.data.url}</Box>
-          <Box>{post.data.image}</Box>
-        </Box>
-      ))}
+    <Box className={styles.Container}>
+      <Box className={styles.blog}>
+        <Typography
+          variant="h1"
+          sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
+        >
+          Blog
+        </Typography>
+        <Typography variant="h2">All Posts:</Typography>
+        <Stack spacing={2} direction="column">
+          {allPosts.map((post) => (
+            <Box key={post.filePath}>
+              <Post {...post.data} />
+            </Box>
+          ))}
+        </Stack>
+      </Box>
     </Box>
   )
+}
+
+Blog.getLayout = function getLayout(page) {
+  return <Layout>{page}</Layout>
 }
 
 export function getStaticProps() {
@@ -33,8 +47,4 @@ export function getStaticProps() {
   })
 
   return { props: { allPosts } }
-}
-
-Blog.getLayout = function getLayout(page) {
-  return <Layout>{page}</Layout>
 }

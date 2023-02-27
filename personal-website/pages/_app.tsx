@@ -2,14 +2,19 @@ import createCache from '@emotion/cache'
 import { CacheProvider, EmotionCache } from '@emotion/react'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
-import { PaletteMode } from '@mui/material'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
 import { Open_Sans } from '@next/font/google'
+import 'katex/dist/katex.min.css'
+import { ThemeProvider, useTheme } from 'next-themes'
 import type { AppProps } from 'next/app'
-import Script from 'next/script'
-
-const opensans = Open_Sans({ subsets: ['latin'], preload: true })
-
+import Head from 'next/head'
+import * as React from 'react'
+import darkTheme from '../components/theme/dark'
+import lightTheme from '../components/theme/light'
 import '../styles/main.scss'
+const opensans = Open_Sans({ subsets: ['latin'], preload: true })
 
 config.autoAddCss = false
 
@@ -20,28 +25,47 @@ const cache = createCache({
 
 interface MyAppProps extends AppProps {
   emotionCache?: EmotionCache
-  themeSetting: PaletteMode
 }
 
 export default function App({ Component, pageProps }: MyAppProps) {
   const getLayout = Component.getLayout || ((page) => page)
 
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+  const { resolvedTheme } = useTheme()
+  const [currentTheme, setCurrentTheme] = React.useState(darkTheme)
+
+  React.useEffect(() => {
+    if (prefersDarkMode) {
+      setCurrentTheme(darkTheme)
+    } else {
+      if (resolvedTheme === 'light') {
+        setCurrentTheme(lightTheme)
+      } else {
+        setCurrentTheme(darkTheme)
+      }
+    }
+  }, [resolvedTheme])
+
   return (
-    <>
-      {/* <!-- Google tag (gtag.js) --> */}
-      <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-17PRGFZN0C"
-        strategy="afterInteractive"
-      />
-      <Script src="/scripts/gtag.js" strategy="afterInteractive" />
-      <style jsx global>{`
-        html {
-          font-family: ${opensans.style.fontFamily};
-        }
-      `}</style>
-      <CacheProvider value={cache}>
-        {getLayout(<Component {...pageProps} />)}
-      </CacheProvider>
-    </>
+    <ThemeProvider>
+      <MuiThemeProvider theme={currentTheme}>
+        <CssBaseline enableColorScheme />
+        <CacheProvider value={cache}>
+          <Head>
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1"
+            />
+          </Head>
+          {/* <!-- Google tag (gtag.js) --> */}
+          <style jsx global>{`
+            html {
+              font-family: ${opensans.style.fontFamily};
+            }
+          `}</style>
+          {getLayout(<Component {...pageProps} />)}
+        </CacheProvider>
+      </MuiThemeProvider>
+    </ThemeProvider>
   )
 }
