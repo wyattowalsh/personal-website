@@ -138,6 +138,6 @@ export default function LinkTree() {
   )
 }
 
-LinkTree.getLayout = function getLayout(page) {
+LinkTree.getLayout = function getLayout(page: React.ReactNode) {
   return <Layout>{page}</Layout>
 }
