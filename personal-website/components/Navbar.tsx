@@ -50,7 +50,7 @@ const drawerWidth = 240
 
 interface LinkTabProps {
   href?: string
-  value?: number
+  value?: string
   label?: string
   icon?: string
   iconPosition?: 'bottom' | 'end' | 'start' | 'top' | undefined
