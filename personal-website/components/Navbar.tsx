@@ -49,7 +49,7 @@ interface Props {
 const drawerWidth = 240
 
 interface LinkTabProps {
-  href?: URL
+  href?: string
   value?: number
   label?: string
   icon?: React.ReactNode
@@ -60,8 +60,8 @@ interface LinkTabProps {
 
 function LinkTab(props: LinkTabProps) {
   return (
-    <Link href={props.href} passHref>
-      <Tab onClick={props.onClick} component="a" {...props} />
+    <Link href={`${props.href}`} passHref>
+      <Tab onClick={props.onClick} {...props} />
     </Link>
   )
 }
