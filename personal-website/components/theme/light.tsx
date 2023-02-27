@@ -102,7 +102,6 @@ export const lightTheme = responsiveFontSizes(
       MuiAppBar: {
         defaultProps: {
           color: 'secondary',
-          contrastText: 'white',
         },
       },
       MuiTooltip: {

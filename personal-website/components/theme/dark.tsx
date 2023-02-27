@@ -98,11 +98,10 @@ export const darkTheme = responsiveFontSizes(
     shape: {
       borderRadius: 4,
     },
-    overrides: {
+    components: {
       MuiAppBar: {
         defaultProps: {
-          color: '#6a9fb5',
-          contrastText: '#000',
+          color: 'secondary',
         },
       },
       MuiTooltip: {
