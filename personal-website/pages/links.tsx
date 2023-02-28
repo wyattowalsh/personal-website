@@ -18,12 +18,12 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Image from 'next/image'
 import Particles from 'react-particles'
-import styles from 'styles/scss/pages/links.module.scss'
 import { loadFull } from 'tsparticles'
 import type { Engine } from 'tsparticles-engine'
 import { ISourceOptions } from 'tsparticles-engine'
 import Layout from '../components/layouts/links'
 import Logo from '../public/img/profile-pic-square.webp'
+import styles from '../styles/scss/pages/links.module.scss'
 import particlesOptions from '../utils/particles.json'
 // -- Data ---------------------------------------------------------------------
 const links = [

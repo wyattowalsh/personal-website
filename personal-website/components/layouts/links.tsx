@@ -45,7 +45,6 @@ export default function Layout(children: any) {
       </Head>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-
         <main>{children}</main>
       </ThemeProvider>
     </>
