@@ -17,6 +17,7 @@ import Link from '@mui/material/Link'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Image from 'next/image'
+import * as React from 'react'
 import Particles from 'react-particles'
 import { loadFull } from 'tsparticles'
 import type { Engine } from 'tsparticles-engine'
@@ -138,6 +139,6 @@ export default function LinkTree() {
   )
 }
 
-LinkTree.getLayout = function getLayout(page: React.ReactNode) {
+LinkTree.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>
 }

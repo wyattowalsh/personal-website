@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack'
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
+import * as React from 'react'
 import Post from '../components/Post'
 import Layout from '../components/layouts/blog'
 import type { PostType } from '../interfaces/post'
@@ -25,7 +26,7 @@ export default function Blog({ allPosts }: Props) {
         </Typography>
         <Typography variant="h2">All Posts:</Typography>
         <Stack spacing={2} direction="column">
-          {allPosts.map((post) => (
+          {allPosts.map((post: PostType) => (
             <Box key={post.filePath}>
               <Post {...post.data} />
             </Box>
@@ -36,7 +37,7 @@ export default function Blog({ allPosts }: Props) {
   )
 }
 
-Blog.getLayout = function getLayout(page: React.ReactNode) {
+Blog.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>
 }
 

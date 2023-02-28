@@ -5,11 +5,12 @@ import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Head from 'next/head'
 import Image from 'next/image'
+import * as React from 'react'
 import Layout from '../components/layouts/base'
 import Avatar from '../public/img/avatar.webp'
 import styles from './index.module.scss'
 
-export default function Home() {
+function Home() {
   return (
     <Box
       className={styles.box}
@@ -134,7 +135,7 @@ export default function Home() {
   )
 }
 
-Home.getLayout = function getLayout(page: React.ReactNode) {
+Home.getLayout = function getLayout(page: React.ReactElement) {
   return (
     <>
       <Head>
@@ -159,7 +160,11 @@ Home.getLayout = function getLayout(page: React.ReactNode) {
         <link rel="icon" href="/favicon/favicon.ico" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <Layout>{page}</Layout>
+      <Layout>
+        <main>{page}</main>
+      </Layout>
     </>
   )
 }
+
+export default Home

@@ -1,9 +1,11 @@
 import Typography from '@mui/material/Typography'
 import fs from 'fs'
 import matter from 'gray-matter'
+import { GetStaticPaths } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import path from 'path'
+import * as React from 'react'
 import readingTime from 'reading-time'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeFormat from 'rehype-format'
@@ -57,7 +59,7 @@ export default function ProjectPage({
   )
 }
 
-ProjectPage.getLayout = function getLayout(page: React.ReactNode) {
+ProjectPage.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>
 }
 
@@ -115,7 +117,7 @@ export const getStaticProps = async ({
   }
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   const paths = projectFilePaths
     // Remove file extensions for page paths
     .map((path) => path.replace(/\.mdx?$/, ''))

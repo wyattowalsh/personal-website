@@ -31,7 +31,11 @@ theme = responsiveFontSizes(theme, {
   factor: 1,
 })
 
-export default function Layout(children: any) {
+type Props = {
+  children: React.ReactNode
+}
+
+export default function Layout({ children }: Props) {
   return (
     <>
       <Head>

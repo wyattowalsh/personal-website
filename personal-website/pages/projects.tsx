@@ -4,6 +4,7 @@ import Stack from '@mui/material/Stack'
 import fs from 'fs'
 import matter from 'gray-matter'
 import path from 'path'
+import * as React from 'react'
 import Post from '../components/Post'
 import Layout from '../components/layouts/blog'
 import type { ProjectType } from '../interfaces/project'
@@ -36,7 +37,7 @@ export default function Blog({ allProjects }: Props) {
   )
 }
 
-Blog.getLayout = function getLayout(page: React.ReactNode) {
+Blog.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>
 }
 

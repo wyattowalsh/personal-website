@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography'
 import fs from 'fs'
 import matter from 'gray-matter'
+import { GetStaticPaths } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 import path from 'path'
@@ -53,15 +54,11 @@ export default function BlogPage({ source, frontMatter, readingTime }: Props) {
   )
 }
 
-BlogPage.getLayout = function getLayout(page: React.ReactNode) {
+BlogPage.getLayout = function getLayout(page: React.ReactElement) {
   return <Layout>{page}</Layout>
 }
 
-export const getStaticProps = async ({
-  params,
-}: {
-  params: { slug: string }
-}) => {
+export const getStaticProps = async ({ params }: any) => {
   const postFilePath = path.join(BLOG_PATH, `${params.slug}.mdx`)
   const source = fs.readFileSync(postFilePath)
 
@@ -111,7 +108,7 @@ export const getStaticProps = async ({
   }
 }
 
-export const getStaticPaths = async () => {
+export const getStaticPaths: GetStaticPaths = async () => {
   const paths = blogFilePaths
     // Remove file extensions for page paths
     .map((path) => path.replace(/\.mdx?$/, ''))
