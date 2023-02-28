@@ -25,7 +25,6 @@ import Layout from '../../components/layouts/blog'
 import type { ProjectData } from '../../interfaces/project'
 import { PROJECTS_PATH, projectFilePaths } from '../../utils/mdxUtils'
 const rehypeFigure = require('rehype-figure')
-const rehypeInline = require('rehype-inline')
 const remarkHint = require('remark-hint')
 const remarkPrism = require('remark-prism')
 
@@ -101,7 +100,6 @@ export const getStaticProps = async ({
         [rehypeAutolinkHeadings],
         [rehypeFormat],
         [rehypeFigure],
-        [rehypeInline],
       ],
     },
   })
