@@ -3,12 +3,12 @@
 .Navbar {
     position: sticky;
     top: 0;
-    width: 100vw;
+    width: 100%;
     height: 10vh;
 }
 
 .toolbar {
-    width: 90vw;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     height: 10vh;
@@ -49,20 +49,24 @@
     &:hover {
         background: $myGold;
     }
+    font-size: clamp(0.35rem, 2vw, 2rem) !important;
 }
 
 .right {
-    flex: 1;
     display: flex;
     justify-content: flex-end;
-    margin-left: auto;
+    margin-left: 1rem;
     align-items: center;
 }
 
+.linksButton {
+    padding: 0.5rem !important;
+    margin: 0.1rem !important;
+}
+
 .social {
-    width: 2rem;
-    height: 2rem;
-    margin-right: 0.75rem;
+    width: clamp(1.5rem, 3vw, 5rem);
+    height: auto;
 }
 
 .drawerLink {

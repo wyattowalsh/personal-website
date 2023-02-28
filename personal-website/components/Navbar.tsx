@@ -394,9 +394,9 @@ export default function Navbar(props: Props) {
             onChange={handleChange}
             aria-label="Site Navigation Tabs"
             textColor="primary"
-            variant="fullWidth"
             centered
             className={styles.tabs}
+            sx={{ display: { xs: 'none', sm: 'block' } }}
           >
             <LinkTab
               value="one"
@@ -423,7 +423,7 @@ export default function Navbar(props: Props) {
               value="three"
               href="/projects"
               label="Projects"
-              icon={<Kanban size="2rem" />}
+              icon={<Kanban className={styles.social} />}
               iconPosition="end"
               className={styles.tab}
             />
@@ -433,6 +433,9 @@ export default function Navbar(props: Props) {
           className={styles.right}
           sx={{ display: { xs: 'none', sm: 'flex' } }}
         >
+          <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+            <ThemeUpdater />
+          </Box>
           <Box>
             <Button
               id="links-button"
@@ -443,14 +446,12 @@ export default function Navbar(props: Props) {
               disableElevation
               onClick={handleClick}
               endIcon={<FontAwesomeIcon icon={faArrowUpRightFromSquare} />}
-              sx={{ color: 'inherit' }}
+              sx={{ color: 'inherit', display: { xs: 'none', sm: 'flex' } }}
+              className={styles.linksButton}
             >
               Links
             </Button>
             {links}
-          </Box>
-          <Box>
-            <ThemeUpdater />
           </Box>
         </Box>
       </Toolbar>

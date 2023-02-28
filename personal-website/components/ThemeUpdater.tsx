@@ -26,6 +26,7 @@ const ThemeUpdater: FC<{}> = () => {
         )
       }
       onClick={() => setTheme(resolvedTheme === 'light' ? 'dark' : 'light')}
+      className={styles.updater}
     />
   )
 }
