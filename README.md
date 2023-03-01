@@ -1,6 +1,6 @@
 <h1 align='center'>Personal Website Implementation 🏠</h1>
 
-<img align='center' src=""/>
+<img align='center' src="utils/cover.gif"/>
 
 ---
 
