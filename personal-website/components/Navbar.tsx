@@ -50,26 +50,21 @@ const drawerWidth = 240
 
 interface LinkTabProps {
   href?: string
+  component?: string
   label?: string
   icon?: any
   iconPosition?: 'bottom' | 'end' | 'start' | 'top' | undefined
   className?: string
-  onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
 }
 
 function LinkTab(props: LinkTabProps) {
   return (
     <Link href={`${props.href}`} passHref>
       <Tab
-        component="a"
-        href={props.href}
         label={props.label}
         icon={props.icon}
         iconPosition={props.iconPosition}
         className={props.className}
-        onClick={(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-          event.preventDefault()
-        }}
       />
     </Link>
   )
@@ -325,7 +320,7 @@ export default function Navbar(props: Props) {
     </Box>
   )
 
-  const [value, setValue] = React.useState(0)
+  const [value, setValue] = React.useState(4)
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)

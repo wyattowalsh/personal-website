@@ -1,31 +1,33 @@
-import createCache from "@emotion/cache";
-import { CacheProvider, EmotionCache } from "@emotion/react";
-import { config } from "@fortawesome/fontawesome-svg-core";
-import "@fortawesome/fontawesome-svg-core/styles.css";
-import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider as MuiThemeProvider } from "@mui/material/styles";
-import { Open_Sans } from "@next/font/google";
-import "katex/dist/katex.min.css";
-import { ThemeProvider, useTheme } from "next-themes";
-import type { AppProps } from "next/app";
-import Head from "next/head";
-import * as React from "react";
-import darkTheme from "../components/theme/dark";
-import lightTheme from "../components/theme/light";
-import "../styles/main.scss";
-const opensans = Open_Sans({ subsets: ["latin"], preload: true });
+import createCache from '@emotion/cache'
+import { CacheProvider, EmotionCache } from '@emotion/react'
+import { config } from '@fortawesome/fontawesome-svg-core'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { Open_Sans } from '@next/font/google'
+import 'katex/dist/katex.min.css'
+import { ThemeProvider, useTheme } from 'next-themes'
+import type { AppProps } from 'next/app'
+import Head from 'next/head'
+import * as React from 'react'
+import darkTheme from '../components/theme/dark'
+import lightTheme from '../components/theme/light'
+import '../styles/main.scss'
 
-import { AppLayoutProps } from "next/app";
+const opensans = Open_Sans({ subsets: ['latin'], preload: true })
 
-config.autoAddCss = false;
+import { AppLayoutProps } from 'next/app'
+
+config.autoAddCss = false
 
 const cache = createCache({
-  key: "css",
+  key: 'css',
   prepend: true,
-});
+})
 
 interface MyAppProps extends AppProps {
-  emotionCache?: EmotionCache;
+  emotionCache?: EmotionCache
 }
 
 export default function App({
@@ -34,16 +36,18 @@ export default function App({
 }: AppLayoutProps & MyAppProps) {
   // Use getLayout from the page you are navigating to
   // So if you have a custom layout for that page it will be used
-  const getLayout = Component.getLayout || ((page: React.ReactNode) => page);
+  const getLayout = Component.getLayout || ((page: React.ReactNode) => page)
 
-  const { resolvedTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = React.useState(darkTheme);
+  const { resolvedTheme } = useTheme()
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
+  const defaultTheme = prefersDarkMode ? darkTheme : lightTheme
+  const [currentTheme, setCurrentTheme] = React.useState(defaultTheme)
 
   React.useEffect(() => {
-    resolvedTheme === "light"
+    resolvedTheme === 'light'
       ? setCurrentTheme(lightTheme)
-      : setCurrentTheme(darkTheme);
-  }, [resolvedTheme]);
+      : setCurrentTheme(darkTheme)
+  }, [resolvedTheme])
 
   return (
     <ThemeProvider>
@@ -66,5 +70,5 @@ export default function App({
         </CacheProvider>
       </MuiThemeProvider>
     </ThemeProvider>
-  );
+  )
 }
