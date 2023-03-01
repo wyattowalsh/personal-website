@@ -50,24 +50,26 @@ const drawerWidth = 240
 
 interface LinkTabProps {
   href?: string
-  value?: number
   label?: string
   icon?: any
   iconPosition?: 'bottom' | 'end' | 'start' | 'top' | undefined
   className?: string
-  onClick?: () => void
+  onClick?: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void
 }
 
 function LinkTab(props: LinkTabProps) {
   return (
     <Link href={`${props.href}`} passHref>
       <Tab
-        onClick={props.onClick}
-        value={props.value}
+        component="a"
+        href={props.href}
         label={props.label}
         icon={props.icon}
         iconPosition={props.iconPosition}
         className={props.className}
+        onClick={(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+          event.preventDefault()
+        }}
       />
     </Link>
   )
@@ -323,7 +325,7 @@ export default function Navbar(props: Props) {
     </Box>
   )
 
-  const [value, setValue] = React.useState()
+  const [value, setValue] = React.useState(0)
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
@@ -401,7 +403,6 @@ export default function Navbar(props: Props) {
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
             <LinkTab
-              value={1}
               href="/"
               label="About"
               icon={
@@ -414,7 +415,6 @@ export default function Navbar(props: Props) {
               className={styles.tab}
             />
             <LinkTab
-              value={2}
               href="/blog"
               label="Blog"
               icon={<FontAwesomeIcon icon={faBlog} className={styles.social} />}
@@ -422,7 +422,6 @@ export default function Navbar(props: Props) {
               className={styles.tab}
             />
             <LinkTab
-              value={3}
               href="/projects"
               label="Projects"
               icon={<Kanban className={styles.social} />}

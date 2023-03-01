@@ -1,51 +1,51 @@
-import Typography from "@mui/material/Typography";
-import fs from "fs";
-import matter from "gray-matter";
-import { GetStaticPaths } from "next";
-import { MDXRemote, MDXRemoteSerializeResult } from "next-mdx-remote";
-import { serialize } from "next-mdx-remote/serialize";
-import path from "path";
-import * as React from "react";
-import readingTime from "reading-time";
-import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeFormat from "rehype-format";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import codeTitle from "remark-code-title";
-import remarkDefinitionList from "remark-definition-list";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import remarkMermaid from "remark-mermaidjs";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import smartypants from "remark-smartypants";
-import remarkToc from "remark-toc";
-import Header from "../../components/BlogHeader";
-import Hero from "../../components/Hero";
-import Layout from "../../components/layouts/blog";
-import type { ProjectData } from "../../interfaces/project";
-import { PROJECTS_PATH, projectFilePaths } from "../../utils/mdxUtils";
-const rehypeFigure = require("rehype-figure");
-const remarkHint = require("remark-hint");
-const remarkPrism = require("remark-prism");
+import Typography from '@mui/material/Typography'
+import fs from 'fs'
+import matter from 'gray-matter'
+import { GetStaticPaths } from 'next'
+import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
+import path from 'path'
+import * as React from 'react'
+import readingTime from 'reading-time'
+import rehypeAutolinkHeadings from 'rehype-autolink-headings'
+import rehypeFormat from 'rehype-format'
+import rehypeKatex from 'rehype-katex'
+import rehypeStringify from 'rehype-stringify'
+import codeTitle from 'remark-code-title'
+import remarkDefinitionList from 'remark-definition-list'
+import remarkFrontmatter from 'remark-frontmatter'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import remarkMermaid from 'remark-mermaidjs'
+import remarkParse from 'remark-parse'
+import remarkRehype from 'remark-rehype'
+import smartypants from 'remark-smartypants'
+import remarkToc from 'remark-toc'
+import Header from '../../components/BlogHeader'
+import Hero from '../../components/Hero'
+import Layout from '../../components/layouts/blog'
+import type { ProjectData } from '../../interfaces/project'
+import { PROJECTS_PATH, projectFilePaths } from '../../lib/projects'
+const rehypeFigure = require('rehype-figure')
+const remarkHint = require('remark-hint')
+const remarkPrism = require('remark-prism')
 
 type Props = {
-  source: MDXRemoteSerializeResult;
-  frontMatter: ProjectData;
+  source: MDXRemoteSerializeResult
+  frontMatter: ProjectData
   readingTime: {
-    text: string;
-    minutes: number;
-    time: number;
-    words: number;
-  };
-};
+    text: string
+    minutes: number
+    time: number
+    words: number
+  }
+}
 
 const components = {
   Hero,
   Typography,
   Header,
-};
+}
 
 export default function ProjectPage({
   source,
@@ -56,22 +56,22 @@ export default function ProjectPage({
     <>
       <MDXRemote {...source} components={components} lazy />
     </>
-  );
+  )
 }
 
 ProjectPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <Layout>{page}</Layout>;
-};
+  return <Layout>{page}</Layout>
+}
 
 export const getStaticProps = async ({
   params,
 }: {
-  params: { slug: string };
+  params: { slug: string }
 }) => {
-  const postFilePath = path.join(PROJECTS_PATH, `${params.slug}.mdx`);
-  const source = fs.readFileSync(postFilePath);
+  const postFilePath = path.join(PROJECTS_PATH, `${params.slug}.mdx`)
+  const source = fs.readFileSync(postFilePath)
 
-  const { content, data } = matter(source);
+  const { content, data } = matter(source)
 
   const mdxSource = await serialize(content, {
     // Optionally pass remark/rehype plugins
@@ -87,8 +87,8 @@ export const getStaticProps = async ({
         [
           remarkMermaid,
           {
-            theme: "dark",
-            launchOptions: { executablePath: "/usr/bin/chromium-browser" },
+            theme: 'dark',
+            launchOptions: { executablePath: '/usr/bin/chromium-browser' },
           },
         ],
         [remarkPrism],
@@ -104,9 +104,9 @@ export const getStaticProps = async ({
         [rehypeFigure],
       ],
     },
-  });
+  })
 
-  const stats = readingTime(content);
+  const stats = readingTime(content)
 
   return {
     props: {
@@ -114,18 +114,18 @@ export const getStaticProps = async ({
       frontMatter: data,
       readingTime: stats,
     },
-  };
-};
+  }
+}
 
 export const getStaticPaths: GetStaticPaths = async () => {
   const paths = projectFilePaths
     // Remove file extensions for page paths
-    .map((path) => path.replace(/\.mdx?$/, ""))
+    .map((path) => path.replace(/\.mdx?$/, ''))
     // Map the path into the static paths object required by Next.js
-    .map((slug) => ({ params: { slug } }));
+    .map((slug) => ({ params: { slug } }))
 
   return {
     paths,
     fallback: false,
-  };
-};
+  }
+}
