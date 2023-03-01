@@ -15,7 +15,7 @@ export default function Layout({ children }: Props) {
   return (
     <>
       <Navbar />
-      <body style={{ paddingTop: '10vh' }}>{children}</body>
+      <main style={{ paddingTop: '10vh' }}>{children}</main>
       <Footer />
     </>
   )
