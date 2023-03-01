@@ -323,7 +323,7 @@ export default function Navbar(props: Props) {
     </Box>
   )
 
-  const [value, setValue] = React.useState('one')
+  const [value, setValue] = React.useState()
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue)
@@ -349,26 +349,28 @@ export default function Navbar(props: Props) {
       }}
     >
       <Toolbar className={styles.toolbar} sx={{ height: '100%' }}>
-        <Link href="/">
+        <Box
+          className={styles.imageContainer}
+          sx={{ display: { xs: 'none', sm: 'flex' } }}
+        >
           <Tooltip title="Return Home" arrow>
-            <Box
-              className={styles.imageContainer}
-              sx={{ display: { xs: 'none', sm: 'flex' } }}
-            >
+            <Link href="/">
               <Image className={styles.image} src={Logo} alt="Site Logo" fill />
-            </Box>
+            </Link>
           </Tooltip>
-        </Link>
-        <Link href="/">
+        </Box>
+
+        <Box
+          className={styles.imageContainer}
+          sx={{ display: { xs: 'flex', sm: 'none' } }}
+        >
           <Tooltip title="Return Home" arrow>
-            <Box
-              className={styles.imageContainer}
-              sx={{ display: { xs: 'flex', sm: 'none' } }}
-            >
+            <Link href="/">
               <Image className={styles.image} src={Logo} alt="Site Logo" fill />
-            </Box>
+            </Link>
           </Tooltip>
-        </Link>
+        </Box>
+
         <Box sx={{ display: { xs: 'block', sm: 'none' } }}>
           <IconButton
             color="primary"

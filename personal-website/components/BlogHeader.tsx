@@ -1,12 +1,12 @@
-import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
-import Typography from '@mui/material/Typography'
-import styles from './BlogHeader.module.scss'
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import styles from "./BlogHeader.module.scss";
 
 interface Props {
-  kicker: string
-  title: string
-  subTitle: string
+  kicker: string;
+  title: string;
+  subTitle: string;
 }
 
 export default function Header(props: Props) {
@@ -15,7 +15,7 @@ export default function Header(props: Props) {
       <Typography
         variant="h6"
         component="h3"
-        sx={{ fontSize: 'small' }}
+        sx={{ fontSize: "small" }}
         gutterBottom
       >
         {props.kicker}
@@ -33,5 +33,5 @@ export default function Header(props: Props) {
       </Typography>
       <Divider />
     </Box>
-  )
+  );
 }

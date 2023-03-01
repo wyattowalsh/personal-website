@@ -1,23 +1,23 @@
-import FileDownloadIcon from '@mui/icons-material/FileDownload'
-import Box from '@mui/material/Box'
-import Button from '@mui/material/Button'
-import Tooltip from '@mui/material/Tooltip'
-import Typography from '@mui/material/Typography'
-import Head from 'next/head'
-import Image from 'next/image'
-import * as React from 'react'
-import Layout from '../components/layouts/base'
-import Avatar from '../public/img/avatar.webp'
-import styles from './index.module.scss'
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Tooltip from "@mui/material/Tooltip";
+import Typography from "@mui/material/Typography";
+import Head from "next/head";
+import Image from "next/image";
+import * as React from "react";
+import Layout from "../components/layouts/base";
+import Avatar from "../public/img/avatar.webp";
+import styles from "./index.module.scss";
 
 function Home() {
   return (
     <Box
       className={styles.box}
       sx={{
-        flexDirection: { xs: 'column', md: 'row' },
-        justifyItems: { xs: 'center', md: 'space-between' },
-        alignItems: { xs: 'center', md: 'flex-start' },
+        flexDirection: { xs: "column", md: "row" },
+        justifyItems: { xs: "center", md: "space-between" },
+        alignItems: { xs: "center", md: "flex-start" },
       }}
     >
       <Box className={styles.left}>
@@ -38,8 +38,8 @@ function Home() {
                 alt="Personal Avatar"
                 width={250}
                 style={{
-                  maxWidth: '100%',
-                  height: 'auto',
+                  maxWidth: "100%",
+                  height: "auto",
                 }}
               />
             </Box>
@@ -62,17 +62,17 @@ function Home() {
       </Box>
       <Box
         className={styles.about}
-        sx={{ maxWidth: { xs: '100%', md: '60%' } }}
+        sx={{ maxWidth: { xs: "100%", md: "60%" } }}
       >
         <Typography variant="h1" className={styles.mainHeading}>
           About Me
         </Typography>
         <br />
-        <Typography variant="h5" sx={{ fontWeight: '700' }}>
+        <Typography variant="h5" sx={{ fontWeight: "700" }}>
           Hey there! <span className={styles.wave}>👋</span>
         </Typography>
         <br />
-        <Typography variant="h6" sx={{ fontWeight: '700' }}>
+        <Typography variant="h6" sx={{ fontWeight: "700" }}>
           My name is Wyatt Walsh.
         </Typography>
         <br />
@@ -132,7 +132,7 @@ function Home() {
         </Typography>
       </Box>
     </Box>
-  )
+  );
 }
 
 Home.getLayout = function getLayout(page: React.ReactElement) {
@@ -164,7 +164,7 @@ Home.getLayout = function getLayout(page: React.ReactElement) {
         <main>{page}</main>
       </Layout>
     </>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

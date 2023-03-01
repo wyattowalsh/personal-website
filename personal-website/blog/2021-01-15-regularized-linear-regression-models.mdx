@@ -24,27 +24,23 @@ Save
 
 ](https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fbookmark%2Fp%2Fdcf5aa662ab9&operation=register&redirect=https%3A%2F%2Ftowardsdatascience.com%2Fregularized-linear-regression-models-dcf5aa662ab9&source=--------------------------bookmark_header-----------)
 
-[Regularized Linear Regression Models](https://towardsdatascience.com/tagged/regularized-regression)
-----------------------------------------------------------------------------------------------------
+## [Regularized Linear Regression Models](https://towardsdatascience.com/tagged/regularized-regression)
 
-Implementing Pathwise Coordinate Descent For The Lasso and The Elastic Net In Python Using NumPy
-================================================================================================
+# Implementing Pathwise Coordinate Descent For The Lasso and The Elastic Net In Python Using NumPy
 
-Explanations for Solving Some of the Most Popular Supervised Learning Algorithms
---------------------------------------------------------------------------------
+## Explanations for Solving Some of the Most Popular Supervised Learning Algorithms
 
 Model Coefficient Value Changes With Growing Regularization Penalty Values (_Image by author)_
 
 Hey there! 👋
 
-Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In  [**part one**](https://medium.com/regularized-linear-regression-models-57bbdce90a8c), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](https://medium.com/regularized-linear-regression-models-44572e79a1b5), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
+Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](https://medium.com/regularized-linear-regression-models-57bbdce90a8c), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](https://medium.com/regularized-linear-regression-models-44572e79a1b5), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
 
 The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**.**
 
-The Lasso for Regression
-========================
+# The Lasso for Regression
 
-The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function ([Part One](https://medium.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**.  In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
+The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function ([Part One](https://medium.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
 
 **_The Lasso_** loss function can be formalized as:
 
@@ -58,8 +54,7 @@ However, unlike previous cases, no closed-form solution exists for this problem.
 
 Numerous algorithms exist to this end, such as **_LARS_** (Least Angle Regression) and **_Forward Stepwise Regression_**, however, the **_Pathwise Coordinate Descent_** algorithm is leveraged within this work. In short, this algorithm optimizes a parameter at a time holding all other parameters constant.
 
-Pathwise Coordinate Descent
----------------------------
+## Pathwise Coordinate Descent
 
 Before beginning the algorithm, all features should be standardized to have zero mean and variance of one. From there, a **_p+1_** length coefficient vector is initialized to zero. Cycles are then run across all coefficients until convergence — where values of the coefficients stabilize and do not change more than a certain tolerance — is reached. Within each cycle, for every coefficient, an update is calculated and subsequently has the soft-thresholding operator applied to it.
 
@@ -85,7 +80,7 @@ When the number of samples is much greater than the number of features (**_n_** 
 
 Equation #7
 
-Utilizing **_warm starts_**  can bring efficiency boosts as well. Using **_warm starts_**, a sequence of models are fitted — with tuning parameter values from a max tuning parameter value down to a minimum tuning parameter value that is some small factor (thousandth) of the max value — initializing the coefficients of each iteration to the solution of the last iteration. In many cases, it is actually faster to fit this path of models than a single model for some small **_λ._** Thus the path can be expressed as:
+Utilizing **_warm starts_** can bring efficiency boosts as well. Using **_warm starts_**, a sequence of models are fitted — with tuning parameter values from a max tuning parameter value down to a minimum tuning parameter value that is some small factor (thousandth) of the max value — initializing the coefficients of each iteration to the solution of the last iteration. In many cases, it is actually faster to fit this path of models than a single model for some small **_λ._** Thus the path can be expressed as:
 
 Equation #8
 
@@ -97,15 +92,13 @@ Equation #9
 
 By providing a starting place to begin searching for optimality, warm starting can many times speed up convergence and also puts the _pathwise_ in the **_Pathwise_ _Coordinate Descent_** algorithm.
 
-Implementation of the Lasso In Python Using NumPy
--------------------------------------------------
+## Implementation of the Lasso In Python Using NumPy
 
 One possible way to implement **_pathwise coordinate descen_**t for **_the Lasso_** (with options for tuning the convergence tolerance, path length, and returning the path) is:
 
 Python Implementation Using Numpy of the Lasso for Regression
 
-The Elastic Net
-===============
+# The Elastic Net
 
 In this form of regularized linear regression, the OLS loss function is changed by the addition of both an **_L₁_** and **_L₂_** penalty to the loss function with tuning parameters controlling the intensity of regularization and the balance between the different penalties. This loss function can be formalized as:
 
@@ -127,19 +120,17 @@ The soft-thresholding operator is the same operator applied in **_the Lasso_** u
 
 Equation #13
 
-Furthermore, **naive updates** or  **covariance updates** can be used  along with **warm starts**. For **warm starts**, the max **_λ_** value can be calculated as:
+Furthermore, **naive updates** or **covariance updates** can be used along with **warm starts**. For **warm starts**, the max **_λ_** value can be calculated as:
 
 Equation #14
 
-Implementation in Python Using NumPy
-------------------------------------
+## Implementation in Python Using NumPy
 
 One possible way to implement **_pathwise coordinate descent_** to solve **_the Elastic Net_** (with options for tuning the convergence tolerance, path length, and returning the path) is:
 
 The Elastic Net for Regression in Python using NumPy
 
-Conclusion
-==========
+# Conclusion
 
 Throughout this series, different regularized forms of linear regression have been examined as tools to overcome the tendency to overfit training data of the **_Ordinary Least Squares_** model. **_The Elastic Net_** — due to its balance between regularization varieties — tends to be the most robust to aid the **overfitting** issue, however, **_the Lasso_** certainly can prove helpful in many situations due to its **automated feature selection**. **_Ridge Regression_** is also a good tool to use to ensure a reduction in possible model overfitting as it shrinks model coefficients towards zero, reducing model variance.
 

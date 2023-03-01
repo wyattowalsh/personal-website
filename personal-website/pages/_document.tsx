@@ -9,17 +9,17 @@ import Document, {
   Html,
   Main,
   NextScript,
-} from 'next/document'
+} from "next/document";
 
-import Script from 'next/script'
+import Script from "next/script";
 // == Document ==================================================================
 class MyDocument extends Document {
   static async getInitialProps(
-    ctx: DocumentContext,
+    ctx: DocumentContext
   ): Promise<DocumentInitialProps> {
-    const initialProps = await Document.getInitialProps(ctx)
+    const initialProps = await Document.getInitialProps(ctx);
 
-    return initialProps
+    return initialProps;
   }
   render() {
     return (
@@ -70,8 +70,8 @@ class MyDocument extends Document {
           <NextScript />
         </body>
       </Html>
-    )
+    );
   }
 }
 
-export default MyDocument
+export default MyDocument;

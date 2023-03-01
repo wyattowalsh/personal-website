@@ -24,8 +24,8 @@ import type { Engine } from 'tsparticles-engine'
 import { ISourceOptions } from 'tsparticles-engine'
 import Layout from '../components/layouts/links'
 import Logo from '../public/img/profile-pic-square.webp'
-import styles from '../styles/scss/pages/links.module.scss'
-import particlesOptions from '../utils/particles.json'
+import particlesOptions from '../public/particles.json'
+import styles from './links.module.scss'
 // -- Data ---------------------------------------------------------------------
 const links = [
   {

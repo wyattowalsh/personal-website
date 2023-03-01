@@ -1,13 +1,13 @@
-import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
-import Typography from '@mui/material/Typography'
-import Image from 'next/image'
-import styles from './Hero.module.scss'
+import Box from "@mui/material/Box";
+import Divider from "@mui/material/Divider";
+import Typography from "@mui/material/Typography";
+import Image from "next/image";
+import styles from "./Hero.module.scss";
 
 interface Props {
-  imgSrc: string
-  imgAlt: string
-  caption: string
+  imgSrc: string;
+  imgAlt: string;
+  caption: string;
 }
 
 export default function Hero(props: Props) {
@@ -33,5 +33,5 @@ export default function Hero(props: Props) {
       </figure>
       <Divider />
     </Box>
-  )
+  );
 }

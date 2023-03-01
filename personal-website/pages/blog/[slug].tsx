@@ -24,7 +24,7 @@ import Header from '../../components/BlogHeader'
 import Hero from '../../components/Hero'
 import Layout from '../../components/layouts/blog'
 import type { PostData } from '../../interfaces/post'
-import { BLOG_PATH, blogFilePaths } from '../../utils/mdxUtils'
+import { BLOG_PATH, blogFilePaths } from '../../lib/blog'
 const rehypeFigure = require('rehype-figure')
 const remarkHint = require('remark-hint')
 const remarkPrism = require('remark-prism')

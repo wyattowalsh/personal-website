@@ -12,11 +12,13 @@ export default function Post(Post: PostData) {
   return (
     <Link href={`/blog/${Post.slug}`}>
       <Box className={styles.post}>
+        <Box className={styles.title}>
+          <Typography variant="h6">{Post.title}</Typography>
+        </Box>
+        <Box className={styles.description}>
+          <Typography variant="body1">{Post.description}</Typography>
+        </Box>
         <Box className={styles.date}>
-          <Typography variant="body2">
-            <b>Date Written: </b>
-            {Post.date}
-          </Typography>
           <Tooltip title="See the post on Medium" arrow>
             <Button
               href={Post.url}
@@ -29,12 +31,10 @@ export default function Post(Post: PostData) {
               }
             />
           </Tooltip>
-        </Box>
-        <Box className={styles.title}>
-          <Typography variant="h6">{Post.title}</Typography>
-        </Box>
-        <Box className={styles.description}>
-          <Typography variant="body1">{Post.description}</Typography>
+          <Typography variant="body2">
+            <b>Date Written: </b>
+            {Post.date}
+          </Typography>
         </Box>
       </Box>
     </Link>

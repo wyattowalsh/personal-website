@@ -1,77 +1,76 @@
 @import "styles/scss/abstracts/__abstracts-dir.scss";
 
 .Navbar {
-    position: sticky;
-    top: 0;
-    width: 100%;
-    height: 10vh;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 10vh;
 }
 
 .toolbar {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    height: 10vh;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
 }
 
 .imageContainer {
-    position: relative;
-    width: 8vh;
-    height: 8vh;
-    margin-right: auto;
-    &:hover {
-        background: $myGold;
-    }
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
+  position: relative;
+  width: 8vh;
+  height: 8vh;
+  margin-right: auto;
+  &:hover {
+    background: $myGold;
+  }
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .image {
-    object-fit: contain;
+  object-fit: contain;
 }
 
 .tabs {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    top: 0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
 }
 
 .tab {
-    font-weight: 700;
-    color: inherit;
-    &:hover {
-        background: $myGold;
-    }
-    font-size: clamp(0.35rem, 2vw, 2rem) !important;
+  font-weight: 700;
+  color: inherit;
+  &:hover {
+    background: $myGold;
+  }
+  font-size: clamp(0.35rem, 1.5vw, 2rem) !important;
 }
 
 .right {
-    display: flex;
-    justify-content: flex-end;
-    margin-left: 1rem;
-    align-items: center;
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 1rem;
+  align-items: center;
 }
 
 .linksButton {
-    padding: 0.5rem !important;
-    margin: 0.1rem !important;
+  padding: 0.5rem !important;
+  margin: 0.1rem !important;
 }
 
 .social {
-    width: clamp(1.5rem, 3vw, 5rem);
-    height: auto;
+  width: clamp(1.5rem, 2vw, 5rem);
+  height: auto;
 }
 
 .drawerLink {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
 }

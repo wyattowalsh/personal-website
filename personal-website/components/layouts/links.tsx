@@ -3,37 +3,37 @@
 // -- Imports ------------------------------------------------------------------
 // React & NextJS imports
 // MUI imports
-import CssBaseline from '@mui/material/CssBaseline'
+import CssBaseline from "@mui/material/CssBaseline";
 import {
   ThemeProvider,
   createTheme,
   responsiveFontSizes,
-} from '@mui/material/styles'
+} from "@mui/material/styles";
 // Components imports
-import Head from 'next/head'
+import Head from "next/head";
 
 let theme = createTheme({
   typography: {
     h1: {
-      fontSize: '1.5rem',
+      fontSize: "1.5rem",
       fontFamily: '"Ubuntu Mono"',
       fontWeight: 900,
     },
     h2: {
-      fontSize: '1.25rem',
+      fontSize: "1.25rem",
       fontFamily: '"Ubuntu Mono"',
       fontWeight: 900,
     },
   },
-})
+});
 theme = responsiveFontSizes(theme, {
-  breakpoints: ['xs', 'sm', 'md', 'lg', 'xl'],
+  breakpoints: ["xs", "sm", "md", "lg", "xl"],
   factor: 1,
-})
+});
 
 type Props = {
-  children: React.ReactNode
-}
+  children: React.ReactNode;
+};
 
 export default function Layout({ children }: Props) {
   return (
@@ -52,5 +52,5 @@ export default function Layout({ children }: Props) {
         <main>{children}</main>
       </ThemeProvider>
     </>
-  )
+  );
 }
