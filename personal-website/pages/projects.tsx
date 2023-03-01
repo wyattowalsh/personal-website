@@ -14,22 +14,20 @@ type Props = {
 export default function Projects({ allProjects }: Props) {
   return (
     <Box className={styles.Container}>
-      <Box className={styles.blog}>
-        <Typography
-          variant="h1"
-          sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
-        >
-          Projects
-        </Typography>
-        <Typography variant="h2">All Posts:</Typography>
-        <Stack spacing={2} direction="column">
-          {allProjects.map((project) => (
-            <Box key={project.filePath}>
-              <Post {...project.data} />
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+      <Typography
+        variant="h1"
+        sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
+      >
+        Projects
+      </Typography>
+      <Typography variant="h2">All Posts:</Typography>
+      <Stack spacing={2} direction="column">
+        {allProjects.map((project) => (
+          <Box key={project.filePath}>
+            <Post {...project.data} />
+          </Box>
+        ))}
+      </Stack>
     </Box>
   )
 }

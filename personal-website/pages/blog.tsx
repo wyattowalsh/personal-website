@@ -13,22 +13,20 @@ type Props = {
 export default function Blog({ allPosts }: Props) {
   return (
     <Box className={styles.Container}>
-      <Box className={styles.blog}>
-        <Typography
-          variant="h1"
-          sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
-        >
-          Blog
-        </Typography>
-        <Typography variant="h2">All Posts:</Typography>
-        <Stack spacing={2} direction="column">
-          {allPosts.map((post: PostType) => (
-            <Box key={post.filePath}>
-              <Post {...post.data} />
-            </Box>
-          ))}
-        </Stack>
-      </Box>
+      <Typography
+        variant="h1"
+        sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
+      >
+        Blog
+      </Typography>
+      <Typography variant="h2">All Posts:</Typography>
+      <Stack spacing={2} direction="column">
+        {allPosts.map((post: PostType) => (
+          <Box key={post.filePath}>
+            <Post {...post.data} />
+          </Box>
+        ))}
+      </Stack>
     </Box>
   )
 }
