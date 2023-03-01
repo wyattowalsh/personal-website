@@ -50,7 +50,7 @@ const drawerWidth = 240
 
 interface LinkTabProps {
   href?: string
-  value?: string
+  value?: number
   label?: string
   icon?: any
   iconPosition?: 'bottom' | 'end' | 'start' | 'top' | undefined
@@ -325,7 +325,7 @@ export default function Navbar(props: Props) {
 
   const [value, setValue] = React.useState()
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue)
   }
 
@@ -401,7 +401,7 @@ export default function Navbar(props: Props) {
             sx={{ display: { xs: 'none', sm: 'block' } }}
           >
             <LinkTab
-              value="one"
+              value={1}
               href="/"
               label="About"
               icon={
@@ -414,7 +414,7 @@ export default function Navbar(props: Props) {
               className={styles.tab}
             />
             <LinkTab
-              value="two"
+              value={2}
               href="/blog"
               label="Blog"
               icon={<FontAwesomeIcon icon={faBlog} className={styles.social} />}
@@ -422,7 +422,7 @@ export default function Navbar(props: Props) {
               className={styles.tab}
             />
             <LinkTab
-              value="three"
+              value={3}
               href="/projects"
               label="Projects"
               icon={<Kanban className={styles.social} />}
