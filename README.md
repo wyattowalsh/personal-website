@@ -31,3 +31,9 @@ This repo contains the associated code base for building my personal website. Th
 ---
 
 # Notes
+
+## To Fix/Update/Extend
+
+- [ ] Fix blog posts' syntax
+- [ ] Add code block (w/ syntax highlighting) support
+- [ ] Create unique project preview component
