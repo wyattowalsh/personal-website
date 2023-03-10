@@ -2,6 +2,7 @@ import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import fs from 'fs'
 import matter from 'gray-matter'
+import langPython from 'highlight.js/lib/languages/python'
 import { GetStaticPaths } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -10,17 +11,15 @@ import path from 'path'
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
 import readingTime from 'reading-time'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypeFigure from 'rehype-figure'
+import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import rehypeStringify from 'rehype-stringify'
 import codeTitle from 'remark-code-title'
 import remarkDefinitionList from 'remark-definition-list'
 import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
-import remarkHint from 'remark-hint'
 import remarkMath from 'remark-math'
 import remarkMermaid from 'remark-mermaidjs'
-import remarkPrism from 'remark-prism'
 import smartypants from 'remark-smartypants'
 import remarkToc from 'remark-toc'
 import Header from '../../components/BlogHeader'
@@ -74,7 +73,7 @@ export const getStaticProps = async ({ params }: any) => {
         [remarkDefinitionList],
         [remarkFrontmatter],
         [remarkGfm],
-        [remarkHint],
+        [require('remark-hint')],
         [remarkMath],
         [
           remarkMermaid,
@@ -86,29 +85,21 @@ export const getStaticProps = async ({ params }: any) => {
         [smartypants],
         [remarkToc],
         [codeTitle],
-        [
-          remarkPrism,
-          {
-            transformInlineCode: true,
-            plugins: [
-              'autolinker',
-              'command-line',
-              'data-uri-highlight',
-              'diff-highlight',
-              'inline-color',
-              'keep-markup',
-              'line-numbers',
-              'show-invisibles',
-              'treeview',
-            ],
-          },
-        ],
+        [require('remark-prism')],
       ],
       rehypePlugins: [
         [rehypeStringify],
         [rehypeKatex],
         [rehypeAutolinkHeadings],
-        [rehypeFigure],
+        [require('rehype-figure')],
+        [
+          rehypeHighlight,
+          {
+            languages: {
+              python: langPython,
+            },
+          },
+        ],
       ],
     },
   })

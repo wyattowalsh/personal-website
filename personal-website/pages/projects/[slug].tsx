@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography'
 import fs from 'fs'
 import matter from 'gray-matter'
+import langPython from 'highlight.js/lib/languages/python'
 import { GetStaticPaths } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -8,7 +9,7 @@ import path from 'path'
 import * as React from 'react'
 import readingTime from 'reading-time'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
-import rehypeFormat from 'rehype-format'
+import rehypeHighlight from 'rehype-highlight'
 import rehypeKatex from 'rehype-katex'
 import rehypeStringify from 'rehype-stringify'
 import codeTitle from 'remark-code-title'
@@ -17,8 +18,6 @@ import remarkFrontmatter from 'remark-frontmatter'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import remarkMermaid from 'remark-mermaidjs'
-import remarkParse from 'remark-parse'
-import remarkRehype from 'remark-rehype'
 import smartypants from 'remark-smartypants'
 import remarkToc from 'remark-toc'
 import Header from '../../components/BlogHeader'
@@ -28,7 +27,6 @@ import type { ProjectData } from '../../interfaces/project'
 import { PROJECTS_PATH, projectFilePaths } from '../../lib/projects'
 const rehypeFigure = require('rehype-figure')
 const remarkHint = require('remark-hint')
-const remarkPrism = require('remark-prism')
 
 type Props = {
   source: MDXRemoteSerializeResult
@@ -77,12 +75,10 @@ export const getStaticProps = async ({
     // Optionally pass remark/rehype plugins
     mdxOptions: {
       remarkPlugins: [
-        [remarkRehype],
         [remarkDefinitionList],
         [remarkFrontmatter],
         [remarkGfm],
-        [remarkHint],
-        [remarkParse],
+        [require('remark-hint')],
         [remarkMath],
         [
           remarkMermaid,
@@ -91,17 +87,24 @@ export const getStaticProps = async ({
             launchOptions: { executablePath: '/usr/bin/chromium-browser' },
           },
         ],
-        [remarkPrism],
         [smartypants],
         [remarkToc],
         [codeTitle],
+        [require('remark-prism')],
       ],
       rehypePlugins: [
         [rehypeStringify],
         [rehypeKatex],
         [rehypeAutolinkHeadings],
-        [rehypeFormat],
-        [rehypeFigure],
+        [require('rehype-figure')],
+        [
+          rehypeHighlight,
+          {
+            languages: {
+              python: langPython,
+            },
+          },
+        ],
       ],
     },
   })
