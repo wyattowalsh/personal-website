@@ -52,7 +52,9 @@ export default function ProjectPage({
 }: Props) {
   return (
     <>
-      <MDXRemote {...source} components={components} lazy />
+      <Box className={styles.container}>
+        <MDXRemote {...source} components={components} lazy />
+      </Box>
     </>
   )
 }
