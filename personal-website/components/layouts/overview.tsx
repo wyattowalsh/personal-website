@@ -8,7 +8,7 @@
 import Box from '@mui/material/Box'
 import Footer from '../Footer'
 import Navbar from '../Navbar'
-import styles from './blog.module.scss'
+import styles from './overview.module.scss'
 
 type Props = {
   children: React.ReactNode
@@ -19,7 +19,7 @@ export default function Layout({ children }: Props) {
     <>
       <Box className={styles.container}>
         <Navbar />
-        <Box className={styles.childrenContainer}>{children}</Box>
+        <Box className={styles.containerInner}>{children}</Box>
         <Footer />
       </Box>
     </>

@@ -41,6 +41,7 @@ function Home() {
                   maxWidth: '100%',
                   height: 'auto',
                 }}
+                quality={100}
               />
             </Box>
           </a>

@@ -33,24 +33,35 @@
 .image {
   object-fit: contain;
 }
-
+.navButtons {
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
 .tabs {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  top: 0;
+  height: 10vh;
+  align-self: center;
+}
+.tabs > div > div {
+  height: 10vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .tab {
-  font-weight: 700;
+  font-weight: 800 !important;
   color: black !important;
   &:hover {
     background: $myGold;
   }
   font-size: clamp(0.35rem, 1.5vw, 2rem) !important;
-  &:active {
-    background: $myGold;
-  }
 }
 .tab > svg {
   width: clamp(0.35rem, 2.75vw, 4rem) !important;
@@ -68,10 +79,42 @@
 }
 
 .linksButton {
+  font-weight: 800 !important;
   padding: 1rem !important;
   margin: 0.1rem !important;
+  border: 0.15rem solid $myBlue !important;
   &:hover {
     scale: 1.1;
+    background: rgba($myGold, 0.35) !important;
+  }
+}
+.linksButton > span > svg {
+  width: clamp(0.35rem, 1.5vw, 4rem) !important;
+  height: auto;
+  color: $myBlue;
+  background-color: rgba(255, 255, 255, 0.1);
+  background-clip: text;
+}
+.linksIcon {
+  &:hover {
+    animation: wobble 1s infinite;
+  }
+}
+@keyframes wobble {
+  0% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+  100% {
+    transform: rotate(0deg);
   }
 }
 

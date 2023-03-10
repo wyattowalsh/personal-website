@@ -440,7 +440,12 @@ export default function Navbar(props: Props) {
               variant="outlined"
               disableElevation
               onClick={handleClick}
-              endIcon={<FontAwesomeIcon icon={faArrowUpRightFromSquare} />}
+              endIcon={
+                <FontAwesomeIcon
+                  icon={faArrowUpRightFromSquare}
+                  className={styles.linksIcon}
+                />
+              }
               sx={{ color: 'inherit', display: { xs: 'none', sm: 'flex' } }}
               className={styles.linksButton}
             >

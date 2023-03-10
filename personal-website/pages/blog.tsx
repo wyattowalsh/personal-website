@@ -3,7 +3,7 @@ import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import * as React from 'react'
 import Post from '../components/Post'
-import Layout from '../components/layouts/blog'
+import Layout from '../components/layouts/overview'
 import type { PostType } from '../interfaces/post'
 import styles from './blog.module.scss'
 

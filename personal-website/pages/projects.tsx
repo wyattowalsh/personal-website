@@ -3,9 +3,9 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import * as React from 'react'
 import ProjectCard from '../components/ProjectCard'
-import Layout from '../components/layouts/blog'
+import Layout from '../components/layouts/overview'
 import type { ProjectType } from '../interfaces/project'
-import styles from './blog.module.scss'
+import styles from './projects.module.scss'
 
 type Props = {
   allProjects: ProjectType[]

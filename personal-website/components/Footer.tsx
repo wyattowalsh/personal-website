@@ -5,13 +5,13 @@ import {
   faMedium,
   faSpotify,
   faTwitter,
-} from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Box from "@mui/material/Box";
-import Tooltip from "@mui/material/Tooltip";
-import Image from "next/image";
-import Logo from "../public/img/logo.webp";
-import styles from "./Footer.module.scss";
+} from '@fortawesome/free-brands-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import Box from '@mui/material/Box'
+import Tooltip from '@mui/material/Tooltip'
+import Image from 'next/image'
+import Logo from '../public/img/logo.webp'
+import styles from './Footer.module.scss'
 
 export default function Footer() {
   return (
@@ -22,7 +22,7 @@ export default function Footer() {
       <hr className={styles.rule} />
       <Box
         className={styles.socials}
-        sx={{ fontSize: { xs: "1.5rem", md: "1.75rem" } }}
+        sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' } }}
       >
         <Tooltip title="LinkedIn" arrow>
           <a
@@ -104,5 +104,5 @@ export default function Footer() {
         </Tooltip>
       </Box>
     </Box>
-  );
+  )
 }
