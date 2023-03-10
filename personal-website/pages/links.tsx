@@ -100,13 +100,7 @@ export default function LinkTree() {
       />
       <Box className={styles.header}>
         <Box className={styles.avatar}>
-          <Image
-            src={Logo}
-            alt="Wyatt Walsh"
-            layout="responsive"
-            width="100"
-            height="100"
-          />
+          <Image src={Logo} alt="Wyatt Walsh" fill />
         </Box>
         <Typography variant="h1" className={styles.name}>
           Wyatt Walsh&apos;s Links

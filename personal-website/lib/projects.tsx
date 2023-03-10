@@ -23,5 +23,7 @@ export function getStaticProps() {
     }
   })
 
+  allProjects.sort((a, b) => (a.data.date > b.data.date ? -1 : 1))
+
   return { props: { allProjects } }
 }

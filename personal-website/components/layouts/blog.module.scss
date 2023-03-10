@@ -1,0 +1,25 @@
+@import "../../styles/scss/abstracts/variables";
+
+.container {
+    margin-top: 10vh;
+    padding-top: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.container a {
+    color: $myBrown;
+    text-decoration: underline;
+    &:hover {
+        color: lighten($myBrown, 25%);
+        text-decoration: none;
+    }
+}
+.container blockquote {
+    border-left: 0.5rem solid $myBrown;
+    padding-left: 1rem;
+    margin-left: 2rem;
+    margin-right: 0;
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+}

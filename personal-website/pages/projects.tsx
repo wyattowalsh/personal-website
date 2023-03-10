@@ -1,9 +1,8 @@
 import { Typography } from '@mui/material'
 import Box from '@mui/material/Box'
-import Stack from '@mui/material/Stack'
-
+import Grid from '@mui/material/Grid'
 import * as React from 'react'
-import Post from '../components/Post'
+import ProjectCard from '../components/ProjectCard'
 import Layout from '../components/layouts/blog'
 import type { ProjectType } from '../interfaces/project'
 import styles from './blog.module.scss'
@@ -13,21 +12,22 @@ type Props = {
 }
 export default function Projects({ allProjects }: Props) {
   return (
-    <Box className={styles.Container}>
-      <Typography
-        variant="h1"
-        sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
-      >
-        Projects
-      </Typography>
-      <Typography variant="h2">All Posts:</Typography>
-      <Stack spacing={2} direction="column">
-        {allProjects.map((project) => (
-          <Box key={project.filePath}>
-            <Post {...project.data} />
-          </Box>
-        ))}
-      </Stack>
+    <Box className={styles.container}>
+      <Box className={styles.Container}>
+        <Typography
+          variant="h1"
+          sx={{ paddingTop: '1rem', paddingBottom: '1rem' }}
+        >
+          All Projects:
+        </Typography>
+        <Grid container spacing={2} className={styles.projectContainer}>
+          {allProjects.map((project) => (
+            <Grid item key={project.filePath}>
+              <ProjectCard {...project.data} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
     </Box>
   )
 }

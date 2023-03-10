@@ -1,6 +1,7 @@
 @import "styles/scss/abstracts/__abstracts-dir.scss";
 
 .box {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-around;

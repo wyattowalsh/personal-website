@@ -1,46 +1,33 @@
 ---
 title: "Implementing Pathwise Coordinate Descent For The Lasso and The Elastic Net In Python Using NumPy"
-description: "Part three of a three-part series on regularized linear regression"
+description: "Explanations for Solving Some of the Most Popular Supervised Learning Algorithms"
 date: "2021-01-15"
 url: "https://towardsdatascience.com/regularized-linear-regression-models-44572e79a1b5"
 image: "/img/blog/ols-basics.webp"
 slug: "2021-01-15-regularized-linear-regression-models"
 ---
 
-> medium-to-markdown@0.0.3 convert
-> node index.js https://towardsdatascience.com/regularized-linear-regression-models-dcf5aa662ab9
+<Header
+  kicker="Regularized Linear Regression Models"
+  title="Implementing Pathwise Coordinate Descent For The Lasso and The Elastic Net In Python Using NumPy"
+  subTitle="Explanations for Solving Some of the Most Popular Supervised Learning Algorithms"
+  date="2021-01-15"
+  imgSrc="/img/blog/regularized-linear-regression-models-cover.webp"
+  imgAlt="Blog post cover image"
+  caption="Model Coefficient Value Changes With Growing Regularization Penalty Values"
+/>
 
-[![Wyatt Walsh](https://miro.medium.com/fit/c/96/96/1*wH1IDunyzV8x1Q1bKIPIsQ.png)
+## Hey there! 👋
 
-](https://medium.com/@wyattowalsh?source=post_page-----dcf5aa662ab9--------------------------------)[Wyatt Walsh](https://medium.com/@wyattowalsh?source=post_page-----dcf5aa662ab9--------------------------------)[Follow](https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fsubscribe%2Fuser%2F4b12137885d8&operation=register&redirect=https%3A%2F%2Ftowardsdatascience.com%2Fregularized-linear-regression-models-dcf5aa662ab9&user=Wyatt+Walsh&userId=4b12137885d8&source=post_page-4b12137885d8----dcf5aa662ab9---------------------follow_byline-----------)
-
-Jan 15, 2021
-
-·7 min read
-
-[
-
-Save
-
-](https://medium.com/m/signin?actionUrl=https%3A%2F%2Fmedium.com%2F_%2Fbookmark%2Fp%2Fdcf5aa662ab9&operation=register&redirect=https%3A%2F%2Ftowardsdatascience.com%2Fregularized-linear-regression-models-dcf5aa662ab9&source=--------------------------bookmark_header-----------)
-
-## [Regularized Linear Regression Models](https://towardsdatascience.com/tagged/regularized-regression)
-
-# Implementing Pathwise Coordinate Descent For The Lasso and The Elastic Net In Python Using NumPy
-
-## Explanations for Solving Some of the Most Popular Supervised Learning Algorithms
-
-Model Coefficient Value Changes With Growing Regularization Penalty Values (_Image by author)_
-
-Hey there! 👋
-
-Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](https://medium.com/regularized-linear-regression-models-57bbdce90a8c), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](https://medium.com/regularized-linear-regression-models-44572e79a1b5), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
+Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In <Link href="/blog/2021-01-13-regularized-linear-regression-models">part one</Link>, linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in <Link href="/blog/2021-01-14-regularized-linear-regression-models">part two</Link>, **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
 
 The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**.**
 
-# The Lasso for Regression
+---
 
-The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function ([Part One](https://medium.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
+## The Lasso for Regression
+
+The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function (<Link href="/blog/2021-01-13-regularized-linear-regression-models#eq7">Part One Eq #7</Link>), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
 
 **_The Lasso_** loss function can be formalized as:
 

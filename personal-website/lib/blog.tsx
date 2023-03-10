@@ -1,6 +1,6 @@
 import fs from 'fs'
-import path from 'path'
 import matter from 'gray-matter'
+import path from 'path'
 
 // POSTS_PATH is useful when you want to get the path to a specific file
 export const BLOG_PATH = path.join(process.cwd(), 'blog')
@@ -22,6 +22,8 @@ export function getStaticProps() {
       filePath,
     }
   })
+
+  allPosts.sort((a, b) => (a.data.date > b.data.date ? -1 : 1))
 
   return { props: { allPosts } }
 }

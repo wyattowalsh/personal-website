@@ -36,7 +36,6 @@ import * as React from 'react'
 import { Kanban } from 'react-bootstrap-icons'
 import Logo from '../public/img/logo.webp'
 import styles from './Navbar.module.scss'
-import ThemeUpdater from './ThemeUpdater'
 
 interface Props {
   /**
@@ -429,9 +428,9 @@ export default function Navbar(props: Props) {
           className={styles.right}
           sx={{ display: { xs: 'none', sm: 'flex' } }}
         >
-          <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          {/* <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
             <ThemeUpdater />
-          </Box>
+          </Box> */}
           <Box>
             <Button
               id="links-button"

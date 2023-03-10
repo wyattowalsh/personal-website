@@ -4,6 +4,7 @@
 // React & NextJS imports
 // MUI imports
 // Components imports
+import Box from '@mui/material/Box'
 import Footer from '../Footer'
 import Navbar from '../Navbar'
 
@@ -15,7 +16,7 @@ export default function Layout({ children }: Props) {
   return (
     <>
       <Navbar />
-      {children}
+      <Box sx={{}}>{children}</Box>
       <Footer />
     </>
   )

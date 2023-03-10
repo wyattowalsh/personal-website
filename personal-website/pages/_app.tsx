@@ -14,6 +14,8 @@ import * as React from 'react'
 import darkTheme from '../components/theme/dark'
 import lightTheme from '../components/theme/light'
 import '../styles/main.scss'
+import '../styles/scss/vendors/prism-synthwave84.css'
+import '../styles/scss/vendors/prism.css'
 
 const opensans = Open_Sans({ subsets: ['latin'], preload: true })
 

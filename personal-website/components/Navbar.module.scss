@@ -43,11 +43,21 @@
 
 .tab {
   font-weight: 700;
-  color: inherit;
+  color: black !important;
   &:hover {
     background: $myGold;
   }
   font-size: clamp(0.35rem, 1.5vw, 2rem) !important;
+  &:active {
+    background: $myGold;
+  }
+}
+.tab > svg {
+  width: clamp(0.35rem, 2.75vw, 4rem) !important;
+  height: auto;
+  color: $myBlue;
+  background-color: rgba(255, 255, 255, 0.1);
+  background-clip: text;
 }
 
 .right {
@@ -58,8 +68,11 @@
 }
 
 .linksButton {
-  padding: 0.5rem !important;
+  padding: 1rem !important;
   margin: 0.1rem !important;
+  &:hover {
+    scale: 1.1;
+  }
 }
 
 .social {

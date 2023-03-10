@@ -1,13 +1,13 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Grid from "@mui/material/Unstable_Grid2";
-import type { ProjectType } from "../interfaces/project";
-import MyCard from "./MyCard";
-import styles from "./Projects.module.scss";
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import Grid from '@mui/material/Unstable_Grid2'
+import type { ProjectType } from '../interfaces/project'
+import MyCard from './ProjectCard'
+import styles from './Projects.module.scss'
 
 type Props = {
-  allProjects: ProjectType[];
-};
+  allProjects: ProjectType[]
+}
 
 export default function Projects({ allProjects }: Props) {
   return (
@@ -22,7 +22,7 @@ export default function Projects({ allProjects }: Props) {
             <MyCard
               image={proj.data.image}
               title={proj.data.title}
-              link={`/projects/${proj.filePath.replace(/\.mdx?$/, "")}`}
+              link={`/projects/${proj.filePath.replace(/\.mdx?$/, '')}`}
               description={proj.data.description}
               url={proj.data.url}
               slug={proj.data.slug}
@@ -31,5 +31,5 @@ export default function Projects({ allProjects }: Props) {
         ))}
       </Grid>
     </Box>
-  );
+  )
 }

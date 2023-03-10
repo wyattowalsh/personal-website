@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2vh;
+  margin-top: 10vh;
   width: 100%;
   background-color: $myBlue;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cpolygon fill='%23933131' points='957 450 539 900 1396 900'/%3E%3Cpolygon fill='%238b1a1a' points='957 450 872.9 900 1396 900'/%3E%3Cpolygon fill='%23d8444f' points='-60 900 398 662 816 900'/%3E%3Cpolygon fill='%23b85c61' points='337 900 398 662 816 900'/%3E%3Cpolygon fill='%23c53b58' points='1203 546 1552 900 876 900'/%3E%3Cpolygon fill='%23a55b67' points='1203 546 1552 900 1162 900'/%3E%3Cpolygon fill='%23d07995' points='641 695 886 900 367 900'/%3E%3Cpolygon fill='%23b4486e' points='587 900 641 695 886 900'/%3E%3Cpolygon fill='%23c84898' points='1710 900 1401 632 1096 900'/%3E%3Cpolygon fill='%23c5a3b5' points='1710 900 1401 632 1365 900'/%3E%3Cpolygon fill='%23bc83bc' points='1210 900 971 687 725 900'/%3E%3Cpolygon fill='%238c618c' points='943 900 1210 900 971 687'/%3E%3C/svg%3E");
@@ -88,4 +88,65 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.name {
+  font-size: clamp(1rem, 2vw, 3rem);
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: 0;
+  text-decoration: underline;
+  background: linear-gradient(325deg, #6a9fb5, #b5826a, #b5a76a, #9b6ab5, #939597);
+  background-size: 1000% 1000%;
+  -webkit-animation: AnimationName 11s ease infinite;
+  -moz-animation: AnimationName 11s ease infinite;
+  -o-animation: AnimationName 11s ease infinite;
+  animation: AnimationName 11s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@-webkit-keyframes AnimationName {
+  0% {
+    background-position: 15% 0%;
+  }
+  50% {
+    background-position: 86% 100%;
+  }
+  100% {
+    background-position: 15% 0%;
+  }
+}
+@-moz-keyframes AnimationName {
+  0% {
+    background-position: 15% 0%;
+  }
+  50% {
+    background-position: 86% 100%;
+  }
+  100% {
+    background-position: 15% 0%;
+  }
+}
+@-o-keyframes AnimationName {
+  0% {
+    background-position: 15% 0%;
+  }
+  50% {
+    background-position: 86% 100%;
+  }
+  100% {
+    background-position: 15% 0%;
+  }
+}
+@keyframes AnimationName {
+  0% {
+    background-position: 15% 0%;
+  }
+  50% {
+    background-position: 86% 100%;
+  }
+  100% {
+    background-position: 15% 0%;
+  }
 }

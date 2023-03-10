@@ -14,7 +14,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
 }
 
 .name {
@@ -32,8 +32,7 @@
   width: 20vh;
   height: 20vh;
   position: relative;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px,
-    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
 }
 
 .links {
@@ -41,7 +40,7 @@
 
 .link {
   width: 70vw;
-  height: 7vh;
+  height: 4vh;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -54,8 +53,7 @@
   margin: 1rem;
   background-color: rgba(181, 148, 106, 1);
   color: rgba(181, 111, 106, 1);
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px,
-    rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 30px 60px -12px, rgba(0, 0, 0, 0.3) 0px 18px 36px -18px;
   &:hover {
     scale: 1.1;
     transition: 0.35s;
@@ -63,11 +61,11 @@
 }
 
 .icon {
-  font-size: clamp(1.5rem, 6vh, 5rem);
+  font-size: clamp(1.25rem, 3.75vh, 5rem);
 }
 
 .linkName {
   font-family: "Open Sans";
   font-weight: 900 !important;
-  font-size: clamp(2rem, 3vw, 7rem) !important;
+  font-size: clamp(1.5rem, 3.5vh, 7rem) !important;
 }

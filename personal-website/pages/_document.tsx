@@ -9,17 +9,17 @@ import Document, {
   Html,
   Main,
   NextScript,
-} from "next/document";
+} from 'next/document'
 
-import Script from "next/script";
+import Script from 'next/script'
 // == Document ==================================================================
 class MyDocument extends Document {
   static async getInitialProps(
-    ctx: DocumentContext
+    ctx: DocumentContext,
   ): Promise<DocumentInitialProps> {
-    const initialProps = await Document.getInitialProps(ctx);
+    const initialProps = await Document.getInitialProps(ctx)
 
-    return initialProps;
+    return initialProps
   }
   render() {
     return (
@@ -50,7 +50,11 @@ class MyDocument extends Document {
             href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
             integrity="sha384-vKruj+a13U8yHIkAyGgK1J3ArTLzrFGBbBc0tDp4ad/EyewESeXE/Iv67Aj8gKZ0"
             crossOrigin="anonymous"
-          ></link>
+          />
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/github-dark.min.css"
+          />
         </Head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-17PRGFZN0C"
@@ -65,13 +69,14 @@ class MyDocument extends Document {
           gtag('config', 'G-17PRGFZN0C');
         `}
         </Script>
+        <Script src="scripts/prism.js"></Script>
         <body>
           <Main />
           <NextScript />
         </body>
       </Html>
-    );
+    )
   }
 }
 
-export default MyDocument;
+export default MyDocument

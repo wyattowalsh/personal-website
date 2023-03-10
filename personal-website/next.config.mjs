@@ -3,22 +3,18 @@ import path from "path";
 // Remark plugins
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeFigure from "rehype-figure";
-import rehypeFormat from "rehype-format";
-import rehypeInline from "rehype-inline";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import codeTitle from "remark-code-title";
-import remarkDefinitionList from "remark-definition-list";
-import remarkFrontmatter from "remark-frontmatter";
-import remarkGfm from "remark-gfm";
-import remarkHint from "remark-hint";
-import remarkMath from "remark-math";
-import remarkMermaid from "remark-mermaidjs";
-import remarkParse from "remark-parse";
-import remarkPrism from "remark-prism";
-import remarkRehype from "remark-rehype";
-import smartypants from "remark-smartypants";
-import remarkToc from "remark-toc";
+import remarkDefinitionList from 'remark-definition-list';
+import remarkFrontmatter from 'remark-frontmatter';
+import remarkGfm from 'remark-gfm';
+import remarkHint from 'remark-hint';
+import remarkMath from 'remark-math';
+import remarkMermaid from 'remark-mermaidjs';
+import remarkPrism from 'remark-prism';
+import smartypants from 'remark-smartypants';
+import remarkToc from 'remark-toc';
 // Rehype plugins
 
 // next.config.mjs -- NextJS Configuration File https://nextjs.org/docs/api-reference/next.config.js/introduction
@@ -27,27 +23,45 @@ const withMDX = nextMDX({
   options: {
     providerImportSource: "@mdx-js/react",
     remarkPlugins: [
-      [remarkRehype],
-      [remarkDefinitionList],
-      [remarkFrontmatter],
-      [remarkGfm],
-      [remarkHint],
-      [remarkParse],
-      [remarkMath],
-      [remarkMermaid],
-      [remarkPrism],
-      [smartypants],
-      [remarkToc],
-      [codeTitle],
-    ],
-    rehypePlugins: [
-      [rehypeStringify],
-      [rehypeKatex],
-      [rehypeAutolinkHeadings],
-      [rehypeFormat],
-      [rehypeFigure],
-      [rehypeInline],
-    ],
+        [remarkDefinitionList],
+        [remarkFrontmatter],
+        [remarkGfm],
+        [remarkHint],
+        [remarkMath],
+        [
+          remarkMermaid,
+          {
+            theme: 'dark',
+            launchOptions: { executablePath: '/usr/bin/chromium-browser' },
+          },
+        ],
+        [smartypants],
+        [remarkToc],
+        [codeTitle],
+        [
+          remarkPrism,
+          {
+            transformInlineCode: true,
+            plugins: [
+              'autolinker',
+              'command-line',
+              'data-uri-highlight',
+              'diff-highlight',
+              'inline-color',
+              'keep-markup',
+              'line-numbers',
+              'show-invisibles',
+              'treeview',
+            ],
+          },
+        ],
+      ],
+      rehypePlugins: [
+        [rehypeStringify],
+        [rehypeKatex],
+        [rehypeAutolinkHeadings],
+        [rehypeFigure],
+      ],
     // If you use MDXProvider, uncomment the following line.
     // providerImportSource: "@mdx-js/react",
   },
