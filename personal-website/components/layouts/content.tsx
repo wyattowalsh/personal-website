@@ -8,7 +8,7 @@
 import Box from '@mui/material/Box'
 import Footer from '../Footer'
 import Navbar from '../Navbar'
-import styles from './overview.module.scss'
+import styles from './content.module.scss'
 
 type Props = {
   children: React.ReactNode
