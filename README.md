@@ -1,6 +1,6 @@
 <h1 align='center'>Personal Website Implementation 🏠</h1>
 
-<img align='center' src=""/>
+<img align='center' src="utils/cover.gif"/>
 
 ---
 
@@ -31,3 +31,9 @@ This repo contains the associated code base for building my personal website. Th
 ---
 
 # Notes
+
+## To Fix/Update/Extend
+
+- [ ] Fix blog posts' syntax
+- [ ] Add code block (w/ syntax highlighting) support
+- [ ] Create unique project preview component
