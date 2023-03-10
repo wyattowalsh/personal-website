@@ -26,6 +26,7 @@ import Hero from '../../components/Hero'
 import Layout from '../../components/layouts/content'
 import type { ProjectData } from '../../interfaces/project'
 import { PROJECTS_PATH, projectFilePaths } from '../../lib/projects'
+import styles from './[slug].module.scss'
 const rehypeFigure = require('rehype-figure')
 const remarkHint = require('remark-hint')
 
