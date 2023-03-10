@@ -22,7 +22,7 @@ import smartypants from 'remark-smartypants'
 import remarkToc from 'remark-toc'
 import Header from '../../components/BlogHeader'
 import Hero from '../../components/Hero'
-import Layout from '../../components/layouts/blog'
+import Layout from '../../components/layouts/content'
 import type { ProjectData } from '../../interfaces/project'
 import { PROJECTS_PATH, projectFilePaths } from '../../lib/projects'
 const rehypeFigure = require('rehype-figure')

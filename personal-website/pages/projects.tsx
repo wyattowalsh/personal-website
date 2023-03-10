@@ -3,7 +3,7 @@ import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import * as React from 'react'
 import ProjectCard from '../components/ProjectCard'
-import Layout from '../components/layouts/overview'
+import Layout from '../components/layouts/content'
 import type { ProjectType } from '../interfaces/project'
 import styles from './projects.module.scss'
 
