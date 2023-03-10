@@ -8,7 +8,6 @@ import CardMedia from '@mui/material/CardMedia'
 import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import Link from 'next/link'
-import type ProjectData from '../interfaces/project'
 import styles from './ProjectCard.module.scss'
 
 export default function ProjectCard({
@@ -18,7 +17,7 @@ export default function ProjectCard({
   date,
   url,
   image,
-}: ProjectData) {
+}: Project.data) {
   return (
     <Card sx={{ maxWidth: 345 }} className={styles.card}>
       <CardMedia component="img" height="140" image={image} alt={title} />
