@@ -149,3 +149,51 @@
     background-position: 15% 0%;
   }
 }
+
+.buttonDownload {
+  background: linear-gradient(232deg, #6a9fb5, #b5826a, #b5a76a, #9b6ab5);
+  background-size: 200% 200%;
+
+  -webkit-animation: style2AnimatedBackgroundGradient 16s ease infinite;
+  -moz-animation: style2AnimatedBackgroundGradient 16s ease infinite;
+  animation: style2AnimatedBackgroundGradient 16s ease infinite;
+  margin-right: 0.5rem;
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: white;
+  }
+}
+
+@-webkit-keyframes style2AnimatedBackgroundGradient {
+  0% {
+    background-position: 0% 11%;
+  }
+  50% {
+    background-position: 100% 90%;
+  }
+  100% {
+    background-position: 0% 11%;
+  }
+}
+@-moz-keyframes style2AnimatedBackgroundGradient {
+  0% {
+    background-position: 0% 11%;
+  }
+  50% {
+    background-position: 100% 90%;
+  }
+  100% {
+    background-position: 0% 11%;
+  }
+}
+@keyframes style2AnimatedBackgroundGradient {
+  0% {
+    background-position: 0% 11%;
+  }
+  50% {
+    background-position: 100% 90%;
+  }
+  100% {
+    background-position: 0% 11%;
+  }
+}

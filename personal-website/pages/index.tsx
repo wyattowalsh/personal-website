@@ -54,6 +54,7 @@ function Home() {
                 endIcon={<FileDownloadIcon />}
                 size="large"
                 color="secondary"
+                className={styles.buttonDownload}
               >
                 Download Resume
               </Button>
