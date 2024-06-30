@@ -14,7 +14,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Anchor, Flex, Group, Title } from '@mantine/core';
 import styles from './Socials.module.scss';
 
-
 const links = [
   {
     name: 'GitHub',
@@ -72,21 +71,24 @@ const links = [
     color: '#b5a76a',
     bgcolor: '#996ab5',
   },
-  // {
-  //   name: 'Website',
-  //   url: 'https://www.w4w.dev',
-  //   icon: faHouseSignal,
-  //   color: '#9b6ab5',
-  // },
 ]
 
-export function Social({ link }) {
+interface Link {
+  name: string;
+  url: string;
+  icon: any;
+  color: string;
+  bgcolor: string;
+}
+
+export function Social({ link }: { link: Link }) {
   return (
     <Anchor href={link.url} target="_blank" rel="noopener noreferrer" className={styles.social}>
-        <Group className={styles.socialLink} align="center" justify="space-around" miw={{base:"80vw", lg:'70vw', xl:'40vw' }} h='6vh' px={{ base: 'sm', sm: 'md', md: 'lg' }} color={link.color} hover={{ bg: link.color }} transition="all 0.2s ease">
-            <FontAwesomeIcon icon={link.icon} className={styles.socialIcon} color={link.color} flip beat fade style={{'--fa-animation-duration': '15s', "--fa-flip-angle": "180deg"}}/>
+        <Group className={styles.socialLink} align="center" justify="space-around" miw={{base:"80vw", lg:'70vw', xl:'40vw' }} h='6vh' px={{ base: 'sm', sm: 'md', md: 'lg' }} color={link.color} 
+               style={{ transition: 'all 0.2s ease' }} >
+            <FontAwesomeIcon icon={link.icon} className={styles.socialIcon} color={link.color} flip beat fade style={{'--fa-animation-duration': '10s', "--fa-flip-angle": "180deg"}} r0tation={180}/>
             <Title order={3} className={styles.socialText} c='black'>{link.name}</Title>
-            <FontAwesomeIcon icon={link.icon} className={styles.socialIcon} color={link.color } flip beat fade style={{"--fa-animation-duration": "15s", "--fa-flip-angle": "180deg"}}/>
+            <FontAwesomeIcon icon={link.icon} className={styles.socialIcon} color={link.color} flip beat fade style={{"--fa-animation-duration": "10s", "--fa-flip-angle": "180deg"}} />
         </Group>
     </Anchor>
   );
@@ -100,5 +102,5 @@ export function Socials() {
         <Social key={link.name} link={link} />
       ))}
     </Flex>
-    );
+  );
 }

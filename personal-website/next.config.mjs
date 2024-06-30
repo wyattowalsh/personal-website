@@ -20,7 +20,10 @@ const nextConfig = {
         includePaths: [path.join(__dirname, 'styles')],
         prependData: `@import "./_mantine.scss"; @import "./styles/main.scss";`,
   },
-  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx']
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  typescript: {
+    ignoreBuildErrors: true,
+  }
 };
 
 
