@@ -1,0 +1,106 @@
+// app/Home.module.scss
+
+@mixin gradientBackgroundEnhanced {
+    // Initialize $background with a base gradient
+    $background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 72%);
+    
+    // Loop to generate multiple gradient layers with added complexity
+    @for $i from 1 through 6 {
+        $angle: random(360) + deg;
+        $colors: ($myPurple, $myGold, $myBlue, $myBrown);
+        $color1: nth($colors, random(length($colors)));
+        $color2: nth($colors, random(length($colors)));
+        $color1-alpha: rgba($color1, 0.5); // Use semi-transparent colors
+        $color2-alpha: rgba($color2, 0.5);
+        // Update $background by layering the new gradient over the existing ones
+        $background: linear-gradient($angle, $color1-alpha, $color2-alpha), $background;
+    }
+    
+    background: $background;
+    background-size: 400% 400%;
+    
+    // Apply enhanced animation
+    animation: gradientShift 5s ease infinite;
+}
+
+// Enhanced dynamic keyframes generation for complex animations
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    25% { background-position: 100% 50%; }
+    50% { background-position: 100% 100%; }
+    75% { background-position: 0% 100%; }
+    100% { background-position: 0% 50%; }
+}
+
+// Improved animation variation for subtle and complex movement
+@for $i from 1 through 5 {
+    @keyframes gradientAnimation-#{$i} {
+        0%, 100% {
+            background-position: 0% 0%;
+        }
+        50% {
+            background-position: 100% 100%;
+        }
+    }
+}
+@for $i from 1 through 5 {
+    @keyframes gradientColoring-#{$i} {
+        // hue rotation
+        0% {
+            filter: hue-rotate(0deg);
+        }
+        100% {
+            filter: hue-rotate(360deg);
+        }
+}
+}
+
+.container {
+    @include gradientBackgroundEnhanced;
+    // Apply a random animation from the improved set
+    $animations: ("gradientAnimation-1", "gradientAnimation-2", "gradientAnimation-3", "gradientAnimation-4", "gradientAnimation-5", "gradientColoring-1", "gradientColoring-2", "gradientColoring-3", "gradientColoring-4", "gradientColoring-5");
+    animation-name: nth($animations, random(length($animations)))   ;
+    animation-duration: 7s; // Extend the animation duration for smoother effect
+    animation-timing-function: ease-in-out; // Use ease-in-out for smoother start/end
+    animation-iteration-count: infinite;
+}
+
+// scss class defn for iconContainer using mantine variables for responsive design
+.iconContainer {
+    display: flex;
+    justify-content: center;
+    width: clamp(3rem, 12vw, 7rem);
+    height: clamp(3rem, 12vw, 7rem);
+}
+
+.title {
+    font-size: clamp(1.5rem, 5vw, 3rem);
+    font-weight: 777;
+    text-align: center;
+    text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(0.5rem);
+
+    &::after {
+        content: "";
+        display: block;
+        height: clamp(0.15rem, 0.5vw, 0.25rem);
+        width: 100%;
+        background-image: linear-gradient(120deg, $myPurple, $myGold, $myBlue, $myBrown);
+        background-size: 300% 300%;
+        animation: gradientShift 5s ease infinite; 
+        border-radius: clamp(0.15rem, 0.5vw, 0.25rem);
+        margin-top: clamp(-0.4rem, -5vw, -1.75rem);
+        }
+}
+
+.subtitle {
+    font-size: clamp(1rem, 5vw, 2rem);
+    font-weight: 777;
+    text-align: center;
+    text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(0.5rem);
+}
+
+.divider {
+    height: clamp(0.15rem, 0.5vw, 0.25rem);
+}

@@ -1,0 +1,54 @@
+@keyframes wave-animation {
+  0% { transform: rotate( 0.0deg); }
+  10% { transform: rotate(14.0deg); }  
+  20% { transform: rotate(-8.0deg); }
+  30% { transform: rotate(14.0deg); }
+  40% { transform: rotate(-4.0deg); }
+  50% { transform: rotate(10.0deg); }
+  60% { transform: rotate( 0.0deg); }  
+  100% { transform: rotate( 0.0deg); }
+}
+
+.wave {
+  display: inline-block;
+  animation-name: wave-animation;
+  animation-duration: 2.5s;
+  animation-iteration-count: infinite;
+  transform-origin: 70% 70%;
+}
+
+
+.title {
+    font-weight: 800;
+    text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(0.5rem);
+    font-size: clamp(0.25rem, 5vw, 1rem);
+    text-decoration: underline;
+    text-decoration-thickness: 0.15rem;
+}
+
+.button {
+    background-color: rgba(106,159,181, 0.25);
+    font-size: 0.75rem !important; // smallest font size
+    padding: clamp(0.5rem, 2vw, 1rem) !important; // reduced padding
+    height: 100% !important; // increased height
+    width: auto;
+    border-radius: 0.5rem; 
+
+    @media (min-width: 480px) { // xs breakpoint
+        font-size: 1rem !important;
+    }
+
+    @media (min-width: 1200px) { // xl breakpoint
+        font-size: 1.5rem !important;
+    }
+
+    &:hover {
+        scale: 1.25;
+        border-radius: 0;
+    }
+}
+.icon {
+    color: $myBrown;
+    font-size:  clamp(0.25rem, 5vw, 1.5rem);
+}

@@ -1,0 +1,82 @@
+// app/components/Socials.module.scss
+@keyframes shiftGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes borderGradient {
+  0% {
+    border-image-source: linear-gradient(45deg, #0A66C2, #20BEFF, #1DB954, #6a9fb5, #b5826a, #b5a76a, #9b6ab5);
+  }
+  50% {
+    border-image-source: linear-gradient(45deg, #b5a76a, #9b6ab5, #0A66C2, #20BEFF, #1DB954, #6a9fb5, #b5826a);
+  }
+  100% {
+    border-image-source: linear-gradient(45deg, #0A66C2, #20BEFF, #1DB954, #6a9fb5, #b5826a, #b5a76a, #9b6ab5);
+  }
+}
+.socialLink {
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    transition: box-shadow 0.5s;
+}
+
+.socialLink:hover {
+    scale: 1.1;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+}
+
+.socialIcon {
+    width: clamp(2rem, 5vw, 3rem);
+    height: clamp(2rem, 5vw, 3rem);
+    filter: 
+        drop-shadow(0 0 0.5rem rgba(0, 0, 0, 0.5)),
+        hue-rotate(0deg),
+        brightness(100%),
+        saturate(100%),
+        contrast(100%),
+        invert(0%),
+        sepia(0%),
+        grayscale(0%);
+    transition: filter 0.5s;
+}
+
+.socialText {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    font-weight: 777 !important;
+    text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    transition: text-shadow 0.5s;
+    color: 'black' !important;
+}
+
+.socialTitle {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    font-weight: 777 !important;
+    text-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.5);
+    transition: text-shadow 0.5s;
+    color: 'black' !important;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.01);
+    padding: clamp(0.5rem, 5vw, 1rem);
+}
+
+.socials {
+    /// awesome creative colored border
+    padding: clamp(1rem, 5vw, 2rem);
+    position: relative;
+    border-radius:  clamp(0.15rem, 0.5vw, 0.25rem);
+    overflow: hidden;
+    border: clamp(0.25rem, 1vw, 0.5rem) solid transparent;
+    border-image-slice: 1;
+    animation: borderGradient 15s ease infinite, shiftGradient 15s ease infinite;
+    
+    background-image: linear-gradient(45deg #6a9fb5, #b5826a, #b5a76a, #9b6ab5);
+    background-size: 300% 300%;
+    background-clip: padding-box; // Ensure the background only fills the padding area, allowing the border to be visible
+    background-blend-mode: overlay;
+}

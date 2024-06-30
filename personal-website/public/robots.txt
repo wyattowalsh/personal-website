@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://w4w.dev
+Host: https://www.w4w.dev
 
 # Sitemaps
-Sitemap: https://w4w.dev/sitemap.xml
+Sitemap: https://www.w4w.dev/sitemap.xml

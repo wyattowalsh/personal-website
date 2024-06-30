@@ -1,0 +1,149 @@
+// app/components/ProjectCard.module.scss
+
+// Define color variables for consistent theming
+$card-bg: #fff;
+$card-hover-bg: #f0f0f0;
+$text-color: #333;
+$secondary-text-color: #666;
+$accent-color: #007bff;
+$accent-color-light: lighten($accent-color, 35%);
+$shadow-color: rgba(0, 0, 0, 0.1);
+$shadow-color-hover: rgba(0, 0, 0, 0.2);
+$date-bg-gradient: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+
+.card {
+  position: relative;
+  margin: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  box-shadow: 0 4px 6px $shadow-color;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: $card-bg;
+  width: 100%; // Make the card take the full width available
+
+  &:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 12px 16px $shadow-color-hover;
+  }
+
+  .media {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease-in-out;
+
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+
+  .title {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    color: $text-color;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: space-around;
+    justify-content: space-between;
+  }
+
+  .date {
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #fff;
+    font-weight: 700;
+    margin-bottom: 8px;
+    background: $date-bg-gradient;
+    padding: 8px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out;
+    // display section as only as wide on content, not the full width
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
+    .dateIcon {
+        color: #fff;
+        fill: #fff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-right: 8px;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .description {
+    font-size: 1rem;
+    line-height: 1.2;
+    color: $secondary-text-color;
+    transition: color 0.3s ease-in-out;
+
+    &:hover {
+      color: $text-color;
+    }
+  }
+
+  .dateTagsContainer {
+    margin-top: 16px;
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-height: 48px;
+      overflow: hidden;
+      transition: max-height 0.3s ease-in-out;
+
+      &.expanded {
+        max-height: none;
+      }
+
+      .mantine-Badge-root {
+        font-size: 0.75rem;
+        padding: 0 4px;
+        border-radius: 4px;
+        background-color: $accent-color-light;
+        color: $text-color;
+      }
+    }
+
+    .expandButton {
+      margin-top: 8px;
+      background: none;
+      border: none;
+      color: $accent-color;
+      cursor: pointer;
+      padding: 0;
+      font-size: 0.9rem;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  .button {
+    margin-top: 16px;
+    transition: background-color 0.3s ease-in-out;
+
+    &:hover {
+      background-color: $accent-color-light;
+    }
+
+    .icon {
+      margin-right: 8px;
+      margin-left: 8px;
+    }
+  }
+}
