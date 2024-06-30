@@ -15,7 +15,7 @@ const AboutText = () => {
             <Text align="center">
                 Thanks for stopping by my personal website! 
                 <br/><br/>
-                I'm Wyatt Walsh. I grew up in the <Anchor href="https://maps.app.goo.gl/3W5KNmfnuAvPoABB6" target="_blank" underline="hover">Eastern Sierras</Anchor> of California, where I developed a love for fishing 🎣, backpacking 🎒, and mountain biking 🚵‍♂️.
+                I&apos;m Wyatt Walsh. I grew up in the <Anchor href="https://maps.app.goo.gl/3W5KNmfnuAvPoABB6" target="_blank" underline="hover">Eastern Sierras</Anchor> of California, where I developed a love for fishing 🎣, backpacking 🎒, and mountain biking 🚵‍♂️.
             </Text>
             <br/>
             <Text align="center">
