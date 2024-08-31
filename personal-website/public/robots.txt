@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://www.w4w.dev
-
-# Sitemaps
-Sitemap: https://www.w4w.dev/sitemap.xml

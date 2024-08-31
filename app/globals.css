@@ -1,0 +1,194 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 198 100% 95%;
+    --foreground: 198 5% 0%;
+    --card: 198 50% 90%;
+    --card-foreground: 198 5% 10%;
+    --popover: 198 100% 95%;
+    --popover-foreground: 198 100% 0%;
+    --primary: 198 33.6% 56.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 198 30% 70%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 160 30% 85%;
+    --muted-foreground: 198 5% 35%;
+    --accent: 160 30% 80%;
+    --accent-foreground: 198 5% 10%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 198 5% 90%;
+    --border: 198 30% 50%;
+    --input: 198 30% 18%;
+    --ring: 198 33.6% 56.3%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 198 50% 5%;
+    --foreground: 198 5% 90%;
+    --card: 198 50% 0%;
+    --card-foreground: 198 5% 90%;
+    --popover: 198 50% 5%;
+    --popover-foreground: 198 5% 90%;
+    --primary: 198 33.6% 56.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 198 30% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 160 30% 15%;
+    --muted-foreground: 198 5% 60%;
+    --accent: 160 30% 15%;
+    --accent-foreground: 198 5% 90%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 198 5% 90%;
+    --border: 198 30% 18%;
+    --input: 198 30% 18%;
+    --ring: 198 33.6% 56.3%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    transition: background-color 0.5s, color 0.5s;
+  }
+}
+
+.fancy-bg {
+  background: linear-gradient(145deg,
+                              hsl(var(--primary)),
+                              hsl(var(--secondary)),
+                              hsl(var(--accent)),
+                              hsl(198, 70%, 50%),
+                              hsl(198, 80%, 60%));
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  border-radius: var(--radius);
+  filter: blur(20px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  z-index: -1;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 10px 20px rgba(0, 0, 0, 0.1);
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.fancy-bg::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  filter: blur(30px);
+  z-index: -2;
+  animation: gradientAnimation 15s ease infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.fancy-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  z-index: -3;
+  animation: gradientAnimation 30s ease infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.button {
+  @apply flex items-center justify-center px-4 py-2 sm:px-6 sm:py-3 rounded-lg text-white font-semibold transition-all duration-300;
+  transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.button-primary {
+  @apply bg-primary hover:bg-secondary-foreground shadow-lg;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--secondary)));
+}
+
+.button-primary:hover {
+  background: linear-gradient(to right, hsl(var(--secondary)), hsl(var(--accent)));
+}
+
+.button-secondary {
+  @apply bg-secondary hover:bg-secondary-foreground shadow-lg;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  background: linear-gradient(to right, hsl(var(--secondary)), hsl(var(--primary)));
+}
+
+.button-secondary:hover {
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+}
+
+.card {
+  @apply p-4 sm:p-6 md:p-8 rounded-lg bg-white dark:bg-gray-800 shadow-lg transform transition-transform;
+  transition: transform 0.3s ease;
+  transform-origin: center;
+}
+
+.card:hover {
+  @apply shadow-2xl backdrop-blur-3xl;
+  transform: scale(1.05);
+  background: linear-gradient(to right, hsl(var(--primary)), hsl(var(--accent)));
+}
+
+.modal-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-75 p-4 sm:p-8;
+}
+
+.modal-content {
+  @apply bg-white dark:bg-gray-900 p-8 sm:p-10 md:p-12 rounded-lg shadow-lg relative max-w-md w-full transition-all transform-gpu;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.modal-content.entering {
+  @apply opacity-0 scale-90;
+}
+
+.modal-content.entered {
+  @apply opacity-100 scale-100;
+}
+
+.modal-content h2 {
+  @apply text-xl sm:text-2xl font-bold mb-4;
+}
+
+.modal-content p {
+  @apply text-base sm:text-lg md:text-xl;
+}
+
+.modal-close-button {
+  @apply absolute top-2 right-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 transition-colors;
+}
