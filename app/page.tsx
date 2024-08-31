@@ -108,8 +108,10 @@ export default function Home() {
 	useEffect(() => {
 		if (isAboutModalOpen) {
 			const modalContent = document.querySelector(".modal-content");
-			modalContent.classList.remove("entering");
-			modalContent.classList.add("entered");
+			if (modalContent) {
+				modalContent.classList.remove("entering");
+				modalContent.classList.add("entered");
+			}
 		}
 	}, [isAboutModalOpen]);
 
@@ -120,14 +122,13 @@ export default function Home() {
 			</div>
 			<div className="relative flex justify-center w-full">
 				<Image
-					className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
+					className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40"
 					src="/logo.png"
 					alt="Logo — Wyatt Walsh"
 					width={120}
 					height={120}
 					priority
 					sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 120px, 130px"
-					className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40"
 				/>
 			</div>
 
@@ -178,7 +179,7 @@ export default function Home() {
 							&times;
 						</button>
 						<h2>About Wyatt Walsh</h2>
-						<p>Placeholder for about section content...</p>
+						{/* <p>Placeholder for about section content...</p> */}
 					</div>
 				</div>
 			)}
