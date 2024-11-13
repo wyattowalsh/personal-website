@@ -1,0 +1,308 @@
+@use "variables.module.scss";
+@use "@/styles/glow.scss";
+
+@import "@/styles/glow.scss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 198 100% 95%;
+    --foreground: 198 5% 0%;
+    --card: 198 50% 90%;
+    --card-foreground: 198 5% 10%;
+    --popover: 198 100% 95%;
+    --popover-foreground: 198 100% 0%;
+    --primary: 198 33.6% 56.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 198 30% 70%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 160 30% 85%;
+    --muted-foreground: 198 5% 35%;
+    --accent: 160 30% 80%;
+    --accent-foreground: 198 5% 10%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 198 5% 90%;
+    --border: 198 30% 50%;
+    --input: 198 30% 18%;
+    --ring: 198 33.6% 56.3%;
+    --radius: 0.5rem;
+    --primary-color: #6a9fb5;
+  }
+
+  html.dark {
+    --background: 198 50% 5%;
+    --foreground: 198 5% 90%;
+    --card: 198 50% 0%;
+    --card-foreground: 198 5% 90%;
+    --popover: 198 50% 5%;
+    --popover-foreground: 198 5% 90%;
+    --primary: 198 33.6% 56.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 198 30% 10%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 160 30% 15%;
+    --muted-foreground: 198 5% 60%;
+    --accent: 160 30% 15%;
+    --accent-foreground: 198 5% 90%;
+    --destructive: 0 100% 30%;
+    --destructive-foreground: 198 5% 90%;
+    --border: 198 30% 18%;
+    --input: 198 30% 18%;
+    --ring: 198 33.6% 56.3%;
+    --radius: 0.5rem;
+  }
+
+  body {
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300;
+  }
+
+  .prose {
+    @apply prose-lg mx-auto;
+  }
+
+  .fade-in {
+    @apply opacity-0 animate-fadeIn;
+  }
+
+  @keyframes fadeIn {
+    to {
+      opacity: 1;
+    }
+  }
+
+  button:hover {
+    @apply bg-gray-300;
+  }
+
+  html.dark button:hover {
+    @apply bg-gray-700;
+  }
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientText {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@layer utilities {
+  .animate-fadeIn {
+    animation: fadeIn 1s forwards;
+  }
+
+  .animate-gradient {
+    animation: gradientText 5s ease infinite;
+  }
+}
+
+.fancy-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+
+  background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #ff9a9e);
+  background-size: 400% 400%;
+  animation: gradientAnimation 10s ease infinite;
+}
+
+html.dark .fancy-bg {
+  background: linear-gradient(45deg, #2b2b2b, #1a1a1a, #1a1a1a, #2b2b2b);
+}
+
+.fancy-bg::before,
+.fancy-bg::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
+  animation: rotate 30s linear infinite;
+  transform: translate3d(0, 0, 0);
+}
+
+.fancy-bg::after {
+  animation-direction: reverse;
+}
+
+.fancy-bg::before {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2), transparent 70%);
+}
+
+.fancy-bg::after {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+}
+
+.card-container {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.card {
+  @apply relative overflow-hidden rounded-xl transition-transform duration-500 ease-out;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  @apply absolute inset-0 z-0 rounded-xl;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  mix-blend-mode: overlay;
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
+.card:hover {
+  transform: translateY(-10px) rotateX(10deg) rotateY(10deg);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+.card-content {
+  @apply relative z-10 p-6 flex flex-col items-center justify-center space-y-4;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  border-radius: 1rem;
+}
+
+.icon {
+  @apply text-6xl transition-transform duration-700 ease-out;
+  color: var(--primary-color);
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.8));
+}
+
+.icon:hover {
+  transform: rotate(360deg) scale(1.2);
+  animation: float 3s ease-in-out infinite;
+}
+
+.link-name {
+  @apply text-xl font-semibold;
+  color: hsla(var(--foreground), 0.85);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.card:hover .icon {
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+button {
+  @apply transition-colors duration-300;
+}
+
+button:hover {
+  @apply bg-gray-300;
+}
+
+html.dark button:hover {
+  @apply bg-gray-700;
+}
+
+/* Custom styles */
+pre {
+  @apply bg-gray-900 text-white p-4 rounded-md overflow-x-auto;
+}
+
+code {
+  @apply bg-gray-200 text-red-600 px-1 rounded;
+}
+
+html.dark code {
+  @apply bg-gray-800;
+}
+
+.admonition {
+  @apply border-l-4 p-4 my-4 rounded-md;
+}
+
+.admonition.note {
+  @apply border-blue-500 bg-blue-50;
+}
+
+html.dark .admonition.note {
+  @apply bg-blue-900;
+}
+
+.admonition.warning {
+  @apply border-yellow-500 bg-yellow-50;
+}
+
+html.dark .admonition.warning {
+  @apply bg-yellow-900;
+}
+
+.admonition.danger {
+  @apply border-red-500 bg-red-50;
+}
+
+html.dark .admonition.danger {
+  @apply bg-red-900;
+}
+
+/* Mermaid diagrams */
+.mermaid {
+  @apply my-8;
+}
