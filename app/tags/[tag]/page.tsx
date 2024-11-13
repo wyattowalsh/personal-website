@@ -1,5 +1,3 @@
-// app/tags/[tag]/page.tsx
-
 import { getPostsByTag, getAllTags } from "@/lib/posts";
 import { notFound } from "next/navigation";
 import BlogList from "@/components/BlogList";
@@ -9,16 +7,14 @@ interface TagPageProps {
 	params: { tag: string };
 }
 
-export async function generateStaticParams() {
-	const tags = await getAllTags();
+export function generateStaticParams() {
+	const tags = getAllTags();
 	return tags.map((tag) => ({
 		tag,
 	}));
 }
 
-export async function generateMetadata({
-	params,
-}: TagPageProps): Promise<Metadata> {
+export function generateMetadata({ params }: TagPageProps): Metadata {
 	const { tag } = params;
 	return {
 		title: `Posts tagged with "${tag}"`,
@@ -26,9 +22,9 @@ export async function generateMetadata({
 	};
 }
 
-export default async function TagPage({ params }: TagPageProps) {
+export default function TagPage({ params }: TagPageProps) {
 	const { tag } = params;
-	const posts = await getPostsByTag(tag);
+	const posts = getPostsByTag(tag);
 
 	if (!posts || posts.length === 0) {
 		notFound();
