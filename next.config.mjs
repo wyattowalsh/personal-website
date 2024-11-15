@@ -44,64 +44,10 @@ import rehypeSortTailwindClasses from "rehype-sort-tailwind-classes";
 import remarkMdxMathEnhanced from "remark-mdx-math-enhanced";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
-export default withMDX({
-	extension: /\.mdx?$/,
-	options: {
-		remarkPlugins: [
-			remarkGfm,
-			remarkMath,
-			remarkAdmonitions,
-			remarkEmoji,
-			remarkCodeTitles,
-			remarkCodeBlocks,
-			remarkCodeFrontmatter,
-			remarkCodeImport,
-			remarkCodeScreenshot,
-			remarkCodesandbox,
-			remarkCollapse,
-			remarkContributors,
-			remarkCustomHeaderId,
-			remarkDefinitionList,
-			remarkDocx,
-			remarkEmbedImages,
-			remarkExtendedTable,
-			remarkFrontmatter,
-			remarkGitContributors,
-			remarkGithub,
-			remarkAlert,
-			remarkHint,
-			remarkOembed,
-			remarkPrism,
-			remarkSmartypants,
-			remarkSources,
-			remarkUsage,
-			remarkMdxMathEnhanced,
-			remarkMdxFrontmatter,
-			remarkToc,
-			remarkValidateLinks,
-		],
-		rehypePlugins: [
-			rehypeSlug,
-			rehypeAutolinkHeadings,
-			rehypeKatex,
-			rehypePrism,
-			rehypeCallouts,
-			rehypeCitation,
-			rehypeColorChips,
-			rehypeInferReadingTimeMeta,
-			rehypeJargon,
-			rehypeMathjax,
-			[rehypePrismPlus, {
-          ignoreMissing: true,
-          showLineNumbers: true,
-        },],
-			rehypeSemanticBlockquotes,
-			rehypeSortTailwindClasses,
-		],
-	},
-})({
-	experimental: {
-		mdxRs: true,
-	},
-	pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
-});
+export default {
+  experimental: {
+    mdxRs: true,
+  },
+  pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  // ...other configurations...
+};

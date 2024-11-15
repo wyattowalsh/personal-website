@@ -7,7 +7,6 @@ const postsDirectory = path.join(process.cwd(), "data/posts");
 
 export interface Post {
   slug: string;
-  title: string;
   date: string;
   tags: string[];
   summary: string;
@@ -73,7 +72,7 @@ export function getAllPostSlugs() {
 
   return files.map((file) => {
     const relativePath = path.relative(postsDirectory, file);
-    const slug = relativePath.replace(/\/index\.mdx?$/, "").replace(/\.mdx?$/, "").replace(/\\/g, "/");
+    const slug = relativePath.replace(/\.mdx?$/, "").replace(/\\/g, "/");
 
     return slug.split("/");
   });

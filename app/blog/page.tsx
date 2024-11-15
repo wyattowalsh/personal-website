@@ -12,11 +12,14 @@ export default async function BlogPage() {
 			<h1 className="text-5xl font-extrabold mb-6 text-center">onelonedatum blog</h1>
 			<SearchBar posts={posts} />
 			<div>
-				{posts.map((post) => (
-					<Link key={post.slug} href={`/blog/${post.slug.join("/")}`}>
-						<a>{post.title}</a>
-					</Link>
-				))}
+				{posts.map((post) => {
+					const slugArray = Array.isArray(post.slug) ? post.slug : [post.slug];
+					return (
+						<Link key={post.slug} href={`/blog/${slugArray.join("/")}`}>
+							<a>{post.title}</a>
+						</Link>
+					);
+				})}
 			</div>
 		</div>
 	);
