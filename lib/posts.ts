@@ -3,7 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import { PostMetaData } from '@/types';
 
-const postsDirectory = path.join(process.cwd(), 'posts');
+const postsDirectory = path.join(process.cwd(), 'data/posts');
 
 export function getSortedPostsData(): PostMetaData[] {
   const fileNames = fs.readdirSync(postsDirectory);

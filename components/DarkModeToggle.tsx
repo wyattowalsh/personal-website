@@ -1,32 +1,52 @@
 "use client";
 
-import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSun, faMoon } from "@fortawesome/free-solid-svg-icons";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function DarkModeToggle() {
-	const { theme, setTheme, resolvedTheme } = useTheme();
+	const { theme, setTheme, systemTheme } = useTheme();
 	const [mounted, setMounted] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
 	}, []);
 
-	if (!mounted) return null;
-
-	const toggleTheme = () => {
-		setTheme(resolvedTheme === "dark" ? "light" : "dark");
-	};
-
-	const icon = resolvedTheme === "dark" ? faSun : faMoon;
+	if (!mounted) {
+		return null;
+	}
 
 	return (
-		<div className="fixed top-4 right-4 z-50">
-			<Button onClick={toggleTheme} className="p-2 rounded bg-gray-200 dark:bg-gray-800">
-				<FontAwesomeIcon icon={icon} />
-			</Button>
-		</div>
+		<DropdownMenu>
+			<DropdownMenuTrigger asChild>
+				<Button variant="outline" size="icon" className="cursor-pointer">
+					{theme === "dark" ||
+					(theme === "system" && systemTheme === "dark") ? (
+						<Sun className="h-[1.2rem] w-[1.2rem]" />
+					) : (
+						<Moon className="h-[1.2rem] w-[1.2rem]" />
+					)}
+					<span className="sr-only">Toggle theme</span>
+				</Button>
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end">
+				<DropdownMenuItem onClick={() => setTheme("light")}>
+					Light
+				</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setTheme("dark")}>
+					Dark
+				</DropdownMenuItem>
+				<DropdownMenuItem onClick={() => setTheme("system")}>
+					System
+				</DropdownMenuItem>
+			</DropdownMenuContent>
+		</DropdownMenu>
 	);
 }
