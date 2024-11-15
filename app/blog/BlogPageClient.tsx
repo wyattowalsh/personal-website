@@ -85,7 +85,7 @@ export default function BlogPageClient({
 		};
 
 		filterPosts();
-	}, [searchTerm, selectedTags, sortBy, currentPage]);
+	}, [searchTerm, selectedTags, sortBy, currentPage, allPosts]);
 
 	const totalPages = Math.ceil(totalPosts / pageSize);
 

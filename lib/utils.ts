@@ -5,13 +5,13 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-// Add formatDate function
-export function formatDate(date: string, locale: string = "en-US", options?: Intl.DateTimeFormatOptions): string {
-    try {
-        return new Date(date).toLocaleDateString(locale, options);
-    } catch {
-        return "Invalid date";
-    }
+export function formatDate(
+  dateString: string,
+  locale = 'en-US',
+  options?: Intl.DateTimeFormatOptions
+) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(locale, options);
 }
 
 // Add CoreContent type

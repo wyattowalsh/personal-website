@@ -1,3 +1,5 @@
+// components/PostCard.tsx
+
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
@@ -23,7 +25,7 @@ const PostCard = ({ post }: PostCardProps) => {
 		summary = "No summary available.",
 		date,
 		tags = [],
-		image = "/default-image.jpg",
+		image = "/logo.webp",
 	} = post;
 
 	return (
@@ -34,13 +36,13 @@ const PostCard = ({ post }: PostCardProps) => {
 						<Image
 							src={image}
 							alt={title}
-							layout="fill"
-							objectFit="cover"
+							fill
+							style={{ objectFit: "cover" }}
 							priority
 						/>
-					</div> 
+					</div>
 					<div className="p-4">
-						<h3 className="text-xl font-semibold mb-2">{title}</h3>
+						<h3 className="text-2xl font-bold mb-2">{title}</h3>
 						<p className="text-gray-600 dark:text-gray-400 mb-4">{summary}</p>
 						{date && (
 							<p className="text-sm text-gray-500">

@@ -1,42 +1,26 @@
-'use client';
+// components/CodeBlock.tsx
 
-import { useState } from "react";
-import { Copy, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import React from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import oneDark from "react-syntax-highlighter/dist/cjs/styles/prism/one-dark";
 
 interface CodeBlockProps {
-	children: React.ReactNode;
 	className?: string;
+	children: React.ReactNode;
 }
 
-export const CodeBlock = ({ children, className }: CodeBlockProps) => {
-	const [isCopied, setIsCopied] = useState(false);
-	const code = String(children).trim();
-
-	const handleCopy = async () => {
-		await navigator.clipboard.writeText(code);
-		setIsCopied(true);
-		setTimeout(() => setIsCopied(false), 2000);
-	};
+export const CodeBlock = ({ className, children }: CodeBlockProps) => {
+	const match = /language-(\w+)/.exec(className || "");
+	const language = match ? match[1] : "";
 
 	return (
-		<div className="relative my-4">
-			<pre className={cn("overflow-x-auto rounded-md", className)}>
-				{children}
-			</pre>
-			<Button
-				onClick={handleCopy}
-				variant="ghost"
-				size="icon"
-				className="absolute top-2 right-2"
-			>
-				{isCopied ? (
-					<Check className="w-4 h-4" />
-				) : (
-					<Copy className="w-4 h-4" />
-				)}
-			</Button>
-		</div>
+		<SyntaxHighlighter
+			style={oneDark}
+			language={language}
+			PreTag="div"
+			className="codeStyle"
+		>
+			{String(children).replace(/\n$/, "")}
+		</SyntaxHighlighter>
 	);
 };

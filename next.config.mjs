@@ -5,7 +5,7 @@ import remarkAdmonitions from "remark-admonitions";
 import remarkEmoji from "remark-emoji";
 import remarkCodeTitles from "remark-code-titles";
 import remarkToc from "remark-toc";
-import remarkValidateLinks from "remark-validate-links"; // Add this import
+import remarkValidateLinks from "remark-validate-links";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
@@ -78,7 +78,7 @@ export default withMDX({
 			remarkMdxMathEnhanced,
 			remarkMdxFrontmatter,
 			remarkToc,
-			remarkValidateLinks, // Add this line
+			remarkValidateLinks,
 		],
 		rehypePlugins: [
 			rehypeSlug,
@@ -91,7 +91,10 @@ export default withMDX({
 			rehypeInferReadingTimeMeta,
 			rehypeJargon,
 			rehypeMathjax,
-			rehypePrismPlus,
+			[rehypePrismPlus, {
+          ignoreMissing: true,
+          showLineNumbers: true,
+        },],
 			rehypeSemanticBlockquotes,
 			rehypeSortTailwindClasses,
 		],

@@ -1,3 +1,5 @@
+// tailwind.config.ts
+
 import type { Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 import typography from "@tailwindcss/typography";
@@ -26,9 +28,9 @@ const config: Config = {
           css: {
             color: theme("colors.gray.800"),
             a: {
-              color: theme("colors.blue.600"),
+              color: theme("colors.primary"),
               "&:hover": {
-                color: theme("colors.blue.500"),
+                color: theme("colors.primary-dark"),
               },
             },
             h1: {

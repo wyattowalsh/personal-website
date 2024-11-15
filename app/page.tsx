@@ -25,11 +25,11 @@ export default function Page() {
 					className="flex items-center justify-center"
 				>
 					<Image
-						className="rounded-full shadow-xl w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40"
+						className="rounded-full shadow-sm drop-shadow w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 p-2 sm:p-3 md:p-4 lg:p-5"
 						src="/logo.webp"
 						alt="Logo — Wyatt Walsh"
-						width={120}
-						height={120}
+						width={150}
+						height={150}
 						priority
 						sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 120px, 130px"
 					/>
