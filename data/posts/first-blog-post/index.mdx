@@ -1,0 +1,21 @@
+---
+title: "First Blog Post"
+date: "2023-10-01"
+summary: "This is a summary of the first blog post."
+image: "/images/first-blog-post.jpg"
+---
+
+import { motion } from 'framer-motion';
+
+<motion.article
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="prose dark:prose-dark fade-in"
+>
+  # First Blog Post
+
+  This is the content of the first blog post.
+
+  {/* Add more content as needed */}
+</motion.article>

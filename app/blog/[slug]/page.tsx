@@ -1,33 +1,40 @@
+import { getAllPostSlugs, getPostData } from "@/lib/posts";
 import { notFound } from "next/navigation";
-import PostLayout from "@/components/PostLayout";
+import type { Metadata } from "next";
+import { MDXRemote } from "next-mdx-remote/rsc";
+import { components } from "@/components/MDXComponents";
 
-interface BlogPostPageProps {
-	params: { slug: string };
+interface BlogPostProps {
+  params: { slug: string };
 }
 
 export async function generateStaticParams() {
-	// Replace with actual logic to get all slugs
-	const slugs = []; // Replace with actual slugs fetching logic
-	return slugs.map((slug) => ({ slug }));
+  const slugs = await getAllPostSlugs();
+  return slugs.map(({ params }) => params);
 }
 
-export default function PostPage({ params }: BlogPostPageProps) {
-	const { slug } = params;
-	// Fetch post data from your own data source
-	const post = {}; // Replace with actual post fetching logic
-	if (!post) {
-		notFound();
-	}
-	const MDXContent = {}; // Replace with actual MDX content fetching logic
+export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
+  const { slug } = params;
+  const post = await getPostData(slug);
+  if (!post) {
+    return {};
+  }
+  return {
+    title: post.title,
+    description: post.summary,
+  };
+}
 
-	const posts = []; // Replace with actual posts fetching logic
-	const currentIndex = posts.findIndex((p) => p.slug === slug);
-	const prevPost = posts[currentIndex - 1] || null;
-	const nextPost = posts[currentIndex + 1] || null;
-
-	return (
-		<PostLayout post={post} prevPost={prevPost} nextPost={nextPost}>
-			<MDXContent />
-		</PostLayout>
-	);
+export default async function BlogPostPage({ params }: BlogPostProps) {
+  const { slug } = params;
+  const post = await getPostData(slug);
+  if (!post) {
+    notFound();
+  }
+  return (
+    <div className="prose mx-auto dark:prose-dark">
+      <h1>{post.title}</h1>
+      <MDXRemote source={post.content} components={components} />
+    </div>
+  );
 }

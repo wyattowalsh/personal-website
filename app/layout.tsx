@@ -1,70 +1,43 @@
-import 'remark-github-blockquote-alert/alert.css';
-
-import { Space_Grotesk } from 'next/font/google';
-import { Metadata } from 'next';
-import siteMetadata from '@/data/siteMetadata';
-import { ThemeProviders } from './theme-providers';
+import { Metadata } from "next";
+import { Fira_Code } from "next/font/google";
 import "./globals.scss";
+import { ThemeProvider } from "next-themes";
+import DarkModeToggle from "@/components/DarkModeToggle";
+import { Toast, ToastProvider } from "@/components/ui/toast";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
+config.autoAddCss = false;
 
-// Import shadcn/ui components
-import { Container, Header, Footer, Main } from 'shadcn/ui';
-
-const space_grotesk = Space_Grotesk({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-space-grotesk',
+const fira_code = Fira_Code({
+    subsets: ["latin"],
+    display: "swap",
+    variable: "--font-fira-code",
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteMetadata.siteUrl),
-  title: {
-    default: siteMetadata.title,
-    template: `%s | ${siteMetadata.title}`,
-  },
-  description: siteMetadata.description,
-  openGraph: {
-    title: siteMetadata.title,
-    description: siteMetadata.description,
-    url: siteMetadata.siteUrl,
-    siteName: siteMetadata.title,
-    images: [
-      {
-        url: siteMetadata.socialBanner,
-        width: 800,
-        height: 600,
-        alt: siteMetadata.title,
-      },
-    ],
-    type: 'website',
-  },
-  alternates: {
-    canonical: './',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-  twitter: {
-    title: siteMetadata.title,
-    card: 'summary_large_image',
-    images: [siteMetadata.socialBanner],
-  },
+    title: "Wyatt Walsh's Social Links, Blog, and Other Web Stuff",
+    description: "Wyatt's social links, blog, and other web stuff.",
+    icons: {
+        icon: "/logo.webp",
+    },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const basePath = process.env.BASE_PATH || '';
-
-  return (
-    <html lang="en" className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 font-display">
-      <body className={`${space_grotesk.variable} font-sans`}>
-        <ThemeProviders>
-          <Container>
-            <Header />
-            <Main>{children}</Main>
-            <Footer />
-          </Container>
-        </ThemeProviders>
-      </body>
-    </html>
-  );
+export default function Layout({ children }: { children: React.ReactNode }) {
+    return (
+        <html lang="en" suppressHydrationWarning>
+            <body className={fira_code.variable}>
+                <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                    <ToastProvider>
+                        <main>
+                            {children}
+                        </main>
+                        <div className="fixed top-0 right-0 p-4">
+                            <DarkModeToggle />
+                        </div>
+                        <Toast />
+                    </ToastProvider>
+                </ThemeProvider>
+            </body>
+        </html>
+    );
 }
