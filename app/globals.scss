@@ -1,5 +1,4 @@
 @use "variables.module.scss";
-@use "@/styles/glow.scss";
 
 @tailwind base;
 @tailwind components;
@@ -7,6 +6,7 @@
 
 @layer base {
   :root {
+    --primary-color: #6a9fb5;
     --background: 198 100% 95%;
     --foreground: 198 5% 0%;
     --card: 198 50% 90%;
@@ -27,10 +27,10 @@
     --input: 198 30% 18%;
     --ring: 198 33.6% 56.3%;
     --radius: 0.5rem;
-    --primary-color: #6a9fb5;
   }
 
   html.dark {
+    --primary-color: #6a9fb5;
     --background: 198 50% 5%;
     --foreground: 198 5% 90%;
     --card: 198 50% 0%;
@@ -51,7 +51,7 @@
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300;
+    @apply transition-colors duration-300;
     margin: 0;
     padding: 0;
   }
@@ -180,60 +180,132 @@
   inset: 0;
   z-index: -1;
   overflow: hidden;
+  background: radial-gradient(circle at center, #ff7e5f, #feb47b, #86a8e7, #91eae4);
+  background-size: 300% 300%;
+  animation: backgroundAnimation 20s ease infinite;
 
-  background:
-    radial-gradient(circle at 25% 25%, rgba(255, 0, 150, 0.4), transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.4), transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.3), transparent 50%),
-    repeating-linear-gradient(45deg,
-      rgba(255, 255, 255, 0.05),
-      rgba(255, 255, 255, 0.05) 1px,
-      transparent 1px,
-      transparent 10px),
-    linear-gradient(120deg, #84fab0, #8fd3f4);
-  background-size: cover, cover, cover, cover, cover;
-  background-blend-mode: screen, overlay, multiply, normal;
-  animation: gradientAnimation 30s ease infinite;
-  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1), transparent 70%),
-    conic-gradient(from 180deg at 50% 50%, #6a9fb5, #ff9a9e, #6a9fb5);
-  mix-blend-mode: overlay;
-  animation: rotate 30s linear infinite;
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent 70%);
+    mix-blend-mode: screen;
+    filter: blur(100px);
+    animation: pulse 8s ease infinite;
+  }
 
-  &::before,
   &::after {
     content: '';
     position: absolute;
-    inset: -50%;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1), transparent 70%);
-    animation: rotate 30s linear infinite;
-    transform: translate3d(0, 0, 0);
-  }
-
-  &::after {
-    animation-direction: reverse;
-  }
-
-  &::before {
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.2), transparent 70%);
-  }
-
-  &::after {
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.05), transparent 70%);
+    inset: 0;
+    opacity: 0.05;
+    animation: patternMove 30s linear infinite;
   }
 
   html.dark & {
-    background:
-      radial-gradient(circle at 25% 25%, rgba(255, 0, 150, 0.1), transparent 50%),
-      radial-gradient(circle at 75% 75%, rgba(0, 255, 255, 0.1), transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.1), transparent 50%),
-      repeating-linear-gradient(45deg,
-        rgba(255, 255, 255, 0.02),
-        rgba(255, 255, 255, 0.02) 1px,
-        transparent 1px,
-        transparent 10px),
-      linear-gradient(120deg, #0f2027, #203a43, #2c5364);
-    background-size: cover, cover, cover, cover, cover;
-    background-blend-mode: screen, overlay, multiply, normal;
+    background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+  }
+}
+
+@keyframes gradientBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes patternMove {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 1000px 1000px;
+  }
+}
+
+.animated-border {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    background: linear-gradient(60deg, #ff6ec4, #7873f5, #1fd1f9, #ff6ec4);
+    background-size: 300% 300%;
+    z-index: -1;
+    filter: blur(5px);
+    animation: borderAnimation 10s linear infinite;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    border-radius: inherit;
+    z-index: 1;
+  }
+}
+
+@keyframes borderAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.enhanced-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #ff6ec4, #7873f5, #1fd1f9, #ff6ec4);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: titleGradient 5s ease infinite;
+  text-transform: none;
+  position: relative;
+}
+
+@keyframes titleGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
   }
 }
 
@@ -336,5 +408,49 @@
 
   to {
     transform: rotate(360deg);
+  }
+}
+
+@keyframes glow {
+  from {
+    text-shadow: 0 0 10px #3498db, 0 0 20px #3498db, 0 0 30px #3498db, 0 0 40px #3498db, 0 0 50px #3498db, 0 0 60px #3498db, 0 0 70px #3498db;
+  }
+
+  to {
+    text-shadow: 0 0 20px #2980b9, 0 0 30px #2980b9, 0 0 40px #2980b9, 0 0 50px #2980b9, 0 0 60px #2980b9, 0 0 70px #2980b9, 0 0 80px #2980b9;
+  }
+}
+
+.enhanced-separator {
+  width: 50%;
+  height: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, #f7971e, #ffd200);
+  background-size: 300% 300%;
+  animation: separatorPulse 4s ease-in-out infinite;
+}
+
+@keyframes backgroundAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes separatorPulse {
+  0%, 100% {
+    opacity: 0.7;
+    box-shadow: 0 0 10px #ffd200;
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px #f7971e;
   }
 }

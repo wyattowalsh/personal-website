@@ -1,13 +1,23 @@
 ---
-title: "Second Blog Post"
-date: "2023-10-15"
+title: "2nd Blog Post"
+image: "/images/first-blog-post.jpg"
 summary: "This is a summary of the second blog post."
 tags: ["tag1", "tag2"]
-image: "/images/second-blog-post.jpg"
+date: "2022-01-01"
+updated: "2022-01-01"
 ---
 
-# Second Blog Post
+import { motion } from 'framer-motion';
 
-This is the content of the second blog post.
+<motion.article
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.8 }}
+  className="prose dark:prose-dark fade-in"
+>
+  # First Blog Post
 
-Here is some more content in the second blog post.
+  This is the content of the first blog post.
+
+  {/* Add more content as needed */}
+</motion.article>

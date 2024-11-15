@@ -1,46 +1,21 @@
-// components/MDXComponents.tsx
-
-"use client";
-
-import React from "react";
+import { MDXProviderComponents } from "mdx/types";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import { CodeBlock } from "./CodeBlock";
-import TOCInline from '@/components/TOCInline'
-import Pre from '@/components/Pre'
-import BlogNewsletterForm from '@/components/BlogNewsletterForm'
-import type { MDXComponents } from 'mdx/types'
-import CustomLink from './Link'
-import TableWrapper from './TableWrapper'
+import Link from "next/link";
+import { Alert } from "@/components/ui/alert";
+import { CodeBlock } from "@/components/CodeBlock";
 
-const Mermaid = dynamic(() => import("./Mermaid"), { ssr: false });
-
-const MDXContext = React.createContext({});
-
-export function useMDXComponents(components?: any) {
-	const contextComponents = React.useContext(MDXContext);
-	return components
-		? { ...contextComponents, ...components }
-		: contextComponents;
-}
-
-export function MDXProvider({ components, children }: any) {
-	const allComponents = useMDXComponents(components);
-	return (
-		<MDXContext.Provider value={allComponents}>{children}</MDXContext.Provider>
-	);
-}
-
-export const components: MDXComponents = {
+const MDXComponents: MDXProviderComponents = {
+	h1: (props) => <h1 className="text-4xl font-bold my-4" {...props} />,
+	h2: (props) => <h2 className="text-3xl font-bold my-3" {...props} />,
+	h3: (props) => <h3 className="text-2xl font-semibold my-2" {...props} />,
+	p: (props) => <p className="mb-4 text-lg leading-relaxed" {...props} />,
+	a: (props) => <Link className="text-blue-600 hover:underline" {...props} />,
+	ul: (props) => <ul className="list-disc ml-6 mb-4" {...props} />,
+	ol: (props) => <ol className="list-decimal ml-6 mb-4" {...props} />,
+	li: (props) => <li className="mb-2" {...props} />,
 	Image,
-	TOCInline,
-	a: CustomLink,
-	pre: Pre,
-	table: TableWrapper,
-	BlogNewsletterForm,
-	code: CodeBlock,
-	Mermaid,
-	admonition: ({ type, ...props }: any) => (
-		<div className={`admonition ${type}`} {...props} />
-	),
+	Alert,
+	pre: CodeBlock,
 };
+
+export default MDXComponents;

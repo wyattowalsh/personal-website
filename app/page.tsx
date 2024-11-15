@@ -3,6 +3,9 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Links from "@/components/Links";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export default function Page() {
 	return (
@@ -14,19 +17,33 @@ export default function Page() {
 			>
 				<div className="fancy-bg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient" />
 			</motion.div>
-			<div className="relative flex flex-col items-center justify-center w-full z-10 space-y-16">
-				<Image
-					className="w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40"
-					src="/logo.webp"
-					alt="Logo — Wyatt Walsh"
-					width={120}
-					height={120}
-					priority
-					sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 120px, 130px"
-				/>
-				<h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient">
+			<div className="relative flex flex-col items-center justify-center w-full z-10 space-y-4">
+				<motion.div
+					initial={{ opacity: 0, scale: 0.8 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 1 }}
+					className="flex items-center justify-center"
+				>
+					<Image
+						className="rounded-full shadow-xl w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40"
+						src="/logo.webp"
+						alt="Logo — Wyatt Walsh"
+						width={120}
+						height={120}
+						priority
+						sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 120px, 130px"
+					/>
+				</motion.div>
+				<motion.h1
+					className="enhanced-title text-center"
+					initial={{ opacity: 0, y: -50 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 1, delay: 0.5 }}
+					whileHover={{ scale: 1.05 }}
+				>
 					Wyatt Walsh
-				</h1>
+				</motion.h1>
+				<Separator className="enhanced-separator" />
 				<Links />
 			</div>
 		</main>

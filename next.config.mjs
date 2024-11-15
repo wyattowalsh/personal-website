@@ -95,7 +95,6 @@ export default withMDX({
 			rehypeSemanticBlockquotes,
 			rehypeSortTailwindClasses,
 		],
-		providerImportSource: "@mdx-js/react",
 	},
 })({
 	experimental: {
