@@ -1,67 +1,76 @@
-<h1 align='center'>Personal Website Implementation 🏠</h1>
-
-<img align='center' src="utils/cover.gif"/>
-
-<!--
----
-
-<h3 align='center'>Contents</h5>
-
-<p align='center'>
-  <a href="#overview">Overview</a> ∇
-  <a href="#technologies">Technologies</a> ∇
-  <a href="#notes">Notes</a>
-</p>
--->
+# `w4w.dev`
+### *My Place on the Web* 🕸️🤖
 
 ---
 
-##### 🗺️ This repo contains the associated code base for building my personal website / link tree.
 
-> #### ↪ Currently on ***<u>V5</u>***! 🚀
+---
+
+> ##### This repo contains the associated code base for building my personal website / link tree.
+
+#### ↪ Currently on ***<u>V6</u>***! 💎 🚀
 
 ---
 
 ## Tech Stack 🥞
 
-<table style="width:100%; border-collapse:collapse; font-family: Arial, sans-serif; text-align: left;">
-  <thead>
-    <tr style="background-color: #6a9fb5; color: white;">
-      <th style="padding: 10px;">Technology</th>
-      <th style="padding: 10px;">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr style="border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://vercel.com/" style="color: #6a9fb5; text-decoration: none;"><strong>Vercel</strong></a></td>
-      <td style="padding: 10px;">App hosting</td>
-    </tr>
-    <tr style="background-color: #f9f9f9; border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://www.typescriptlang.org/" style="color: #6a9fb5; text-decoration: none;"><strong>Typescript</strong></a></td>
-      <td style="padding: 10px;">Programming language</td>
-    </tr>
-    <tr style="border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://nextjs.org/" style="color: #6a9fb5; text-decoration: none;"><strong>Next.js</strong></a></td>
-      <td style="padding: 10px;">App framework</td>
-    </tr>
-    <tr style="background-color: #f9f9f9; border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://react.dev/" style="color: #6a9fb5; text-decoration: none;"><strong>React</strong></a></td>
-      <td style="padding: 10px;">UI library</td>
-    </tr>
-    <tr style="border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://tailwindcss.com/" style="color: #6a9fb5; text-decoration: none;"><strong>tailwindcss</strong></a></td>
-      <td style="padding: 10px;">CSS framework</td>
-    </tr>
-    <tr style="background-color: #f9f9f9; border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://ui.shadcn.com/" style="color: #6a9fb5; text-decoration: none;"><strong>shadcn/ui</strong></a></td>
-      <td style="padding: 10px;">UI components</td>
-    </tr>
-    <tr style="border-bottom: 1px solid #dddddd;">
-      <td style="padding: 10px;"><a href="https://www.framer.com/motion/" style="color: #6a9fb5; text-decoration: none;"><strong>Framer Motion</strong></a></td>
-      <td style="padding: 10px;">Animations</td>
-    </tr>
-  </tbody>
-</table>
+| Technology/Plugin                                      | Description                 | Summary Description | Links                                                                                   |
+|--------------------------------------------------------|-----------------------------|----------------------|-----------------------------------------------------------------------------------------|
+| [Vercel](https://vercel.com/)                          | App hosting                 | A platform for frontend developers, providing global hosting and deployment for web projects. | [Documentation](https://vercel.com/docs) |
+| [TypeScript](https://www.typescriptlang.org/)          | Programming language        | A typed superset of JavaScript that compiles to plain JavaScript, enhancing code reliability and maintainability. | [Handbook](https://www.typescriptlang.org/docs/handbook/intro.html) |
+| [Next.js](https://nextjs.org/)                         | App framework               | A React-based framework for building server-side rendered and static web applications. | [Learn Next.js](https://nextjs.org/learn) |
+| [React](https://react.dev/)                            | UI library                  | A popular JavaScript library for building user interfaces, maintained by Facebook. | [Getting Started](https://react.dev/learn) |
+| [Tailwind CSS](https://tailwindcss.com/)               | CSS framework               | A utility-first CSS framework for creating custom designs without writing custom CSS. | [Documentation](https://tailwindcss.com/docs) |
+| [shadcn/ui](https://ui.shadcn.com/)                    | UI components               | A set of pre-built UI components for React applications, offering a modular approach to design. | [Components](https://ui.shadcn.com/components) |
+| [Framer Motion](https://www.framer.com/motion/)        | Animations                  | An open-source library for creating animations and complex interactions in React applications. | [API Reference](https://www.framer.com/motion/api/) |
+| [MDX](https://mdxjs.com/)                              | Markdown for JSX            | A format for writing JSX and Markdown together, allowing seamless component rendering within Markdown files. | [Getting Started](https://mdxjs.com/getting-started/) |
+| [SCSS](https://sass-lang.com/)                         | CSS preprocessor            | A CSS preprocessor that adds features like variables, nested rules, and mixins to standard CSS. | [Guide](https://sass-lang.com/guide) |
+| [Aceternity UI](https://aceternity-ui.com/)            | UI components               | A comprehensive UI component library designed for scalable and aesthetic React projects. | [Documentation](https://aceternity-ui.com/docs) |
+| **[remark-code-blocks](https://github.com/remarkjs/remark-code-blocks)** | MDX Plugin          | Enhances MDX by allowing code blocks with added functionality, like syntax highlighting. | [GitHub Repository](https://github.com/remarkjs/remark-code-blocks) |
+| **[remark-code-frontmatter](https://github.com/remarkjs/remark-code-frontmatter)** | MDX Plugin          | Adds support for frontmatter metadata within code blocks in MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-code-frontmatter) |
+| **[remark-code-import](https://github.com/remarkjs/remark-code-import)** | MDX Plugin          | Allows importing code snippets from external files into MDX documents. | [GitHub Repository](https://github.com/remarkjs/remark-code-import) |
+| **[remark-code-screenshot](https://github.com/remarkjs/remark-code-screenshot)** | MDX Plugin          | Captures screenshots of code blocks as images. | [GitHub Repository](https://github.com/remarkjs/remark-code-screenshot) |
+| **[remark-code-title](https://github.com/remarkjs/remark-code-title)** | MDX Plugin          | Adds custom titles to code blocks in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-code-title) |
+| **[remark-codesandbox](https://github.com/remarkjs/remark-codesandbox)** | MDX Plugin          | Integrates CodeSandbox embeds within MDX documents. | [GitHub Repository](https://github.com/remarkjs/remark-codesandbox) |
+| **[remark-collapse](https://github.com/remarkjs/remark-collapse)** | MDX Plugin          | Enables collapsible sections in MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-collapse) |
+| **[remark-contributors](https://github.com/remarkjs/remark-contributors)** | MDX Plugin          | Adds a list of contributors to MDX documents. | [GitHub Repository](https://github.com/remarkjs/remark-contributors) |
+| **[remark-custom-header-id](https://github.com/remarkjs/remark-custom-header-id)** | MDX Plugin          | Customizes header IDs for improved linkability. | [GitHub Repository](https://github.com/remarkjs/remark-custom-header-id) |
+| **[remark-definition-list](https://github.com/remarkjs/remark-definition-list)** | MDX Plugin          | Adds support for definition lists in MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-definition-list) |
+| **[remark-docx](https://github.com/remarkjs/remark-docx)** | MDX Plugin          | Converts MDX content to DOCX format. | [GitHub Repository](https://github.com/remarkjs/remark-docx) |
+| **[remark-embed-images](https://github.com/remarkjs/remark-embed-images)** | MDX Plugin          | Embeds images directly into MDX files. | [GitHub Repository](https://github.com/remarkjs/remark-embed-images) |
+| **[remark-emoji](https://github.com/remarkjs/remark-emoji)** | MDX Plugin          | Converts emoji shortcodes to Unicode emojis in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-emoji) |
+| **[remark-extended-table](https://github.com/remarkjs/remark-extended-table)** | MDX Plugin          | Adds support for extended table features in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-extended-table) |
+| **[remark-frontmatter](https://github.com/remarkjs/remark-frontmatter)** | MDX Plugin          | Supports parsing and using frontmatter metadata in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-frontmatter) |
+| **[remark-mdx-frontmatter](https://github.com/remarkjs/remark-mdx-frontmatter)** | MDX Plugin          | Adds MDX-specific frontmatter support for more flexible metadata usage. | [GitHub Repository](https://github.com/remarkjs/remark-mdx-frontmatter) |
+| **[remark-gfm](https://github.com/remarkjs/remark-gfm)** | MDX Plugin          | Adds GitHub Flavored Markdown support in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-gfm) |
+| **[remark-git-contributors](https://github.com/remarkjs/remark-git-contributors)** | MDX Plugin          | Lists Git contributors within MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-git-contributors) |
+| **[remark-github](https://github.com/remarkjs/remark-github)** | MDX Plugin          | Links and styles GitHub references in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-github) |
+| **[remark-github-blockquote-alert](https://github.com/jaywcjlove/remark-github-blockquote-alert)** | MDX Plugin          | Styles blockquotes as alerts with GitHub-like design. | [GitHub Repository](https://github.com/jaywcjlove/remark-github-blockquote-alert) |
+| **[remark-hint](https://github.com/remarkjs/remark-hint)** | MDX Plugin          | Adds hint and tip boxes to MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-hint) |
+| **[remark-math](https://github.com/remarkjs/remark-math)** | MDX Plugin          | Adds support for math notation in MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-math) |
+| **[remark-mdx-math-enhanced](https://github.com/remarkjs/remark-mdx-math-enhanced)** | MDX Plugin          | Enhances math rendering capabilities in MDX for better equation display and formatting. | [GitHub Repository](https://github.com/remarkjs/remark-mdx-math-enhanced) |
+| **[rehype-katex](https://github.com/rehypejs/rehype-katex)** | MDX Plugin          | Renders math notation using KaTeX in MDX. | [GitHub Repository](https://github.com/rehypejs/rehype-katex) |
+| **[rehype-mathjax](https://github.com/rehypejs/rehype-mathjax)** | MDX Plugin          | Renders math notation using MathJax in MDX. | [GitHub Repository](https://github.com/rehypejs/rehype-mathjax) |
+| **[remark-oembed](https://github.com/remarkjs/remark-oembed)** | MDX Plugin          | Embeds external content like tweets and videos in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-oembed) |
+| **[remark-prism](https://github.com/remarkjs/remark-prism)** | MDX Plugin          | Adds syntax highlighting to code blocks using Prism.js. | [GitHub Repository](https://github.com/remarkjs/remark-prism) |
+| **[remark-smartypants](https://github.com/remarkjs/remark-smartypants)** | MDX Plugin          | Converts quotes and dashes to typographically correct symbols. | [GitHub Repository](https://github.com/remarkjs/remark-smartypants) |
+| **[remark-sources](https://github.com/remarkjs/remark-sources)** | MDX Plugin          | Lists sources and references in MDX content. | [GitHub Repository](https://github.com/remarkjs/remark-sources) |
+| **[remark-usage](https://github.com/remarkjs/remark-usage)** | MDX Plugin          | Generates usage documentation from code in MDX. | [GitHub Repository](https://github.com/remarkjs/remark-usage) |
+| **[rehype-autolink-headings](https://github.com/rehypejs/rehype-autolink-headings)** | MDX Plugin          | Adds anchor links to headings in MDX content. | [GitHub Repository](https://github.com/rehypejs/rehype-autolink-headings) |
+| **[rehype-callouts](https://github.com/rehypejs/rehype-callouts)** | MDX Plugin          | Adds callout boxes to MDX content. | [GitHub Repository](https://github.com/rehypejs/rehype-callouts) |
+| **[rehype-citation](https://github.com/rehypejs/rehype-citation)** | MDX Plugin          | Enables citation formatting in MDX content. | [GitHub Repository](https://github.com/rehypejs/rehype-citation) |
+| **[rehype-color-chips](https://github.com/rehypejs/rehype-color-chips)** | MDX Plugin          | Displays color chips in MDX for easier color visualization. | [GitHub Repository](https://github.com/rehypejs/rehype-color-chips) |
+| **[rehype-infer-reading-time-meta](https://github.com/rehypejs/rehype-infer-reading-time-meta)** | MDX Plugin          | Infers reading time and adds metadata to MDX content. | [GitHub Repository](https://github.com/rehypejs/rehype-infer-reading-time-meta) |
+| **[rehype-jargon](https://github.com/rehypejs/rehype-jargon)** | MDX Plugin          | Provides tooltips for technical terms in MDX. | [GitHub Repository](https://github.com/rehypejs/rehype-jargon) |
+| **[rehype-mermaid](https://github.com/rehypejs/rehype-mermaid)** | MDX Plugin          | Integrates Mermaid diagrams into MDX content. | [GitHub Repository](https://github.com/rehypejs/rehype-mermaid) |
+| **[rehype-prism-plus](https://github.com/rehypejs/rehype-prism-plus)** | MDX Plugin          | Advanced code block syntax highlighting using Prism.js. | [GitHub Repository](https://github.com/rehypejs/rehype-prism-plus) |
+| **[rehype-semantic-blockquotes](https://github.com/rehypejs/rehype-semantic-blockquotes)** | MDX Plugin          | Styles blockquotes with semantic HTML. | [GitHub Repository](https://github.com/rehypejs/rehype-semantic-blockquotes) |
+| **[rehype-sort-tailwind-classes](https://github.com/rehypejs/rehype-sort-tailwind-classes)** | MDX Plugin          | Automatically sorts Tailwind CSS classes for consistency. | [GitHub Repository](https://github.com/rehypejs/rehype-sort-tailwind-classes) |
+| **[mdx-embed](https://github.com/PaulieScanlon/mdx-embed)** | MDX Plugin          | Embeds media from various platforms directly into MDX content. | [GitHub Repository](https://github.com/PaulieScanlon/mdx-embed) |
+| **[remark-toc](https://github.com/remarkjs/remark-toc)** | MDX Plugin          | Generates a table of contents in MDX documents. | [GitHub Repository](https://github.com/remarkjs/remark-toc) |
+| **[remark-validate-links](https://github.com/remarkjs/remark-validate-links)** | MDX Plugin          | Validates links in MDX content to ensure they are functional. | [GitHub Repository](https://github.com/remarkjs/remark-validate-links) |
+| **[eslint-plugin-mdx](https://github.com/mdx-js/eslint-plugin-mdx)** | Linting Plugin       | An ESLint plugin that adds support for linting MDX and JSX within Markdown files. | [GitHub Repository](https://github.com/mdx-js/eslint-plugin-mdx) |
+
 
 ---
 

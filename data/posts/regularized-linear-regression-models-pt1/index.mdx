@@ -1,0 +1,157 @@
+---
+title: "Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)"
+image: "/cover.webp"
+caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
+summary: "This is a summary of the first blog post."
+tags: ["tag1", "tag2"]
+date: "2021-01-13"
+updated: "2024-11-15"
+---
+
+# Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)
+
+## Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy
+
+Hey 👋
+
+Welcome to part one of a three-part deep-dive on **regularized linear regression modeling** — some of the most popular algorithms for supervised learning tasks.
+
+Before hopping into the equations and code, let us first discuss what will be covered in this series.
+
+**Part one** will include an introductory discussion about regression, an explanation of linear regression modeling, and a presentation of the ***Ordinary Least Squares*** (OLS) model (from the derivation of the model estimator using applied optimization theory through the implementation of the findings in Python using NumPy).
+
+Drawbacks of the OLS model and some possible remedies will be discussed in [**part two**](/blog/regularized-linear-regression-models-pt2). One such remedy, ***Ridge Regression***, will be presented here with an explanation including the derivation of its model estimator and NumPy implementation in Python.
+
+[**Part three**](/blog/regularized-linear-regression-models-pt3) will conclude this series of posts with explanations of the remaining regularized linear models: ***the Lasso*** and ***the Elastic Net***. Solving these models is more complicated than in previous cases since a discrete optimization technique is needed. The cause of this complication, the *Pathwise Coordinate Descent* algorithm along with its NumPy-based Python implementation, and some concluding remarks are given in this post.
+
+The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive)
+
+## Introduction
+
+Managerial decision making, organizational efficiency, and revenue generation are all areas that can be improved through the utilization of data-based insights. Currently, these insights are being more readily sought out as technological accessibility stretches further and competitive advantages in the market are harder to acquire. One field that seeks to realize value within collected data samples is predictive analytics. By leveraging mathematical/statistical techniques and programming, practitioners are able to identify patterns within data allowing for the generation of valuable insights.
+
+***Regression*** is one technique within predictive analytics that is used to predict the value of a continuous response variable given one or many related feature variables. Algorithms of this class accomplish this task by learning the relationships between the input (feature) variables and the output (response) variable through training on a sample dataset. How these relationships are learned, and furthermore used for prediction varies from algorithm to algorithm. The practitioner is faced with options for regression modeling algorithms, however, linear regression models tend to be explored early on in the process due to their ease of application and high explainability.
+
+## Linear Regression Modeling
+
+A linear regression model learns the input-output relationships by fitting a linear function to the sample data. This can be mathematically formalized as:
+
+$$
+y_{i} = \beta_{0} + \beta_{1}x_{i,1} + \beta_{2}x_{i,2} + \dots + \beta_{p}x_{i,p} + \epsilon_{i} \quad \forall i \in \{1, \dots, n\}
+\\
+\text{where:}
+\\
+p \text{ is the number of features}
+\\
+n \text{ is the number of samples}
+\\
+\epsilon_{i} \text{ is an error term with a mean of zero and finite variance}
+$$
+
+Thus, the response is modeled as a weighted sum of the input variables multiplied by linear coefficients with an error term included. It will prove useful in future steps involving optimization to use vector notation. The linear modeling equation can be expressed this way as:
+
+$$
+y = X\beta + \epsilon, \text{ where:}
+\\
+y \text{ is a response vector } [y_1, y_2, \dots, y_n]^T \text{ of length } n
+\\
+X \text{ is an } n \times (p + 1) \text{ design matrix of features } [1, X_1, X_2, \dots, X_p]
+\\
+\beta \text{ is a length } (p + 1) \text{ coefficient vector } [\beta_0, \beta_1, \beta_2, \dots, \beta_p]
+$$
+
+An important aspect of the above equation to note is that there is a column of **1**’s appended to the design matrix. This is such that the first coefficient of the coefficient vector can serve as an intercept term. In cases where an intercept is not sought after this column can be omitted.
+
+Thus the goal of model training is to find an estimate of the coefficient vector, **β̂**, which can then be utilized with the above equations to make predictions of the response given new feature data. This can be accomplished by applying optimization theory to the model equations above to derive an equation for the model coefficient estimator that minimizes a notion of model error found by training on the sample data.
+
+### Minimizing a Notion of Model Error
+
+To consider how model error can be minimized, a consideration of model error must first be made. Prediction error for a single prediction can be expressed as:\
+
+$$
+\hat{y_i} = \sum_{j=1}^{p} x_{i,j} \hat{\beta_j}, \text{ a model prediction of sample } i, \text{ has an error (or residual) defined as: } y_i - \hat{y_i}
+$$
+
+Thus, in vector notation, total model error across all predictions can be found as:
+
+$$
+\hat{y} = X \hat{\beta}, \text{ all sample model predictions, has an associated total model error: } ||y - \hat{y}||_2^2
+$$
+
+However, for the uses of finding a minimal overall model error, the ***L₂*** norm above is not a good objective function. This is due to the fact that negative errors and positive errors will cancel out, thus a minimization will find an objective value of zero even though in reality the model error is much higher.
+
+This signed error cancellation issue can be solved by squaring the model’s prediction error producing the sum of squared error (SSE) term:
+
+$$
+\sum_{i=1}^{n}(y_{i}-\hat{y_{i}})^{2}=\sum_{i=1}^{n}(y_{i}-\sum_{j=1}^{p}x_{i,j}\hat{\beta}_{j})^{2}
+$$
+
+This same term can be expressed in vector notation as:
+
+$$
+||y - \hat{y}||_2^2 = ||y - X \hat{\beta}||_2^2
+$$
+
+As will be seen in future optimization applications, this function is much better suited to serve as a **loss function**, a function minimized that aptly models the error for a given technique. Many different models other than regularized linear models use the SSE error term as a term in their respective loss functions.
+
+---
+
+## Ordinary Least Squares
+
+Now that linear modeling and error has been covered, we can move on to the most simple linear regression model, ***Ordinary Least Squares*** (OLS). In this case, the simple SSE error term is the model’s loss function and can be expressed as:
+
+$$
+L(\beta) = ||y - \hat{y}||_2^2 = ||y - X \hat{\beta}||_2^2
+$$
+
+Using this loss function, the problem can now be formalized as a *least-squares* optimization problem. This problem serves to derive estimates for the model parameters, **β**, that minimize the SSE between the actual and predicted values of the outcome and is formalized as:
+
+$$
+\hat{\beta} = \arg \min_{\beta} L(\beta) = \arg \min_{\beta} \frac{1}{2n} ||y - X \beta||_2^2
+$$
+
+The 1/(2n) term is added in order to simplify solving the gradient and allow the objective function to converge to the expected value of the model error by **the Law of Large Numbers**.
+
+Aided by the problem’s unconstrained nature, a closed-form solution for the OLS estimator can be obtained by setting the gradient of the loss function (objective) equal to zero and solving the resultant equation for the coefficient vector, **β̂**. This produces the following estimator:
+
+$$
+\hat{\beta} = (X^TX)^{-1}(X^Ty)
+$$
+
+However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (Eq. #8) is convex since any local optimality of a convex function is also global optimality and therefore unique.
+
+One possible way to show this is through the second-order convexity conditions, which state that a function is convex if it is continuous, twice differentiable, and has an associated Hessian matrix that is positive semi-definite. Due to its quadratic nature, the OLS loss function (Eq. #8) is both continuous and twice differentiable, satisfying the first two conditions.
+
+To establish the last condition, the OLS Hessian matrix is found as:
+
+$$
+H = 2X^TX
+$$
+
+Furthermore, this Hessian can be shown to be positive semi-definite as:
+
+$$
+\beta^T(2X^TX)\beta = 2(X\beta)^TX\beta = 2||X\beta||_2^2 \ge 0 \quad \forall \beta
+$$
+
+Thus, by the second-order conditions for convexity, the OLS loss function (Eq. #8) is convex, thus the estimator found above (Eq #9) is the ***unique*** global minimizer to the OLS problem.
+
+### Implementing the Estimator Using Python and NumPy
+
+Solving for the OLS estimator using the matrix inverse does not scale well, thus the NumPy function solve, which employs the LAPACK _gesv routine, is used to find the least-squares solution. This function solves the equation in the case where A is square and full-rank (linearly independent columns). However, in the case that A is not full-rank, then the function lstsq should be used, which utilizes the xGELSD routine and thus finds the singular value decomposition of A.
+
+One possible implementation in Python of OLS with an optional intercept term is:
+
+<script src="https://gist.github.com/wyattowalsh/75a3ea1df349c6a3598839d6f042b9e6.js"></script>
+
+---
+
+## Conclusion
+
+Hope you enjoyed part one of ***Regularized Linear Regression Models***. 👍
+
+Make sure to check out [**part two**](/blog/regularized-linear-regression-models-pt2) to find out why the OLS model sometimes fails to perform accurately and how ***Ridge Regression*** can be used to help and read [**part three**](/blog/regularized-linear-regression-models-pt3) to learn about two more regularized models, ***the Lasso*** and ***the Elastic Net***.
+
+See [here](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
+
+Please leave a comment if you would like! I am always trying to improve my posts (logically, syntactically, or otherwise) and am happy to discuss anything related! 😊
