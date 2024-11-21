@@ -13,8 +13,7 @@ export function PostLayout({ children }: PostLayoutProps) {
 	return (
 		<article className="space-y-8">
 			<PostHeader />
-			<hr />
-			<Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
+			{children}
 			<hr />
 			<PostPagination />
 			<hr />

@@ -100,7 +100,7 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 
 		// Always apply date sorting if no specific sort method is selected
 		searchResults = searchResults.sort((a, b) => {
-			const modifier = sortDirection === "asc" ? 1 : -1;
+			const modifier = sortDirection === "asc" ? -1 : 1;
 			if (sortMethod === "title") {
 				return a.title.localeCompare(b.title) * modifier;
 			}

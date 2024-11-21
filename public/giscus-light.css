@@ -1,0 +1,74 @@
+
+/* Tailwind CSS implementation for enhanced light mode */
+
+/* Root-level custom properties for easy theming */
+:root {
+  --border-radius: 0.375rem; /* 6px */
+  --transition-duration: 200ms; /* 0.2s */
+  --bg-color-light: #f3f4f6; /* Light mode background color */
+  --text-color-light: #1f2937; /* Light mode text color */
+  --border-color-light: #d1d5db; /* Light mode border color */
+  --button-bg-light: #e5e7eb; /* Light mode button background */
+  --button-text-light: #374151; /* Light mode button text */
+  --button-hover-bg-light: #d1d5db; /* Light mode button hover background */
+  --button-active-bg-light: #9ca3af; /* Light mode button active background */
+  --gradient-from-light: #3b82f6; /* Light mode gradient start */
+  --gradient-via-light: #2563eb; /* Light mode gradient middle */
+  --gradient-to-light: #1d4ed8; /* Light mode gradient end */
+  --shadow-light: rgba(0, 0, 0, 0.1); /* Light mode shadow */
+}
+
+/* General transitions for main content */
+main {
+  @apply transition-colors duration-[var(--transition-duration)];
+}
+
+/* Buttons */
+button,
+.main-button {
+  @apply rounded-[var(--border-radius)] shadow-md border focus:outline-none;
+  @apply transition-colors duration-[var(--transition-duration)] ease-in-out;
+}
+
+button:hover,
+.main-button:hover {
+  @apply shadow-lg;
+}
+
+button:active,
+.main-button:active {
+  @apply shadow-md;
+}
+
+/* Main container styling */
+.main-container {
+  @apply rounded-[var(--border-radius)] shadow-md p-4 transition-colors duration-[var(--transition-duration)];
+}
+
+/* Headings with gradient text */
+h1,
+h2,
+h3 {
+  @apply bg-clip-text text-transparent font-semibold;
+}
+
+/* Giscus reactions count */
+.gsc-reactions-count {
+  @apply block transition-colors duration-[var(--transition-duration)];
+}
+
+/* Giscus comments box styling */
+.gsc-comments > .gsc-comment-box {
+  @apply mb-2 border rounded-[var(--border-radius)] p-3 shadow-sm transition-shadow duration-[var(--transition-duration)];
+}
+
+/* Homepage background */
+.gsc-homepage-bg {
+  @apply rounded-[var(--border-radius)] shadow-sm;
+}
+
+/* Loading image */
+main .gsc-loading-image {
+  @apply bg-center bg-no-repeat opacity-80;
+  background-image: url('https://github.githubassets.com/images/mona-loading-light.gif');
+}

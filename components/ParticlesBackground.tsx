@@ -1,37 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container } from "@tsparticles/engine";
+import type { Container, Engine } from "@tsparticles/engine";
 import { loadAll } from "@tsparticles/all";
 import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
 
 export default function ParticlesBackground() {
 	const [init, setInit] = useState(false);
-	const { theme } = useTheme();
+	const { theme, systemTheme } = useTheme();
+	const currentTheme = theme === "system" ? systemTheme : theme;
 
 	useEffect(() => {
-		initParticlesEngine(async (engine) => {
-			await loadAll(engine);
-		}).then(() => {
+		const initEngine = async () => {
+			await initParticlesEngine(async (engine: Engine) => {
+				await loadAll(engine);
+			});
 			setInit(true);
-		});
+		};
+		initEngine();
 	}, []);
 
-	const particlesLoaded = async (container?: Container): Promise<void> => {
-		console.log(container);
-		return Promise.resolve();
-	};
+	const particlesLoaded = useCallback(async (container?: Container) => {
+		if (container) {
+			console.log("Particles container loaded", container);
+		}
+	}, []);
 
-	if (init) {
-		return (
-			<Particles
-				id="tsparticles"
-				className="absolute inset-0 -z-10"
-				url={getRandomConfigUrl(theme === "dark" ? "dark" : "light")}
-				particlesLoaded={particlesLoaded}
-			/>
-		);
+	if (!init) {
+		return null;
 	}
 
-	return <></>;
+	return (
+		<Particles
+			id="tsparticles"
+			className="absolute inset-0 -z-10"
+			url={getRandomConfigUrl(currentTheme === "dark" ? "dark" : "light")}
+			particlesLoaded={particlesLoaded}
+		/>
+	);
 }

@@ -1,0 +1,97 @@
+/* Tailwind CSS implementation for enhanced dark mode */
+
+/* Root-level custom properties for easy theming */
+:root {
+	--border-radius: 0.375rem; /* 6px */
+	--transition-duration: 200ms; /* 0.2s */
+	--bg-color-dark: #1f2937; /* Dark mode background color */
+	--text-color-dark: #f3f4f6; /* Dark mode text color */
+	--border-color-dark: #4b5563; /* Dark mode border color */
+	--button-bg-dark: #374151; /* Dark mode button background */
+	--button-text-dark: #e5e7eb; /* Dark mode button text */
+	--button-hover-bg-dark: #4b5563; /* Dark mode button hover background */
+	--button-active-bg-dark: #6b7280; /* Dark mode button active background */
+	--gradient-from-dark: #60a5fa; /* Dark mode gradient start */
+	--gradient-via-dark: #3b82f6; /* Dark mode gradient middle */
+	--gradient-to-dark: #2563eb; /* Dark mode gradient end */
+	--shadow-dark: rgba(0, 0, 0, 0.5); /* Dark mode shadow */
+}
+
+body {
+	background-color: var(--bg-color-dark);
+	color: var(--text-color-dark);
+}
+
+/* General transitions for main content */
+main {
+	@apply transition-colors duration-[var(--transition-duration)];
+}
+
+/* Buttons */
+button,
+.main-button {
+	@apply rounded-[var(--border-radius)] shadow-md border focus:outline-none;
+	@apply transition-colors duration-[var(--transition-duration)] ease-in-out;
+	background-color: var(--button-bg-dark);
+	color: var(--button-text-dark);
+	border-color: var(--border-color-dark);
+}
+
+button:hover,
+.main-button:hover {
+	@apply shadow-lg;
+	background-color: var(--button-hover-bg-dark);
+}
+
+button:active,
+.main-button:active {
+	@apply shadow-md;
+	background-color: var(--button-active-bg-dark);
+}
+
+/* Main container styling */
+.main-container {
+	@apply rounded-[var(--border-radius)] shadow-md p-4 transition-colors duration-[var(--transition-duration)];
+	background-color: var(--bg-color-dark);
+	color: var(--text-color-dark);
+	border-color: var(--border-color-dark);
+}
+
+/* Headings with gradient text */
+h1,
+h2,
+h3 {
+	@apply bg-clip-text text-transparent font-semibold;
+	background-image: linear-gradient(
+		to right,
+		var(--gradient-from-dark),
+		var(--gradient-via-dark),
+		var(--gradient-to-dark)
+	);
+}
+
+/* Giscus reactions count */
+.gsc-reactions-count {
+	@apply block transition-colors duration-[var(--transition-duration)];
+	color: var(--text-color-dark);
+}
+
+/* Giscus comments box styling */
+.gsc-comments > .gsc-comment-box {
+	@apply mb-2 border rounded-[var(--border-radius)] p-3 shadow-sm transition-shadow duration-[var(--transition-duration)];
+	background-color: var(--bg-color-dark);
+	color: var(--text-color-dark);
+	border-color: var(--border-color-dark);
+}
+
+/* Homepage background */
+.gsc-homepage-bg {
+	@apply rounded-[var(--border-radius)] shadow-sm;
+	background-color: var(--bg-color-dark);
+}
+
+/* Loading image */
+main .gsc-loading-image {
+	@apply bg-center bg-no-repeat opacity-80;
+	background-image: url("https://github.githubassets.com/images/mona-loading-dark.gif");
+}

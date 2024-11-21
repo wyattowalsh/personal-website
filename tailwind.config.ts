@@ -71,6 +71,12 @@ const config: Config = {
           '50%': { backgroundPosition: '100% 50%' },
         },
       },
+      fontSize: {
+        'title-sm': ['1.5rem', { lineHeight: '2rem' }], // 24px
+        'title-md': ['2rem', { lineHeight: '2.5rem' }], // 32px
+        'title-lg': ['2.5rem', { lineHeight: '3rem' }], // 40px
+        'title-xl': ['3rem', { lineHeight: '3.5rem' }], // 48px
+      },
     },
   },
   plugins: [

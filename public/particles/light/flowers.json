@@ -18,7 +18,7 @@
         "shape": {
             "type": "image",
             "image": {
-                "src": "path/to/flower.png",
+                "src": "iris.png",
                 "width": 100,
                 "height": 100
             }

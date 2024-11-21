@@ -22,12 +22,21 @@ The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes th
 
 **_The Lasso_** loss function can be formalized as:
 
-$$L(\beta) = ||y - X \beta||_2^2 + \lambda ||\beta||_1 \text{ with tuning parameter } \lambda \ge 0$$
+$$
+\begin{equation*}
+L(\boldsymbol{\beta}) = \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_1, \quad \text{with tuning parameter } \lambda \geq 0
+\end{equation*}
+$$
 
 Similar to previous cases, an intercept term can be included through data augmentation of the design matrix with a column of **1**s. Furthermore, formulating the problem as a _least-squares_ optimization problem produces:
 
 $$
-\hat{\beta} = \arg \min_{\beta} L(\beta) = \arg \min_{\beta} \frac{1}{2n} ||y - X\beta||_2^2 + \lambda ||\beta||_1
+\begin{equation*}
+\begin{aligned}
+\hat{\boldsymbol{\beta}} &= \underset{\boldsymbol{\beta}}{\arg\min} \, L(\boldsymbol{\beta}) \\[0.5em]
+&= \underset{\boldsymbol{\beta}}{\arg\min} \left\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \|\boldsymbol{\beta}\|_1 \right\}
+\end{aligned}
+\end{equation*}
 $$
 
 However, unlike previous cases, no closed-form solution exists for this problem. This is due to the fact that the addition of the **_L₁_** penalty makes the function no longer continuously differentiable because of the non-smooth absolute component. To remedy this issue, a discrete optimization technique needs to be applied to search for an optimal solution.
@@ -41,29 +50,37 @@ Before beginning the algorithm, all features should be standardized to have zero
 The simplest form of **_Coordinate Descent_ updates** calculates — for each coefficient — the simple (single variable as opposed to multiple regression) least-squares coefficient value using the partial residuals across all other features in the design matrix. Partial residuals, in this case, are found as:
 
 $$
+\begin{equation*}
 r_{i,j} = y_i - \sum_{k \ne j} x_{i,k} \beta_k
+\end{equation*}
 $$
 
 Therefore, the estimate for a particular coefficient value can be found as:
 
 $$
+\begin{equation*}
 \beta_j^* = \frac{1}{n} \sum_{i=1}^{n} x_{i,j} r_{i,j}
+\end{equation*}
 $$
 
 Now, the penalty, as dictated by the tuning parameter, is included in the model through the soft-thresholding operator. This is expressed as:
 
 $$
-\beta_j = S(\beta_j^*,\lambda) = \text{sign}(\beta_j^*)(|\beta_j^*| - \lambda)_+ = \begin{cases}
-\beta_j^* - \lambda & \beta_j^* > 0 \text{ and } \lambda < |\beta_j^*| \\
-\beta_j^* + \lambda & \beta_j^* > 0 \text{ and } \lambda < |\beta_j^*| \\
-0 & \lambda \geq |\beta_j^*|
+\begin{equation*}
+\beta_j = S(\beta_j^*, \lambda) = \begin{cases}
+\beta_j^* - \lambda & \text{if } \beta_j^* > 0 \text{ and } \lambda < |\beta_j^*| \\[0.5em]
+\beta_j^* + \lambda & \text{if } \beta_j^* < 0 \text{ and } \lambda < |\beta_j^*| \\[0.5em]
+0 & \text{if } \lambda \geq |\beta_j^*|
 \end{cases}
+\end{equation*}
 $$
 
 **_Naive updates_** can be utilized for improved efficiency. These updates are found via:
 
 $$
+\begin{equation*}
 \beta_j^* = \frac{1}{n} \sum_{i=1}^{n} x_{i,j} r_i + \beta_j
+\end{equation*}
 $$
 
 where **_rᵢ_** is the current model residual for all samples, **_n_**.
@@ -71,13 +88,17 @@ where **_rᵢ_** is the current model residual for all samples, **_n_**.
 When the number of samples is much greater than the number of features (**_n_** >> **_p_**), further efficiency improvements can be derived by using **covariance updates**. For these updates, the first term of the **_Naive update_** equation above (Eq. #6) is replaced as shown by:
 
 $$
-\sum_{i=1}^{n} x_{i,j} r_i = \langle x_j, y \rangle - \sum_{k: |\beta_k| > 0} \langle x_j, x_k \rangle \beta_k
+\begin{equation*}
+\sum_{i=1}^{n} x_{i,j} r_i = \langle \mathbf{x}_j, \mathbf{y} \rangle - \sum_{k: |\beta_k| > 0} \langle \mathbf{x}_j, \mathbf{x}_k \rangle \beta_k
+\end{equation*}
 $$
 
 Utilizing **_warm starts_** can bring efficiency boosts as well. Using **_warm starts_**, a sequence of models are fitted — with tuning parameter values from a max tuning parameter value down to a minimum tuning parameter value that is some small factor (thousandth) of the max value — initializing the coefficients of each iteration to the solution of the last iteration. In many cases, it is actually faster to fit this path of models than a single model for some small **_��._** Thus the path can be expressed as:
 
 $$
-\lambda_\text{max} \to \lambda_\text{min} = \epsilon \cdot \lambda_\text{max}
+\begin{equation*}
+\lambda_{\text{max}} \rightarrow \lambda_{\text{min}} = \epsilon \cdot \lambda_{\text{max}}
+\end{equation*}
 $$
 
 where **_𝜖_** is typically 0.001 and there are 100 values spaced on a log scale.
@@ -85,14 +106,16 @@ where **_𝜖_** is typically 0.001 and there are 100 values spaced on a log sca
 Furthermore, the max value of the tuning parameter to begin the path at can be found by finding the minimum value that will bring the estimates for all model coefficients to zero. This is since any values above this value will result in total sparsity of the coefficient vector. The max value of the path (starting point) can be found as:
 
 $$
-\lambda_{\text{max}} = \frac{\max_l |\langle x_l, y \rangle|}{n}
+\begin{equation*}
+\lambda_{\text{max}} = \frac{\max_l |\langle \mathbf{x}_l, \mathbf{y} \rangle|}{n}
+\end{equation*}
 $$
 
 By providing a starting place to begin searching for optimality, warm starting can many times speed up convergence and also puts the _pathwise_ in the **_Pathwise_** **_Coordinate Descent_** algorithm.
 
 ### Implementation of the Lasso In Python Using NumPy
 
-One possible way to implement **_pathwise coordinate descen_**t for **_the Lasso_** (with options for tuning the convergence tolerance, path length, and returning the path) is:
+One possible way to implement **_pathwise coordinate descent_** for **_the Lasso_** (with options for tuning the convergence tolerance, path length, and returning the path) is:
 
 <Gist url="https://gist.github.com/wyattowalsh/6a95b1c9ad6118b196336cffd5de4f72" />
 
@@ -103,7 +126,12 @@ One possible way to implement **_pathwise coordinate descen_**t for **_the Lasso
 In this form of regularized linear regression, the OLS loss function is changed by the addition of both an **_L₁_** and **_L₂_** penalty to the loss function with tuning parameters controlling the intensity of regularization and the balance between the different penalties. This loss function can be formalized as:
 
 $$
-L(\beta) = ||y - X \beta||_2^2 + \lambda \left( (1-\alpha) \frac{1}{2} ||\beta||_2^2 + \alpha ||\beta||_1 \right) \text{ with tuning parameters } \lambda \geq 0, 0 \leq \alpha \leq 1
+\begin{equation*}
+\begin{aligned}
+L(\boldsymbol{\beta}) &= \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left( (1-\alpha) \frac{1}{2} \|\boldsymbol{\beta}\|_2^2 + \alpha \|\boldsymbol{\beta}\|_1 \right), \\[0.5em]
+&\text{with tuning parameters } \lambda \geq 0, \, 0 \leq \alpha \leq 1
+\end{aligned}
+\end{equation*}
 $$
 
 Having both **_L₁_** and **_L₂_** penalties, **_the Elastic Net_** serves to deliver a compromise between Ridge regression and the Lasso, bringing coefficients towards zero and selectively to zero. Here, **_α_** can be considered as the parameter determining the ratio of **_L₁_** penalty to add, whereas **_λ_** can be thought of as the intensity of regularization to apply.
@@ -111,7 +139,12 @@ Having both **_L₁_** and **_L₂_** penalties, **_the Elastic Net_** serves to
 **_The Elastic Net_** loss function is also used to formalize a _least-squares_ optimization problem:
 
 $$
-\hat{\beta} = \arg \min_{\beta} L(\beta) = \arg \min_{\beta} \frac{1}{2n} ||y - X\beta||_2^2 + \lambda [(1 - \alpha) \frac{1}{2} ||\beta||_2^2 + \alpha ||\beta||]
+\begin{equation*}
+\begin{aligned}
+\hat{\boldsymbol{\beta}} &= \underset{\boldsymbol{\beta}}{\arg\min} \, L(\boldsymbol{\beta}) \\[0.5em]
+&= \underset{\boldsymbol{\beta}}{\arg\min} \left\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[(1-\alpha)\frac{1}{2}\|\boldsymbol{\beta}\|_2^2 + \alpha\|\boldsymbol{\beta}\|_1\right] \right\}
+\end{aligned}
+\end{equation*}
 $$
 
 Similarly to the Lasso, an intercept is included through design matrix augmentation, a 1/(2n) term is added for mathematical completeness, and **_pathwise coordinate descent_** is implemented to solve since a closed-form solution does not exist due to the **_L₁_** penalty term.
@@ -119,7 +152,9 @@ Similarly to the Lasso, an intercept is included through design matrix augmentat
 Just as in **_the Lasso, pathwise coordinate descent_** is used to solve for model coefficient estimates however changes need to be made to the update equations to account for the dual penalties. In this case, the **_j_**th coefficient value obtained after soft-thresholding is now found as:
 
 $$
-\beta_j = \frac{S(\beta_j^*, \lambda \alpha)}{1 + \lambda (1 - \alpha)}
+\begin{equation*}
+\beta_j = \frac{S(\beta_j^*, \lambda\alpha)}{1 + \lambda(1-\alpha)}
+\end{equation*}
 $$
 
 The soft-thresholding operator is the same operator applied in **_the Lasso_** update (Eq. #5):
@@ -131,7 +166,9 @@ $$
 Furthermore, **naive updates** or **covariance updates** can be used along with **warm starts**. For **warm starts**, the max **_λ_** value can be calculated as:
 
 $$
-\lambda_{max} = \frac{\max_{l} |\langle x_{l}, y \rangle|}{n \alpha}
+\begin{equation*}
+\lambda_{\text{max}} = \frac{\max_l |\langle \mathbf{x}_l, \mathbf{y} \rangle|}{n\alpha}
+\end{equation*}
 $$
 
 ### Implementation in Python Using NumPy
