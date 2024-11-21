@@ -1,24 +1,94 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import type { PostMetadata } from '@/lib/posts';
 import { cn } from '@/lib/utils';
+import { LoadingSpinner } from '@/components/LoadingSpinner';
 
 interface PostHeaderProps {
-  post: PostMetadata;
   className?: string;
 }
 
-const PostHeader = ({ post, className }: PostHeaderProps) => {
-  const [isHovered, setIsHovered] = useState(false);
+export default function PostHeader({ className }: PostHeaderProps) {
+  const [state, setState] = useState<{
+    post: PostMetadata | null;
+    isLoading: boolean;
+    error: string | null;
+    isHovered: boolean;
+    imageLoaded: boolean;
+  }>({
+    post: null,
+    isLoading: true,
+    error: null,
+    isHovered: false,
+    imageLoaded: false,
+  });
+
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchPost = async () => {
+      try {
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
+        const slug = pathname.split('/blog/posts/')[1];
+        if (!slug) return;
+
+        const response = await fetch(`/api/blog/posts/${slug}`, {
+          signal: controller.signal,
+          headers: {
+            'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400'
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const post = await response.json();
+        setState(prev => ({ ...prev, post, isLoading: false }));
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        
+        const errorMessage = error instanceof Error ? error.message : 'Failed to load post';
+        console.error('Error loading post:', errorMessage);
+        setState(prev => ({
+          ...prev,
+          error: errorMessage,
+          isLoading: false
+        }));
+      }
+    };
+
+    fetchPost();
+    return () => controller.abort();
+  }, [pathname]);
+
+  if (state.isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (state.error || !state.post) {
+    return (
+      <div className="text-destructive text-center p-4">
+        {state.error || 'Post not found'}
+      </div>
+    );
+  }
 
   return (
-    (<motion.header
+    <motion.header
       className={cn(
         "mb-12 rounded-xl overflow-hidden bg-card hover:shadow-2xl transition-all duration-300",
         className
@@ -26,23 +96,33 @@ const PostHeader = ({ post, className }: PostHeaderProps) => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      onMouseEnter={() => setState(prev => ({ ...prev, isHovered: true }))}
+      onMouseLeave={() => setState(prev => ({ ...prev, isHovered: false }))}
     >
-      <div className="relative h-64 sm:h-72 md:h-80">
+      {/* Updated image container with flexible aspect ratio */}
+      <div className="relative aspect-[21/9] w-full overflow-hidden">
         <Image
-          src={post.image || '/logo.webp'}
-          alt={post.title}
+          src={state.post.image || '/logo.webp'}
+          alt={state.post.title}
           fill
           priority
-          className="object-cover transition-transform duration-500"
+          sizes="100vw"
+          className={cn(
+            "object-cover transition-all duration-500",
+            !state.imageLoaded && "blur-sm scale-105",
+            state.imageLoaded && "blur-0 scale-100",
+            // Add object-position classes for better image positioning
+            "object-center",
+            // Add gradient overlay for better text readability
+            "after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-b after:from-transparent after:to-black/60"
+          )}
           style={{
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
-            maxWidth: "100%",
-            height: "auto"
-          }} />
+            transform: state.isHovered ? 'scale(1.05)' : 'scale(1)'
+          }}
+          onLoad={() => setState(prev => ({ ...prev, imageLoaded: true }))}
+        />
         <AnimatePresence>
-          {isHovered && (
+          {state.isHovered && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -59,31 +139,31 @@ const PostHeader = ({ post, className }: PostHeaderProps) => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          {post.title}
+          {state.post.title}
         </motion.h1>
         <div className="space-y-4">
           <div className="flex items-center space-x-4 text-muted-foreground">
-            {post.date && (
-              <time dateTime={post.date}>{formatDate(post.date)}</time>
+            {state.post.date && (
+              <time dateTime={state.post.date}>{formatDate(state.post.date)}</time>
             )}
-            {post.readingTime && (
+            {state.post.readingTime && (
               <>
                 <span>•</span>
-                <span>{post.readingTime}</span>
+                <span>{state.post.readingTime}</span>
               </>
             )}
           </div>
-          {post.updated && (
+          {state.post.updated && (
             <p className="text-sm text-muted-foreground">
-              Last updated: <time dateTime={post.updated}>{formatDate(post.updated)}</time>
+              Last updated: <time dateTime={state.post.updated}>{formatDate(state.post.updated)}</time>
             </p>
           )}
-          {post.summary && (
-            <p className="text-lg text-muted-foreground">{post.summary}</p>
+          {state.post.summary && (
+            <p className="text-lg text-muted-foreground">{state.post.summary}</p>
           )}
-          {post.tags && post.tags.length > 0 && (
+          {state.post.tags && state.post.tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
+              {state.post.tags.map((tag) => (
                 <Link key={tag} href={`/blog/tags/${tag}`}>
                   <Badge
                     variant="secondary"
@@ -97,8 +177,6 @@ const PostHeader = ({ post, className }: PostHeaderProps) => {
           )}
         </div>
       </div>
-    </motion.header>)
+    </motion.header>
   );
-};
-
-export default PostHeader;
+}

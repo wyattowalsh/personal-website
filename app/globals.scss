@@ -49,6 +49,47 @@
   code {
     @apply bg-gray-200 text-red-600 px-1 rounded dark:bg-gray-800;
   }
+
+  .katex-inline {
+    @apply text-blue-600 dark:text-blue-400;
+    font-size: 1em;
+    vertical-align: middle;
+    transition: color 0.3s ease;
+  }
+
+  .katex-display {
+    @apply text-purple-600 dark:text-purple-400;
+    font-size: 1.25em;
+    margin: 1em 0;
+    text-align: center;
+    transition: color 0.3s ease;
+  }
+
+  @media (max-width: 640px) {
+    .katex-display {
+      font-size: 1.1em;
+    }
+  }
+
+  @media (min-width: 641px) and (max-width: 1023px) {
+    .katex-display {
+      font-size: 1.2em;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .katex-display {
+      font-size: 1.25em;
+    }
+  }
+
+  .fancy-bg {
+    // ...existing fancy-bg styles from page.module.scss...
+  }
+
+  @keyframes backgroundAnimation {
+    // ...existing code...
+  }
 }
 
 @keyframes fadeIn {
@@ -117,6 +158,16 @@
       glitch-movement 4s infinite reverse;
     filter: blur(var(--glitch-blur));
     mix-blend-mode: multiply;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-text);
+  }
+  
+  .gradient-heading {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-heading);
   }
 }
 

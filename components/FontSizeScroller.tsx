@@ -12,7 +12,7 @@ export default function FontSizeScroller({ children }: { children: React.ReactNo
   return (
     <div style={{ fontSize: `${fontSize}px` }}>
       <div className="flex justify-end mb-4">
-        <label htmlFor="font-size-slider" className="mr-2">Font Size:</label>
+        <label htmlFor="font-size-slider" className="mr-2 text-gray-700 dark:text-gray-300">Font Size:</label>
         <input
           id="font-size-slider"
           type="range"
@@ -20,7 +20,7 @@ export default function FontSizeScroller({ children }: { children: React.ReactNo
           max="24"
           value={fontSize}
           onChange={handleFontSizeChange}
-          className="w-32"
+          className="w-32 accent-blue-600 dark:accent-blue-400"
         />
       </div>
       {children}

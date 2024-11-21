@@ -61,37 +61,38 @@ export default function PostPagination() {
   const { prevPost, nextPost } = state.data;
 
   return (
-    (<nav className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8" aria-label="Post navigation">
-      {prevPost ? (
-        <Link href={`/blog/posts/${prevPost.slug}`} className="md:mr-auto">
+    <nav className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8" aria-label="Post navigation">
+      {nextPost ? (
+        <Link href={`/blog/posts/${nextPost.slug}`} className="md:mr-auto">
           <motion.div whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}>
             <Card className="p-4 flex items-center space-x-4 hover:shadow-md transition-shadow">
               <ChevronLeft className="w-5 h-5" />
               <div>
                 <p className="text-sm text-muted-foreground">Previous</p>
-                <p className="font-medium line-clamp-1">{prevPost.title}</p>
+                <p className="font-medium line-clamp-1">{nextPost.title}</p>
               </div>
             </Card>
           </motion.div>
         </Link>
       ) : (
-        (<div />) // Empty div to maintain grid layout
+        <div /> // Empty div to maintain grid layout
       )}
-      {nextPost ? (
-        <Link href={`/blog/posts/${nextPost.slug}`} className="md:ml-auto">
+
+      {prevPost ? (
+        <Link href={`/blog/posts/${prevPost.slug}`} className="md:ml-auto">
           <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.95 }}>
             <Card className="p-4 flex items-center space-x-4 hover:shadow-md transition-shadow">
               <div>
                 <p className="text-sm text-muted-foreground">Next</p>
-                <p className="font-medium line-clamp-1">{nextPost.title}</p>
+                <p className="font-medium line-clamp-1">{prevPost.title}</p>
               </div>
               <ChevronRight className="w-5 h-5" />
             </Card>
           </motion.div>
         </Link>
       ) : (
-        (<div />) // Empty div to maintain grid layout
+        <div /> // Empty div to maintain grid layout
       )}
-    </nav>)
+    </nav>
   );
 }

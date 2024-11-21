@@ -1,6 +1,6 @@
 {
   "name": "personal-website",
-  "version": "0.1.0",
+  "version": "0.6.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -137,6 +137,7 @@
     "remark-validate-links": "^12.1.1",
     "sass": "^1.80.7",
     "sass-loader": "^13.3.2",
+    "six": "^0.0.12",
     "super-react-gist": "latest",
     "tailwind-merge": "^2.5.4",
     "tailwindcss": "^3.4.14",

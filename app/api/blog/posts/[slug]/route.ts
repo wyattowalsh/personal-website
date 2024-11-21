@@ -1,47 +1,43 @@
+import { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { getPostBySlug } from '@/lib/posts';
-import { revalidatePath } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate every hour
 
+interface RouteHandlerContext {
+  params: Promise<{ slug: string }>;
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { slug: string } }
+  request: NextRequest,
+  context: RouteHandlerContext
 ) {
   try {
-    if (!params.slug) {
-      return new NextResponse('Slug is required', { status: 400 });
+    const { slug } = await context.params;
+    
+    if (!slug) {
+      return NextResponse.json(
+        { error: 'Slug parameter is required' },
+        { status: 400 }
+      );
     }
 
-    const post = await getPostBySlug(params.slug);
+    const post = await getPostBySlug(slug);
     
     if (!post) {
-      return new NextResponse('Post not found', { 
-        status: 404,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+      return NextResponse.json(
+        { error: 'Post not found' },
+        { status: 404 }
+      );
     }
 
-    // Cache the response for 1 hour
-    return new NextResponse(JSON.stringify(post), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
-      }
-    });
+    return NextResponse.json(post);
   } catch (error) {
-    console.error('Error in post route:', error);
-    return new NextResponse(
-      JSON.stringify({ message: 'Internal Server Error' }),
-      { 
-        status: 500,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
+    console.error('Error fetching post:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 }
     );
   }
 }

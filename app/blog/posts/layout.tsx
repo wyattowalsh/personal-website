@@ -2,7 +2,7 @@ import React from "react";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PostLayout } from "@/components/PostLayout";
-
+import Script from 'next/script';
 
 export default function PostsLayout({
   children,

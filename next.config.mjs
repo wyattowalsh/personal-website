@@ -36,15 +36,19 @@ import rehypeInferReadingTimeMeta from "rehype-infer-reading-time-meta";
 // import rehypeMathjax from "rehype-mathjax";
 import rehypePrismPlus from "rehype-prism-plus";
 import rehypeSemanticBlockquotes from "rehype-semantic-blockquotes";
-// import remarkMdxMathEnhanced from "remark-mdx-math-enhanced";
+import remarkMdxMathEnhanced from "remark-mdx-math-enhanced";
 import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   images: {
-    loader: 'default',
-    domains: ['localhost', 'w4w.dev', 'miro.medium.com'],
-    path: '', // Usually empty for default usage
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'miro.medium.com',
+        pathname: '/**',
+      },
+    ],
   },
 };
 
@@ -81,7 +85,7 @@ const withMDX = createMDX({
       remarkPrism,
       remarkSmartypants,
       remarkSources,
-      // remarkMdxMathEnhanced,
+      [remarkMdxMathEnhanced, { component: 'Math' }],
       remarkMdxFrontmatter,
       remarkToc,
       remarkValidateLinks,
@@ -103,16 +107,6 @@ const withMDX = createMDX({
       },],
       rehypeSemanticBlockquotes,
     ],
-    images: {
-      resolve: async (src) => {
-        if (src.startsWith('http')) {
-          return src;
-        }
-        return src.startsWith('/') ? src : `/${src}`;
-      },
-      sizes: "100vw",
-      loading: "lazy",
-    },
   },
 });
 

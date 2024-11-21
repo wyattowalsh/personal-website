@@ -1,0 +1,161 @@
+---
+title: "Implementing Pathwise Coordinate Descent For The Lasso and The Elastic Net In Python Using NumPy"
+image: "/lasso.webp"
+caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
+summary: "Explanations for Solving Some of the Most Popular Supervised Learning Algorithms"
+tags: ["ML", "TDS", "Python"]
+date: "2021-01-13"
+updated: "2024-11-20"
+---
+
+Hey there! 👋
+
+Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](/blog/regularized-linear-regression-models-pt1), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](/blog/regularized-linear-regression-models-pt2), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
+
+The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**.**
+
+---
+
+## The Lasso for Regression
+
+The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
+
+**_The Lasso_** loss function can be formalized as:
+
+$$L(\beta) = ||y - X \beta||_2^2 + \lambda ||\beta||_1 \text{ with tuning parameter } \lambda \ge 0$$
+
+Similar to previous cases, an intercept term can be included through data augmentation of the design matrix with a column of **1**s. Furthermore, formulating the problem as a _least-squares_ optimization problem produces:
+
+$$
+\hat{\beta} = \arg \min_{\beta} L(\beta) = \arg \min_{\beta} \frac{1}{2n} ||y - X\beta||_2^2 + \lambda ||\beta||_1
+$$
+
+However, unlike previous cases, no closed-form solution exists for this problem. This is due to the fact that the addition of the **_L₁_** penalty makes the function no longer continuously differentiable because of the non-smooth absolute component. To remedy this issue, a discrete optimization technique needs to be applied to search for an optimal solution.
+
+Numerous algorithms exist to this end, such as **_LARS_** (Least Angle Regression) and **_Forward Stepwise Regression_**, however, the **_Pathwise Coordinate Descent_** algorithm is leveraged within this work. In short, this algorithm optimizes a parameter at a time holding all other parameters constant.
+
+## Pathwise Coordinate Descent
+
+Before beginning the algorithm, all features should be standardized to have zero mean and variance of one. From there, a **_p+1_** length coefficient vector is initialized to zero. Cycles are then run across all coefficients until convergence — where values of the coefficients stabilize and do not change more than a certain tolerance — is reached. Within each cycle, for every coefficient, an update is calculated and subsequently has the soft-thresholding operator applied to it.
+
+The simplest form of **_Coordinate Descent_ updates** calculates — for each coefficient — the simple (single variable as opposed to multiple regression) least-squares coefficient value using the partial residuals across all other features in the design matrix. Partial residuals, in this case, are found as:
+
+$$
+r_{i,j} = y_i - \sum_{k \ne j} x_{i,k} \beta_k
+$$
+
+Therefore, the estimate for a particular coefficient value can be found as:
+
+$$
+\beta_j^* = \frac{1}{n} \sum_{i=1}^{n} x_{i,j} r_{i,j}
+$$
+
+Now, the penalty, as dictated by the tuning parameter, is included in the model through the soft-thresholding operator. This is expressed as:
+
+$$
+\beta_j = S(\beta_j^*,\lambda) = \text{sign}(\beta_j^*)(|\beta_j^*| - \lambda)_+ = \begin{cases}
+\beta_j^* - \lambda & \beta_j^* > 0 \text{ and } \lambda < |\beta_j^*| \\
+\beta_j^* + \lambda & \beta_j^* > 0 \text{ and } \lambda < |\beta_j^*| \\
+0 & \lambda \geq |\beta_j^*|
+\end{cases}
+$$
+
+**_Naive updates_** can be utilized for improved efficiency. These updates are found via:
+
+$$
+\beta_j^* = \frac{1}{n} \sum_{i=1}^{n} x_{i,j} r_i + \beta_j
+$$
+
+where **_rᵢ_** is the current model residual for all samples, **_n_**.
+
+When the number of samples is much greater than the number of features (**_n_** >> **_p_**), further efficiency improvements can be derived by using **covariance updates**. For these updates, the first term of the **_Naive update_** equation above (Eq. #6) is replaced as shown by:
+
+$$
+\sum_{i=1}^{n} x_{i,j} r_i = \langle x_j, y \rangle - \sum_{k: |\beta_k| > 0} \langle x_j, x_k \rangle \beta_k
+$$
+
+Utilizing **_warm starts_** can bring efficiency boosts as well. Using **_warm starts_**, a sequence of models are fitted — with tuning parameter values from a max tuning parameter value down to a minimum tuning parameter value that is some small factor (thousandth) of the max value — initializing the coefficients of each iteration to the solution of the last iteration. In many cases, it is actually faster to fit this path of models than a single model for some small **_��._** Thus the path can be expressed as:
+
+$$
+\lambda_\text{max} \to \lambda_\text{min} = \epsilon \cdot \lambda_\text{max}
+$$
+
+where **_𝜖_** is typically 0.001 and there are 100 values spaced on a log scale.
+
+Furthermore, the max value of the tuning parameter to begin the path at can be found by finding the minimum value that will bring the estimates for all model coefficients to zero. This is since any values above this value will result in total sparsity of the coefficient vector. The max value of the path (starting point) can be found as:
+
+$$
+\lambda_{\text{max}} = \frac{\max_l |\langle x_l, y \rangle|}{n}
+$$
+
+By providing a starting place to begin searching for optimality, warm starting can many times speed up convergence and also puts the _pathwise_ in the **_Pathwise_** **_Coordinate Descent_** algorithm.
+
+### Implementation of the Lasso In Python Using NumPy
+
+One possible way to implement **_pathwise coordinate descen_**t for **_the Lasso_** (with options for tuning the convergence tolerance, path length, and returning the path) is:
+
+<Gist url="https://gist.github.com/wyattowalsh/6a95b1c9ad6118b196336cffd5de4f72" />
+
+---
+
+## The Elastic Net
+
+In this form of regularized linear regression, the OLS loss function is changed by the addition of both an **_L₁_** and **_L₂_** penalty to the loss function with tuning parameters controlling the intensity of regularization and the balance between the different penalties. This loss function can be formalized as:
+
+$$
+L(\beta) = ||y - X \beta||_2^2 + \lambda \left( (1-\alpha) \frac{1}{2} ||\beta||_2^2 + \alpha ||\beta||_1 \right) \text{ with tuning parameters } \lambda \geq 0, 0 \leq \alpha \leq 1
+$$
+
+Having both **_L₁_** and **_L₂_** penalties, **_the Elastic Net_** serves to deliver a compromise between Ridge regression and the Lasso, bringing coefficients towards zero and selectively to zero. Here, **_α_** can be considered as the parameter determining the ratio of **_L₁_** penalty to add, whereas **_λ_** can be thought of as the intensity of regularization to apply.
+
+**_The Elastic Net_** loss function is also used to formalize a _least-squares_ optimization problem:
+
+$$
+\hat{\beta} = \arg \min_{\beta} L(\beta) = \arg \min_{\beta} \frac{1}{2n} ||y - X\beta||_2^2 + \lambda [(1 - \alpha) \frac{1}{2} ||\beta||_2^2 + \alpha ||\beta||]
+$$
+
+Similarly to the Lasso, an intercept is included through design matrix augmentation, a 1/(2n) term is added for mathematical completeness, and **_pathwise coordinate descent_** is implemented to solve since a closed-form solution does not exist due to the **_L₁_** penalty term.
+
+Just as in **_the Lasso, pathwise coordinate descent_** is used to solve for model coefficient estimates however changes need to be made to the update equations to account for the dual penalties. In this case, the **_j_**th coefficient value obtained after soft-thresholding is now found as:
+
+$$
+\beta_j = \frac{S(\beta_j^*, \lambda \alpha)}{1 + \lambda (1 - \alpha)}
+$$
+
+The soft-thresholding operator is the same operator applied in **_the Lasso_** update (Eq. #5):
+
+$$
+sign(\beta_j^*)(||\beta_j^*|| - \lambda\alpha) + 
+$$
+
+Furthermore, **naive updates** or **covariance updates** can be used along with **warm starts**. For **warm starts**, the max **_λ_** value can be calculated as:
+
+$$
+\lambda_{max} = \frac{\max_{l} |\langle x_{l}, y \rangle|}{n \alpha}
+$$
+
+### Implementation in Python Using NumPy
+
+One possible way to implement **_pathwise coordinate descent_** to solve **_the Elastic Net_** (with options for tuning the convergence tolerance, path length, and returning the path) is:
+
+<Gist url="https://gist.github.com/wyattowalsh/3bfb1a924007f19a7191a17b6c4e52a0" />
+
+---
+
+## Conclusion
+
+Throughout this series, different regularized forms of linear regression have been examined as tools to overcome the tendency to overfit training data of the **_Ordinary Least Squares_** model. **_The Elastic Net_** — due to its balance between regularization varieties — tends to be the most robust to aid the **overfitting** issue, however, **_the Lasso_** certainly can prove helpful in many situations due to its **automated feature selection**. **_Ridge Regression_** is also a good tool to use to ensure a reduction in possible model overfitting as it shrinks model coefficients towards zero, reducing model variance.
+
+The header image of this series well demonstrates the difference between **_Ridge Regression_** and **_the Lasso_**, as it can be seen that the model coefficients all shrink towards zero on the left for the **_Ridge Regression_** case, and, on the right, coefficients are being brought to zero in a selective order for **_the Lasso_** case.
+
+Congratulations! 🎉🎊🥳
+
+You made it to the end of the series!
+
+I hope that these posts were informative and helpful for you to learn more about **_regularized linear regression_** and the necessary **optimization** needed to solve the associated models.
+
+See [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
+
+If you are just now beginning the series, make sure to check out [**part one**](/blog/regularized-linear-regression-models-pt1) and [**part two**](/blog/regularized-linear-regression-models-pt2)!
+
+Please leave a comment if you would like! I am always trying to improve my posts (logically, syntactically, or otherwise) and am happy to discuss anything related! 👋

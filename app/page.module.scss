@@ -1,48 +1,5 @@
 @use "variables.module.scss" as variables;
 
-.fancy-bg {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  overflow: hidden;
-  background: var(--gradient-background);
-  background-size: 300% 300%;
-  animation: backgroundAnimation 20s ease infinite;
-  transition: background 0.5s ease;
-
-  &::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent 70%);
-    mix-blend-mode: screen;
-    filter: blur(100px);
-    animation: pulse 8s ease infinite;
-    will-change: opacity;
-    backdrop-filter: blur(100px);
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0.05;
-    animation: patternMove 30s linear infinite;
-    background-image: radial-gradient(
-      circle at center,
-      rgba(255, 255, 255, 0.1) 2px,
-      transparent 2px
-    );
-    background-size: 24px 24px;
-    will-change: background-position;
-  }
-
-  html.dark & {
-    background: var(--gradient-background);
-    transition: background 0.5s ease;
-  }
-}
-
 @keyframes backgroundAnimation {
   0%,
   100% { 

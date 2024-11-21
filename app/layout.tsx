@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { Fira_Code, Montserrat } from "next/font/google";
+import Script from "next/script";
 import "./globals.scss";
 import "katex/dist/katex.min.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -8,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import LayoutContent from "@/components/LayoutContent";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import Header from "@/components/Header";
+import KaTeXLoader from "@/components/KaTeXLoader";
 
 config.autoAddCss = false;
 
@@ -33,6 +35,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link 
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+          integrity="sha384-ZYE+JaVHEQ/eFGzZ9kq+z8MC2RPM/qY0A+y2UM3fPvFJQP7MBGdqREgBjAj/EB/Y"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}>
         <ThemeProvider
           attribute="class"
@@ -43,8 +53,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           {children}
         </ThemeProvider>
+        <ScrollIndicator />
+        <KaTeXLoader />
       </body>
-      <ScrollIndicator />
     </html>
   );
 }

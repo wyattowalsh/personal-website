@@ -255,13 +255,14 @@ export async function getAdjacentPosts(currentSlug: string | string[]): Promise<
     }
 
     return {
-      prevPost: currentIndex > 0 ? {
-        slug: posts[currentIndex - 1].slug,
-        title: posts[currentIndex - 1].title,
-      } : undefined,
-      nextPost: currentIndex < posts.length - 1 ? {
+      // Switch these - newer posts are "previous", older posts are "next"
+      prevPost: currentIndex < posts.length - 1 ? {
         slug: posts[currentIndex + 1].slug,
         title: posts[currentIndex + 1].title,
+      } : undefined,
+      nextPost: currentIndex > 0 ? {
+        slug: posts[currentIndex - 1].slug,
+        title: posts[currentIndex - 1].title,
       } : undefined,
     };
   } catch (error) {

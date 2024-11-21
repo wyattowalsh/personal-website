@@ -1,16 +1,18 @@
 import React, { Suspense } from "react";
-import ClientPostHeader from "@/components/ClientPostHeader";
+import PostHeader from "@/components/PostHeader";
 import PostPagination from "@/components/PostPagination";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import type { PostMetadata } from "@/lib/posts";
 
-export function PostLayout({
-  children,
-}: {
+interface PostLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export function PostLayout({ children }: PostLayoutProps) {
   return (
     <article className="space-y-8">
-      <ClientPostHeader />
+      <PostHeader/>
+      <hr/>
       <div className="prose prose-lg dark:prose-invert max-w-none">
         {children}
       </div>

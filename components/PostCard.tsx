@@ -39,35 +39,35 @@ const PostCard = ({ post, className }: PostCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    (<motion.div
+    <motion.div
       whileHover={{ y: -5 }}
-      className={cn("transition-transform duration-300 h-full", className)} // Add h-full class
+      className={cn("transition-transform duration-300 h-full", className)}
     >
       <Link href={`/blog/posts/${slug}`}>
         <Card
-          className="overflow-hidden bg-card hover:shadow-2xl transition-shadow duration-300 cursor-pointer rounded-xl transform hover:scale-105 h-full" // Add h-full class
+          className="overflow-hidden bg-card hover:shadow-2xl transition-shadow duration-300 cursor-pointer rounded-xl transform hover:scale-105 h-full"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div className="relative h-56"> {/* Set fixed height for image container */}
+          {/* Updated image container with aspect ratio */}
+          <div className="relative aspect-[16/9] w-full">
             <Image
               src={image}
               alt={title}
-              width={400}
-              height={250}
-              // Set height to full
-              className="w-full h-full object-cover transition-transform duration-500 rounded-t-xl"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className={cn(
+                "object-cover transition-transform duration-500 rounded-t-xl",
+                "hover:scale-105"
+              )}
               placeholder="blur"
               blurDataURL="/placeholder.png"
-              style={{
-                maxWidth: "100%",
-                height: "auto"
-              }} />
+            />
             {isHovered && (
-              <div className="absolute inset-0 bg-black bg-opacity-30 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-black bg-opacity-30 transition-opacity duration-300" />
             )}
           </div>
-          <div className="p-4 flex flex-col flex-grow bg-gradient-to-b from-card to-muted rounded-b-xl h-full"> {/* Add h-full class */}
+          <div className="p-4 flex flex-col flex-grow bg-gradient-to-b from-card to-muted rounded-b-xl h-full">
             <div className="flex flex-row items-center gap-4 mb-2">
               <h3 className="text-xl font-semibold text-foreground leading-tight flex-grow">
                 {title}
@@ -110,7 +110,7 @@ const PostCard = ({ post, className }: PostCardProps) => {
           </div>
         </Card>
       </Link>
-    </motion.div>)
+    </motion.div>
   );
 };
 

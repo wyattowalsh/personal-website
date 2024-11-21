@@ -12,9 +12,16 @@ export async function GET(request: Request) {
       return new NextResponse('Slug is required', { status: 400 });
     }
 
-    const adjacentPosts = await getAdjacentPosts(slug);
+    // Get posts and swap the order to match chronological navigation
+    const { prevPost, nextPost } = await getAdjacentPosts(slug);
+    const response = {
+      // Newer post should be nextPost (chronologically next)
+      nextPost: prevPost,  // Was pointing to older post
+      // Older post should be prevPost (chronologically previous)
+      prevPost: nextPost,  // Was pointing to newer post
+    };
     
-    return new NextResponse(JSON.stringify(adjacentPosts), {
+    return new NextResponse(JSON.stringify(response), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
