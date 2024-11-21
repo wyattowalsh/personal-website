@@ -6,56 +6,62 @@ import "katex/dist/katex.min.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import LayoutContent from "@/components/LayoutContent";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import Header from "@/components/Header";
 import KaTeXLoader from "@/components/KaTeXLoader";
+import CustomScrollbars from "@/components/Scroll";
 
 config.autoAddCss = false;
 
 const firaCode = Fira_Code({
-  subsets: ["latin"],
-  variable: "--font-fira-code",
+	subsets: ["latin"],
+	variable: "--font-fira-code",
 });
 
 const montserrat = Montserrat({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-montserrat",
+	subsets: ["latin"],
+	display: "swap",
+	variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
-  title: "Welcome to Wyatt's Personal Web App",
-  description: "Wyatt's personal web app with social links, blog, and more.",
-  icons: {
-    icon: "/logo.webp",
-  },
+	title: "Welcome to Wyatt's Personal Web App",
+	description: "Wyatt's personal web app with social links, blog, and more.",
+	icons: {
+		icon: "/logo.webp",
+	},
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link 
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-          integrity="sha384-ZYE+JaVHEQ/eFGzZ9kq+z8MC2RPM/qY0A+y2UM3fPvFJQP7MBGdqREgBjAj/EB/Y"
-          crossOrigin="anonymous"
-        />
-      </head>
-      <body className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Header />
-          {children}
-        </ThemeProvider>
-        <ScrollIndicator />
-        <KaTeXLoader />
-      </body>
-    </html>
-  );
+export default function RootLayout({
+	children,
+}: {
+	children: React.ReactNode;
+}) {
+	return (
+		<html lang="en" suppressHydrationWarning>
+			<head>
+				<link
+					rel="stylesheet"
+					href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+					integrity="sha384-ZYE+JaVHEQ/eFGzZ9kq+z8MC2RPM/qY0A+y2UM3fPvFJQP7MBGdqREgBjAj/EB/Y"
+					crossOrigin="anonymous"
+				/>
+			</head>
+			<body
+				className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<Header />
+					<CustomScrollbars>{children}</CustomScrollbars>
+				</ThemeProvider>
+				<ScrollIndicator />
+				<KaTeXLoader />
+			</body>
+		</html>
+	);
 }

@@ -26,6 +26,18 @@ import { motion } from "framer-motion";
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
 
+interface Post {
+	slug: string;
+	title: string;
+	summary: string;
+	date: string;
+	updated?: string;
+	tags: string[];
+	image?: string;
+	readingTime?: string;
+	content: string;
+}
+
 interface SearchBarProps {
 	posts: Post[]; // Make sure Post type includes content field
 	tags: string[];
@@ -40,9 +52,12 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 	const [sortMethod, setSortMethod] = useState<string>("date");
 	const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-	// Mount effect to initialize results
+	// Mount effect to initialize results with sorted posts
 	useEffect(() => {
-		setResults(posts);
+		const sortedPosts = [...posts].sort(
+			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+		);
+		setResults(sortedPosts);
 		setMounted(true);
 	}, [posts]);
 
@@ -65,8 +80,9 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 		[posts]
 	);
 
+	// Update search effect to maintain sort order
 	useEffect(() => {
-		let searchResults = posts;
+		let searchResults = [...posts]; // Create new array to avoid mutating props
 
 		if (query.trim()) {
 			const fuseResults = fuse.search(query);
@@ -82,16 +98,16 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 			);
 		}
 
+		// Always apply date sorting if no specific sort method is selected
 		searchResults = searchResults.sort((a, b) => {
 			const modifier = sortDirection === "asc" ? 1 : -1;
-			if (sortMethod === "date") {
-				return (
-					(new Date(b.date).getTime() - new Date(a.date).getTime()) * modifier
-				);
-			} else if (sortMethod === "title") {
+			if (sortMethod === "title") {
 				return a.title.localeCompare(b.title) * modifier;
 			}
-			return 0;
+			// Default to date sorting
+			return (
+				(new Date(b.date).getTime() - new Date(a.date).getTime()) * modifier
+			);
 		});
 
 		setResults(searchResults);

@@ -1,109 +1,66 @@
-/*!
- * Enhanced Light Theme with a Modern Touch
- * Refined Custom Version by <Your Name>
- */
+/* Tailwind CSS implementation for enhanced light mode */
 
-main {
-    --color-prettylights-syntax-comment: #6a737d;
-    --color-prettylights-syntax-constant: #005cc5;
-    --color-prettylights-syntax-entity: #8250df;
-    --color-prettylights-syntax-storage-modifier-import: #24292e;
-    --color-prettylights-syntax-entity-tag: #22863a;
-    --color-prettylights-syntax-keyword: #d73a49;
-    --color-prettylights-syntax-string: #032f62;
-    --color-prettylights-syntax-variable: #e36209;
-    --color-btn-text: #24292e;
-    --color-btn-bg: #f6f8fa;
-    --color-btn-border: #d1d5da;
-    --color-btn-shadow: 0 2px 4px rgba(27, 31, 35, 0.1);
-    --color-btn-inset-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
-    --color-btn-hover-bg: #f3f4f6;
-    --color-btn-hover-border: #c6cbd1;
-    --color-btn-active-bg: #edeff2;
-    --color-btn-active-border: #adb6bd;
-    --color-btn-selected-bg: #e1e4e8;
-    --color-btn-primary-bg: linear-gradient(180deg, #0366d6, #005cc5);
-    --color-btn-primary-hover-bg: linear-gradient(180deg, #005cc5, #004494);
-    --color-btn-primary-shadow: 0 4px 6px rgba(3, 102, 214, 0.2);
-    --color-btn-primary-inset-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
-    --color-fg-default: #24292e;
-    --color-fg-muted: #6a737d;
-    --color-fg-subtle: #959da5;
-    --color-canvas-default: #ffffff;
-    --color-canvas-overlay: #f6f8fa;
-    --color-canvas-inset: #e1e4e8;
-    --color-border-default: #d1d5da;
-    --color-border-muted: #e1e4e8;
-    --color-accent-fg: #0366d6;
-    --color-accent-muted: #79b8ff;
-    --color-success-fg: #28a745;
-    --color-attention-fg: #735c0f;
-    --color-danger-fg: #d73a49;
-    --color-danger-subtle: #ffeef0;
-
-    /*! Enhanced UI styling */
-    --border-radius: 6px;
-    --transition-duration: 0.2s;
+/* Root-level custom properties for easy theming */
+:root {
+  --border-radius: 0.375rem; /* 6px */
+  --transition-duration: 200ms; /* 0.2s */
 }
 
+/* General transitions for main content */
 main {
-    transition: background-color var(--transition-duration), color var(--transition-duration);
+  @apply transition-colors duration-[var(--transition-duration)];
 }
 
+/* Buttons */
 button,
 .main-button {
-    border-radius: var(--border-radius);
-    transition: background-color var(--transition-duration), box-shadow var(--transition-duration);
-    box-shadow: var(--color-btn-shadow);
+  @apply rounded-[var(--border-radius)] shadow-md bg-gray-100 text-gray-800 
+           border border-gray-300 hover:bg-gray-200 active:bg-gray-300 focus:outline-none;
+  @apply transition-colors duration-[var(--transition-duration)] ease-in-out;
 }
 
 button:hover,
 .main-button:hover {
-    background-color: var(--color-btn-hover-bg);
-    box-shadow: 0 3px 8px rgba(27, 31, 35, 0.15);
+  @apply shadow-lg;
 }
 
 button:active,
 .main-button:active {
-    background-color: var(--color-btn-active-bg);
-    box-shadow: 0 2px 4px rgba(27, 31, 35, 0.1);
+  @apply shadow-md;
 }
 
+/* Main container styling */
 .main-container {
-    border-radius: var(--border-radius);
-    background-color: var(--color-canvas-overlay);
-    box-shadow: 0 1px 4px rgba(27, 31, 35, 0.1);
-    padding: 1rem;
-    transition: background-color var(--transition-duration);
+  @apply rounded-[var(--border-radius)] bg-gray-100 text-gray-900 
+           shadow-md p-4 transition-colors duration-[var(--transition-duration)];
 }
 
-h1, h2, h3 {
-    color: var(--color-accent-fg);
-    background: linear-gradient(90deg, #0366d6, #005cc5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+/* Headings with gradient text */
+h1,
+h2,
+h3 {
+  @apply bg-gradient-to-r from-blue-600 via-blue-500 to-blue-400 
+           bg-clip-text text-transparent font-semibold;
 }
 
+/* Giscus reactions count */
 .gsc-reactions-count {
-    display: block;
-    color: var(--color-accent-fg);
-    transition: color var(--transition-duration);
+  @apply block text-blue-500 transition-colors duration-[var(--transition-duration)];
 }
 
-.gsc-homepage-bg {
-    background-color: #f6f8fa;
-    border-radius: var(--border-radius);
-}
-
+/* Giscus comments box styling */
 .gsc-comments > .gsc-comment-box {
-    margin-bottom: 0.5rem;
-    border: 1px solid var(--color-border-default);
-    border-radius: var(--border-radius);
-    padding: 0.75rem;
-    box-shadow: 0 1px 3px rgba(27, 31, 35, 0.1);
+  @apply mb-2 border border-gray-300 rounded-[var(--border-radius)] 
+           p-3 shadow-sm transition-shadow duration-[var(--transition-duration)];
 }
 
+/* Homepage background */
+.gsc-homepage-bg {
+  @apply bg-gray-50 rounded-[var(--border-radius)] shadow-sm;
+}
+
+/* Loading image */
 main .gsc-loading-image {
-    background-image: url('https://github.githubassets.com/images/mona-loading-light.gif');
-    opacity: 0.8;
+  @apply bg-center bg-no-repeat opacity-80;
+  background-image: url('https://github.githubassets.com/images/mona-loading-light.gif');
 }

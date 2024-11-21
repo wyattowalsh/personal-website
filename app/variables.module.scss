@@ -1,42 +1,74 @@
+// variables.module.scss
+
+// Base Colors
+$color-hue: 198;
+$color-saturation: 33.6%;
+$color-lightness: 56.3%;
+$foreground-lightness-light: 0%;
+$foreground-lightness-dark: 90%;
+$background-lightness-light: 95%;
+$background-lightness-dark: 5%;
+
+// Shadows
+$shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+$shadow-soft-light: 0 10px 25px rgba(0, 0, 0, 0.1);
+$shadow-soft-dark: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+// Fonts
+$font-sans: 'Montserrat',
+sans-serif;
+$font-display: 'Oswald',
+sans-serif;
+$font-code: 'Fira Code',
+monospace;
+
+// Gradients
+$gradient-background-light: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+$gradient-background-dark: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+$gradient-text-light: linear-gradient(90deg, #1a56db 0%, #7c3aed 100%);
+$gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+
+// Light Theme Variables
 @mixin light {
-  --background: 198 100% 95%;
-  --foreground: 198 5% 0%;
-  --primary: 198 33.6% 56.3%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 198 30% 70%;
-  --secondary-foreground: 0 0% 0%;
-  --accent: 160 30% 80%;
-  --accent-foreground: 198 5% 10%;
-  --destructive: 0 100% 30%;
-  --destructive-foreground: 198 5% 90%;
-  --border: 198 30% 50%;
-  --input: 198 30% 18%;
-  --ring: 198 33.6% 56.3%;
+  --background: hsl(#{$color-hue}, 100%, #{$background-lightness-light}%);
+  --foreground: hsl(#{$color-hue}, 5%, #{$foreground-lightness-light}%);
+  --primary: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(#{$color-hue}, 30%, 70%);
+  --secondary-foreground: hsl(0, 0%, 0%);
+  --accent: hsl(160, 30%, 80%);
+  --accent-foreground: hsl(#{$color-hue}, 5%, 10%);
+  --destructive: hsl(0, 100%, 30%);
+  --destructive-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --border: hsl(#{$color-hue}, 30%, 50%);
+  --input: hsl(#{$color-hue}, 30%, 18%);
+  --ring: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
   --radius: 0.5rem;
 
-  --card: 198 50% 90%;
-  --card-foreground: 198 5% 10%;
-  --popover: 198 100% 95%;
-  --popover-foreground: 198 100% 0%;
-  --muted: 160 30% 85%;
-  --muted-foreground: 198 5% 35%;
+  --card: hsl(#{$color-hue}, 50%, 90%);
+  --card-foreground: hsl(#{$color-hue}, 5%, 10%);
+  --popover: hsl(#{$color-hue}, 100%, 95%);
+  --popover-foreground: hsl(#{$color-hue}, 100%, 0%);
+  --muted: hsl(160, 30%, 85%);
+  --muted-foreground: hsl(#{$color-hue}, 5%, 35%);
 
-  --font-sans: 'Montserrat', sans-serif;
-  --font-display: 'Oswald', sans-serif;
-  --font-code: 'Fira Code', monospace;
+  --font-sans: #{$font-sans};
+  --font-display: #{$font-display};
+  --font-code: #{$font-code};
 
-  --gradient-background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-  --gradient-text: linear-gradient(90deg, #1a56db 0%, #7c3aed 100%);
+  --gradient-background: #{$gradient-background-light};
+  --gradient-text: #{$gradient-text-light};
   --gradient-heading: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
   --gradient-separator: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
 
-  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
-  --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.1);
+  --shadow-glow: #{$shadow-glow};
+  --shadow-soft: #{$shadow-soft-light};
 
-  --glitch-color1: rgba(255, 0, 255, 0.8);  // Enhanced Magenta
-  --glitch-color2: rgba(0, 255, 255, 0.8);  // Enhanced Cyan
-  --glitch-color3: rgba(255, 255, 0, 0.8);  // Enhanced Yellow
-  --glitch-color4: rgba(0, 255, 0, 0.8);    // Enhanced Green
+
+  --glitch-color1: rgba(255, 0, 255, 0.8); // Enhanced Magenta
+  --glitch-color2: rgba(0, 255, 255, 0.8); // Enhanced Cyan
+  --glitch-color3: rgba(255, 255, 0, 0.8); // Enhanced Yellow
+  --glitch-color4: rgba(0, 255, 0, 0.8); // Enhanced Green
   --glitch-shadow: rgba(62, 184, 229, 0.7); // Light blue glow
   --glitch-text-base: #000;
   --glitch-blur: 0.75px;
@@ -51,45 +83,47 @@
   --separator-pulse-color4: rgba(147, 51, 234, 0.5);
 }
 
+// Dark Theme Variables
 @mixin dark {
-  --background: 198 50% 5%;
-  --foreground: 198 5% 90%;
-  --primary: 198 33.6% 56.3%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 198 30% 10%;
-  --secondary-foreground: 0 0% 100%;
-  --accent: 160 30% 15%;
-  --accent-foreground: 198 5% 90%;
-  --destructive: 0 100% 30%;
-  --destructive-foreground: 198 5% 90%;
-  --border: 198 30% 18%;
-  --input: 198 30% 18%;
-  --ring: 198 33.6% 56.3%;
+  --background: hsl(#{$color-hue}, 50%, #{$background-lightness-dark}%);
+  --foreground: hsl(#{$color-hue}, 5%, #{$foreground-lightness-dark}%);
+  --primary: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(#{$color-hue}, 30%, 10%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --accent: hsl(160, 30%, 15%);
+  --accent-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --destructive: hsl(0, 100%, 30%);
+  --destructive-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --border: hsl(#{$color-hue}, 30%, 18%);
+  --input: hsl(#{$color-hue}, 30%, 18%);
+  --ring: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
   --radius: 0.5rem;
 
-  --card: 198 50% 0%;
-  --card-foreground: 198 5% 90%;
-  --popover: 198 50% 5%;
-  --popover-foreground: 198 5% 90%;
-  --muted: 160 30% 15%;
-  --muted-foreground: 198 5% 60%;
+  --card: hsl(#{$color-hue}, 50%, 0%);
+  --card-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --popover: hsl(#{$color-hue}, 50%, 5%);
+  --popover-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --muted: hsl(160, 30%, 15%);
+  --muted-foreground: hsl(#{$color-hue}, 5%, 60%);
 
-  --font-sans: 'Montserrat', sans-serif;
-  --font-display: 'Oswald', sans-serif;
-  --font-code: 'Fira Code', monospace;
+  --font-sans: #{$font-sans};
+  --font-display: #{$font-display};
+  --font-code: #{$font-code};
 
-  --gradient-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --gradient-text: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+  --gradient-background: #{$gradient-background-dark};
+  --gradient-text: #{$gradient-text-dark};
   --gradient-heading: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
   --gradient-separator: linear-gradient(90deg, #0fd850 0%, #f9f047 100%);
 
-  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
-  --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.5);
+  --shadow-glow: #{$shadow-glow};
+  --shadow-soft: #{$shadow-soft-dark};
 
-  --glitch-color1: rgba(255, 0, 255, 0.9);  // Enhanced Brighter Magenta
-  --glitch-color2: rgba(0, 255, 255, 0.9);  // Enhanced Brighter Cyan
-  --glitch-color3: rgba(255, 255, 0, 0.9);  // Enhanced Brighter Yellow
-  --glitch-color4: rgba(0, 255, 0, 0.9);    // Enhanced Brighter Green
+
+  --glitch-color1: rgba(255, 0, 255, 0.9); // Enhanced Brighter Magenta
+  --glitch-color2: rgba(0, 255, 255, 0.9); // Enhanced Brighter Cyan
+  --glitch-color3: rgba(255, 255, 0, 0.9); // Enhanced Brighter Yellow
+  --glitch-color4: rgba(0, 255, 0, 0.9); // Enhanced Brighter Green
   --glitch-shadow: rgba(80, 200, 245, 0.8); // Bright blue glow
   --glitch-text-base: #fff;
   --glitch-blur: 1px;

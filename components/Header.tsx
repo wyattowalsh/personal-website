@@ -7,16 +7,16 @@ import DarkModeToggle from "@/components/DarkModeToggle";
 import FontSizeToggle from "@/components/FontSizeToggle";
 
 export default function Header() {
-  const pathname = usePathname();
-  const isBlogPage = pathname.startsWith("/blog");
+	const pathname = usePathname();
+	const isBlogPage = pathname.startsWith("/blog");
 
-  return (
-    <header className="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 lg:px-10 lg:py-5 z-50 bg-transparent">
-      <BlogBackLink />
-      <div className="flex items-center space-x-4">
-        <DarkModeToggle />
-        {isBlogPage && <FontSizeToggle />}
-      </div>
-    </header>
-  );
+	return (
+		<header className="fixed top-0 left-0 w-full flex justify-between items-center px-4 py-2 sm:px-6 sm:py-3 md:px-8 md:py-4 lg:px-10 lg:py-5 z-50 bg-transparent">
+			<BlogBackLink />
+			<div className="flex items-center space-x-4">
+				<DarkModeToggle />
+				{isBlogPage && <FontSizeToggle>Toggle Font Size</FontSizeToggle>}
+			</div>
+		</header>
+	);
 }
