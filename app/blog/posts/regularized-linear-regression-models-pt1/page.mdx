@@ -56,10 +56,10 @@ $$
 \begin{equation*}
 \begin{aligned}
 \mathbf{y} &= \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \text{where:} \\[1.5em]
-\mathbf{y} &\in \mathbb{R}^n : \text{ Response vector } [y_1, y_2, \ldots, y_n]^\top \\[0.8em]
-\mathbf{X} &\in \mathbb{R}^{n \times (p+1)} : \text{ Design matrix } [\mathbf{1}, \mathbf{X}_1, \mathbf{X}_2, \ldots, \mathbf{X}_p] \\[0.8em]
-\boldsymbol{\beta} &\in \mathbb{R}^{p+1} : \text{ Coefficient vector } [\beta_0, \beta_1, \ldots, \beta_p]^\top \\[0.8em]
-\boldsymbol{\epsilon} &\in \mathbb{R}^n : \text{ Error vector } [\epsilon_1, \epsilon_2, \ldots, \epsilon_n]^\top
+\mathbf{y} &in \mathbb{R}^n : \text{ Response vector } [y_1, y_2, \ldots, y_n]^\top \\[0.8em]
+\mathbf{X} &in \mathbb{R}^{n \times (p+1)} : \text{ Design matrix } [\mathbf{1}, \mathbf{X}_1, \mathbf{X}_2, \ldots, \mathbf{X}_p] \\[0.8em]
+\boldsymbol{\beta} &in \mathbb{R}^{p+1} : \text{ Coefficient vector } [\beta_0, \beta_1, \ldots, \beta_p]^\top \\[0.8em]
+\boldsymbol{\epsilon} &in \mathbb{R}^n : \text{ Error vector } [\epsilon_1, \epsilon_2, \ldots, \epsilon_n]^\top
 \end{aligned}
 \end{equation*}
 $$
@@ -135,6 +135,8 @@ $$
 \hat{\boldsymbol{\beta}}_{\text{OLS}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}
 \end{equation*}
 $$
+
+Thus, by utilizing the above data augmentation the same result as shown in Equation #9 can be used to solve for the coefficient estimates. That result is reproduced here:
 
 However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (Eq. #8) is convex since any local optimality of a convex function is also global optimality and therefore unique.
 
