@@ -61,7 +61,7 @@ export default function PostPagination() {
   const { prevPost, nextPost } = state.data;
 
   return (
-    <nav className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8" aria-label="Post navigation">
+    (<nav className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8" aria-label="Post navigation">
       {prevPost ? (
         <Link href={`/blog/posts/${prevPost.slug}`} className="md:mr-auto">
           <motion.div whileHover={{ x: -5 }} whileTap={{ scale: 0.95 }}>
@@ -75,9 +75,8 @@ export default function PostPagination() {
           </motion.div>
         </Link>
       ) : (
-        <div /> // Empty div to maintain grid layout
+        (<div />) // Empty div to maintain grid layout
       )}
-
       {nextPost ? (
         <Link href={`/blog/posts/${nextPost.slug}`} className="md:ml-auto">
           <motion.div whileHover={{ x: 5 }} whileTap={{ scale: 0.95 }}>
@@ -91,8 +90,8 @@ export default function PostPagination() {
           </motion.div>
         </Link>
       ) : (
-        <div /> // Empty div to maintain grid layout
+        (<div />) // Empty div to maintain grid layout
       )}
-    </nav>
+    </nav>)
   );
 }

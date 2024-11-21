@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import type { PostMetadata } from '@/lib/posts';
 import { cn } from '@/lib/utils';
 

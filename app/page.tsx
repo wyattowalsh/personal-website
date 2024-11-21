@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import Links from "@/components/Links";
 import { Separator } from "@/components/ui/separator";
 import LandingTitle from "@/components/LandingTitle";

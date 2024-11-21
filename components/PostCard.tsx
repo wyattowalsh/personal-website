@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { formatDate } from "@/lib/utils";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import TagLink from "@/components/TagLink";

@@ -101,7 +101,7 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    (<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Search Input Section */}
       <div className="mb-8">
         <div className="relative group">
@@ -123,7 +123,6 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
                         transition-transform duration-300" />
         </div>
       </div>
-
       {/* Filters and Sort Section */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h3 className="text-lg font-semibold text-foreground/90 dark:text-gray-200">
@@ -166,7 +165,6 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
           </TooltipProvider>
         </div>
       </div>
-
       {/* Tags Section */}
       <div className="mb-8">
         <div className="flex flex-wrap gap-2">
@@ -186,9 +184,7 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
           ))}
         </div>
       </div>
-
       <Separator className="my-8 opacity-50" />
-
       {/* Results Section - Fixed aspect ratio for single results */}
       <div 
         suppressHydrationWarning 
@@ -199,16 +195,16 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
         {results.length > 0 ? (
           results.length === 1 ? (
             // Single result - centered in grid
-            <div className="sm:col-start-1 lg:col-start-2 w-full">
+            (<div className="sm:col-start-1 lg:col-start-2 w-full">
               <PostCard 
                 key={results[0].slug} 
                 post={results[0]} 
                 className="h-full" // Add h-full class
               />
-            </div>
+            </div>)
           ) : (
             // Multiple results
-            results.map((post, idx) => (
+            (results.map((post, idx) => (
               <motion.div
                 key={post.slug}
                 className="h-full" // Add h-full class
@@ -224,11 +220,11 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
                   className="h-full" // Add h-full class
                 />
               </motion.div>
-            ))
+            )))
           )
         ) : (
           // No results message - span full width
-          <div className="col-span-full text-center py-12">
+          (<div className="col-span-full text-center py-12">
             <p className="text-lg text-muted-foreground">
               No matching posts found.
             </p>
@@ -242,10 +238,10 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
             >
               Clear filters
             </Button>
-          </div>
+          </div>)
         )}
       </div>
-    </div>
+    </div>)
   );
 };
 

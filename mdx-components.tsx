@@ -1,7 +1,7 @@
 // mdx-components.tsx
 
 import type { MDXComponents } from 'mdx/types';
-import Image, { ImageProps } from 'next/image';
+import Image, { ImageProps } from "next/legacy/image";
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
