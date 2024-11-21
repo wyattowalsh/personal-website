@@ -1,0 +1,19 @@
+// components/searchbar.module.scss
+
+.searchInput {
+  @apply rounded-xl shadow-md;
+  @apply bg-white dark:bg-gray-800;
+  @apply placeholder-gray-500 text-gray-900 dark:text-gray-100;
+  @apply focus:outline-none focus:ring-4 focus:ring-blue-500/50;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.tagBadge {
+  @apply cursor-pointer px-3 py-1 rounded-full text-sm;
+  @apply bg-gray-200 dark:bg-gray-700;
+  @apply hover:bg-blue-500 hover:text-white transition-colors;
+}
+
+.activeTagBadge {
+  @apply bg-blue-500 text-white;
+}

@@ -1,0 +1,96 @@
+---
+title: "Using Ridge Regression to Overcome Drawbacks of Ordinary Least Squares (OLS)"
+image: "/ridge.webp"
+caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
+summary: "Weaknesses of OLS, Optimization to Obtain the Ridge Model Estimator, and an Implementation in Python Using Numpy"
+tags: ["ML", "TDS", "Python"]
+date: "2021-01-14"
+updated: "2024-11-20"
+---
+
+
+Hello again and hopefully welcome back 👋
+
+In [the last part](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the O**_rdinary Least Squares_** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
+
+Moving forward, in this part, drawbacks of OLS, potential remedies, and the **_Ridge Regression_** model will be discussed.
+
+Similar to the last part, all implementations suggested here were validated on a wine quality prediction dataset that, along with other related files, can be found at the project’s repository, [**here**](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**.**
+
+## Drawbacks of OLS
+
+As is with most things, there are tradeoffs that have to made when modeling. One such major tradeoff is that of the **bias-variance tradeoff.** Any model’s error can be broken down into two components: bias and variance. Bias can be considered the error implicit in the modeling algorithm, whereas variance can be considered the error derived from differences in idiosyncrasies across training datasets. A good model is one that should have the overall error minimized, thus both bias and variance should be minimized. However, there is a tradeoff to consider as increasing bias will often decrease variance.
+
+For the OLS model, a high variance is a concern. Since the SSE is being optimized, the model tends to fit outlier data points since they will produce higher error values due to the squared term within the loss function. By fitting these outlier points, the OLS model can subsequently base predictions off modeled patterns that are only present in the training data — idiosyncratic outlying points — and not representative of the entire population. This phenomenon is called **_overfitting_** and can lead to predictive models with low accuracy when generalizing to new predictions.
+
+Since OLS is a low bias model, it is well-suited to have its variance lowered through bias addition, which may result in higher overall predictive ability. One way to add bias is through **shrinkage**, biasing model coefficient estimates toward zero. This shrinkage can be achieved through the addition of a **regularization penalty** to the loss function which applies a unique form of shrinkage to the overall coefficient estimates.
+
+In the next section, I’ll cover **_Ridge Regression_ —** regularization by the addition of a tuning parameter (λ) coefficient controlled **_L₂_** penalty to the OLS loss function.
+
+> Make sure to check out the next and [final part of the series](https://towardsdatascience.com/regularized-linear-regression-models-dcf5aa662ab9) to learn about the other two forms of regularized linear regression, **the Lasso** and **the Elastic Net.**
+
+# Ridge Regression
+
+This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
+
+![](https://miro.medium.com/v2/resize:fit:616/1*BYgPXXS1fHgFUVKZQej6MA.png)
+
+Equation #1
+
+Similarly to the OLS case, this loss function can then be formulated as a _least-squares_ optimization problem to find estimates for the model coefficients that minimize the loss function as:
+
+![](https://miro.medium.com/v2/resize:fit:532/1*-MS_E_A7aT_U-3wPqQK5Pw.png)
+
+Equation #2
+
+Just like the OLS case, a 1/(2n) term is added in order to simply solving the gradient and allow the objective function to converge to the expected value of the model error by **the Law of Large Numbers**.
+
+This problem is also unconstrained and a closed-form solution for **the Ridge estimator** can be found by setting the gradient of the loss function (objective) equal to zero and solving the resultant equation. This produces an estimator result of:
+
+![](https://miro.medium.com/v2/resize:fit:252/1*2wlXh_tx5RcZyYvVX5DSNA.png)
+
+Equation #3
+
+This estimator should also be shown to be unique. In this case, the associated **_Hessian_** matrix is:
+
+![](https://miro.medium.com/v2/resize:fit:192/1*Ll-vX-C8GD2um5ZCkdknYg.png)
+
+Equation #4
+
+It turns out that this matrix can be shown to be **positive definite** by:
+
+![](https://miro.medium.com/v2/resize:fit:700/1*GdZ5Gy7DEtfBTcJQyAKakg.png)
+
+Equation #5
+
+Thus, since the associated Hessian matrix of the Ridge loss function is positive definite, the function is strongly convex, which implies that the Ridge estimator (Eq. #3) is the **unique** global minimizer to the **_Ridge Regression_** problem.
+
+Implementations of the estimator can be simplified by noticing that the problem can be reformulated as an OLS problem through **data augmentation**. This would take the form of:
+
+![](https://miro.medium.com/v2/resize:fit:444/1*V0A1Ci1XCkDxcqKBa8pjiA.png)
+
+Equation #6
+
+Thus, by utilizing the above data augmentation the same result as [Equation #9 from the last part of this series](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c) can be used to solve for the coefficient estimates. That result is reproduced here:
+
+![](https://miro.medium.com/v2/resize:fit:224/1*9J0ge0zzhKK6PrbF02x5nQ.png)
+
+Equation #7
+
+## Implementing the Estimator Using Python and NumPy
+
+Similar to the OLS case, the matrix inverse does not scale well, thus the NumPy function `solve`, which employs the LAPACK _\_gesv_ routine, is used to find the least-squares solution. This function solves the equation in the case where A is square and full-rank (linearly independent columns). However, in the case that A is not full-rank, then the function `lstsq` should be used, which utilizes the xGELSD routine and thus finds the singular value decomposition of A.
+
+One possible Python implementation of **_Ridge Regression_** with an optional intercept term is:
+
+# Conclusion
+
+Thanks for reading part two of **_Regularized Linear Regression Models_**! 🙌
+
+If you have not already, make sure to check out [**part one**!](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c)
+
+Continue on to [**part three**](https://towardsdatascience.com/regularized-linear-regression-models-dcf5aa662ab9) to learn about **_the Lasso_** and **_the Elastic Net_**, the last two regularized linear regression techniques!
+
+See [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
+
+Please leave a comment if you would like! I am always trying to improve my posts (logically, syntactically, or otherwise) and am happy to discuss anything related! 👍

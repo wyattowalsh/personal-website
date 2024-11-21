@@ -1,0 +1,193 @@
+@use "variables.module.scss" as variables;
+
+.fancy-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: var(--gradient-background);
+  background-size: 300% 300%;
+  animation: backgroundAnimation 20s ease infinite;
+  transition: background 0.5s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.4), transparent 70%);
+    mix-blend-mode: screen;
+    filter: blur(100px);
+    animation: pulse 8s ease infinite;
+    will-change: opacity;
+    backdrop-filter: blur(100px);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    animation: patternMove 30s linear infinite;
+    background-image: radial-gradient(
+      circle at center,
+      rgba(255, 255, 255, 0.1) 2px,
+      transparent 2px
+    );
+    background-size: 24px 24px;
+    will-change: background-position;
+  }
+
+  html.dark & {
+    background: var(--gradient-background);
+    transition: background 0.5s ease;
+  }
+}
+
+@keyframes backgroundAnimation {
+  0%,
+  100% { 
+    background-position: 0% 50%;
+    will-change: background-position;
+  }
+
+  50% { 
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes patternMove {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: 1000px 1000px;
+  }
+}
+
+.enhanced-title-landing {
+  font-size: 3.5rem;
+  font-weight: 700;
+  background: var(--gradient-text);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: titleGradient 5s ease infinite;
+  text-transform: none;
+  position: relative;
+  font-family: var(--font-enhanced-title);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold;
+  letter-spacing: -0.02em;
+
+  @screen sm {
+    letter-spacing: -0.03em;
+  }
+
+  @screen lg {
+    letter-spacing: -0.04em;
+  }
+}
+
+@keyframes titleGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.enhanced-separator {
+  width: 50%;
+  height: 4px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: var(--radius);
+  background: var(--gradient-separator);
+  background-size: 300% 300%;
+  animation: separatorPulse 4s ease-in-out infinite;
+  transition: opacity 0.3s ease, box-shadow 0.3s ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    background: inherit;
+    filter: blur(4px);
+    opacity: 0.7;
+  }
+
+  &:hover {
+    opacity: 0.9;
+    box-shadow: 
+      0 0 15px var(--separator-shadow-color1),
+      0 0 30px var(--separator-shadow-color2);
+  }
+}
+
+@keyframes separatorPulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    box-shadow: 
+      0 0 10px var(--separator-pulse-color1),
+      0 0 20px var(--separator-pulse-color2);
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 
+      0 0 20px var(--separator-pulse-color3),
+      0 0 40px var(--separator-pulse-color4);
+  }
+}
+
+.enhanced-animated-text {
+  background: var(--gradient-text);
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientBackground 8s ease infinite;
+  position: relative;
+  
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  will-change: background-position, transform;
+}
+
+.enhanced-animated-text:hover {
+  animation-play-state: paused;
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes gradientBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+html.dark .enhanced-animated-text {
+  background: var(--gradient-text);
+}

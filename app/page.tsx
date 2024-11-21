@@ -1,51 +1,80 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { useEffect } from "react";
 import Image from "next/image";
 import Links from "@/components/Links";
 import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import LandingTitle from "@/components/LandingTitle";
+import ParticlesBackground from "@/components/ParticlesBackground";
+import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { useMediaQuery } from "usehooks-ts";
+import styles from "./page.module.scss";
 
-export default function Page() {
-	return (
-		<main className="relative flex min-h-screen flex-col items-center justify-center p-4 sm:p-8 md:p-24 overflow-hidden">
-			<motion.div
-				className="absolute inset-0"
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1, transition: { duration: 1 } }}
-			>
-				<div className="fancy-bg bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-gradient" />
-			</motion.div>
-			<div className="relative flex flex-col items-center justify-center w-full z-10 space-y-4">
-				<motion.div
-					initial={{ opacity: 0, scale: 0.8 }}
-					animate={{ opacity: 1, scale: 1 }}
-					transition={{ duration: 1 }}
-					className="flex items-center justify-center"
-				>
-					<Image
-						className="rounded-full shadow-sm drop-shadow w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 lg:w-40 lg:h-40 p-2 sm:p-3 md:p-4 lg:p-5"
-						src="/logo.webp"
-						alt="Logo — Wyatt Walsh"
-						width={150}
-						height={150}
-						priority
-						sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 120px, 130px"
-					/>
-				</motion.div>
-				<motion.h1
-					className="enhanced-title text-center"
-					initial={{ opacity: 0, y: -50 }}
-					animate={{ opacity: 1, y: 0 }}
-					transition={{ duration: 1, delay: 0.5 }}
-					whileHover={{ scale: 1.05 }}
-				>
-					Wyatt Walsh
-				</motion.h1>
-				<Separator className="enhanced-separator" />
-				<Links />
-			</div>
-		</main>
-	);
+export default function HomePage() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress);
+  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
+  const logoSize = isLargeScreen ? 256 : 192;
+
+  const imageScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.3]);
+
+  const imageVariants = {
+    initial: { opacity: 0, scale: 0.8, rotate: -10 },
+    animate: { opacity: 1, scale: 1, rotate: 0, transition: { duration: 1, ease: "easeOut" } },
+    hover: { scale: 1.1, rotate: 5, transition: { yoyo: Infinity, duration: 0.5 } },
+  };
+
+  useEffect(() => {
+    document.body.style.overflowX = "hidden";
+    return () => {
+      document.body.style.overflowX = "";
+    };
+  }, []);
+
+  return (
+    <main className="relative overflow-hidden min-h-screen">
+      <ParticlesBackground />
+
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50"
+        style={{ scaleX }}
+      />
+
+      <div className="relative z-10 flex flex-col min-h-screen px-4">
+        <motion.div
+          className="flex flex-col items-center justify-center space-y-8 py-20 md:min-h-screen md:justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.div
+            className="relative"
+            style={{ scale: imageScale, opacity: imageOpacity }}
+            variants={imageVariants}
+            initial="initial"
+            animate="animate"
+            whileHover="hover"
+            whileTap={{ scale: 0.95 }}
+          >
+            <Image
+              className="rounded-full shadow-xl hover:shadow-2xl transition-shadow duration-300 border-4 border-white dark:border-gray-800"
+              src="/logo.webp"
+              alt="Logo — Wyatt Walsh"
+              width={logoSize}
+              height={logoSize}
+              priority
+              quality={100}
+            />
+          </motion.div>
+
+          <LandingTitle />
+
+          <Separator className="enhanced-separator w-3/4 max-w-md my-4" />
+
+          <Links />
+        </motion.div>
+      </div>
+    </main>
+  );
 }

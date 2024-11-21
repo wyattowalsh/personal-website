@@ -1,0 +1,114 @@
+{
+    "background": {
+      "color": {
+        "value": "#000000"
+      }
+    },
+    "fpsLimit": 60,
+    "particles": {
+      "number": {
+        "value": 120,
+        "density": {
+          "enable": true,
+          "area": 800
+        }
+      },
+      "color": {
+        "value": ["#ff00ff", "#00ffff", "#ff4500"]
+      },
+      "shape": {
+        "type": "circle"
+      },
+      "opacity": {
+        "value": {
+          "min": 0.4,
+          "max": 0.8
+        },
+        "random": true,
+        "animation": {
+          "enable": true,
+          "speed": 0.5,
+          "minimumValue": 0.2,
+          "sync": false
+        }
+      },
+      "size": {
+        "value": {
+          "min": 1,
+          "max": 6
+        },
+        "random": true,
+        "animation": {
+          "enable": true,
+          "speed": 5,
+          "minimumValue": 1,
+          "sync": false
+        }
+      },
+      "links": {
+        "enable": true,
+        "distance": 100,
+        "color": "#ffffff",
+        "opacity": 0.1,
+        "width": 1
+      },
+      "move": {
+        "enable": true,
+        "speed": 0.3,
+        "direction": "none",
+        "outModes": {
+          "default": "out"
+        },
+        "random": true,
+        "straight": false,
+        "trail": {
+          "enable": true,
+          "length": 10,
+          "fillColor": "#000000"
+        },
+        "path": {
+          "enable": true,
+          "generator": "perlinNoise"
+        }
+      },
+      "parallax": {
+        "enable": true,
+        "force": 60,
+        "smooth": 10
+      }
+    },
+    "interactivity": {
+      "events": {
+        "onHover": {
+          "enable": true,
+          "mode": ["attract", "bubble"]
+        },
+        "onClick": {
+          "enable": true,
+          "mode": ["push", "remove"]
+        }
+      },
+      "modes": {
+        "attract": {
+          "distance": 200,
+          "duration": 0.4,
+          "easing": "ease-out-quad",
+          "factor": 5
+        },
+        "bubble": {
+          "distance": 250,
+          "size": 10,
+          "duration": 2,
+          "opacity": 0.8
+        },
+        "push": {
+          "quantity": 4
+        },
+        "remove": {
+          "quantity": 2
+        }
+      }
+    },
+    "detectRetina": true
+  }
+  

@@ -2,10 +2,10 @@
 title: "Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)"
 image: "/cover.webp"
 caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
-summary: "This is a summary of the first blog post."
-tags: ["tag1", "tag2"]
+summary: "Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy"
+tags: ["ML", "TDS", "Python"]
 date: "2021-01-13"
-updated: "2024-11-15"
+updated: "2024-11-20"
 ---
 
 # Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)
@@ -31,6 +31,8 @@ The models and included implementations were tested on a wine quality prediction
 Managerial decision making, organizational efficiency, and revenue generation are all areas that can be improved through the utilization of data-based insights. Currently, these insights are being more readily sought out as technological accessibility stretches further and competitive advantages in the market are harder to acquire. One field that seeks to realize value within collected data samples is predictive analytics. By leveraging mathematical/statistical techniques and programming, practitioners are able to identify patterns within data allowing for the generation of valuable insights.
 
 ***Regression*** is one technique within predictive analytics that is used to predict the value of a continuous response variable given one or many related feature variables. Algorithms of this class accomplish this task by learning the relationships between the input (feature) variables and the output (response) variable through training on a sample dataset. How these relationships are learned, and furthermore used for prediction varies from algorithm to algorithm. The practitioner is faced with options for regression modeling algorithms, however, linear regression models tend to be explored early on in the process due to their ease of application and high explainability.
+
+---
 
 ## Linear Regression Modeling
 
@@ -142,9 +144,8 @@ Solving for the OLS estimator using the matrix inverse does not scale well, thus
 
 One possible implementation in Python of OLS with an optional intercept term is:
 
-<div align='center'>
-<script src="https://gist.github.com/wyattowalsh/75a3ea1df349c6a3598839d6f042b9e6.js"></script>
-</div>
+<Gist url="https://gist.github.com/wyattowalsh/75a3ea1df349c6a3598839d6f042b9e6" />
+
 ---
 
 ## Conclusion

@@ -1,0 +1,76 @@
+{
+    "background": {
+      "color": {
+        "value": "#000000"
+      }
+    },
+    "particles": {
+      "number": {
+        "value": 200,
+        "density": {
+          "enable": true,
+          "area": 1000
+        }
+      },
+      "color": {
+        "value": ["#00ff00", "#00cc00", "#009900"]
+      },
+      "shape": {
+        "type": "char",
+        "character": {
+          "value": ["✦", "★", "✧", "❖", "✪", "⚙", "☯", "☮", "✈", "☘", "♬", "♫", "☀", "☁", "⚡", "❄", "☂", "☕", "♛", "♞", "♜", "♝", "♚", "♔", "♕", "♖", "♗", "♘", "♙", "♟", "❤", "☾", "☽", "⚑", "✉", "☢", "☣", "♲", "⚛", "⌘", "☠", "☤", "⚕", "♿", "⚠", "♻", "☃", "♺", "⚓", "⛵", "✈", "⌛", "⏳", "⚔", "⚖", "⚙", "✂", "✒", "✏", "⌨", "✇", "✍", "✎", "✁", "★", "☆", "✦", "✧", "✩", "✪", "✫", "✬", "✭", "✮", "✯", "☉", "⌂", "⌘", "☇", "☈", "☢", "☣", "☤", "☥", "☦", "☧", "☨", "☩", "☪", "☫", "☬", "☭", "☮", "☯", "☽", "☾", "☿", "♀", "♁", "♂", "♃", "♄", "♅", "♆", "♇", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"],
+          "font": "Verdana, Geneva, sans-serif",
+          "style": "",
+          "weight": "700",
+          "fill": true
+        }
+      },
+      "opacity": {
+        "value": 0.9,
+        "random": true,
+        "animation": {
+          "enable": true,
+          "speed": 3,
+          "minimumValue": 0.1,
+          "sync": false
+        }
+      },
+      "size": {
+        "value": {
+          "min": 14,
+          "max": 20
+        }
+      },
+      "move": {
+        "enable": true,
+        "speed": 8,
+        "direction": "bottom",
+        "outModes": {
+          "default": "out"
+        },
+        "gravity": {
+          "enable": true,
+          "acceleration": 10
+        }
+      },
+      "zIndex": {
+        "value": {
+          "min": 0,
+          "max": 100
+        },
+        "opacityRate": 1
+      }
+    },
+    "interactivity": {
+      "events": {
+        "onHover": {
+          "enable": false
+        },
+        "onClick": {
+          "enable": false
+        }
+      }
+    },
+    "detectRetina": true
+  }
+  

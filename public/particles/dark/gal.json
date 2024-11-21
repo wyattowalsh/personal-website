@@ -1,0 +1,115 @@
+{
+    "background": {
+      "color": {
+        "value": "#000000"
+      }
+    },
+    "particles": {
+      "number": {
+        "value": 200,
+        "density": {
+          "enable": true,
+          "area": 1200
+        }
+      },
+      "color": {
+        "value": ["#ffffff", "#6a9fb5", "#ffcc00"],
+        "animation": {
+          "enable": true,
+          "speed": 20,
+          "sync": false
+        }
+      },
+      "shape": {
+        "type": ["circle", "star"]
+      },
+      "opacity": {
+        "value": {
+          "min": 0.3,
+          "max": 0.9
+        },
+        "random": true,
+        "animation": {
+          "enable": true,
+          "speed": 1,
+          "minimumValue": 0.3,
+          "sync": false
+        }
+      },
+      "size": {
+        "value": {
+          "min": 1,
+          "max": 4
+        },
+        "random": true
+      },
+      "move": {
+        "enable": true,
+        "speed": 0.8,
+        "direction": "none",
+        "outModes": {
+          "default": "out"
+        },
+        "attract": {
+          "enable": true,
+          "rotateX": 3000,
+          "rotateY": 3000
+        }
+      },
+      "tilt": {
+        "enable": true,
+        "value": {
+          "min": 0,
+          "max": 360
+        },
+        "animation": {
+          "enable": true,
+          "speed": 0.5,
+          "sync": false
+        }
+      },
+      "warp": {
+        "enable": true,
+        "speed": 2
+      }
+    },
+    "interactivity": {
+      "events": {
+        "onHover": {
+          "enable": true,
+          "mode": ["attract", "bubble"]
+        },
+        "onClick": {
+          "enable": true,
+          "mode": ["push", "repulse"]
+        }
+      },
+      "modes": {
+        "attract": {
+          "distance": 200,
+          "duration": 0.4,
+          "easing": "ease-out-quad",
+          "factor": 5
+        },
+        "bubble": {
+          "distance": 250,
+          "size": 8,
+          "duration": 2,
+          "opacity": 0.8
+        },
+        "push": {
+          "quantity": 5
+        },
+        "repulse": {
+          "distance": 400,
+          "duration": 0.8,
+          "factor": 100,
+          "speed": 1,
+          "maxSpeed": 50,
+          "easing": "ease-out-quad"
+        }
+      }
+    },
+    "detectRetina": true
+  }
+  

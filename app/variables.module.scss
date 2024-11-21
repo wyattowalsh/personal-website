@@ -1,16 +1,10 @@
-:root {
+@mixin light {
   --background: 198 100% 95%;
   --foreground: 198 5% 0%;
-  --card: 198 50% 90%;
-  --card-foreground: 198 5% 10%;
-  --popover: 198 100% 95%;
-  --popover-foreground: 198 100% 0%;
   --primary: 198 33.6% 56.3%;
   --primary-foreground: 0 0% 100%;
   --secondary: 198 30% 70%;
   --secondary-foreground: 0 0% 0%;
-  --muted: 160 30% 85%;
-  --muted-foreground: 198 5% 35%;
   --accent: 160 30% 80%;
   --accent-foreground: 198 5% 10%;
   --destructive: 0 100% 30%;
@@ -19,28 +13,50 @@
   --input: 198 30% 18%;
   --ring: 198 33.6% 56.3%;
   --radius: 0.5rem;
-  --primary-color: #6a9fb5;
-  --font-fira-code: 'Fira Code';
-  --font-sans: 'ui-sans-serif', 'system-ui';
-  --font-serif: 'ui-serif', 'Georgia';
-  --font-mono: 'ui-monospace', 'SFMono-Regular';
-  --font-display: 'Oswald';
-  --font-body: '"Open Sans"';
+
+  --card: 198 50% 90%;
+  --card-foreground: 198 5% 10%;
+  --popover: 198 100% 95%;
+  --popover-foreground: 198 100% 0%;
+  --muted: 160 30% 85%;
+  --muted-foreground: 198 5% 35%;
+
+  --font-sans: 'Montserrat', sans-serif;
+  --font-display: 'Oswald', sans-serif;
+  --font-code: 'Fira Code', monospace;
+
+  --gradient-background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  --gradient-text: linear-gradient(90deg, #ff5f6d 0%, #ffc371 100%);
+  --gradient-separator: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+
+  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+  --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+  --glitch-color1: rgba(255, 0, 255, 0.8);  // Enhanced Magenta
+  --glitch-color2: rgba(0, 255, 255, 0.8);  // Enhanced Cyan
+  --glitch-color3: rgba(255, 255, 0, 0.8);  // Enhanced Yellow
+  --glitch-color4: rgba(0, 255, 0, 0.8);    // Enhanced Green
+  --glitch-shadow: rgba(62, 184, 229, 0.7); // Light blue glow
+  --glitch-text-base: #000;
+  --glitch-blur: 0.75px;
+  --glitch-noise-opacity: 0.15;
+  --glitch-gap: 0.25;
+
+  --separator-shadow-color1: #2563eb;
+  --separator-shadow-color2: #9333ea;
+  --separator-pulse-color1: #2563eb;
+  --separator-pulse-color2: rgba(37, 99, 235, 0.5);
+  --separator-pulse-color3: #9333ea;
+  --separator-pulse-color4: rgba(147, 51, 234, 0.5);
 }
 
-.dark {
+@mixin dark {
   --background: 198 50% 5%;
   --foreground: 198 5% 90%;
-  --card: 198 50% 0%;
-  --card-foreground: 198 5% 90%;
-  --popover: 198 50% 5%;
-  --popover-foreground: 198 5% 90%;
   --primary: 198 33.6% 56.3%;
   --primary-foreground: 0 0% 100%;
   --secondary: 198 30% 10%;
   --secondary-foreground: 0 0% 100%;
-  --muted: 160 30% 15%;
-  --muted-foreground: 198 5% 60%;
   --accent: 160 30% 15%;
   --accent-foreground: 198 5% 90%;
   --destructive: 0 100% 30%;
@@ -49,4 +65,39 @@
   --input: 198 30% 18%;
   --ring: 198 33.6% 56.3%;
   --radius: 0.5rem;
+
+  --card: 198 50% 0%;
+  --card-foreground: 198 5% 90%;
+  --popover: 198 50% 5%;
+  --popover-foreground: 198 5% 90%;
+  --muted: 160 30% 15%;
+  --muted-foreground: 198 5% 60%;
+
+  --font-sans: 'Montserrat', sans-serif;
+  --font-display: 'Oswald', sans-serif;
+  --font-code: 'Fira Code', monospace;
+
+  --gradient-background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-text: linear-gradient(90deg, #89f7fe 0%, #66a6ff 100%);
+  --gradient-separator: linear-gradient(90deg, #0fd850 0%, #f9f047 100%);
+
+  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+  --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+  --glitch-color1: rgba(255, 0, 255, 0.9);  // Enhanced Brighter Magenta
+  --glitch-color2: rgba(0, 255, 255, 0.9);  // Enhanced Brighter Cyan
+  --glitch-color3: rgba(255, 255, 0, 0.9);  // Enhanced Brighter Yellow
+  --glitch-color4: rgba(0, 255, 0, 0.9);    // Enhanced Brighter Green
+  --glitch-shadow: rgba(80, 200, 245, 0.8); // Bright blue glow
+  --glitch-text-base: #fff;
+  --glitch-blur: 1px;
+  --glitch-noise-opacity: 0.2;
+  --glitch-gap: 0.5;
+
+  --separator-shadow-color1: #3b82f6;
+  --separator-shadow-color2: #6366f1;
+  --separator-pulse-color1: #3b82f6;
+  --separator-pulse-color2: rgba(59, 130, 246, 0.5);
+  --separator-pulse-color3: #6366f1;
+  --separator-pulse-color4: rgba(99, 102, 241, 0.5);
 }

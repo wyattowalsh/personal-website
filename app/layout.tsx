@@ -1,43 +1,50 @@
 import { Metadata } from "next";
-import { Fira_Code } from "next/font/google";
+import { Fira_Code, Montserrat } from "next/font/google";
 import "./globals.scss";
-import { ThemeProvider } from "next-themes";
-import DarkModeToggle from "@/components/DarkModeToggle";
-import { Toast, ToastProvider } from "@/components/ui/toast";
-import { config } from "@fortawesome/fontawesome-svg-core";
+import "katex/dist/katex.min.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import { ThemeProvider } from "@/components/ThemeProvider";
+import LayoutContent from "@/components/LayoutContent";
+import ScrollIndicator from "@/components/ScrollIndicator";
+import Header from "@/components/Header";
+
 config.autoAddCss = false;
 
-const fira_code = Fira_Code({
-	subsets: ["latin"],
-	display: "swap",
-	variable: "--font-fira-code",
+const firaCode = Fira_Code({
+  subsets: ["latin"],
+  variable: "--font-fira-code",
+});
+
+const montserrat = Montserrat({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-montserrat",
 });
 
 export const metadata: Metadata = {
-	title:
-		"Welcome to my personal web app! - Social Links, Blog, and Other Web Stuff",
-	description:
-		"Wyatt's personal web app with social links, blog, and other web stuff.",
-	icons: {
-		icon: "/logo.webp",
-	},
+  title: "Welcome to Wyatt's Personal Web App",
+  description: "Wyatt's personal web app with social links, blog, and more.",
+  icons: {
+    icon: "/logo.webp",
+  },
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={fira_code.variable}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-					<ToastProvider>
-						<main>{children}</main>
-						<div className="fixed top-0 right-0 p-4">
-							<DarkModeToggle />
-						</div>
-						<Toast />
-					</ToastProvider>
-				</ThemeProvider>
-			</body>
-		</html>
-	);
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning>
+      <body className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          {children}
+        </ThemeProvider>
+      </body>
+      <ScrollIndicator />
+    </html>
+  );
 }

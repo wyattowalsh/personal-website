@@ -5,14 +5,19 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export function formatDate(
-  dateString: string,
-  locale = 'en-US',
+export const formatDate = (
+  date: string,
+  locale: string,
   options?: Intl.DateTimeFormatOptions
-) {
-  const date = new Date(dateString);
-  return date.toLocaleDateString(locale, options);
-}
+): string => {
+  try {
+    // Parse the date string as UTC
+    const utcDate = new Date(date + 'T00:00:00Z');
+    return new Intl.DateTimeFormat(locale, options).format(utcDate);
+  } catch {
+    return "Invalid Date";
+  }
+};
 
 // Add CoreContent type
 export type CoreContent<T> = Omit<T, '_id' | '_raw' | 'body'>;
