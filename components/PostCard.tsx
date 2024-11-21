@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { formatDate } from "@/lib/utils";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import TagLink from "@/components/TagLink";
@@ -39,7 +39,7 @@ const PostCard = ({ post, className }: PostCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.div
+    (<motion.div
       whileHover={{ y: -5 }}
       className={cn("transition-transform duration-300 h-full", className)} // Add h-full class
     >
@@ -55,10 +55,14 @@ const PostCard = ({ post, className }: PostCardProps) => {
               alt={title}
               width={400}
               height={250}
-              className="w-full h-full object-cover transition-transform duration-500 rounded-t-xl" // Set height to full
+              // Set height to full
+              className="w-full h-full object-cover transition-transform duration-500 rounded-t-xl"
               placeholder="blur"
               blurDataURL="/placeholder.png"
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
             {isHovered && (
               <div className="absolute inset-0 bg-black bg-opacity-30 transition-opacity duration-300"></div>
             )}
@@ -106,7 +110,7 @@ const PostCard = ({ post, className }: PostCardProps) => {
           </div>
         </Card>
       </Link>
-    </motion.div>
+    </motion.div>)
   );
 };
 

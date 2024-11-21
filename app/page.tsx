@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import Image from "next/legacy/image";
+import Image from "next/image";
 import Links from "@/components/Links";
 import { Separator } from "@/components/ui/separator";
 import LandingTitle from "@/components/LandingTitle";
@@ -33,14 +33,12 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="relative overflow-hidden min-h-screen">
+    (<main className="relative overflow-hidden min-h-screen">
       <ParticlesBackground />
-
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 z-50"
         style={{ scaleX }}
       />
-
       <div className="relative z-10 flex flex-col min-h-screen px-4">
         <motion.div
           className="flex flex-col items-center justify-center space-y-8 py-20 md:min-h-screen md:justify-center"
@@ -65,7 +63,10 @@ export default function HomePage() {
               height={logoSize}
               priority
               quality={100}
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto"
+              }} />
           </motion.div>
 
           <LandingTitle />
@@ -75,6 +76,6 @@ export default function HomePage() {
           <Links />
         </motion.div>
       </div>
-    </main>
+    </main>)
   );
 }

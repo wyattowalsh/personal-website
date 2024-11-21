@@ -1,7 +1,7 @@
 // mdx-components.tsx
 
 import type { MDXComponents } from 'mdx/types';
-import Image, { ImageProps } from "next/legacy/image";
+import Image, { ImageProps } from "next/image";
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -157,16 +157,19 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     img: (props) => {
       const { width = 600, height = 400, ...rest } = props;
       return (
-        <div className="my-6 flex justify-center">
+        (<div className="my-6 flex justify-center">
           <Image
             className="rounded-lg shadow-md dark:shadow-none"
             alt={props.alt || ''}
             width={width}
             height={height}
-            layout="responsive"
             {...(rest as ImageProps)}
-          />
-        </div>
+            sizes="100vw"
+            style={{
+              width: "100%",
+              height: "auto"
+            }} />
+        </div>)
       );
     },
 

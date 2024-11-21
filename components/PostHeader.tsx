@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { formatDate } from '@/lib/utils';
 import Link from 'next/link';
-import Image from "next/legacy/image";
+import Image from "next/image";
 import type { PostMetadata } from '@/lib/posts';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +18,7 @@ const PostHeader = ({ post, className }: PostHeaderProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
-    <motion.header
+    (<motion.header
       className={cn(
         "mb-12 rounded-xl overflow-hidden bg-card hover:shadow-2xl transition-all duration-300",
         className
@@ -36,10 +36,11 @@ const PostHeader = ({ post, className }: PostHeaderProps) => {
           fill
           priority
           className="object-cover transition-transform duration-500"
-          style={{ 
-            transform: isHovered ? 'scale(1.05)' : 'scale(1)'
-          }}
-        />
+          style={{
+            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+            maxWidth: "100%",
+            height: "auto"
+          }} />
         <AnimatePresence>
           {isHovered && (
             <motion.div
@@ -96,7 +97,7 @@ const PostHeader = ({ post, className }: PostHeaderProps) => {
           )}
         </div>
       </div>
-    </motion.header>
+    </motion.header>)
   );
 };
 
