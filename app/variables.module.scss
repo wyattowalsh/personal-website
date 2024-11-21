@@ -137,3 +137,20 @@ $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
   --separator-pulse-color3: #6366f1;
   --separator-pulse-color4: rgba(99, 102, 241, 0.5);
 }
+
+// Enhanced Glitch Effect Variables
+:root {
+  --glitch-text-shadow: 2px 2px var(--primary);
+  --glitch-duration: 0.75s;
+  --glitch-intensity: 0.75;
+
+  // Enhanced shadow effects
+  --shadow-glow:
+    0 0 10px rgba(var(--primary-rgb), 0.1),
+    0 0 20px rgba(var(--primary-rgb), 0.05),
+    0 0 30px rgba(var(--primary-rgb), 0.025);
+
+  --shadow-soft:
+    0 10px 30px -10px rgba(var(--primary-rgb), 0.1),
+    0 5px 15px -5px rgba(var(--primary-rgb), 0.05);
+}

@@ -10,7 +10,7 @@ updated: "2024-11-20"
 
 Hey there! 👋
 
-Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](/blog/regularized-linear-regression-models-pt1), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](/blog/regularized-linear-regression-models-pt2), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
+Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](/blog/posts/regularized-linear-regression-models-pt1), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](/blog/posts/regularized-linear-regression-models-pt2), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
 
 The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**.**
 
@@ -18,7 +18,7 @@ The models and included implementations were tested on a wine quality prediction
 
 ## The Lasso for Regression
 
-The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
+The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function (Equation #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
 
 **_The Lasso_** loss function can be formalized as:
 
@@ -142,7 +142,7 @@ $$
 \begin{equation*}
 \begin{aligned}
 \hat{\boldsymbol{\beta}} &= \underset{\boldsymbol{\beta}}{\arg\min} \, L(\boldsymbol{\beta}) \\[0.5em]
-&= \underset{\boldsymbol{\beta}}{\arg\min} \left\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[(1-\alpha)\frac{1}{2}\|\boldsymbol{\beta}\|_2^2 + \alpha\|\boldsymbol{\beta}\|_1\right] \right\}
+&= \underset{\boldsymbol{\beta}}{\arg\min} \left\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[(1-\alpha)\frac{1}{2}\|\boldboldsymbol{\beta}\|_2^2 + \alpha\|\boldsymbol{\beta}\|_1\right] \right\}
 \end{aligned}
 \end{equation*}
 $$
@@ -193,6 +193,6 @@ I hope that these posts were informative and helpful for you to learn more about
 
 See [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
 
-If you are just now beginning the series, make sure to check out [**part one**](/blog/regularized-linear-regression-models-pt1) and [**part two**](/blog/regularized-linear-regression-models-pt2)!
+If you are just now beginning the series, make sure to check out [**part one**](/blog/posts/regularized-linear-regression-models-pt1) and [**part two**](/blog/posts/regularized-linear-regression-models-pt2)!
 
 Please leave a comment if you would like! I am always trying to improve my posts (logically, syntactically, or otherwise) and am happy to discuss anything related! 👋

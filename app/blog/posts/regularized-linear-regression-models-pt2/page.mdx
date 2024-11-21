@@ -10,7 +10,7 @@ updated: "2024-11-20"
 
 Hello again and hopefully welcome back 👋
 
-In [the last part](/blog/regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the O**_rdinary Least Squares_** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
+In [the last part](/blog/posts/regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the O**_rdinary Least Squares_** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
 
 Moving forward, in this part, drawbacks of OLS, potential remedies, and the **_Ridge Regression_** model will be discussed.
 
@@ -32,7 +32,7 @@ In the next section, I’ll cover **_Ridge Regression_ —** regularization by t
 
 ## Ridge Regression
 
-This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
+This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function (Equation #7) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
 
 $$
 \begin{equation*}
@@ -125,9 +125,9 @@ One possible Python implementation of **_Ridge Regression_** with an optional in
 
 Thanks for reading part two of **_Regularized Linear Regression Models_**! 🙌
 
-If you have not already, make sure to check out [**part one**!](/blog/regularized-linear-regression-models-pt1)
+If you have not already, make sure to check out [**part one**!](/blog/posts/regularized-linear-regression-models-pt1)
 
-Continue on to [**part three**](/blog/regularized-linear-regression-models-pt3) to learn about **_the Lasso_** and **_the Elastic Net_**, the last two regularized linear regression techniques!
+Continue on to [**part three**](/blog/posts/regularized-linear-regression-models-pt3) to learn about **_the Lasso_** and **_the Elastic Net_**, the last two regularized linear regression techniques!
 
 See [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
 
