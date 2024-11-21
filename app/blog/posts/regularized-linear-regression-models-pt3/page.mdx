@@ -128,7 +128,7 @@ In this form of regularized linear regression, the OLS loss function is changed 
 $$
 \begin{equation*}
 \begin{aligned}
-L(\boldsymbol{\beta}) &= \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left( (1-\alpha) \frac{1}{2} \|\boldsymbol{\beta}\|_2^2 + \alpha \|\boldsymbol{\beta}\|_1 \right), \\[0.5em]
+L(\boldboldsymbol{\beta}) &= \|\mathbf{y} - \mathbf{X}\boldboldsymbol{\beta}\|_2^2 + \lambda \left( (1-\alpha) \frac{1}{2} \|\boldboldsymbol{\beta}\|_2^2 + \alpha \|\boldboldsymbol{\beta}\|_1 \right), \\[0.5em]
 &\text{with tuning parameters } \lambda \geq 0, \, 0 \leq \alpha \leq 1
 \end{aligned}
 \end{equation*}
@@ -141,8 +141,8 @@ Having both **_L₁_** and **_L₂_** penalties, **_the Elastic Net_** serves to
 $$
 \begin{equation*}
 \begin{aligned}
-\hat{\boldsymbol{\beta}} &= \underset{\boldsymbol{\beta}}{\arg\min} \, L(\boldsymbol{\beta}) \\[0.5em]
-&= \underset{\boldsymbol{\beta}}{\arg\min} \left\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 + \lambda \left[(1-\alpha)\frac{1}{2}\|\boldboldsymbol{\beta}\|_2^2 + \alpha\|\boldsymbol{\beta}\|_1\right] \right\}
+\hat{\boldboldsymbol{\beta}} &= \underset{\boldboldsymbol{\beta}}{\arg\min} \, L(\boldboldsymbol{\beta}) \\[0.5em]
+&= \underset{\boldboldsymbol{\beta}}{\arg\min} \left\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldboldsymbol{\beta}\|_2^2 + \lambda \left[(1-\alpha)\frac{1}{2}\|\boldboldsymbol{\beta}\|_2^2 + \alpha\|\boldboldsymbol{\beta}\|_1\right] \right\}
 \end{aligned}
 \end{equation*}
 $$
