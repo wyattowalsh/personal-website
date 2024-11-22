@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, createContext, useEffect } from "react";
+import React, { Suspense, createContext, useEffect, useState } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PostHeader from "@/components/PostHeader";
 import PostPagination from "@/components/PostPagination";

@@ -7,8 +7,11 @@ import { Loader2 } from "lucide-react";
 import { cva, VariantProps } from "class-variance-authority";
 import styles from "./loadingspinner.module.scss";
 
+// Omit color from HTMLAttributes to avoid conflict
+type BaseSpinnerProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>;
+
 interface LoadingSpinnerProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends BaseSpinnerProps,
     VariantProps<typeof spinnerVariants> {
   message?: string;
 }

@@ -1,38 +1,36 @@
-import { NextResponse } from 'next/server';
-import { getAdjacentPosts } from '@/lib/posts';
+import { NextRequest } from 'next/server';
+import { getAllPosts } from '@/lib/posts';
 
-export const revalidate = 3600; // Revalidate every hour
+export const dynamic = 'force-dynamic';
 
-export async function GET(request: Request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const slug = searchParams.get('slug');
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const currentSlug = searchParams.get('slug');
 
-    if (!slug) {
-      return new NextResponse('Slug is required', { status: 400 });
-    }
-
-    // Get posts and swap the order to match chronological navigation
-    const { prevPost, nextPost } = await getAdjacentPosts(slug);
-    const response = {
-      // Newer post should be nextPost (chronologically next)
-      nextPost: prevPost,  // Was pointing to older post
-      // Older post should be prevPost (chronologically previous)
-      prevPost: nextPost,  // Was pointing to newer post
-    };
-    
-    return new NextResponse(JSON.stringify(response), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
-      }
-    });
-  } catch (error) {
-    console.error('Error in adjacent posts route:', error);
-    return new NextResponse(
-      JSON.stringify({ message: 'Internal Server Error' }), 
-      { status: 500 }
-    );
+  if (!currentSlug) {
+    return new Response('Missing slug parameter', { status: 400 });
   }
+
+  const posts = await getAllPosts();
+  const sortedPosts = posts.sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+
+  const currentIndex = sortedPosts.findIndex(post => post.slug === currentSlug);
+  
+  const previousPost = currentIndex < sortedPosts.length - 1 ? 
+    sortedPosts[currentIndex + 1] : null;
+  const nextPost = currentIndex > 0 ? 
+    sortedPosts[currentIndex - 1] : null;
+
+  return Response.json({
+    previous: previousPost ? {
+      title: previousPost.title,
+      slug: previousPost.slug
+    } : null,
+    next: nextPost ? {
+      title: nextPost.title,
+      slug: nextPost.slug
+    } : null
+  });
 }

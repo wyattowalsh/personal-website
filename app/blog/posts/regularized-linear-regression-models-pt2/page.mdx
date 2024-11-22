@@ -35,52 +35,52 @@ In the next section, I’ll cover **_Ridge Regression_ —** regularization by t
 This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
 
 $$
-L(β) = ||y - Xβ||₂² + λ||β||₂²  \quad \text{with tuning parameter } λ ≥ 0
+L(\beta) = ||y - X\beta||_2^2 + \lambda||\beta||_2^2  \quad \text{with tuning parameter } \lambda \geq 0
 $$
 
 Similarly to the OLS case, this loss function can then be formulated as a _least-squares_ optimization problem to find estimates for the model coefficients that minimize the loss function as:
 
-$$L(β) = ||y - Xβ||₂² + λ||β||₂²  with tuning parameter λ ≥ 0$$
+$$
+L(\beta) = ||y - X\beta||_2^2 + \lambda||\beta||_2^2  \quad \text{with tuning parameter } \lambda \geq 0
+$$
 
 Just like the OLS case, a 1/(2n) term is added in order to simply solving the gradient and allow the objective function to converge to the expected value of the model error by **the Law of Large Numbers**.
 
 This problem is also unconstrained and a closed-form solution for **the Ridge estimator** can be found by setting the gradient of the loss function (objective) equal to zero and solving the resultant equation. This produces an estimator result of:
 
-$$\hat{\beta} = (X^TX + \lambda I)^{-1}X^Ty$$
+$$
+\hat{\beta} = (X^TX + \lambda I)^{-1}X^Ty
+$$
 
 This estimator should also be shown to be unique. In this case, the associated **_Hessian_** matrix is:
 
-$$H = 2X^TX + 2 \lambda I$$
+$$
+H = 2X^TX + 2 \lambda I
+$$
 
 It turns out that this matrix can be shown to be **positive definite** by:
 
-$$\beta^{T}(X^{T}X+\lambda I)\beta=(X\beta)^{T}X\beta+\lambda\beta^{T}\beta=||X\beta||_{2}^{2}+\lambda||\beta||_{2}^{2}>0\quad\forall\beta\ne0$$
-
-Thus, since the associated Hessian matrix of the Ridge loss function is positive definite, the function is strongly convex, which implies that the Ridge estimator (Eq. #3) is the **unique** global minimizer to the **_Ridge Regression_** problem.
-
-Implementations of the estimator can be simplified by noticing that the problem can be reformulated as an OLS problem through **data augmentation**. This would take the form of:
-
-$$\begin{bmatrix} 
-\hat{\beta}_0 \\ 
-\hat{\beta} 
+$$
+\begin{bmatrix}
+\hat{\beta}_0 \\
+\hat{\beta}
 \end{bmatrix} = 
 \arg \min_{\beta_0, \beta} 
-\left\| 
-\begin{bmatrix} 
-Y \\ 
-0 
-\end{bmatrix} - 
-\begin{bmatrix} 
-1_n & X \\ 
-0 & \lambda \cdot I 
-\end{bmatrix} 
-\begin{bmatrix} 
-\beta_0 \\ 
-\beta 
-\end{bmatrix}  
+\left\|
+\begin{bmatrix}
+Y \\
+0
+\end{bmatrix} -
+\begin{bmatrix}
+1_n & X \\
+0 & \lambda \cdot I
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\
+\beta
+\end{bmatrix}
 \right\|_2^2
 $$
-
 
 Thus, by utilizing the above data augmentation the same result as [Equation #9 from the last part of this series](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c) can be used to solve for the coefficient estimates. That result is reproduced here:
 

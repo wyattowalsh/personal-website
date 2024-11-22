@@ -1,6 +1,7 @@
 // tailwind.config.ts
 
 import type { Config } from 'tailwindcss';
+import type { PluginAPI } from 'tailwindcss/types/config';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import typography from '@tailwindcss/typography';
 
@@ -77,8 +78,8 @@ const config: Config = {
           '50%': { backgroundPosition: '100% 50%' },
         },
         pulse: {
-          '0%, 100%': { opacity: 1 },
-          '50%': { opacity: 0.5 },
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.5' },
         },
         glitch: {
           '0%': {
@@ -148,8 +149,8 @@ const config: Config = {
   plugins: [
     typography,
     // Add custom utilities
-    function({ addUtilities }: PluginAPI) {
-      addUtilities({
+    function(api: PluginAPI) {
+      api.addUtilities({
         '.bg-gradient-text': {
           background: 'var(--gradient-text)',
           '-webkit-background-clip': 'text',

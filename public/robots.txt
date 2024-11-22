@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://w4w.dev
+
+# Sitemaps
+Sitemap: https://w4w.dev/sitemap.xml

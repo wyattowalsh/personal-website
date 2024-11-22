@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useContext } from "react";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import { cn } from "@/lib/utils";
 import { Copy, Check } from "lucide-react";
+import { EquationContext } from "@/components/PostLayout";
 
 interface MathProps {
 	children: string;
@@ -23,6 +24,15 @@ export default function Math({
 }: MathProps) {
 	const [copied, setCopied] = useState(false);
 	const Wrapper = display ? "div" : "span";
+	
+	// Get equation context
+	const equationContext = useContext(EquationContext);
+	
+	// Check if this is a display equation that needs numbering
+	const isDisplayEquation = display || children.includes('\\begin{equation}');
+	const equationNumber = isDisplayEquation ? 
+		(equationContext?.increment?.(), equationContext?.count) : 
+		undefined;
 
 	const handleCopy = async () => {
 		await navigator.clipboard.writeText(children);
@@ -42,7 +52,7 @@ export default function Math({
 		try {
 			result = katex.renderToString(sanitizedChildren, {
 				...options,
-				displayMode: display || children.includes("{align}"),
+				displayMode: isDisplayEquation,
 				throwOnError: true,
 				globalGroup: true,
 				trust: true,
@@ -52,7 +62,7 @@ export default function Math({
 			console.error("KaTeX rendering error:", error);
 			result = katex.renderToString(sanitizedChildren, {
 				...options,
-				displayMode: display || children.includes("{align}"),
+				displayMode: isDisplayEquation,
 				throwOnError: false,
 				strict: "ignore",
 				globalGroup: true,
@@ -61,14 +71,14 @@ export default function Math({
 		}
 
 		return result;
-	}, [sanitizedChildren, display, options, children]);
+	}, [sanitizedChildren, isDisplayEquation, options]);
 
 	return (
 		<Wrapper
-			id={id}
+			id={id || (equationNumber ? `equation-${equationNumber}` : undefined)}
 			className={cn(
 				"math",
-				display ? "math-display" : "math-inline",
+				isDisplayEquation ? "math-display" : "math-inline",
 				"group relative w-full"
 			)}
 		>
@@ -76,7 +86,7 @@ export default function Math({
 				className="overflow-x-auto"
 				dangerouslySetInnerHTML={{ __html: renderedKatex }}
 			/>
-			{display && (
+			{isDisplayEquation && (
 				<>
 					<button
 						onClick={handleCopy}
@@ -89,8 +99,8 @@ export default function Math({
 							<Copy className="h-5 w-5 text-gray-500 hover:text-gray-700" />
 						)}
 					</button>
-					{number && (
-						<span className="equation-number">({number})</span>
+					{equationNumber && (
+						<span className="equation-number">({equationNumber})</span>
 					)}
 				</>
 			)}
