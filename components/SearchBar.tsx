@@ -130,58 +130,97 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 	}
 
 	return (
-		<div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-			{/* Search Input Section */}
-			<div className="mb-8">
+		<div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
+			{/* Search Input Section - Enhanced responsiveness */}
+			<div className="relative">
 				<div className="relative group">
 					<Input
 						type="text"
-						className="w-full p-4 text-lg bg-background border-2 border-border 
-                     hover:border-primary/50 focus:border-primary
-                     dark:bg-gray-900 dark:text-gray-100
-                     placeholder:text-muted-foreground/60
-                     transition-all duration-300 ease-in-out
-                     rounded-lg shadow-sm hover:shadow-md"
+						className={cn(
+							"w-full",
+							"p-3 sm:p-4",
+							"text-base sm:text-lg",
+							"bg-background/95 backdrop-blur-sm",
+							"border-2 border-border",
+							"hover:border-primary/50 focus:border-primary",
+							"dark:bg-gray-900/95 dark:text-gray-100",
+							"placeholder:text-muted-foreground/60",
+							"transition-all duration-300 ease-in-out",
+							"rounded-lg shadow-sm hover:shadow-md",
+							"focus:ring-2 focus:ring-primary/20",
+							"dark:focus:ring-primary/40"
+						)}
 						placeholder="Search posts by title, content, or tags..."
 						value={query}
 						onChange={handleSearch}
 					/>
 					<div
-						className="absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r 
-                        from-primary/40 via-primary to-primary/40
-                        transform scale-x-0 group-hover:scale-x-100
-                        transition-transform duration-300"
+						className={cn(
+							"absolute inset-x-0 bottom-0 h-0.5",
+							"bg-gradient-to-r from-primary/40 via-primary to-primary/40",
+							"transform scale-x-0 group-hover:scale-x-100",
+							"transition-transform duration-300"
+						)}
 					/>
 				</div>
 			</div>
-			{/* Filters and Sort Section */}
-			<div className="mb-8 flex flex-col sm:flex-row sm:items-center gap-4">
-				<h3 className="text-lg font-semibold text-foreground/90 dark:text-gray-200 whitespace-nowrap">
-					Filter & Sort
-				</h3>
 
-				{/* Tags moved here */}
-				<div className="flex-1 flex flex-wrap gap-2">
+			{/* Filters and Sort Section - Improved layout */}
+			<div
+				className={cn(
+					"flex flex-col gap-4",
+					"sm:flex-row sm:items-start",
+					"lg:items-center"
+				)}
+			>
+				{/* Tags Section - Better wrapping */}
+				<div
+					className={cn(
+						"flex-1",
+						"flex flex-wrap gap-2",
+						"max-h-[120px] sm:max-h-none",
+						"overflow-y-auto sm:overflow-visible",
+						"scrollbar-thin scrollbar-thumb-primary/20",
+						"scrollbar-track-transparent"
+					)}
+				>
 					{tags.map((tag) => (
-						<div
+						<motion.div
 							key={tag}
 							onClick={() => toggleTag(tag)}
-							className={cn("cursor-pointer", {
-								"opacity-50":
-									selectedTags.length > 0 && !selectedTags.includes(tag),
-							})}
+							className={cn(
+								"cursor-pointer transition-all duration-200",
+								selectedTags.length > 0 && !selectedTags.includes(tag)
+									? "opacity-40 scale-95"
+									: "opacity-100 scale-100",
+								"hover:scale-105"
+							)}
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.95 }}
 						>
 							<TagLink tag={tag} isNested />
-						</div>
+						</motion.div>
 					))}
 				</div>
 
-				{/* Sort controls */}
-				<div className="flex items-center gap-3 ml-auto">
+				{/* Sort Controls - Responsive layout */}
+				<div
+					className={cn(
+						"flex items-center gap-3",
+						"sm:ml-auto",
+						"w-full sm:w-auto",
+						"justify-end"
+					)}
+				>
 					<Select value={sortMethod} onValueChange={setSortMethod}>
 						<SelectTrigger
-							className="w-[180px] bg-background dark:bg-gray-800 
-                                    border-2 hover:border-primary/50"
+							className={cn(
+								"w-full sm:w-[180px]",
+								"bg-background/95 dark:bg-gray-800/95",
+								"backdrop-blur-sm",
+								"border-2 hover:border-primary/50",
+								"transition-all duration-200"
+							)}
 						>
 							<SelectValue placeholder="Sort by..." />
 						</SelectTrigger>
@@ -190,6 +229,7 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 							<SelectItem value="title">Sort by Title</SelectItem>
 						</SelectContent>
 					</Select>
+
 					<TooltipProvider>
 						<Tooltip>
 							<TooltipTrigger asChild>
@@ -199,10 +239,14 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 									onClick={() =>
 										setSortDirection((d) => (d === "asc" ? "desc" : "asc"))
 									}
-									className="h-10 w-10 border-2 hover:border-primary/50
-                           bg-background dark:bg-gray-800
-                           hover:bg-accent/10 dark:hover:bg-gray-700
-                           transition-colors duration-200"
+									className={cn(
+										"h-10 w-10",
+										"border-2 hover:border-primary/50",
+										"bg-background/95 dark:bg-gray-800/95",
+										"backdrop-blur-sm",
+										"hover:bg-accent/10 dark:hover:bg-gray-700",
+										"transition-all duration-200"
+									)}
 								>
 									{sortDirection === "asc" ? (
 										<ChevronUp className="h-4 w-4" />
@@ -211,7 +255,10 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 									)}
 								</Button>
 							</TooltipTrigger>
-							<TooltipContent className="bg-popover/95 backdrop-blur-sm">
+							<TooltipContent
+								className="bg-popover/95 backdrop-blur-sm"
+								sideOffset={5}
+							>
 								<p className="text-sm">
 									{sortDirection === "asc" ? "Ascending" : "Descending"}
 								</p>
@@ -221,49 +268,51 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 				</div>
 			</div>
 
-			<Separator className="my-8 opacity-50" />
+			<Separator className="opacity-50" />
 
-			{/* Results Section */}
+			{/* Results Grid - Responsive layout */}
 			<div
-				suppressHydrationWarning
-				className="grid gap-4 sm:gap-6 lg:gap-8 w-full
-                  grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
-                  [&>*]:h-full auto-rows-fr"
+				className={cn(
+					"grid gap-4 sm:gap-6 lg:gap-8",
+					"grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+					"[&>*]:h-full",
+					"auto-rows-fr"
+				)}
 			>
 				{results.length > 0 ? (
 					results.length === 1 ? (
-						// Single result - centered in grid
-						<div className="sm:col-start-1 lg:col-start-2 w-full">
-							<PostCard
-								key={results[0].slug}
-								post={results[0]}
-								className="h-full" // Add h-full class
-							/>
+						// Single result - centered
+						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
+							<PostCard post={results[0]} className="h-full" />
 						</div>
 					) : (
-						// Multiple results
+						// Multiple results with staggered animation
 						results.map((post, idx) => (
 							<motion.div
 								key={post.slug}
-								className="h-full" // Add h-full class
+								className="h-full"
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
 								transition={{
-									duration: 0.3,
+									type: "spring",
+									stiffness: 100,
+									damping: 15,
 									delay: Math.min(idx * 0.1, 0.8),
 								}}
 							>
-								<PostCard
-									post={post}
-									className="h-full" // Add h-full class
-								/>
+								<PostCard post={post} className="h-full" />
 							</motion.div>
 						))
 					)
 				) : (
-					// No results message - span full width
-					<div className="col-span-full text-center py-12">
-						<p className="text-lg text-muted-foreground">
+					// No results message
+					<motion.div
+						className="col-span-full text-center py-12"
+						initial={{ opacity: 0, scale: 0.95 }}
+						animate={{ opacity: 1, scale: 1 }}
+						transition={{ duration: 0.3 }}
+					>
+						<p className="text-lg text-muted-foreground mb-4">
 							No matching posts found.
 						</p>
 						<Button
@@ -272,11 +321,15 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 								setQuery("");
 								setSelectedTags([]);
 							}}
-							className="mt-4 hover:text-primary"
+							className={cn(
+								"hover:text-primary",
+								"transition-all duration-200",
+								"hover:scale-105 active:scale-95"
+							)}
 						>
 							Clear filters
 						</Button>
-					</div>
+					</motion.div>
 				)}
 			</div>
 		</div>

@@ -56,7 +56,8 @@ const withMDX = createMDX({
   options: {
     remarkPlugins: [
       remarkGfm,
-      remarkMath,
+      remarkMath, 
+      [remarkMdxMathEnhanced, { component: 'Math' }],
       remarkEmoji,
       remarkCodeTitles,
       remarkCodeBlocks,
@@ -85,7 +86,6 @@ const withMDX = createMDX({
       remarkPrism,
       remarkSmartypants,
       remarkSources,
-      [remarkMdxMathEnhanced, { component: 'Math' }],
       remarkMdxFrontmatter,
       remarkToc,
       // remarkValidateLinks,

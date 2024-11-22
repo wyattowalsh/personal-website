@@ -1,5 +1,5 @@
 /* LoadingSpinner.module.scss */
-
+@use 'sass:math';
 .cube-spinner {
     width: 64px;
     height: 64px;
@@ -154,4 +154,21 @@
       transform: translate(0);
     }
   }
+
+  @function random-percentage() {
+    @return math.random(100) + 0%;
+  }
   
+  @function random-translate() {
+    @return math.random(10) - 5 + px;
+  }
+  
+  @keyframes glitch-anim {
+    $steps: 20;
+    @for $i from 0 through $steps {
+      #{math.percentage(math.div($i, 2 * $steps))} {
+        clip-path: inset(random-percentage() 0 random-percentage() 0);
+        transform: translate(random-translate(), random-translate());
+      }
+    }
+  }

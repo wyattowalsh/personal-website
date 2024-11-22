@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { Fira_Code, Montserrat } from "next/font/google";
-import Script from "next/script";
 import "./globals.scss";
 import "katex/dist/katex.min.css";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -11,8 +10,6 @@ import Header from "@/components/Header";
 import KaTeXLoader from "@/components/KaTeXLoader";
 import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
-import { LoadingSpinner } from "@/components/LoadingSpinner";
-import Comments from "@/components/Comments";
 import { GoogleTagManager } from '@next/third-parties/google'
 
 config.autoAddCss = false;

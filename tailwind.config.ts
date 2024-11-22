@@ -1,13 +1,16 @@
 import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import typography from '@tailwindcss/typography';
+import { ThemeConfig } from 'tailwindcss/types/config';
+import { PluginAPI } from 'tailwindcss/types/config';
 
+// Update the function definition to match Tailwind's expected types
 function withOpacityValue(variable: string) {
-  return ({ opacityValue }: { opacityValue: string }) => {
+  return ({ opacityValue }: { opacityValue: number | undefined }) => {
     if (opacityValue === undefined) {
-      return `var(${variable})`;
+      return `rgb(var(${variable}))`;
     }
-    return `var(${variable}, ${opacityValue})`;
+    return `rgb(var(${variable}) / ${opacityValue})`;
   };
 }
 
@@ -18,13 +21,20 @@ const config: Config = {
     './components/**/*.{html,js,jsx,ts,tsx,md,mdx,css,scss}',
     './app/globals.scss',
     './app/variables.module.scss',
+    "./app/**/*.{js,ts,jsx,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
-        primary: 'var(--primary)',
+        primary: {
+          DEFAULT: 'rgb(var(--primary-rgb))',
+          foreground: 'var(--primary-foreground)',
+          20: 'rgb(var(--primary-rgb) / 0.2)',
+          30: 'rgb(var(--primary-rgb) / 0.3)',
+        },
         'primary-foreground': 'var(--primary-foreground)',
         secondary: 'var(--secondary)',
         'secondary-foreground': 'var(--secondary-foreground)',
@@ -42,13 +52,18 @@ const config: Config = {
         input: 'var(--input)',
         ring: 'var(--ring)',
         'border-muted': 'var(--border-muted)',
-        'math-bg': withOpacityValue('--math-bg'),
+        'math-bg': 'rgb(var(--math-bg) / <alpha-value>)',
+        'math-bg-transparent': 'rgb(var(--math-bg-transparent) / <alpha-value>)',
         'math-border': 'var(--math-border)',
         'math-controls-bg': 'var(--math-controls-bg)',
         'math-controls-hover': 'var(--math-controls-hover)',
-        'math-controls-text': 'var(--math-controls-text)',
-        'math-controls-text-hover': 'var(--math-controls-text-hover)',
-        'math-inline': withOpacityValue('--math-bg-transparent'),
+        'math-controls-text': 'rgb(var(--math-controls-text) / <alpha-value>)',
+        'math-controls-text-hover': 'rgb(var(--math-controls-text-hover) / <alpha-value>)',
+        'math-inline': `rgb(var(--math-bg-transparent) / <alpha-value>)`,
+        'math-text-color': 'var(--math-text-color)',
+        'math-index-color': 'var(--math-index-color)',
+        'math-inline-bg': 'var(--math-inline-bg)',
+        'math-display-bg': 'var(--math-display-bg)',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],
@@ -185,7 +200,7 @@ const config: Config = {
       transitionTimingFunction: {
         'header': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
-      typography: (theme) => ({
+      typography: (theme: (path: string) => string) => ({
         DEFAULT: {
           css: {
             color: 'var(--foreground)',
@@ -224,13 +239,9 @@ const config: Config = {
               borderLeftColor: 'var(--border)',
               color: 'var(--muted-foreground)',
             },
-            'code': {
+            code: {
               color: 'var(--foreground)',
               backgroundColor: 'var(--muted)',
-            },
-            'pre': {
-              backgroundColor: 'var(--card)',
-              color: 'var(--card-foreground)',
             },
             hr: {
               borderColor: 'var(--border)',
@@ -261,11 +272,6 @@ const config: Config = {
             'h1,h2,h3,h4,h5,h6': {
               scrollMarginTop: theme('spacing.32'),
             },
-            pre: false,
-            code: false,
-            'pre code': false,
-            'code::before': false,
-            'code::after': false,
             '.math-inline': {
               backgroundColor: 'var(--math-bg-transparent)',
               borderRadius: theme('borderRadius.md'),
@@ -357,11 +363,44 @@ const config: Config = {
           },
         },
       }),
+      opacity: {
+        '10': '0.1',
+        '20': '0.2',
+        '30': '0.3',
+        '40': '0.4',
+        '50': '0.5',
+        '60': '0.6',
+        '70': '0.7',
+        '80': '0.8',
+        '90': '0.9',
+      },
+      backgroundOpacity: {
+        '10': '0.1',
+        '20': '0.2',
+        '30': '0.3',
+        '40': '0.4',
+        '50': '0.5',
+        '60': '0.6',
+        '70': '0.7',
+        '80': '0.8',
+        '90': '0.9',
+      },
+      borderOpacity: {
+        '10': '0.1',
+        '20': '0.2',
+        '30': '0.3',
+        '40': '0.4',
+        '50': '0.5',
+        '60': '0.6',
+        '70': '0.7',
+        '80': '0.8',
+        '90': '0.9',
+      },
     },
   },
   plugins: [
     typography,
-    function({ addUtilities }) {
+    function({ addUtilities }: PluginAPI) {
       const newUtilities = {
         '.bg-gradient-text': {
           background: 'var(--gradient-text)',
@@ -373,7 +412,7 @@ const config: Config = {
           boxShadow: 'var(--shadow-soft)',
         },
       };
-      addUtilities(newUtilities, ['responsive', 'hover', 'dark']);
+      addUtilities(newUtilities);
     },
   ],
 };

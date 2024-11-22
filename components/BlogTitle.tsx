@@ -110,18 +110,19 @@ const GlitchText = ({ children }: { children: React.ReactNode }) => (
 	<motion.div
 		className={cn(
 			"relative inline-block",
-			styles['glitch-text'],
+			styles['glitch-container'],
 			"animate-glitch-text"
 		)}
 		initial={{ opacity: 0 }}
 		animate={{ opacity: 1 }}
 		transition={{ duration: 0.3 }}
 	>
-		{/* Base text */}
+		 {/* Main text layer */}
 		<span 
 			className={cn(
 				"relative z-10",
-				"bg-gradient-to-r from-[var(--glitch-color-1)] via-primary to-[var(--glitch-color-2)]",
+				styles['glitch-text'],
+				"bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-500",
 				"bg-clip-text text-transparent",
 				"animate-glitch-skew"
 			)}
@@ -130,19 +131,15 @@ const GlitchText = ({ children }: { children: React.ReactNode }) => (
 			{children}
 		</span>
 
-		{/* Glitch layers */}
-		<div className={styles['glitch-layer']} aria-hidden="true">
-			{children}
-		</div>
-		<div 
-			className={cn(
-				styles['glitch-layer'], 
-				"animate-glitch-clip"
-			)} 
-			aria-hidden="true"
-		>
-			{children}
-		</div>
+		{/* Glitch effect layers */}
+		<span className={styles['glitch-copy-1']} aria-hidden="true">{children}</span>
+		<span className={styles['glitch-copy-2']} aria-hidden="true">{children}</span>
+		
+		{/* Scanlines */}
+		<div className={styles['scanlines']}></div>
+		
+		{/* Cyber decorations */}
+		<div className={styles['cyber-brackets']}></div>
 	</motion.div>
 );
 
@@ -232,10 +229,11 @@ const BlogTitle = () => {
 							"bg-gradient-to-br from-black/40 via-black/60 to-black/40",
 							"dark:from-white/10 dark:via-white/20 dark:to-white/10",
 							"border border-cyan-500/20 dark:border-cyan-400/20",
-							"shadow-[0_0_50px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+							"shadow-[0_0_50px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(255,255,255,0.1)]",
+							styles['card-container']
 						)}
 					>
-						<AnimatedBackground />
+						<div className={styles['cyber-grid']}></div>
 						<BackgroundParticles />
 						<div className={styles.scanlines} />
 
@@ -253,7 +251,8 @@ const BlogTitle = () => {
 								className={cn(
 									"text-4xl sm:text-5xl md:text-6xl font-bold",
 									"p-2 select-none",
-									"filter drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]"
+									"filter drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]",
+									styles['title']
 								)}
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
@@ -263,7 +262,7 @@ const BlogTitle = () => {
 									ease: [0.6, -0.05, 0.01, 0.99]
 								}}
 							>
-								<GlitchText>one lone datum</GlitchText>
+								<GlitchText>onelonedatum</GlitchText>
 							</motion.h1>
 						</div>
 					</Card>

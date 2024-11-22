@@ -36,38 +36,68 @@ $math-controls-text-hover: hsl(222.2, 47.4%, 11.2%);
 $math-controls-bg: hsla(210, 40%, 98%, 0.9);
 $math-controls-hover: hsla(210, 40%, 95%, 1);
 
+// Ensure math controls variables are properly set
+$math-controls-bg: hsla(210, 40%, 98%, 0.95);
+$math-controls-text: hsl(215.4, 16.3%, 46.9%);
+
+// New Math component variables
+$math-text-color: hsl(222, 47%, 11%); // Slate-900
+$math-index-color: hsl(215, 20%, 65%); // Slate-500
+$math-inline-bg: hsla(210, 40%, 98%, 0.9);
+$math-display-bg: hsla(210, 40%, 98%, 0.95);
+
 // Light Mode Variables
 @use 'sass:map';
 
+// Light Mode Math Colors
 $light-math-colors: (
-  'math-bg': hsla(210, 40%, 98%, 0.95),
-  'math-bg-transparent': hsla(210, 40%, 98%, 0.4),
-  'math-border': hsla(214.3, 31.8%, 91.4%, 0.6),
-  'math-shadow': 0 4px 16px rgba(0, 0, 0, 0.06),
-  'math-hover-shadow': 0 8px 30px rgba(59, 130, 246, 0.15),
+  'math-bg': '245 247 250',  // RGB format
+  'math-bg-transparent': '245 247 250',
+  'math-border': 'hsla(214.3, 31.8%, 91.4%, 0.6)',
+  'math-controls-text': '100 116 139', // slate-500
+  'math-controls-text-hover': '15 23 42', // slate-900
+);
+
+// Dark Mode Math Colors
+$dark-math-colors: (
+  'math-bg': '17 19 23',  // RGB format
+  'math-bg-transparent': '17 19 23',
+  'math-border': 'hsla(217.2, 32.6%, 17.5%, 0.6)',
+  'math-controls-text': '148 163 184', // slate-400
+  'math-controls-text-hover': '241 245 249', // slate-100
+);
+
+$light-math-colors: (
+  'math-bg': '245 247 250',  // RGB values without rgb() wrapper
+  'math-bg-transparent': '245 247 250',
+  'math-border': 'hsla(214.3, 31.8%, 91.4%, 0.6)',
+  'math-shadow': '0 4px 16px rgba(0, 0, 0, 0.06)',
+  'math-hover-shadow': '0 8px 30px rgba(59, 130, 246, 0.15)',
   'math-equation-bg': hsla(210, 40%, 98%, 0.9),
-  'math-controls-bg': hsla(210, 40%, 98%, 0.9),
-  'math-controls-hover': hsla(210, 40%, 95%, 1),
-  'math-controls-text': hsl(215.4, 16.3%, 46.9%),
-  'math-controls-text-hover': hsl(222.2, 47.4%, 11.2%),
+  'math-controls-bg': 'hsla(210, 40%, 98%, 0.95)',
+  'math-controls-hover': 'hsla(210, 40%, 95%, 1)',
+  'math-controls-text': '100 116 139', // RGB values for slate-500
+  'math-controls-text-hover': '15 23 42', // RGB values for slate-900
 );
 
 // Dark Mode Variables
 $dark-math-colors: (
-  'math-bg': hsla(222.2, 84%, 4.9%, 0.8),
-  'math-bg-transparent': hsla(222.2, 84%, 4.9%, 0.4),
-  'math-border': hsla(217.2, 32.6%, 17.5%, 0.6),
-  'math-shadow': 0 4px 16px rgba(0, 0, 0, 0.3),
-  'math-hover-shadow': 0 8px 30px rgba(59, 130, 246, 0.25),
+  'math-bg': '17 19 23',  // RGB values without rgb() wrapper
+  'math-bg-transparent': '17 19 23',
+  'math-border': 'hsla(217.2, 32.6%, 17.5%, 0.6)',
+  'math-shadow': '0 4px 16px rgba(0, 0, 0, 0.3)',
+  'math-hover-shadow': '0 8px 30px rgba(59, 130, 246, 0.25)',
   'math-equation-bg': hsla(222.2, 84%, 4.9%, 0.8),
-  'math-controls-bg': hsla(222.2, 84%, 4.9%, 0.9),
-  'math-controls-hover': hsla(222.2, 84%, 4.9%, 1),
-  'math-controls-text': hsl(215, 20.2%, 65.1%),
-  'math-controls-text-hover': hsl(210, 40%, 98%),
+  'math-controls-bg': 'hsla(222.2, 84%, 4.9%, 0.9)',
+  'math-controls-hover': 'hsla(222.2, 84%, 4.9%, 1)',
+  'math-controls-text': '148 163 184', // RGB values for slate-400
+  'math-controls-text-hover': '241 245 249', // RGB values for slate-100
 );
 
 // Light Theme Variables
 @mixin light {
+  --primary-rgb: 59, 130, 246; // Add this if not present
+  --primary: rgb(var(--primary-rgb));
   --background: hsl(198 100% 95%);
   --foreground: hsl(198 5% 0%);
   --primary: hsl(198 33.6% 56.3%);
@@ -154,6 +184,13 @@ $dark-math-colors: (
   --math-controls-text: hsl(215.4, 16.3%, 46.9%);
   --math-controls-text-hover: hsl(222.2, 47.4%, 11.2%);
 
+  // Enhanced 404 page variables
+  --cyber-grid-color: rgba(59, 130, 246, 0.1);
+  --cyber-grid-size: 30px;
+  --glitch-blur-intensity: 2px;
+  --noise-intensity: 0.1;
+  --scan-line-color: rgba(0, 0, 0, 0.1);
+
   // Typography
   --heading-color: hsl(198 5% 10%);
   --heading-color-hover: hsl(198 33.6% 56.3%);
@@ -180,6 +217,8 @@ $dark-math-colors: (
 
 // Dark Theme Variables
 @mixin dark {
+  --primary-rgb: 59, 130, 246; // Add this if not present
+  --primary: rgb(var(--primary-rgb));
   --background: hsl(198 50% 5%);
   --foreground: hsl(198 5% 90%);
   --primary: hsl(198 33.6% 56.3%);
@@ -265,6 +304,13 @@ $dark-math-colors: (
   --math-controls-hover: hsla(222.2, 84%, 4.9%, 1);
   --math-controls-text: hsl(215, 20.2%, 65.1%);
   --math-controls-text-hover: hsl(210, 40%, 98%);
+
+  // Enhanced 404 page variables
+  --cyber-grid-color: rgba(59, 130, 246, 0.2);
+  --cyber-grid-size: 30px;
+  --glitch-blur-intensity: 3px;
+  --noise-intensity: 0.15;
+  --scan-line-color: rgba(255, 255, 255, 0.1);
 
   --link-color-hover: var(--primary-foreground);
   --code-bg: hsl(198 50% 10%);
