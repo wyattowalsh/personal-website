@@ -13,8 +13,7 @@ import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Comments from "@/components/Comments";
-import { DefaultSeo } from 'next-seo';
-import SEO from '../next-seo.config';
+import { GoogleTagManager } from '@next/third-parties/google'
 
 config.autoAddCss = false;
 
@@ -45,6 +44,7 @@ export default function RootLayout({
 	return (
 		<StrictMode>
 		<html lang="en" suppressHydrationWarning>
+		<GoogleTagManager gtmId="GTM-P7VFKNK6" />
 			<body
 				className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}
 			>
@@ -54,7 +54,6 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					 <DefaultSeo {...SEO} />
 					<Header />
 					<CustomScrollbars>{children}</CustomScrollbars>
 				</ThemeProvider>
