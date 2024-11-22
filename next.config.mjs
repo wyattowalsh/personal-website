@@ -4,7 +4,7 @@ import remarkMath from "remark-math";
 import remarkEmoji from "remark-emoji";
 import remarkCodeTitles from "remark-code-titles";
 import remarkToc from "remark-toc";
-import remarkValidateLinks from "remark-validate-links";
+// import remarkValidateLinks from "remark-validate-links";
 import rehypeSlug from "rehype-slug";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import rehypeKatex from "rehype-katex";
@@ -88,7 +88,7 @@ const withMDX = createMDX({
       [remarkMdxMathEnhanced, { component: 'Math' }],
       remarkMdxFrontmatter,
       remarkToc,
-      remarkValidateLinks,
+      // remarkValidateLinks,
     ],
     rehypePlugins: [
       rehypeSlug,

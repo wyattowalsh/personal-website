@@ -13,6 +13,8 @@ import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import Comments from "@/components/Comments";
+import { DefaultSeo } from 'next-seo';
+import SEO from '../next-seo.config';
 
 config.autoAddCss = false;
 
@@ -52,6 +54,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
+					 <DefaultSeo {...SEO} />
 					<Header />
 					<CustomScrollbars>{children}</CustomScrollbars>
 				</ThemeProvider>
