@@ -11,19 +11,17 @@ import { ArticleJsonLd, NextSeo } from 'next-seo';
 // Create context for equation numbering
 export const EquationContext = createContext({ count: 0, increment: () => {} });
 
-interface PostLayoutProps {
-	children: React.ReactNode;
-  meta: {
-    title: string;
-    description: string;
-    date: string;
-    lastModified: string;
-    tags: string[];
-    image: string;
-  };
+interface PostMetadata {
+  title: string;
+  summary: string;
+  date: string;
+  updated?: string;
+  tags: string[];
+  image?: string;
+  caption?: string;
 }
 
-export function PostLayout({ children, meta }: PostLayoutProps) {
+export function PostLayout({ children, frontmatter }: { children: React.ReactNode, frontmatter: PostMetadata }) {
 	const [equationCount, setEquationCount] = React.useState(0);
 	const pathname = usePathname();
 
@@ -39,7 +37,13 @@ export function PostLayout({ children, meta }: PostLayoutProps) {
 	return (
 		<EquationContext.Provider value={{ count: equationCount, increment: incrementCount }}>
 			<article className="space-y-8 max-w-none w-full overflow-x-hidden">
-				<PostHeader />
+				<PostHeader 
+					title={frontmatter.title}
+					date={frontmatter.date}
+					updated={frontmatter.updated}
+					image={frontmatter.image}
+					caption={frontmatter.caption}
+				/>
 				<hr />
 				<div className="prose prose-lg max-w-none">
 					<Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
@@ -49,44 +53,42 @@ export function PostLayout({ children, meta }: PostLayoutProps) {
 				<hr />
 				<Comments />
 			</article>
-      <NextSeo
-        title={meta?.title}
-        description={meta?.description}
-        canonical={`https://w4w.dev${pathname}`}
-        openGraph={{
-          type: 'article',
-          title: meta?.title,
-          description: meta?.description,
-          url: `https://w4w.dev${pathname}`,
-          article: {
-            publishedTime: meta?.date,
-            modifiedTime: meta?.lastModified,
-            authors: ['Wyatt Walsh'],
-            tags: meta?.tags,
-          },
-          images: [
-            {
-              url: meta?.image || 'https://w4w.dev/opengraph.png',
-              width: 1200,
-              height: 630,
-              alt: meta?.title,
-            }
-          ]
-        }}
-      />
-      <ArticleJsonLd
-        useAppDir={true}
-        url={`https://w4w.dev${pathname}`}
-        title={meta?.title || ''}
-        images={[meta?.image || 'https://w4w.dev/opengraph.png']}
-        datePublished={meta?.date || ''}
-        dateModified={meta?.lastModified || meta?.date || ''}
-        authorName="Wyatt Walsh"
-        description={meta?.description || ''}
-        isAccessibleForFree={true}
-        publisherName="W4W"
-        publisherLogo="https://w4w.dev/logo.webp"
-      />
+			<NextSeo
+				title={frontmatter.title}
+				description={frontmatter.summary}
+				canonical={`https://w4w.dev${pathname}`}
+				openGraph={{
+					type: 'article',
+					title: frontmatter.title,
+					description: frontmatter.summary,
+					url: `https://w4w.dev${pathname}`,
+					article: {
+						publishedTime: frontmatter.date,
+						modifiedTime: frontmatter.updated || frontmatter.date,
+						authors: ['Wyatt Walsh'],
+						tags: frontmatter.tags,
+					},
+					images: [{
+						url: frontmatter.image || 'https://w4w.dev/opengraph.png',
+						width: 1200,
+						height: 630,
+						alt: frontmatter.title,
+					}]
+				}}
+			/>
+			<ArticleJsonLd
+				useAppDir={true}
+				url={`https://w4w.dev${pathname}`}
+				title={frontmatter.title}
+				images={[frontmatter.image || 'https://w4w.dev/opengraph.png']}
+				datePublished={frontmatter.date}
+				dateModified={frontmatter.updated || frontmatter.date}
+				authorName="Wyatt Walsh"
+				description={frontmatter.summary}
+				isAccessibleForFree={true}
+				publisherName="W4W"
+				publisherLogo="https://w4w.dev/logo.webp"
+			/>
 		</EquationContext.Provider>
 	);
 }

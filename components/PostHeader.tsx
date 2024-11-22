@@ -12,11 +12,15 @@ import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag } from "lucide-react";
 
-interface PostHeaderProps {
-	className?: string;
+export interface PostHeaderProps {
+  title: string;
+  date: string;
+  updated?: string;
+  image?: string;
+  caption?: string;
 }
 
-export default function PostHeader({ className }: PostHeaderProps) {
+export default function PostHeader({ title, date, updated, image, caption }: PostHeaderProps) {
 	const [state, setState] = useState<{
 		post: PostMetadata | null;
 		isLoading: boolean;
@@ -98,7 +102,6 @@ export default function PostHeader({ className }: PostHeaderProps) {
 				"rounded-2xl overflow-hidden",
 				"bg-gradient-to-br from-primary via-background to-secondary",
 				"transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-xl",
-				className
 			)}
 			initial={{ opacity: 0, y: -20 }}
 			animate={{ opacity: 1, y: 0 }}
