@@ -22,7 +22,9 @@ The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes th
 
 **_The Lasso_** loss function can be formalized as:
 
-$$L(\beta) = ||y - X \beta||_2^2 + \lambda ||\beta||_1 \text{ with tuning parameter } \lambda \ge 0$$
+$$
+L(\beta) = ||y - X \beta||_2^2 + \lambda ||\beta||_1 \text{ with tuning parameter } \lambda \ge 0
+$$
 
 Similar to previous cases, an intercept term can be included through data augmentation of the design matrix with a column of **1**s. Furthermore, formulating the problem as a _least-squares_ optimization problem produces:
 
@@ -74,7 +76,7 @@ $$
 \sum_{i=1}^{n} x_{i,j} r_i = \langle x_j, y \rangle - \sum_{k: |\beta_k| > 0} \langle x_j, x_k \rangle \beta_k
 $$
 
-Utilizing **_warm starts_** can bring efficiency boosts as well. Using **_warm starts_**, a sequence of models are fitted — with tuning parameter values from a max tuning parameter value down to a minimum tuning parameter value that is some small factor (thousandth) of the max value — initializing the coefficients of each iteration to the solution of the last iteration. In many cases, it is actually faster to fit this path of models than a single model for some small **_��._** Thus the path can be expressed as:
+Utilizing **_warm starts_** can bring efficiency boosts as well. Using **_warm starts_**, a sequence of models are fitted — with tuning parameter values from a max tuning parameter value down to a minimum tuning parameter value that is some small factor (thousandth) of the max value — initializing the coefficients of each iteration to the solution of the last iteration. In many cases, it is actually faster to fit this path of models than a single model for some small **_λ_** value.
 
 $$
 \lambda_\text{max} \to \lambda_\text{min} = \epsilon \cdot \lambda_\text{max}

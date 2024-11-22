@@ -2,12 +2,22 @@
 
 import Giscus from "@giscus/react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
-export function Comments() {
-	const { theme } = useTheme();
+export default function Comments() {
+	const { resolvedTheme } = useTheme();
+	const [giscusTheme, setGiscusTheme] = useState("/giscus-light.css");
+
+	useEffect(() => {
+		if (resolvedTheme === "dark") {
+			setGiscusTheme("/giscus-dark.css");
+		} else {
+			setGiscusTheme("/giscus-light.css");
+		}
+	}, [resolvedTheme]);
 
 	return (
-		<section className="mt-8">
+		<section key={giscusTheme}>
 			<Giscus
 				id="comments"
 				repo="wyattowalsh/personal-website"
@@ -19,7 +29,7 @@ export function Comments() {
 				reactionsEnabled="1"
 				emitMetadata="1"
 				inputPosition="bottom"
-				theme={`/giscus.css`}
+				theme={resolvedTheme === "dark" ? "dark" : "light"}
 				lang="en"
 				loading="lazy"
 			/>

@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import TagLink from "@/components/TagLink";
 import { cn } from "@/lib/utils";
+import { Calendar, Clock } from "lucide-react";
 
 interface PostCardProps {
 	post: {
@@ -43,7 +44,7 @@ const PostCard = ({ post, className }: PostCardProps) => {
 			whileHover={{ y: -5 }}
 			className={cn("transition-transform duration-300 h-full", className)}
 		>
-			<Link href={`/blog/posts/${slug}`} className="block h-full">
+			<Link href={`/blog/posts/${slug}`} className="block h-full no-underline">
 				<Card className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col">
 					<div className="relative aspect-video w-full">
 						<Image
@@ -55,29 +56,48 @@ const PostCard = ({ post, className }: PostCardProps) => {
 							placeholder="blur"
 							blurDataURL="/logo.webp"
 						/>
-						<div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-50"></div>
-						<div className="absolute bottom-0 left-0 right-0 p-4">
-							<h3 className="text-xl font-semibold text-white leading-tight drop-shadow-lg">
+						{/* Enhanced gradient overlay for better contrast */}
+						<div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/80"></div>
+						
+						{/* Card content with guaranteed contrast */}
+						<div className="absolute bottom-0 left-0 right-0 p-4 z-10">
+							<h3 className={cn(
+								"text-xl font-semibold leading-tight",
+								"text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+								"tracking-tight"
+							)}>
 								{title}
 							</h3>
-							<p className="text-sm text-gray-200 mt-1 line-clamp-2 drop-shadow-lg">
+							<p className={cn(
+								"text-sm mt-1 line-clamp-2",
+								"text-gray-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+								"leading-relaxed"
+							)}>
 								{summary}
 							</p>
 						</div>
 					</div>
-					<div className="p-4 flex flex-col flex-grow">
+					
+					<div className="p-4 flex flex-col flex-grow bg-gradient-to-b from-card to-card/95">
 						<div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
 							{date && (
-								<p>
-									Published:{" "}
-									{formatDate(date, "en-US", {
-										year: "numeric",
-										month: "long",
-										day: "numeric",
-									})}
-								</p>
+								<span className="flex items-center gap-2">
+									<Calendar className="h-4 w-4" />
+									<time dateTime={date} className="no-underline">
+										{formatDate(date, "en-US", {
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+										})}
+									</time>
+								</span>
 							)}
-							{readingTime && <p>⏱️ {readingTime}</p>}
+							{readingTime && (
+								<span className="flex items-center gap-2">
+									<Clock className="h-4 w-4" />
+									<span className="no-underline">{readingTime}</span>
+								</span>
+							)}
 						</div>
 						<Separator className="my-2" />
 						{tags.length > 0 && (

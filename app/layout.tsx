@@ -10,6 +10,9 @@ import ScrollIndicator from "@/components/ScrollIndicator";
 import Header from "@/components/Header";
 import KaTeXLoader from "@/components/KaTeXLoader";
 import CustomScrollbars from "@/components/Scroll";
+import { StrictMode } from 'react';
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import Comments from "@/components/Comments";
 
 config.autoAddCss = false;
 
@@ -38,15 +41,8 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
+		<StrictMode>
 		<html lang="en" suppressHydrationWarning>
-			<head>
-				<link
-					rel="stylesheet"
-					href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-					integrity="sha384-ZYE+JaVHEQ/eFGzZ9kq+z8MC2RPM/qY0A+y2UM3fPvFJQP7MBGdqREgBjAj/EB/Y"
-					crossOrigin="anonymous"
-				/>
-			</head>
 			<body
 				className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}
 			>
@@ -63,5 +59,6 @@ export default function RootLayout({
 				<KaTeXLoader />
 			</body>
 		</html>
+		</StrictMode>
 	);
 }

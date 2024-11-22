@@ -27,6 +27,8 @@ $gradient-background-light: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
 $gradient-background-dark: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 $gradient-text-light: linear-gradient(90deg, #1a56db 0%, #7c3aed 100%);
 $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
+$gradient-border-light: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+$gradient-border-dark: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 
 // Light Theme Variables
 @mixin light {
@@ -60,6 +62,7 @@ $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
   --gradient-text: #{$gradient-text-light};
   --gradient-heading: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
   --gradient-separator: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+  --gradient-border: #{$gradient-border-light};
 
   --shadow-glow: #{$shadow-glow};
   --shadow-soft: #{$shadow-soft-light};
@@ -81,6 +84,14 @@ $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
   --separator-pulse-color2: rgba(37, 99, 235, 0.5);
   --separator-pulse-color3: #9333ea;
   --separator-pulse-color4: rgba(147, 51, 234, 0.5);
+
+  --gradient-header-overlay: linear-gradient(to bottom,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0.6) 100%);
+  --shadow-header: 0 4px 30px rgba(0, 0, 0, 0.1);
+
+  --border-muted: hsl(#{$color-hue}, 20%, 80%);
 }
 
 // Dark Theme Variables
@@ -115,6 +126,7 @@ $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
   --gradient-text: #{$gradient-text-dark};
   --gradient-heading: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
   --gradient-separator: linear-gradient(90deg, #0fd850 0%, #f9f047 100%);
+  --gradient-border: #{$gradient-border-dark};
 
   --shadow-glow: #{$shadow-glow};
   --shadow-soft: #{$shadow-soft-dark};
@@ -136,4 +148,12 @@ $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
   --separator-pulse-color2: rgba(59, 130, 246, 0.5);
   --separator-pulse-color3: #6366f1;
   --separator-pulse-color4: rgba(99, 102, 241, 0.5);
+
+  --gradient-header-overlay: linear-gradient(to bottom,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.2) 50%,
+      rgba(0, 0, 0, 0.6) 100%);
+  --shadow-header: 0 4px 30px rgba(0, 0, 0, 0.3);
+
+  --border-muted: hsl(#{$color-hue}, 20%, 20%);
 }

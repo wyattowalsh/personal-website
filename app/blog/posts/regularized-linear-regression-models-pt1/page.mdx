@@ -35,17 +35,15 @@ Managerial decision making, organizational efficiency, and revenue generation ar
 A linear regression model learns the input-output relationships by fitting a linear function to the sample data. This can be mathematically formalized as:
 
 $$
-\begin{equation*}
 y_i = \beta_0 + \sum_{j=1}^p \beta_j x_{i,j} + \epsilon_i, \quad \forall i \in \{1, \ldots, n\}
-\end{equation*}
 $$
 
-Where:
+where:
 
 $$
 \begin{aligned}
-p &: \text{ Number of features} \\[1em]
-n &: \text{ Number of samples} \\[1em]
+p &: \text{Number of features} \\[1em]
+n &: \text{Number of samples} \\[1em]
 \epsilon_i &: \text{ Error term } \sim \mathcal{N}(0, \sigma^2)
 \end{aligned}
 $$
@@ -53,15 +51,18 @@ $$
 Thus, the response is modeled as a weighted sum of the input variables multiplied by linear coefficients with an error term included. It will prove useful in future steps involving optimization to use vector notation. The linear modeling equation can be expressed this way as:
 
 $$
-\begin{equation*}
+\mathbf{y} &= \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}
+$$
+
+where:
+
+$$
 \begin{aligned}
-\mathbf{y} &= \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\epsilon}, \quad \text{where:} \\[1.5em]
 \mathbf{y} &\in \mathbb{R}^n : \text{ Response vector } [y_1, y_2, \ldots, y_n]^\top \\[0.8em]
 \mathbf{X} &\in \mathbb{R}^{n \times (p+1)} : \text{ Design matrix } [\mathbf{1}, \mathbf{X}_1, \mathbf{X}_2, \ldots, \mathbf{X}_p] \\[0.8em]
 \boldsymbol{\beta} &\in \mathbb{R}^{p+1} : \text{ Coefficient vector } [\beta_0, \beta_1, \ldots, \beta_p]^\top \\[0.8em]
 \boldsymbol{\epsilon} &\in \mathbb{R}^n : \text{ Error vector } [\epsilon_1, \epsilon_2, \ldots, \epsilon_n]^\top
 \end{aligned}
-\end{equation*}
 $$
 
 Thus the goal of model training is to find an estimate of the coefficient vector, **β̂**, which can then be utilized with the above equations to make predictions of the response given new feature data. This can be accomplished by applying optimization theory to the model equations above to derive an equation for the model coefficient estimator that minimizes a notion of model error found by training on the sample data.
@@ -71,23 +72,19 @@ Thus the goal of model training is to find an estimate of the coefficient vector
 To consider how model error can be minimized, a consideration of model error must first be made. Prediction error for a single prediction can be expressed as:
 
 $$
-\begin{equation*}
 \begin{aligned}
 \hat{y}_i &= \sum_{j=1}^p x_{i,j} \hat{\beta}_j \\[0.5em]
 \text{residual}_i &= y_i - \hat{y}_i
 \end{aligned}
-\end{equation*}
 $$
 
 Thus, in vector notation, total model error across all predictions can be found as:
 
 $$
-\begin{equation*}
 \begin{aligned}
 \hat{\mathbf{y}} &= \mathbf{X}\hat{\boldsymbol{\beta}} \\[1em]
 \text{Total Error} &= \|\mathbf{y} - \hat{\mathbf{y}}\|_2^2 = (\mathbf{y} - \hat{\mathbf{y}})^\top(\mathbf{y} - \hat{\mathbf{y}})
 \end{aligned}
-\end{equation*}
 $$
 
 However, for the uses of finding a minimal overall model error, the ***L₂*** norm above is not a good objective function. This is due to the fact that negative errors and positive errors will cancel out, thus a minimization will find an objective value of zero even though in reality the model error is much higher.
@@ -95,9 +92,7 @@ However, for the uses of finding a minimal overall model error, the ***L₂*** n
 This signed error cancellation issue can be solved by squaring the model’s prediction error producing the sum of squared error (SSE) term:
 
 $$
-\begin{equation*}
 \text{SSE} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 = \sum_{i=1}^n \Big(y_i - \sum_{j=1}^p x_{i,j}\hat{\beta}_j\Big)^2
-\end{equation*}
 $$
 
 This same term can be expressed in vector notation as:
@@ -121,9 +116,7 @@ $$
 Using this loss function, the problem can now be formalized as a *least-squares* optimization problem. This problem serves to derive estimates for the model parameters, **β**, that minimize the SSE between the actual and predicted values of the outcome and is formalized as:
 
 $$
-\begin{equation*}
 \hat{\boldsymbol{\beta}}_{\text{OLS}} = \arg \min_{\boldsymbol{\beta}} \Big\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 \Big\}
-\end{equation*}
 $$
 
 The 1/(2n) term is added in order to simplify solving the gradient and allow the objective function to converge to the expected value of the model error by **the Law of Large Numbers**.
@@ -131,9 +124,7 @@ The 1/(2n) term is added in order to simplify solving the gradient and allow the
 Aided by the problem’s unconstrained nature, a closed-form solution for the OLS estimator can be obtained by setting the gradient of the loss function (objective) equal to zero and solving the resultant equation for the coefficient vector, **β̂**. This produces the following estimator:
 
 $$
-\begin{equation*}
 \hat{\boldsymbol{\beta}}_{\text{OLS}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}
-\end{equation*}
 $$
 
 However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (Eq. #8) is convex since any local optimality of a convex function is also global optimality and therefore unique.
@@ -143,21 +134,17 @@ One possible way to show this is through the second-order convexity conditions, 
 To establish the last condition, the OLS Hessian matrix is found as:
 
 $$
-\begin{equation*}
 \mathbf{H} = \nabla^2 L(\boldsymbol{\beta}) = \frac{2}{n}\mathbf{X}^\top\mathbf{X}
-\end{equation*}
 $$
 
 Furthermore, this Hessian can be shown to be positive semi-definite as:
 
 $$
-\begin{equation*}
 \begin{aligned}
 \mathbf{v}^\top\mathbf{H}\mathbf{v} &= \frac{2}{n}\mathbf{v}^\top(\mathbf{X}^\top\mathbf{X})\mathbf{v} \\[0.5em]
 &= \frac{2}{n}(\mathbf{X}\mathbf{v})^\top(\mathbf{X}\mathbf{v}) \\[0.5em]
 &= \frac{2}{n}\|\mathbf{X}\mathbf{v}\|_2^2 \geq 0 \quad \forall \mathbf{v} \in \mathbb{R}^{p+1}
 \end{aligned}
-\end{equation*}
 $$
 
 Thus, by the second-order conditions for convexity, the OLS loss function (Eq. #8) is convex, thus the estimator found above (Eq #9) is the ***unique*** global minimizer to the OLS problem.

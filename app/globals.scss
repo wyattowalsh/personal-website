@@ -20,6 +20,15 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
+  a:not(.no-underline) {
+    @apply text-primary underline transition-colors duration-300;
+  }
+
+  a.no-underline, 
+  .no-underline a {
+    text-decoration: none;
+  }
+
   a {
     @apply text-primary underline transition-colors duration-300;
   }
@@ -31,6 +40,7 @@
   .prose {
     @apply mx-auto;
     color: var(--foreground);
+    @apply prose-headings:gradient-heading;
   }
 
   code {
@@ -39,6 +49,45 @@
 
   pre {
     @apply bg-card text-card-foreground p-4 rounded-lg overflow-x-auto;
+  }
+
+  .gradient-border {
+    @apply border-2 border-transparent bg-clip-border;
+    background-image: var(--gradient-border);
+  }
+
+  .glow-effect {
+    @apply shadow-glow;
+  }
+
+  .pulse-effect {
+    @apply animate-pulse;
+  }
+
+  .spin-effect {
+    @apply animate-spin;
+  }
+
+  .bounce-effect {
+    @apply animate-bounce;
+  }
+
+  .math-display {
+    position: relative;
+    margin: 1em 0;
+    overflow-x: auto;
+    
+    .equation-number {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted-foreground);
+    }
+
+    &:hover .copy-button {
+      opacity: 1;
+    }
   }
 
   @keyframes fadeIn {
@@ -118,6 +167,18 @@
     .gradient-heading {
       @apply bg-clip-text text-transparent;
       background-image: var(--gradient-heading);
+    }
+
+    .image-transition {
+      @apply transition-all duration-700 ease-out;
+
+      &:hover {
+        @apply scale-110;
+      }
+    }
+
+    .header-overlay {
+      background: var(--gradient-header-overlay);
     }
   }
 
@@ -268,6 +329,18 @@
     100% {
       clip-path: inset(58% 0 43% 0);
       transform: translate(20px, -10px);
+    }
+  }
+
+  @keyframes gradientMove {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
     }
   }
 }

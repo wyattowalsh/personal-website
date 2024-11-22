@@ -15,7 +15,7 @@ export default function Header() {
 			<BlogBackLink />
 			<div className="flex items-center space-x-4">
 				<DarkModeToggle />
-				{isBlogPage && <FontSizeToggle>Toggle Font Size</FontSizeToggle>}
+				{/* {isBlogPage && <FontSizeToggle>Toggle Font Size</FontSizeToggle>} */}
 			</div>
 		</header>
 	);

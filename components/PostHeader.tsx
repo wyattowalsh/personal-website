@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
 import type { PostMetadata } from "@/lib/posts";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { Calendar, Clock, Tag } from "lucide-react";
 
 interface PostHeaderProps {
 	className?: string;
@@ -20,13 +21,11 @@ export default function PostHeader({ className }: PostHeaderProps) {
 		post: PostMetadata | null;
 		isLoading: boolean;
 		error: string | null;
-		isHovered: boolean;
 		imageLoaded: boolean;
 	}>({
 		post: null,
 		isLoading: true,
 		error: null,
-		isHovered: false,
 		imageLoaded: false,
 	});
 
@@ -73,6 +72,10 @@ export default function PostHeader({ className }: PostHeaderProps) {
 		return () => controller.abort();
 	}, [pathname]);
 
+	const handleImageLoad = () => {
+		setState((prev) => ({ ...prev, imageLoaded: true }));
+	};
+
 	if (state.isLoading) {
 		return (
 			<div className="flex justify-center items-center min-h-[200px]">
@@ -92,16 +95,15 @@ export default function PostHeader({ className }: PostHeaderProps) {
 	return (
 		<motion.header
 			className={cn(
-				"mb-12 rounded-xl overflow-hidden bg-card hover:shadow-2xl transition-all duration-300",
+				"rounded-2xl overflow-hidden",
+				"bg-gradient-to-br from-primary via-background to-secondary",
+				"transition-transform duration-500 ease-out hover:scale-[1.02] hover:shadow-xl",
 				className
 			)}
 			initial={{ opacity: 0, y: -20 }}
 			animate={{ opacity: 1, y: 0 }}
 			transition={{ duration: 0.4, ease: "easeOut" }}
-			onMouseEnter={() => setState((prev) => ({ ...prev, isHovered: true }))}
-			onMouseLeave={() => setState((prev) => ({ ...prev, isHovered: false }))}
 		>
-			{/* Updated image container with flexible aspect ratio */}
 			<div className="relative aspect-[21/9] w-full overflow-hidden">
 				<Image
 					src={state.post.image || "/logo.webp"}
@@ -110,42 +112,37 @@ export default function PostHeader({ className }: PostHeaderProps) {
 					priority
 					sizes="100vw"
 					className={cn(
-						"object-cover transition-all duration-500",
+						"object-cover object-center transition-transform duration-700",
 						!state.imageLoaded && "blur-sm scale-105",
 						state.imageLoaded && "blur-0 scale-100",
-						// Add object-position classes for better image positioning
-						"object-center",
-						// Add gradient overlay for better text readability
-						"after:content-[''] after:absolute after:inset-0 after:bg-gradient-to-b after:from-transparent after:to-black/60"
 					)}
-					style={{
-						transform: state.isHovered ? "scale(1.05)" : "scale(1)",
-					}}
-					onLoad={() => setState((prev) => ({ ...prev, imageLoaded: true }))}
+					onLoad={handleImageLoad}
 				/>
-				<AnimatePresence>
-					{state.isHovered && (
-						<motion.div
-							initial={{ opacity: 0 }}
-							animate={{ opacity: 1 }}
-							exit={{ opacity: 0 }}
-							className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-						/>
-					)}
-				</AnimatePresence>
+				{state.post.caption && (
+					<p className="absolute bottom-4 left-4 text-lg italic text-white bg-black/50 px-2 py-1 rounded">
+						{state.post.caption}
+					</p>
+				)}
+				<div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/30 to-black/70" />
 			</div>
-			<div className="p-6">
+			<div className="p-8 relative z-10">
 				<motion.h1
-					className="text-4xl font-bold mb-4 text-foreground"
+					className="text-4xl font-extrabold mb-4 bg-gradient-heading bg-clip-text text-transparent"
 					initial={{ opacity: 0 }}
 					animate={{ opacity: 1 }}
 					transition={{ delay: 0.2 }}
 				>
 					{state.post.title}
 				</motion.h1>
-				<div className="space-y-4">
-					<div className="flex items-center space-x-4 text-muted-foreground">
-						{state.post.date && (
+				{state.post.summary && (
+					<p className="text-xl text-muted-foreground leading-relaxed">
+						{state.post.summary}
+					</p>
+				)}
+				<div className="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center text-muted-foreground w-full space-y-4 sm:space-y-0 border-t border-b border-muted py-2 my-6">
+					{state.post.date && (
+						<span className="flex items-center">
+							<Calendar className="h-5 w-5 mr-2" />
 							<time dateTime={state.post.date}>
 								{formatDate(state.post.date, "en-US", {
 									year: "numeric",
@@ -153,46 +150,44 @@ export default function PostHeader({ className }: PostHeaderProps) {
 									day: "numeric",
 								})}
 							</time>
-						)}
-						{state.post.readingTime && (
-							<>
-								<span>•</span>
-								<span>{state.post.readingTime}</span>
-							</>
-						)}
-					</div>
-					{state.post.updated && (
-						<p className="text-sm text-muted-foreground">
-							Last updated:{" "}
-							<time dateTime={state.post.updated}>
-								{formatDate(state.post.updated, "en-US", {
-									year: "numeric",
-									month: "long",
-									day: "numeric",
-								})}
-							</time>
-						</p>
+						</span>
 					)}
-					{state.post.summary && (
-						<p className="text-lg text-muted-foreground">
-							{state.post.summary}
-						</p>
+					{state.post.readingTime && (
+						<span className="flex items-center">
+							<Clock className="h-5 w-5 mr-2" />
+							<span>{state.post.readingTime} read</span>
+						</span>
 					)}
 					{state.post.tags && state.post.tags.length > 0 && (
-						<div className="flex flex-wrap gap-2">
-							{state.post.tags.map((tag) => (
-								<Link key={tag} href={`/blog/tags/${tag}`}>
-									<Badge
-										variant="secondary"
-										className="hover:bg-secondary/80 transition-colors cursor-pointer"
-									>
-										#{tag}
-									</Badge>
-								</Link>
-							))}
+						<div className="flex items-center">
+							<Tag className="h-5 w-5 mr-2" />
+							<div className="flex flex-wrap gap-2">
+								{state.post.tags.map((tag) => (
+									<Link key={tag} href={`/blog/tags/${tag}`}>
+										<Badge
+											variant="secondary"
+											className="hover:bg-secondary/80 transition-colors cursor-pointer"
+										>
+											#{tag}
+										</Badge>
+									</Link>
+								))}
+							</div>
 						</div>
 					)}
 				</div>
+				{state.post.updated && (
+					<p className="text-sm text-muted-foreground mt-4">
+						Last updated:{" "}
+						<time dateTime={state.post.updated}>
+							{formatDate(state.post.updated, "en-US", {
+								year: "numeric",
+								month: "long",
+								day: "numeric",
+							})}
+						</time>
+					</p>
+				)}
 			</div>
 		</motion.header>
 	);
