@@ -4,6 +4,7 @@
 @use 'tailwindcss/components';
 @use 'tailwindcss/utilities';
 
+@import 'katex/dist/katex.min.css';
 @layer base {
   :root {
     @include variables.light;
@@ -44,14 +45,5 @@
   pre {
     @apply bg-card text-card-foreground p-4 rounded-lg overflow-x-auto;
   }
-
 }
 
-@layer utilities {
-  .shadow-math {
-    @apply shadow-[0_4px_12px_rgba(0,0,0,0.05)];
-  }
-  .hover\:shadow-math-hover:hover {
-    @apply shadow-[0_8px_24px_rgba(59,130,246,0.1)];
-  }
-}

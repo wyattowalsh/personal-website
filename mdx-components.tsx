@@ -367,9 +367,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </details>
         ),
 
-        Math: ({ children }) => (
-            <Math>{children}</Math>
-        ),
+        Math: ({ children }) => <Math>{children}</Math>,
 
         ...components,
     };

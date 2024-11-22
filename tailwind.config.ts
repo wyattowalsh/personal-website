@@ -1,24 +1,14 @@
 import type { Config } from 'tailwindcss';
-import type { PluginAPI } from 'tailwindcss/types/config';
 import { fontFamily } from 'tailwindcss/defaultTheme';
 import typography from '@tailwindcss/typography';
 
-function withOpacity(variableName: string) {
-  return ({ opacityValue }) => {
-    if (opacityValue !== undefined) {
-      return `rgba(var(${variableName}), ${opacityValue})`
-    }
-    return `rgb(var(${variableName}))`
-  }
-}
-
 function withOpacityValue(variable: string) {
-  return ({ opacityValue }) => {
+  return ({ opacityValue }: { opacityValue: string }) => {
     if (opacityValue === undefined) {
-      return `var(${variable})`
+      return `var(${variable})`;
     }
-    return `var(${variable}, ${opacityValue})`
-  }
+    return `var(${variable}, ${opacityValue})`;
+  };
 }
 
 const config: Config = {
@@ -54,13 +44,11 @@ const config: Config = {
         'border-muted': 'var(--border-muted)',
         'math-bg': withOpacityValue('--math-bg'),
         'math-border': 'var(--math-border)',
-        'equation-bg': 'var(--math-equation-bg)',
         'math-controls-bg': 'var(--math-controls-bg)',
         'math-controls-hover': 'var(--math-controls-hover)',
         'math-controls-text': 'var(--math-controls-text)',
         'math-controls-text-hover': 'var(--math-controls-text-hover)',
-        'math-inline': withOpacity('--math-bg-transparent'),
-        'math-bg-transparent': 'var(--math-bg-transparent)',
+        'math-inline': withOpacityValue('--math-bg-transparent'),
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],

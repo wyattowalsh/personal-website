@@ -26,6 +26,10 @@ export default function KaTeXLoader() {
         crossOrigin="anonymous"
         strategy="lazyOnload"
       />
+      <Script
+        src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" 
+        strategy="lazyOnload"
+      />
     </>
   );
 }

@@ -36,6 +36,36 @@ $math-controls-text-hover: hsl(222.2, 47.4%, 11.2%);
 $math-controls-bg: hsla(210, 40%, 98%, 0.9);
 $math-controls-hover: hsla(210, 40%, 95%, 1);
 
+// Light Mode Variables
+@use 'sass:map';
+
+$light-math-colors: (
+  'math-bg': hsla(210, 40%, 98%, 0.95),
+  'math-bg-transparent': hsla(210, 40%, 98%, 0.4),
+  'math-border': hsla(214.3, 31.8%, 91.4%, 0.6),
+  'math-shadow': 0 4px 16px rgba(0, 0, 0, 0.06),
+  'math-hover-shadow': 0 8px 30px rgba(59, 130, 246, 0.15),
+  'math-equation-bg': hsla(210, 40%, 98%, 0.9),
+  'math-controls-bg': hsla(210, 40%, 98%, 0.9),
+  'math-controls-hover': hsla(210, 40%, 95%, 1),
+  'math-controls-text': hsl(215.4, 16.3%, 46.9%),
+  'math-controls-text-hover': hsl(222.2, 47.4%, 11.2%),
+);
+
+// Dark Mode Variables
+$dark-math-colors: (
+  'math-bg': hsla(222.2, 84%, 4.9%, 0.8),
+  'math-bg-transparent': hsla(222.2, 84%, 4.9%, 0.4),
+  'math-border': hsla(217.2, 32.6%, 17.5%, 0.6),
+  'math-shadow': 0 4px 16px rgba(0, 0, 0, 0.3),
+  'math-hover-shadow': 0 8px 30px rgba(59, 130, 246, 0.25),
+  'math-equation-bg': hsla(222.2, 84%, 4.9%, 0.8),
+  'math-controls-bg': hsla(222.2, 84%, 4.9%, 0.9),
+  'math-controls-hover': hsla(222.2, 84%, 4.9%, 1),
+  'math-controls-text': hsl(215, 20.2%, 65.1%),
+  'math-controls-text-hover': hsl(210, 40%, 98%),
+);
+
 // Light Theme Variables
 @mixin light {
   --background: hsl(198 100% 95%);
@@ -142,6 +172,10 @@ $math-controls-hover: hsla(210, 40%, 95%, 1);
   --card-border: rgba(255, 255, 255, 0.5);
   --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   --card-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+
+  @each $name, $value in $light-math-colors {
+    --#{$name}: #{$value};
+  }
 }
 
 // Dark Theme Variables
@@ -244,4 +278,8 @@ $math-controls-hover: hsla(210, 40%, 95%, 1);
   --card-border: rgba(255, 255, 255, 0.1);
   --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   --card-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+
+  @each $name, $value in $dark-math-colors {
+    --#{$name}: #{$value};
+  }
 }
