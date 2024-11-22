@@ -1,74 +1,46 @@
 "use client";
 
-import React, { Suspense, createContext, useEffect, useState } from "react";
+import React, { Suspense, createContext, useRef, useEffect } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PostHeader from "@/components/PostHeader";
 import PostPagination from "@/components/PostPagination";
 import Comments from "@/components/Comments";
 import { usePathname } from "next/navigation";
 
-// Create context for equation numbering
-export const EquationContext = createContext({ count: 0, increment: () => {} });
+export const EquationContext = React.createContext({
+  increment: () => 0,
+});
 
-interface PostMetadata {
-  title: string;
-  summary: string;
-  date: string;
-  updated?: string;
-  tags: string[];
-  image?: string;
-  caption?: string;
+interface PostLayoutProps {
+	children: React.ReactNode;
 }
 
-export function PostLayout({ children, frontmatter }: { children: React.ReactNode, frontmatter: PostMetadata }) {
-	const [equationCount, setEquationCount] = React.useState(0);
-	const pathname = usePathname();
+export function PostLayout({ children }: PostLayoutProps) {
+  const equationCounter = useRef(0);
+  const pathname = usePathname();
+  const pageSlug = pathname.split('/').pop() || '';
 
-	// Reset equation counter when pathname changes
-	useEffect(() => {
-		setEquationCount(0);
-	}, [pathname]);
+  // Reset counter when pathname changes
+  useEffect(() => {
+    equationCounter.current = 0;
+  }, [pathname]);
 
-	const incrementCount = React.useCallback(() => {
-		setEquationCount(prev => prev + 1);
-	}, []);
-
-	const jsonLd = {
-		'@context': 'https://schema.org',
-		'@type': 'BlogPosting',
-		headline: frontmatter.title,
-		description: frontmatter.summary,
-		image: frontmatter.image || 'https://w4w.dev/opengraph.png',
-		datePublished: frontmatter.date,
-		dateModified: frontmatter.updated || frontmatter.date,
-		author: {
-			'@type': 'Person',
-			name: 'Wyatt Walsh',
-			url: 'https://w4w.dev'
-		}
-	};
+  const increment = () => ++equationCounter.current;
 
 	return (
-		<EquationContext.Provider value={{ count: equationCount, increment: incrementCount }}>
-			<article className="space-y-8 max-w-none w-full overflow-x-hidden">
-				<script
-					type="application/ld+json"
-					dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-				/>
-				<PostHeader 
-					title={frontmatter.title}
-					date={frontmatter.date}
-					updated={frontmatter.updated}
-					image={frontmatter.image}
-					caption={frontmatter.caption}
-				/>
-				<hr />
-				<div className="prose prose-lg max-w-none">
+		<EquationContext.Provider value={{ 
+      increment,
+      pageSlug 
+    }}>
+			<article className="space-y-8 max-w-none w-full overflow-x-hidden dark:text-muted-foreground">
+				<PostHeader />
+				<hr className="border-border-muted" />
+				<div className="prose prose-2xl max-w-none dark:text-muted-foreground">
 					<Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
 				</div>
-				<hr />
+				<hr className="border-border-muted" />
 				<PostPagination />
-				<hr />
+				<hr className="border-border-muted" />
 				<Comments />
 			</article>
 		</EquationContext.Provider>

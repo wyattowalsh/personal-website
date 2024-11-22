@@ -30,29 +30,35 @@ $gradient-text-dark: linear-gradient(90deg, #60a5fa 0%, #a78bfa 100%);
 $gradient-border-light: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
 $gradient-border-dark: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 
+// Math controls
+$math-controls-text: hsl(215, 20.2%, 65.1%);
+$math-controls-text-hover: hsl(222.2, 47.4%, 11.2%);
+$math-controls-bg: hsla(210, 40%, 98%, 0.9);
+$math-controls-hover: hsla(210, 40%, 95%, 1);
+
 // Light Theme Variables
 @mixin light {
-  --background: hsl(#{$color-hue}, 100%, #{$background-lightness-light}%);
-  --foreground: hsl(#{$color-hue}, 5%, #{$foreground-lightness-light}%);
-  --primary: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
+  --background: hsl(198 100% 95%);
+  --foreground: hsl(198 5% 0%);
+  --primary: hsl(198 33.6% 56.3%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(#{$color-hue}, 30%, 70%);
+  --secondary: hsl(198 30% 70%);
   --secondary-foreground: hsl(0, 0%, 0%);
   --accent: hsl(160, 30%, 80%);
   --accent-foreground: hsl(#{$color-hue}, 5%, 10%);
   --destructive: hsl(0, 100%, 30%);
   --destructive-foreground: hsl(#{$color-hue}, 5%, 90%);
-  --border: hsl(#{$color-hue}, 30%, 50%);
-  --input: hsl(#{$color-hue}, 30%, 18%);
-  --ring: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
+  --border: hsl(198 30% 50%);
+  --input: hsl(198 30% 18%);
+  --ring: hsl(198 33.6% 56.3%);
   --radius: 0.5rem;
 
-  --card: hsl(#{$color-hue}, 50%, 90%);
-  --card-foreground: hsl(#{$color-hue}, 5%, 10%);
+  --card: hsl(198 50% 90%);
+  --card-foreground: hsl(198 5% 10%);
   --popover: hsl(#{$color-hue}, 100%, 95%);
   --popover-foreground: hsl(#{$color-hue}, 100%, 0%);
-  --muted: hsl(160, 30%, 85%);
-  --muted-foreground: hsl(#{$color-hue}, 5%, 35%);
+  --muted: hsl(160 30% 85%);
+  --muted-foreground: hsl(198 5% 35%);
 
   --font-sans: #{$font-sans};
   --font-display: #{$font-display};
@@ -64,9 +70,8 @@ $gradient-border-dark: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   --gradient-separator: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
   --gradient-border: #{$gradient-border-light};
 
-  --shadow-glow: #{$shadow-glow};
+  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.3);
   --shadow-soft: #{$shadow-soft-light};
-
 
   --glitch-color1: rgba(255, 0, 255, 0.8); // Enhanced Magenta
   --glitch-color2: rgba(0, 255, 255, 0.8); // Enhanced Cyan
@@ -91,32 +96,77 @@ $gradient-border-dark: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
       rgba(255, 255, 255, 0.6) 100%);
   --shadow-header: 0 4px 30px rgba(0, 0, 0, 0.1);
 
-  --border-muted: hsl(#{$color-hue}, 20%, 80%);
+  --border-muted: hsl(214.3, 31.8%, 85%);
+
+  // Code block colors
+  --code-bg: hsl(210, 40%, 98%);
+  --code-fg: hsl(222.2, 84%, 4.9%);
+  --code-border: hsl(214.3, 31.8%, 91.4%);
+  --code-line-highlight: hsl(210, 40%, 90%);
+  --code-line-number: hsl(215.4, 16.3%, 46.9%);
+
+  // Math specific variables
+  --math-bg: hsla(210, 40%, 98%, 0.95);
+  --math-bg-transparent: hsla(210, 40%, 98%, 0.4);
+  --math-border: hsla(214.3, 31.8%, 91.4%, 0.6);
+  --math-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --math-hover-shadow: 0 8px 30px rgba(59, 130, 246, 0.15);
+  --math-equation-bg: hsla(210, 40%, 98%, 0.9);
+
+  --glitch-shadow-1: 2px 2px #ff00c1, -2px -2px #00fff9;
+  --glitch-shadow-2: 3px 3px #ff00c1, -3px -3px #00fff9;
+  --glitch-shadow-3: 1px 1px #ff00c1, -1px -1px #00fff9;
+  --glitch-color-1: #ff00c1;
+  --glitch-color-2: #00fff9;
+
+  --math-controls-bg: hsla(210, 40%, 98%, 0.95);
+  --math-controls-hover: hsla(210, 40%, 95%, 1);
+  --math-controls-text: hsl(215.4, 16.3%, 46.9%);
+  --math-controls-text-hover: hsl(222.2, 47.4%, 11.2%);
+
+  // Typography
+  --heading-color: hsl(198 5% 10%);
+  --heading-color-hover: hsl(198 33.6% 56.3%);
+  --text-color: hsl(198 5% 20%);
+  --text-color-muted: hsl(198 5% 40%);
+  --link-color: var(--primary);
+  --link-color-hover: var(--primary-foreground);
+  --code-bg: hsl(210 40% 96%);
+  --code-color: hsl(198 5% 20%);
+  --blockquote-bg: hsl(210 40% 96.1%);
+  --blockquote-color: hsl(198 5% 40%);
+  --blockquote-border: var(--primary);
+
+  --card-gradient-from: rgba(255, 255, 255, 0.8);
+  --card-gradient-to: rgba(255, 255, 255, 0.3);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --card-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 // Dark Theme Variables
 @mixin dark {
-  --background: hsl(#{$color-hue}, 50%, #{$background-lightness-dark}%);
-  --foreground: hsl(#{$color-hue}, 5%, #{$foreground-lightness-dark}%);
-  --primary: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
+  --background: hsl(198 50% 5%);
+  --foreground: hsl(198 5% 90%);
+  --primary: hsl(198 33.6% 56.3%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(#{$color-hue}, 30%, 10%);
   --secondary-foreground: hsl(0, 0%, 100%);
-  --accent: hsl(160, 30%, 15%);
-  --accent-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --accent: hsl(217.2, 32.6%, 20%);
+  --accent-foreground: hsl(210, 40%, 98%);
   --destructive: hsl(0, 100%, 30%);
   --destructive-foreground: hsl(#{$color-hue}, 5%, 90%);
-  --border: hsl(#{$color-hue}, 30%, 18%);
-  --input: hsl(#{$color-hue}, 30%, 18%);
-  --ring: hsl(#{$color-hue}, #{$color-saturation}, #{$color-lightness});
+  --border: hsl(198 30% 18%);
+  --input: hsl(198 30% 18%);
+  --ring: hsl(198 33.6% 56.3%);
   --radius: 0.5rem;
 
-  --card: hsl(#{$color-hue}, 50%, 0%);
-  --card-foreground: hsl(#{$color-hue}, 5%, 90%);
+  --card: hsl(198 50% 0%);
+  --card-foreground: hsl(198 5% 90%);
   --popover: hsl(#{$color-hue}, 50%, 5%);
   --popover-foreground: hsl(#{$color-hue}, 5%, 90%);
-  --muted: hsl(160, 30%, 15%);
-  --muted-foreground: hsl(#{$color-hue}, 5%, 60%);
+  --muted: hsl(160 30% 15%);
+  --muted-foreground: hsl(198 5% 60%);
 
   --font-sans: #{$font-sans};
   --font-display: #{$font-display};
@@ -128,9 +178,8 @@ $gradient-border-dark: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
   --gradient-separator: linear-gradient(90deg, #0fd850 0%, #f9f047 100%);
   --gradient-border: #{$gradient-border-dark};
 
-  --shadow-glow: #{$shadow-glow};
+  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
   --shadow-soft: #{$shadow-soft-dark};
-
 
   --glitch-color1: rgba(255, 0, 255, 0.9); // Enhanced Brighter Magenta
   --glitch-color2: rgba(0, 255, 255, 0.9); // Enhanced Brighter Cyan
@@ -155,5 +204,44 @@ $gradient-border-dark: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
       rgba(0, 0, 0, 0.6) 100%);
   --shadow-header: 0 4px 30px rgba(0, 0, 0, 0.3);
 
-  --border-muted: hsl(#{$color-hue}, 20%, 20%);
+  --border-muted: hsl(217.2, 32.6%, 25%);
+
+  // Code block colors
+  --code-bg: hsl(222.2, 84%, 6.9%);
+  --code-fg: hsl(210, 40%, 98%);
+  --code-border: hsl(217.2, 32.6%, 17.5%);
+  --code-line-highlight: hsl(217.2, 32.6%, 12%);
+  --code-line-number: hsl(215, 20.2%, 65.1%);
+
+  // Math specific variables
+  --math-bg: hsla(222.2, 84%, 4.9%, 0.8);
+  --math-bg-transparent: hsla(222.2, 84%, 4.9%, 0.4);
+  --math-border: hsla(217.2, 32.6%, 17.5%, 0.6);
+  --math-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  --math-hover-shadow: 0 8px 30px rgba(59, 130, 246, 0.25);
+  --math-equation-bg: hsla(222.2, 84%, 4.9%, 0.8);
+
+  --glitch-shadow-1: 2px 2px #ff00ea, -2px -2px #00ffff;
+  --glitch-shadow-2: 3px 3px #ff00ea, -3px -3px #00ffff;
+  --glitch-shadow-3: 1px 1px #ff00ea, -1px -1px #00ffff;
+  --glitch-color-1: #ff00ea;
+  --glitch-color-2: #00ffff;
+
+  --math-controls-bg: hsla(222.2, 84%, 4.9%, 0.9);
+  --math-controls-hover: hsla(222.2, 84%, 4.9%, 1);
+  --math-controls-text: hsl(215, 20.2%, 65.1%);
+  --math-controls-text-hover: hsl(210, 40%, 98%);
+
+  --link-color-hover: var(--primary-foreground);
+  --code-bg: hsl(198 50% 10%);
+  --code-color: hsl(198 5% 80%);
+  --blockquote-bg: hsl(198 50% 7%);
+  --blockquote-color: hsl(198 5% 65%);
+  --blockquote-border: var(--primary);
+
+  --card-gradient-from: rgba(30, 30, 30, 0.8);
+  --card-gradient-to: rgba(20, 20, 20, 0.3);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --card-hover-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
 }

@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
+import styles from './blogtitle.module.scss';
 
 const icons = [
 	Code,
@@ -107,42 +108,41 @@ const FloatingIcon = ({
 
 const GlitchText = ({ children }: { children: React.ReactNode }) => (
 	<motion.div
-		className="relative inline-block overflow-hidden"
+		className={cn(
+			"relative inline-block",
+			styles['glitch-text'],
+			"animate-glitch-text"
+		)}
 		initial={{ opacity: 0 }}
 		animate={{ opacity: 1 }}
 		transition={{ duration: 0.3 }}
 	>
-		<span className="relative inline-block glitch-base" data-text={children}>
-			{/* Base text */}
-			<span
-				className={cn(
-					"relative z-10 inline-block",
-					"bg-gradient-to-r from-cyan-500 via-pink-500 to-purple-500",
-					"bg-clip-text text-transparent",
-					"mix-blend-screen"
-				)}
-			>
-				{children}
-			</span>
-
-			{/* Glitch layers */}
-			{[1, 2].map((layer) => (
-				<span
-					key={layer}
-					aria-hidden="true"
-					data-text={children}
-					className={cn(
-						"absolute inset-0 inline-block",
-						"bg-gradient-to-r from-cyan-500 via-pink-500 to-purple-500",
-						"bg-clip-text text-transparent",
-						"opacity-90",
-						layer === 1 ? "glitch-layer-1" : "glitch-layer-2"
-					)}
-				>
-					{children}
-				</span>
-			))}
+		{/* Base text */}
+		<span 
+			className={cn(
+				"relative z-10",
+				"bg-gradient-to-r from-[var(--glitch-color-1)] via-primary to-[var(--glitch-color-2)]",
+				"bg-clip-text text-transparent",
+				"animate-glitch-skew"
+			)}
+			data-text={children}
+		>
+			{children}
 		</span>
+
+		{/* Glitch layers */}
+		<div className={styles['glitch-layer']} aria-hidden="true">
+			{children}
+		</div>
+		<div 
+			className={cn(
+				styles['glitch-layer'], 
+				"animate-glitch-clip"
+			)} 
+			aria-hidden="true"
+		>
+			{children}
+		</div>
 	</motion.div>
 );
 
@@ -218,38 +218,56 @@ const BlogTitle = () => {
 	return (
 		<motion.div className="relative w-full py-2 sm:py-3 md:py-4 overflow-hidden pt-0">
 			<div className="max-w-4xl mx-auto mt-0">
-				<Card
-					id="title-container"
-					className={cn(
-						"relative rounded-2xl overflow-hidden perspective-1000 p-6 sm:p-8 md:p-12",
-						"bg-black/50 dark:bg-white/10 backdrop-blur-md",
-						"border border-cyan-500/40 dark:border-cyan-400/40",
-						"shadow-2xl shadow-cyan-500/30 dark:shadow-cyan-400/30"
-					)}
+				<motion.div
+					initial={{ opacity: 0, y: 20 }}
+					animate={{ opacity: 1, y: 0 }}
+					transition={{ duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] }}
 				>
-					<AnimatedBackground />
-					<BackgroundParticles />
+					<Card
+						id="title-container"
+						className={cn(
+							"relative rounded-2xl overflow-hidden perspective-1000",
+							"p-6 sm:p-8 md:p-12",
+							"backdrop-blur-[20px]",
+							"bg-gradient-to-br from-black/40 via-black/60 to-black/40",
+							"dark:from-white/10 dark:via-white/20 dark:to-white/10",
+							"border border-cyan-500/20 dark:border-cyan-400/20",
+							"shadow-[0_0_50px_rgba(0,0,0,0.15)] dark:shadow-[0_0_50px_rgba(255,255,255,0.1)]"
+						)}
+					>
+						<AnimatedBackground />
+						<BackgroundParticles />
+						<div className={styles.scanlines} />
 
-					{containerSize.width > 0 &&
-						icons.map((Icon, index) => (
-							<FloatingIcon
-								key={index}
-								icon={Icon}
-								containerSize={containerSize}
-							/>
-						))}
+						{containerSize.width > 0 &&
+							icons.map((Icon, index) => (
+								<FloatingIcon
+									key={index}
+									icon={Icon}
+									containerSize={containerSize}
+								/>
+							))}
 
-					<div className="relative z-10 text-center">
-						<motion.h1
-							className={cn(
-								"text-4xl sm:text-5xl md:text-6xl font-bold",
-								"p-2 select-none"
-							)}
-						>
-							<GlitchText>one lone datum</GlitchText>
-						</motion.h1>
-					</div>
-				</Card>
+						<div className="relative z-10 text-center">
+							<motion.h1
+								className={cn(
+									"text-4xl sm:text-5xl md:text-6xl font-bold",
+									"p-2 select-none",
+									"filter drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]"
+								)}
+								initial={{ opacity: 0, y: 20 }}
+								animate={{ opacity: 1, y: 0 }}
+								transition={{
+									duration: 0.8,
+									delay: 0.2,
+									ease: [0.6, -0.05, 0.01, 0.99]
+								}}
+							>
+								<GlitchText>one lone datum</GlitchText>
+							</motion.h1>
+						</div>
+					</Card>
+				</motion.div>
 			</div>
 		</motion.div>
 	);

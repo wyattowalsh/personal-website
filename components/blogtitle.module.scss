@@ -6,6 +6,28 @@
   text-shadow: 
     0 0 1px rgba(255, 255, 255, 0.9),
     0 0 2px rgba(255, 255, 255, 0.7);
+
+  &::before,
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--background);
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+  }
+
+  &::before {
+    left: -2px;
+    text-shadow: 2px 0 var(--glitch-color-1);
+  }
+
+  &::after {
+    left: 2px;
+    text-shadow: -2px 0 var(--glitch-color-2);
+  }
 }
 
 .glitch-layer {
@@ -16,6 +38,9 @@
   opacity: 0.5;
   filter: blur(0.5px);
   will-change: transform;
+  inset: 0;
+  mix-blend-mode: difference;
+  animation: glitch-layer 4s infinite linear;
 }
 
 .glitch-layer--1 {
@@ -134,6 +159,16 @@
   }
 }
 
+@keyframes glitch-anim {
+  $steps: 20;
+  @for $i from 0 through $steps {
+    #{percentage($i/(2*$steps))} {
+      clip-path: inset(random(100) + 0% 0 random(100) + 0% 0);
+      transform: translate(#{random(10) - 5}px, #{random(10) - 5}px);
+    }
+  }
+}
+
 // Add noise texture
 .glitch-text::before {
   content: '';
@@ -171,4 +206,82 @@
   50% { transform: translate(1px, -1px) skew(-0.5deg); }
   75% { transform: translate(-1px, -1px) skew(0.5deg); }
   100% { transform: translate(0) skew(0deg); }
+}
+
+// Add plasma effect
+.glitch-base {
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle at center,
+      rgba(255,255,255,0.1) 0%,
+      rgba(255,255,255,0.05) 25%,
+      transparent 70%
+    );
+    animation: plasma 8s ease infinite;
+    mix-blend-mode: overlay;
+  }
+}
+
+@keyframes plasma {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.2); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+// Add chromatic aberration
+.glitch-text {
+  &::before,
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    animation: chrome-top 3s infinite linear alternate-reverse;
+  }
+
+  &::before {
+    left: -2px;
+    text-shadow: 2px 0 #ff0000;
+  }
+
+  &::after {
+    left: 2px;
+    text-shadow: -2px 0 #00ffff;
+  }
+}
+
+@keyframes chrome-top {
+  0% { transform: translate(0); }
+  50% { transform: translate(-1px, 1px); }
+  100% { transform: translate(1px, -1px); }
+}
+
+// Add scanline effect
+.scanlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.1) 0px,
+    rgba(0,0,0,0.1) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
 }

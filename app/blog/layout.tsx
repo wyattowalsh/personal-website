@@ -11,7 +11,7 @@ export default function BlogLayout({
 }) {
 	return (
 		<>
-			<main className="min-h-screen mx-auto p-4 md:p-8">
+			<main className="min-h-screen mx-auto p-4 sm:p-6 lg:p-8 max-w-[100ch] lg:max-w-[110ch] xl:max-w-[120ch] 2xl:max-w-[130ch]">
 				<BlogTitle />
 				<hr />
 				{children}
