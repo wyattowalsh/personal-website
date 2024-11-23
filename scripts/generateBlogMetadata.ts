@@ -43,6 +43,12 @@ interface PostMetadata {
   };
 }
 
+function isValidDate(dateString: string | null): boolean {
+  if (!dateString) return false;
+  const date = new Date(dateString);
+  return !isNaN(date.getTime());
+}
+
 async function getAllMdxFiles(dir: string, files: string[] = []): Promise<string[]> {
   const entries = await fs.readdir(dir, { withFileTypes: true });
 
@@ -74,17 +80,17 @@ async function getFileGitDates(filePath: string) {
       `git log -1 --format=%aI "${filePath}"`
     );
 
-    // Ensure dates are valid ISO strings or return null
-    const createdDate = created.trim() ? new Date(created.trim()).toISOString() : null;
-    const updatedDate = updated.trim() ? new Date(updated.trim()).toISOString() : null;
+    // Clean and validate dates
+    const createdDate = created.trim();
+    const updatedDate = updated.trim();
 
     return {
-      created: createdDate,
-      updated: updatedDate
+      created: isValidDate(createdDate) ? createdDate : null,
+      updated: isValidDate(updatedDate) ? updatedDate : undefined // Convert null to undefined
     };
   } catch (error) {
     console.warn(`Failed to get git dates for ${filePath}:`, error);
-    return { created: null, updated: null };
+    return { created: null, updated: undefined }; // Convert null to undefined
   }
 }
 
@@ -116,16 +122,20 @@ async function generateMetadata() {
       // Get git dates
       const gitDates = await getFileGitDates(file);
 
-      // Ensure dates are in ISO format
-      const created = data.created 
-        ? new Date(data.created).toISOString()
-        : gitDates.created 
-          ? gitDates.created 
-          : fileStats.birthtime.toISOString();
+      // Ensure we have a valid created date
+      let created = data.created;
+      if (!isValidDate(created)) {
+        created = gitDates.created;
+        if (!isValidDate(created)) {
+          created = fileStats.birthtime.toISOString();
+        }
+      }
 
-      const updated = gitDates.updated 
-        ? gitDates.updated 
-        : fileStats.mtime.toISOString();
+      // Ensure we have a valid updated date or undefined
+      let updated = gitDates.updated;
+      if (!isValidDate(updated)) {
+        updated = fileStats.mtime.toISOString();
+      }
 
       slugs.push(slug);
       metadata[slug] = {
@@ -133,7 +143,7 @@ async function generateMetadata() {
         title: data.title,
         summary: data.summary || '',
         created,
-        updated,
+        updated, // This will now be string | undefined
         date: created, // Keep for compatibility
         tags: data.tags || [],
         image: data.image,
@@ -142,7 +152,7 @@ async function generateMetadata() {
         readingTime: stats.text,
       };
 
-      console.log(`Processed metadata for: ${slug}`);
+      console.log(`Processed metadata for: ${slug} (created: ${created})`);
     }));
 
     // Sort slugs by created date

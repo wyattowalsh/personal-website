@@ -1,8 +1,21 @@
 # `w4w.dev`
-### *My Place on the Web* 🕸️🤖
+### *My Personal Web App* 🤖✨
 
 ---
 
+<p>
+![GitHub commit activity](https://img.shields.io/github/commit-activity/t/wyattowalsh/personal-website?style=for-the-badge&logo=github)
+![Website](https://img.shields.io/website?url=https%3A%2F%2Fw4w.dev)
+[![Vercel](https://img.shields.io/badge/hosted_on-Vercel-000?logo=vercel&style=for-the-badge)](https://vercel.com)
+[![Next.js](https://img.shields.io/badge/Next.js-15-000?logo=next.js&logoColor=white&style=for-the-badge)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v4+-3178C6?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org)
+[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3-06B6D4?logo=tailwindcss&style=for-the-badge)](https://tailwindcss.com)
+[![shadcn/ui](https://img.shields.io/badge/shadcn/ui-stable-000?style=for-the-badge)](https://ui.shadcn.dev)
+[![MDX](https://img.shields.io/badge/MDX-v2-000?logo=mdx&style=for-the-badge)](https://mdxjs.com)
+[![Giscus](https://img.shields.io/badge/Giscus-enabled-9B83FF?logo=github&style=for-the-badge)](https://giscus.app)
+[![YOURLS](https://img.shields.io/badge/YOURLS-v1.9+-3178C6?logo=link&style=for-the-badge)](https://yourls.org)
+[![npm](https://img.shields.io/npm/v/next?label=npm&logo=npm&style=for-the-badge)](https://www.npmjs.com/package/next)
+<p>
 
 ---
 
@@ -71,9 +84,10 @@
 | **[remark-validate-links](https://github.com/remarkjs/remark-validate-links)** | MDX Plugin          | Validates links in MDX content to ensure they are functional. | [GitHub Repository](https://github.com/remarkjs/remark-validate-links) |
 | **[eslint-plugin-mdx](https://github.com/mdx-js/eslint-plugin-mdx)** | Linting Plugin       | An ESLint plugin that adds support for linting MDX and JSX within Markdown files. | [GitHub Repository](https://github.com/mdx-js/eslint-plugin-mdx) |
 
-
 ---
 
 <div align='center'>
   <img height=35 src="https://github.com/user-attachments/assets/d14e9e05-b1a5-4b24-a8da-862453a01641"/>
 </div>
+
+---
