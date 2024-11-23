@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useRef, useEffect } from "react";
+import React, { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PostHeader from "@/components/PostHeader";
 import PostPagination from "@/components/PostPagination";
@@ -11,7 +11,7 @@ export function PostLayout({ children }: { children: React.ReactNode }) {
       <article className="space-y-8 max-w-none w-full overflow-x-hidden">
         <PostHeader />
         <hr className="border-border-muted" />
-         {children}
+        {children}
         <hr className="border-border-muted" />
         <PostPagination />
         <hr className="border-border-muted" />

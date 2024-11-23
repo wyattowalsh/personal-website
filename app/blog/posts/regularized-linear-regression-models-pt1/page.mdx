@@ -4,8 +4,7 @@ image: "/lasso.webp"
 caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
 summary: "Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy"
 tags: ["ML", "TDS", "Python", "Optimization"]
-date: "2021-01-13"
-updated: "2024-11-20"
+created: "2021-01-13"
 ---
 
 Hey 👋
@@ -16,11 +15,13 @@ Before hopping into the equations and code, let us first discuss what will be co
 
 **Part one** will include an introductory discussion about regression, an explanation of linear regression modeling, and a presentation of the ***Ordinary Least Squares*** (OLS) model (from the derivation of the model estimator using applied optimization theory through the implementation of the findings in Python using NumPy).
 
-Drawbacks of the OLS model and some possible remedies will be discussed in [**part two**](/blog/regularized-linear-regression-models-pt2). One such remedy, ***Ridge Regression***, will be presented here with an explanation including the derivation of its model estimator and NumPy implementation in Python.
+Drawbacks of the OLS model and some possible remedies will be discussed in [**part two**](./regularized-linear-regression-models-pt2). One such remedy, ***Ridge Regression***, will be presented here with an explanation including the derivation of its model estimator and NumPy implementation in Python.
 
-[**Part three**](/blog/regularized-linear-regression-models-pt3) will conclude this series of posts with explanations of the remaining regularized linear models: ***the Lasso*** and ***the Elastic Net***. Solving these models is more complicated than in previous cases since a discrete optimization technique is needed. The cause of this complication, the *Pathwise Coordinate Descent* algorithm along with its NumPy-based Python implementation, and some concluding remarks are given in this post.
+[**Part three**](./regularized-linear-regression-models-pt3) will conclude this series of posts with explanations of the remaining regularized linear models: ***the Lasso*** and ***the Elastic Net***. Solving these models is more complicated than in previous cases since a discrete optimization technique is needed. The cause of this complication, the *Pathwise Coordinate Descent* algorithm along with its NumPy-based Python implementation, and some concluding remarks are given in this post.
 
-The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](https://github.com/wyattowalsh/regularized-regression-deep-dive)
+The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive)
+
+---
 
 ## Introduction
 
@@ -35,13 +36,9 @@ Managerial decision making, organizational efficiency, and revenue generation ar
 A linear regression model learns the input-output relationships by fitting a linear function to the sample data. This can be mathematically formalized as:
 
 $$
-y_i = \beta_0 + \sum_{j=1}^p \beta_j x_{i,j} + \epsilon_i, \quad \forall i \in \{1, \ldots, n\}
-$$
-
-where:
-
-$$
+y_i = \beta_0 + \sum_{j=1}^p \beta_j x_{i,j} + \epsilon_i, \quad \forall i \in \{1, \ldots, n\}\\[1em]
 \begin{aligned}
+    \textbf{where:} \\[0.5em]
     p         & : \text{ Number of features}         \\[1em]
     n         & : \text{ Number of samples}          \\[1em]
     \epsilon_i & : \text{ Error term}, \; \epsilon_i \sim \mathcal{N}(0, \sigma^2)
@@ -51,13 +48,9 @@ $$
 Thus, the response is modeled as a weighted sum of the input variables multiplied by linear coefficients with an error term included. It will prove useful in future steps involving optimization to use vector notation. The linear modeling equation can be expressed this way as:
 
 $$
-\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \boldsymbol{\epsilon}
-$$
-
-where:
-
-$$
+\mathbf{y} = \mathbf{X} \boldsymbol{\beta} + \epsilon\\[1em]
 \begin{aligned}
+    \textbf{where:} \\[0.5em]
     \mathbf{y} &\in \mathbb{R}^n 
     &: &\text{ Response vector } [y_1, y_2, \ldots, y_n]^\top \\[1em]
     \mathbf{X} &\in \mathbb{R}^{n \times (p+1)} 
@@ -68,6 +61,8 @@ $$
     &: &\text{ Error vector } [\epsilon_1, \epsilon_2, \ldots, \epsilon_n]^\top
 \end{aligned}
 $$
+
+An important aspect of the above equation to note is that there is a column of **1**’s appended to the design matrix. This is such that the first coefficient of the coefficient vector can serve as an intercept term. In cases where an intercept is not sought after this column can be omitted.
 
 Thus the goal of model training is to find an estimate of the coefficient vector, **β̂**, which can then be utilized with the above equations to make predictions of the response given new feature data. This can be accomplished by applying optimization theory to the model equations above to derive an equation for the model coefficient estimator that minimizes a notion of model error found by training on the sample data.
 
@@ -99,7 +94,7 @@ $$
 \text{SSE} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 = \sum_{i=1}^n \Big(y_i - \sum_{j=1}^p x_{i,j}\hat{\beta}_j\Big)^2
 $$
 
-This same term can be expressed in vector notation as:
+This same term can be expressed in vector notation as (<a href="#equation-7">Eq. #7</a>):
 
 $$
 ||y - \hat{y}||_2^2 = ||y - X \hat{\beta}||_2^2
@@ -131,9 +126,9 @@ $$
 \hat{\boldsymbol{\beta}}_{\text{OLS}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}
 $$
 
-However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (Eq. #8) is convex since any local optimality of a convex function is also global optimality and therefore unique.
+However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (<a href="#equation-8">Eq. #8</a>) is convex since any local optimality of a convex function is also global optimality and therefore unique.
 
-One possible way to show this is through the second-order convexity conditions, which state that a function is convex if it is continuous, twice differentiable, and has an associated Hessian matrix that is positive semi-definite. Due to its quadratic nature, the OLS loss function (Eq. #8) is both continuous and twice differentiable, satisfying the first two conditions.
+One possible way to show this is through the second-order convexity conditions, which state that a function is convex if it is continuous, twice differentiable, and has an associated Hessian matrix that is positive semi-definite. Due to its quadratic nature, the OLS loss function (<a href="#equation-8">Eq. #8</a>) is both continuous and twice differentiable, satisfying the first two conditions.
 
 To establish the last condition, the OLS Hessian matrix is found as:
 
@@ -151,7 +146,7 @@ $$
 \end{aligned}
 $$
 
-Thus, by the second-order conditions for convexity, the OLS loss function (Eq. #8) is convex, thus the estimator found above (Eq #9) is the ***unique*** global minimizer to the OLS problem.
+Thus, by the second-order conditions for convexity, the OLS loss function (<a href="#equation-8">Eq. #8</a>) is convex, thus the estimator found above (<a href="#equation-9">Eq. #9</a>) is the ***unique*** global minimizer to the OLS problem.
 
 ### Implementing the Estimator Using Python and NumPy
 

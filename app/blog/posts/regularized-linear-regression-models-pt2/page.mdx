@@ -4,13 +4,12 @@ image: "/ridge.webp"
 caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
 summary: "Weaknesses of OLS, Optimization to Obtain the Ridge Model Estimator, and an Implementation in Python Using Numpy"
 tags: ["ML", "TDS", "Python", "Optimization"]
-date: "2021-01-14"
-updated: "2024-11-20"
+created: "2021-01-14"
 ---
 
 Hello again and hopefully welcome back 👋
 
-In [the last part](/blog/regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the O**_rdinary Least Squares_** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
+In [the last part](/blog/regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the ***Ordinary Least Squares*** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
 
 Moving forward, in this part, drawbacks of OLS, potential remedies, and the **_Ridge Regression_** model will be discussed.
 
@@ -24,7 +23,7 @@ For the OLS model, a high variance is a concern. Since the SSE is being optimize
 
 Since OLS is a low bias model, it is well-suited to have its variance lowered through bias addition, which may result in higher overall predictive ability. One way to add bias is through **shrinkage**, biasing model coefficient estimates toward zero. This shrinkage can be achieved through the addition of a **regularization penalty** to the loss function which applies a unique form of shrinkage to the overall coefficient estimates.
 
-In the next section, I’ll cover **_Ridge Regression_ —** regularization by the addition of a tuning parameter (λ) coefficient controlled **_L₂_** penalty to the OLS loss function.
+In the next section, I’ll cover **_Ridge Regression_** regularization by the addition of a tuning parameter (λ) coefficient controlled **_L₂_** penalty to the OLS loss function.
 
 > Make sure to check out the next and [final part of the series](/blog/regularized-linear-regression-models-pt3) to learn about the other two forms of regularized linear regression, **the Lasso** and **the Elastic Net.**
 
@@ -32,13 +31,13 @@ In the next section, I’ll cover **_Ridge Regression_ —** regularization by t
 
 ## Ridge Regression
 
-This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
+This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One: Eq. #7](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c)) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
 
 $$
 L(\beta) = ||y - X\beta||_2^2 + \lambda||\beta||_2^2  \quad \text{with tuning parameter } \lambda \geq 0
 $$
 
-Similarly to the OLS case, this loss function can then be formulated as a _least-squares_ optimization problem to find estimates for the model coefficients that minimize the loss function as:
+Similarly to the OLS case (<a href="#equation-7">Eq. #7</a>), this loss function can then be formulated as a _least-squares_ optimization problem to find estimates for the model coefficients that minimize the loss function as:
 
 $$
 L(\beta) = ||y - X\beta||_2^2 + \lambda||\beta||_2^2  \quad \text{with tuning parameter } \lambda \geq 0
@@ -82,9 +81,11 @@ Y \\
 \right\|_2^2
 $$
 
-Thus, by utilizing the above data augmentation the same result as [Equation #9 from the last part of this series](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c) can be used to solve for the coefficient estimates. That result is reproduced here:
+Thus, by utilizing the above data augmentation the same result as [<a href="/blog/posts/regularized-linear-regression-models-pt3#equation-9">Equation #9</a> from the next part of this series] can be used to solve for the coefficient estimates. That result is reproduced here (<a href="#equation-9">Eq. #9</a>):
 
-$$\hat{\beta} = (X^TX)^{-1}(X^Ty)$$
+$$
+\hat{\beta} = (X^TX)^{-1}(X^Ty)
+$$
 
 ### Implementing the Estimator Using Python and NumPy
 

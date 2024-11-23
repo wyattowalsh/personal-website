@@ -8,14 +8,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { AdjacentPost } from "@/lib/posts";
+import { getAdjacentPosts } from "@/lib/metadata";
 
 export default function PostPagination() {
   const [state, setState] = useState<{
-    data: { prevPost?: AdjacentPost; nextPost?: AdjacentPost };
+    data: { prevPost: AdjacentPost | null; nextPost: AdjacentPost | null };
     isLoading: boolean;
     error: string | null;
   }>({
-    data: {},
+    data: { prevPost: null, nextPost: null }, // Initialize with null values
     isLoading: true,
     error: null,
   });
@@ -23,42 +24,39 @@ export default function PostPagination() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const controller = new AbortController();
-
-    const fetchAdjacentPosts = async () => {
+    const loadAdjacentPosts = async () => {
       try {
+        console.log('Loading adjacent posts for:', pathname); // Debug log
         setState(prev => ({ ...prev, isLoading: true, error: null }));
-        // Extract the slug from the pathname
         const slug = pathname.split("/blog/posts/")[1];
-        if (!slug) return;
-
-        // Fetch adjacent posts data
-        const response = await fetch(`/api/blog/posts/adjacent?slug=${encodeURIComponent(slug)}`, {
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (!slug) {
+          console.warn('No slug found in pathname:', pathname); // Debug log
+          return;
         }
-
-        const data = await response.json();
-        setState(prev => ({ ...prev, data, isLoading: false }));
+        
+        const data = await getAdjacentPosts(slug);
+        console.log('Adjacent posts data:', data); // Debug log
+        // Ensure data has the expected shape
+        setState(prev => ({
+          ...prev,
+          data: {
+            prevPost: data?.prevPost || null,
+            nextPost: data?.nextPost || null
+          },
+          isLoading: false
+        }));
       } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") return;
-        console.error("Error fetching adjacent posts:", error);
+        console.error("Error loading adjacent posts:", error);
         setState(prev => ({
           ...prev,
           isLoading: false,
           error: "Failed to load navigation",
+          data: { prevPost: null, nextPost: null } // Reset data on error
         }));
       }
     };
 
-    fetchAdjacentPosts();
-    return () => controller.abort();
+    loadAdjacentPosts();
   }, [pathname]);
 
   if (state.isLoading) {
@@ -73,7 +71,10 @@ export default function PostPagination() {
     );
   }
 
+  // Safe destructuring after checks
   const { prevPost, nextPost } = state.data;
+  
+  // Return early if no navigation is possible
   if (!prevPost && !nextPost) return null;
 
   return (

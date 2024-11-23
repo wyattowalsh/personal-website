@@ -3,9 +3,8 @@ title: "Implementing Pathwise Coordinate Descent For The Lasso and The Elastic N
 image: "/lasso.webp"
 caption: "Model Coefficient Value Changes With Growing Regularization Penalty Values (Image by author)"
 summary: "Explanations for Solving Some of the Most Popular Supervised Learning Algorithms"
-tags: ["ML", "TDS", "Python"]
-date: "2021-01-15"
-updated: "2024-11-20"
+tags: ["ML", "TDS", "Python", "Optimization"]
+created: "2021-01-15"
 ---
 
 Hey there! 👋
@@ -18,7 +17,7 @@ The models and included implementations were tested on a wine quality prediction
 
 ## The Lasso for Regression
 
-The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function ([Part One](https://towardsdatascience.com/regularized-linear-regression-models-57bbdce90a8c): Eq. #7), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
+The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function (<a href="#equation-7">Equation #7</a>), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
 
 **_The Lasso_** loss function can be formalized as:
 
@@ -70,7 +69,7 @@ $$
 
 where **_rᵢ_** is the current model residual for all samples, **_n_**.
 
-When the number of samples is much greater than the number of features (**_n_** >> **_p_**), further efficiency improvements can be derived by using **covariance updates**. For these updates, the first term of the **_Naive update_** equation above (Eq. #6) is replaced as shown by:
+When the number of samples is much greater than the number of features (**_n_** >> **_p_**), further efficiency improvements can be derived by using **covariance updates**. For these updates, the first term of the naive updates equation above (<a href="#equation-6">Eq. #6</a>) is replaced as shown by:
 
 $$
 \sum_{i=1}^{n} x_{i,j} r_i = \langle x_j, y \rangle - \sum_{k: |\beta_k| > 0} \langle x_j, x_k \rangle \beta_k
@@ -124,7 +123,7 @@ $$
 \beta_j = \frac{S(\beta_j^*, \lambda \alpha)}{1 + \lambda (1 - \alpha)}
 $$
 
-The soft-thresholding operator is the same operator applied in **_the Lasso_** update (Eq. #5):
+The soft-thresholding operator is the same operator applied in **_the Lasso_** update (<a href="#equation-5">Eq. #5</a>):
 
 $$
 sign(\beta_j^*)(||\beta_j^*|| - \lambda\alpha) + 

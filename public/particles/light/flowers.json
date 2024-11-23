@@ -1,45 +1,48 @@
 {
     "background": {
         "color": {
-            "value": "#ffffff"
+            "value": "#f7f9fc"
         }
     },
     "particles": {
         "number": {
-            "value": 80,
+            "value": 140,
             "density": {
                 "enable": true,
-                "area": 800
+                "area": 1200
             }
         },
         "color": {
-            "value": ["#ff69b4", "#ff1493", "#ff00ff"]
+            "value": ["#ff69b4", "#ff1493", "#ff00ff", "#ffc0cb", "#f500a0", "#e0e0f8", "#d5d9ff"]
         },
         "shape": {
-            "type": "image",
+            "type": ["circle", "image"],
             "image": {
-                "src": "path/to/flower.png",
-                "width": 100,
-                "height": 100
+                "src": "/flower.webp",
+                "width": 60,
+                "height": 60
             }
         },
         "opacity": {
-            "value": 0.9,
+            "value": {
+                "min": 0.4,
+                "max": 0.8
+            },
             "random": true
         },
         "size": {
             "value": {
-                "min": 10,
-                "max": 20
+                "min": 5,
+                "max": 12
             },
             "random": true
         },
         "move": {
             "enable": true,
-            "speed": 1.5,
-            "direction": "none",
+            "speed": 3,
+            "direction": "bottom",
             "outModes": {
-                "default": "out"
+                "default": "bounce"
             }
         }
     },
@@ -47,7 +50,7 @@
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": "repulse"
+                "mode": "grab"
             },
             "onClick": {
                 "enable": true,
@@ -55,14 +58,18 @@
             }
         },
         "modes": {
-            "repulse": {
-                "distance": 100,
-                "duration": 0.4
+            "grab": {
+                "distance": 180,
+                "lineLinked": {
+                    "opacity": 0.6
+                }
             },
             "push": {
-                "quantity": 4
+                "quantity": 5
             }
         }
     },
-    "detectRetina": true
+    "detectRetina": true,
+    "fpsLimit": 120,
+    "pauseOnBlur": true
 }

@@ -14,6 +14,22 @@ function withOpacityValue(variable: string) {
   };
 }
 
+const {
+  default: flattenColorPalette,
+} = require("tailwindcss/lib/util/flattenColorPalette");
+
+// This plugin adds each Tailwind color as a global CSS variable, e.g. var(--gray-200).
+function addVariablesForColors({ addBase, theme }: any) {
+  let allColors = flattenColorPalette(theme("colors"));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val])
+  );
+ 
+  addBase({
+    ":root": newVars,
+  });
+}
+
 const config: Config = {
   darkMode: ['class'],
   content: [
@@ -38,7 +54,12 @@ const config: Config = {
         'primary-foreground': 'var(--primary-foreground)',
         secondary: 'var(--secondary)',
         'secondary-foreground': 'var(--secondary-foreground)',
-        accent: 'var(--accent)',
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)',
+          '20': 'rgb(var(--accent-rgb) / 0.2)',
+          '40': 'rgb(var(--accent-rgb) / 0.4)',
+        },
         'accent-foreground': 'var(--accent-foreground)',
         destructive: 'var(--destructive)',
         'destructive-foreground': 'var(--destructive-foreground)',
@@ -54,7 +75,7 @@ const config: Config = {
         'border-muted': 'var(--border-muted)',
         'math-bg': 'rgb(var(--math-bg) / <alpha-value>)',
         'math-bg-transparent': 'rgb(var(--math-bg-transparent) / <alpha-value>)',
-        'math-border': 'var(--math-border)',
+        'math-border': 'rgb(var(--math-border) / <alpha-value>)',
         'math-controls-bg': 'var(--math-controls-bg)',
         'math-controls-hover': 'var(--math-controls-hover)',
         'math-controls-text': 'rgb(var(--math-controls-text) / <alpha-value>)',
@@ -64,6 +85,24 @@ const config: Config = {
         'math-index-color': 'var(--math-index-color)',
         'math-inline-bg': 'var(--math-inline-bg)',
         'math-display-bg': 'var(--math-display-bg)',
+        'math-display-number': 'var(--math-display-number)',
+        'math-display-number-hover': 'var(--math-display-number-hover)',
+        'post-header': {
+          'gradient-from': 'var(--post-header-gradient-from)',
+          'gradient-via': 'var(--post-header-gradient-via)',
+          'gradient-to': 'var(--post-header-gradient-to)',
+          'border': 'var(--post-header-border)',
+        },
+        'back-link': {
+          'bg': 'var(--back-link-bg)',
+          'hover-bg': 'var(--back-link-hover-bg)',
+          'border': 'var(--back-link-border)',
+        },
+        // Add selection colors
+        'selection-bg': 'var(--selection-bg)',
+        'selection-text': 'var(--selection-text)',
+        'selection-heading-bg': 'var(--selection-heading-bg)',
+        'selection-heading-text': 'var(--selection-heading-text)',
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],
@@ -76,6 +115,10 @@ const config: Config = {
         'header': 'var(--shadow-header)',
         'math': 'var(--math-shadow)',
         'math-hover': 'var(--math-hover-shadow)',
+        'post-header': 'var(--post-header-shadow)',
+        'post-header-hover': 'var(--post-header-hover-shadow)',
+        'back-link': 'var(--back-link-shadow)',
+        'back-link-hover': 'var(--back-link-hover-shadow)',
       },
       borderRadius: {
         xl: 'var(--radius)',
@@ -102,10 +145,21 @@ const config: Config = {
         'glitch-clip': 'glitch-clip 3s infinite linear alternate-reverse',
         'card-hover': 'card-hover 0.3s ease-in-out forwards',
         'card-float': 'card-float 3s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.5s ease-out forwards',
+        'title-glow': 'title-glow 2s ease-in-out infinite alternate',
+        'float-smooth': 'float-smooth 6s ease-in-out infinite',
+        'gradient-x': 'gradient-x 15s ease infinite',
+        'gradient-y': 'gradient-y 15s ease infinite',
+        'gradient-xy': 'gradient-xy 15s ease infinite',
+        'gradient': 'gradient 8s linear infinite',
+        'subtitle-fade': 'subtitleFade 0.5s ease-out forwards',
+        'subtitle-slide': 'subtitleSlide 0.5s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
           to: { opacity: '1' },
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
@@ -193,6 +247,46 @@ const config: Config = {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-6px)' },
         },
+        'title-glow': {
+          'from': { textShadow: '0 0 20px var(--primary)' },
+          'to': { textShadow: '0 0 30px var(--primary), 0 0 10px var(--primary)' }
+        },
+        'float-smooth': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' }
+        },
+        'gradient-y': {
+          '0%, 100%': {
+            'background-size': '400% 400%',
+            'background-position': 'center top'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'center center'
+          }
+        },
+        'gradient-x': {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          }
+        },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        subtitleFade: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        subtitleSlide: {
+          '0%': { transform: 'translateY(100%)' },
+          '100%': { transform: 'translateY(0)' },
+        },
       },
       transitionDuration: {
         '700': '700ms',
@@ -242,6 +336,20 @@ const config: Config = {
             code: {
               color: 'var(--foreground)',
               backgroundColor: 'var(--muted)',
+              borderRadius: '0.25rem',
+              padding: '0.2em 0.4em',
+              fontWeight: '500',
+              fontFamily: 'var(--font-code)',
+              fontSize: '0.9em',
+              letterSpacing: '-0.025em',
+              '&::before': {
+                content: '""',
+                display: 'none',
+              },
+              '&::after': {
+                content: '""',
+                display: 'none',
+              }
             },
             hr: {
               borderColor: 'var(--border)',
@@ -396,10 +504,22 @@ const config: Config = {
         '80': '0.8',
         '90': '0.9',
       },
+      backgroundColor: {
+        'scrollbar-track': 'transparent',
+      },
+      textShadow: {
+        'glow': '0 0 10px var(--primary), 0 0 20px var(--primary)',
+        'glow-dark': '0 0 10px var(--primary-foreground), 0 0 20px var(--primary-foreground)',
+      },
     },
+  },
+  future: {
+    respectDefaultRingColorOpacity: true,
+    disableColorOpacityUtilitiesByDefault: false,
   },
   plugins: [
     typography,
+    addVariablesForColors,
     function({ addUtilities }: PluginAPI) {
       const newUtilities = {
         '.bg-gradient-text': {
@@ -411,8 +531,39 @@ const config: Config = {
         '.shadow-soft': {
           boxShadow: 'var(--shadow-soft)',
         },
+        '.scrollbar-thin': {
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': {
+            width: '8px',
+            height: '8px',
+          },
+        },
+        '.scrollbar-track-transparent': {
+          '&::-webkit-scrollbar-track': {
+            backgroundColor: 'transparent',
+          },
+        },
+        '.scrollbar-thumb-rounded': {
+          '&::-webkit-scrollbar-thumb': {
+            borderRadius: '4px',
+          },
+        },
+        '.text-shadow-glow': {
+          textShadow: '0 0 10px var(--primary), 0 0 20px var(--primary)',
+        },
+        '.text-shadow-glow-dark': {
+          textShadow: '0 0 10px var(--primary-foreground), 0 0 20px var(--primary-foreground)',
+        },
       };
-      addUtilities(newUtilities);
+      addUtilities(newUtilities, ['responsive', 'hover']);
+    },
+    function({ addComponents, theme }) {
+      addComponents({
+        '.bg-gradient-glow': {
+          backgroundImage: `linear-gradient(to right, ${theme('colors.primary.DEFAULT')}, ${theme('colors.accent.DEFAULT')})`,
+          opacity: '0.2',
+        },
+      });
     },
   ],
 };

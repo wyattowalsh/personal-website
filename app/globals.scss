@@ -1,11 +1,9 @@
 @use 'sass:math';
 @use 'variables.module.scss' as variables;
 
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
-
-@import 'katex/dist/katex.min.css';
+@use "tailwindcss/base";
+@use "tailwindcss/components";
+@use "tailwindcss/utilities";
 
 @function random-percentage() {
   @return math.random(100) + 0%;
@@ -50,6 +48,18 @@
 
   code {
     @apply bg-muted text-accent-foreground px-1.5 py-0.5 rounded;
+    
+    // Add specific styles for inline code
+    &:not(pre code) {
+      font-family: var(--font-code);
+      font-weight: 500;
+      font-size: 0.9em;
+      letter-spacing: -0.025em;
+      vertical-align: baseline;
+      position: relative;
+      white-space: pre;
+      box-decoration-break: clone;
+    }
   }
 
   pre {
@@ -119,7 +129,274 @@
     font-size: 0.85em;
     color: var(--math-index-color);
   }
+
+  // Add styles for anchor links on headings
+  h1, h2, h3, h4, h5, h6 {
+    scroll-margin-top: 100px;
+    position: relative;
+    
+    .anchor-link {
+      @apply opacity-0 absolute;
+      left: -1.5em;
+      padding-right: 0.5em;
+      cursor: pointer;
+      
+      &:hover {
+        @apply opacity-100;
+      }
+      
+      .anchor-icon {
+        @apply inline-block align-middle;
+        width: 1em;
+        height: 1em;
+      }
+    }
+    
+    &:hover .anchor-link {
+      @apply opacity-100;
+    }
+  }
+
+  // Enhanced equation styles
+  .math-display {
+    .equation-number-container {
+      @apply absolute right-4 bottom-4;
+      @apply flex items-center gap-2;
+      @apply opacity-0 hover:opacity-100;
+      @apply transition-opacity duration-200;
+    }
+
+    .equation-number {
+      @apply text-math-display-number text-sm;
+      @apply transition-all duration-300;
+      @apply hover:text-math-display-number-hover;
+      @apply cursor-pointer;
+      @apply select-none;
+      @apply flex items-center gap-1;
+      
+      &:hover {
+        @apply scale-105;
+      }
+    }
+
+    &:target {
+      @apply ring-2 ring-primary/50;
+      @apply bg-primary/5;
+      animation: highlight 2s ease-out;
+    }
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply scroll-mt-20 relative;
+
+    .anchor {
+      @apply absolute opacity-0 -left-5 top-1/2 -translate-y-1/2;
+      @apply transition-all duration-200 ease-out;
+      @apply p-1 rounded-md;
+      @apply hover:bg-primary/5;
+      
+      .anchor-icon {
+        @apply block w-4 h-4;
+        @apply text-muted-foreground;
+        @apply transition-all duration-200;
+        @apply transform scale-90;
+        
+        &:hover {
+          @apply text-primary scale-100;
+        }
+      }
+    }
+
+    &:hover .anchor {
+      @apply opacity-100;
+    }
+  }
+
+  // Enhanced header styles with autolink
+  h1, h2, h3, h4, h5, h6 {
+    @apply scroll-mt-20 relative;
+    
+    // Anchor link container
+    .anchor {
+      @apply absolute -left-8 top-1/2 -translate-y-1/2;
+      @apply opacity-0 invisible;
+      @apply p-2 -m-2; // Larger touch target
+      @apply rounded-lg;
+      @apply transition-all duration-300 ease-out;
+      @apply hover:bg-primary/5 dark:hover:bg-primary/10;
+      @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+      @apply sm:visible; // Only show on larger screens
+      
+      // Responsive positioning
+      @apply md:-left-10;
+      @apply lg:-left-12;
+      
+      // Icon styling
+      .anchor-icon {
+        @apply block;
+        @apply text-muted-foreground opacity-50;
+        @apply dark:text-muted-foreground dark:opacity-40;
+        @apply transition-all duration-300;
+        @apply transform scale-75;
+        @apply hover:scale-100 hover:text-primary hover:opacity-100;
+        @apply dark:hover:text-primary dark:hover:opacity-100;
+        
+        // Responsive icon sizing
+        @apply w-4 h-4;
+        @apply sm:w-5 sm:h-5;
+        @apply md:w-6 md:h-6;
+        
+        // Add subtle glow on hover
+        @apply hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)];
+        @apply dark:hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)];
+      }
+    }
+
+    // Show anchor on header hover
+    &:hover .anchor {
+      @apply opacity-100;
+      @apply visible;
+      @apply translate-x-0;
+    }
+
+    // Mobile-friendly touch target
+    @media (hover: none) {
+      .anchor {
+        @apply opacity-50 visible;
+        @apply -left-6 sm:-left-8;
+        
+        .anchor-icon {
+          @apply scale-90;
+        }
+      }
+    }
+
+    // Active state styles
+    .anchor:active {
+      @apply scale-95;
+      @apply bg-primary/10 dark:bg-primary/15;
+    }
+
+    // When header is targeted by URL hash
+    &:target {
+      @apply relative;
+      
+      &::before {
+        content: "";
+        @apply absolute -inset-x-4 -inset-y-2;
+        @apply bg-primary/5 dark:bg-primary/10;
+        @apply rounded-lg;
+        @apply animate-[highlight_2s_ease-out];
+      }
+      
+      .anchor {
+        @apply opacity-100 visible;
+      }
+    }
+  }
+
+  // Default text selection
+  ::selection {
+    @apply bg-selection-bg text-selection-text;
+  }
+
+  // Heading-specific text selection
+  h1, h2, h3, h4, h5, h6 {
+    &::selection {
+      @apply bg-selection-heading-bg text-selection-heading-text;
+    }
+
+    // Also style selection within headings (e.g., for nested elements)
+    & *::selection {
+      @apply bg-selection-heading-bg text-selection-heading-text;
+    }
+  }
+
+  // Enhanced responsive heading styles
+  h1 {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
+    @apply leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight;
+    @apply tracking-tight sm:tracking-tight md:tracking-tight;
+    @apply mb-4 sm:mb-6 md:mb-8;
+  }
+
+  h2 {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
+    @apply leading-tight sm:leading-tight md:leading-tight;
+    @apply tracking-tight;
+    @apply mt-8 sm:mt-10 md:mt-12 mb-4 sm:mb-6;
+  }
+
+  h3 {
+    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl;
+    @apply leading-snug sm:leading-snug md:leading-snug;
+    @apply mt-6 sm:mt-8 md:mt-10 mb-3 sm:mb-4;
+  }
+
+  h4 {
+    @apply text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl;
+    @apply leading-snug;
+    @apply mt-4 sm:mt-6 md:mt-8 mb-2 sm:mb-3;
+  }
+
+  // Enhanced heading hover and focus states
+  h1, h2, h3, h4, h5, h6 {
+    @apply relative overflow-visible;
+    
+    // Progressive reveal effect on hover
+    &::after {
+      @apply content-[''] absolute bottom-0 left-0 w-full;
+      @apply h-[2px] bg-primary/30 dark:bg-primary/20;
+      @apply transform scale-x-0 origin-left;
+      @apply transition-transform duration-300 ease-out;
+    }
+
+    &:hover::after {
+      @apply scale-x-100;
+    }
+
+    // Enhanced focus styles
+    &:focus-visible {
+      @apply outline-none ring-2 ring-primary/50 dark:ring-primary/40;
+      @apply rounded-lg;
+    }
+
+    // Improved anchor link visibility
+    .anchor {
+      @apply opacity-0 transform -translate-x-2;
+      @apply transition-all duration-300 ease-out;
+
+      @screen md {
+        @apply opacity-0 -translate-x-4;
+      }
+
+      @screen lg {
+        @apply opacity-0 -translate-x-6;
+      }
+    }
+
+    &:hover .anchor {
+      @apply opacity-100 translate-x-0;
+    }
+  }
+
+  // Enhanced mobile experience
+  @media (hover: none) {
+    h1, h2, h3, h4, h5, h6 {
+      .anchor {
+        @apply opacity-50 translate-x-0;
+      }
+    }
+  }
 }
+
+// Remove or adjust styles that may interfere with 'strong' and 'em'
+// For example, if you have:
+// strong, em {
+//   // Custom styles that affect nesting
+// }
+
+// Modify or remove these styles to prevent conflicts
 
 @keyframes glitch-anim {
   $steps: 20;
@@ -198,6 +475,243 @@
       animation: glitch-anim 2s infinite linear alternate-reverse;
     }
   }
+
+  .math-display {
+    @apply relative my-8 px-8 py-6;
+    @apply rounded-xl border border-math-border;
+    @apply bg-math-bg/95 dark:bg-math-bg/80;
+    @apply shadow-math hover:shadow-math-hover;
+    @apply transition-all duration-300;
+    @apply hover:border-primary/30;
+
+    .math-content {
+      @apply overflow-x-auto overflow-y-hidden;
+      @apply scrollbar-thin;
+      @apply scrollbar-track-transparent;
+      @apply scrollbar-thumb-rounded;
+      
+      &::-webkit-scrollbar-thumb {
+        @apply bg-math-controls-text/20 hover:bg-math-controls-text/30;
+      }
+    }
+
+    .math-link-button {
+      @apply absolute right-2 top-2;
+      @apply p-2 rounded-full;
+      @apply opacity-0 hover:opacity-100;
+      @apply transition-opacity duration-200;
+      @apply hover:bg-math-controls-bg;
+      @apply text-math-controls-text;
+      @apply hover:text-math-controls-text-hover;
+    }
+
+    // Style for equation numbers
+    .katex {
+      text-align: center;
+      
+      .tag {
+        @apply text-math-controls-text;
+        @apply transition-colors duration-300;
+        position: absolute;
+        right: -1em;  // Adjust this value as needed
+      }
+
+      // Add clickable behavior to equation numbers
+      .tag:hover {
+        @apply text-math-controls-text-hover;
+        cursor: pointer;
+      }
+
+      // Ensure equation content doesn't overlap with tag
+      .katex-html {
+        position: relative;
+      }
+    }
+
+    .equation-number {
+      @apply absolute right-2 bottom-2 text-math-display-number;
+      transition: color 0.3s ease;
+    }
+
+    .equation-number:hover {
+      @apply text-math-display-number-hover;
+      cursor: pointer;
+    }
+
+    .equation-number-container {
+      @apply absolute right-4 bottom-4;
+      @apply flex items-center gap-2;
+    }
+
+    .equation-number {
+      @apply text-math-display-number text-sm;
+      @apply transition-all duration-300;
+      @apply hover:text-math-display-number-hover;
+      @apply cursor-pointer;
+      @apply select-none;
+      @apply flex items-center gap-1;
+      
+      &:hover {
+        @apply scale-105;
+      }
+
+      &::before {
+        content: "";
+        @apply absolute -inset-2;
+      }
+    }
+
+    // Highlight the equation when targeted by URL hash
+    &:target {
+      @apply ring-2 ring-primary/50;
+      @apply bg-primary/5;
+    }
+
+    // Add anchor link styles
+    &.anchor-equation {
+      @apply cursor-pointer;
+      
+      .anchor-icon {
+        @apply absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full;
+        @apply opacity-0 transition-opacity duration-200;
+        @apply text-math-controls-text w-4 h-4 mx-2;
+      }
+  
+      &:hover {
+        .anchor-icon {
+          @apply opacity-100;
+        }
+      }
+    }
+
+    &.anchor-equation {
+      @apply relative;
+      
+      .anchor-link {
+        @apply absolute -left-6 top-1/2;
+        @apply -translate-y-1/2;
+        @apply opacity-0;
+        @apply text-math-controls-text;
+        @apply transition-all duration-200;
+        @apply cursor-pointer;
+        @apply p-1;
+        @apply rounded-md;
+        @apply hover:bg-math-controls-bg;
+        @apply hover:text-math-controls-text-hover;
+  
+        &:focus-visible {
+          @apply opacity-100 outline-none ring-2 ring-primary;
+        }
+      }
+  
+      &:hover {
+        .anchor-link {
+          @apply opacity-100;
+        }
+      }
+    }
+
+    .equation-link {
+      @apply absolute -left-5 top-1/2 -translate-y-1/2;
+      @apply opacity-0 transition-all duration-200;
+      @apply text-muted-foreground hover:text-primary;
+      @apply p-1 rounded-md hover:bg-primary/5;
+      @apply scale-90 hover:scale-100;
+      @apply hover:opacity-100;
+    }
+
+    .equation-number {
+      @apply absolute right-4 bottom-4;
+      @apply text-sm text-muted-foreground;
+      @apply transition-all duration-200;
+      @apply opacity-60 hover:opacity-100;
+      @apply select-none cursor-pointer;
+      @apply hover:text-primary;
+    }
+
+    &:target {
+      @apply ring-2 ring-primary/20;
+      @apply bg-primary/5;
+      animation: equation-highlight 1.5s ease-out;
+    }
+  }
+
+  .math-inline {
+    @apply relative inline-flex items-center;
+    @apply px-2 py-0.5 rounded-md;
+    @apply bg-math-bg/40 dark:bg-math-bg/20;
+    @apply border border-math-border/30;
+    @apply transition-all duration-300;
+    @apply hover:bg-math-bg/60 dark:hover:bg-math-bg/40;
+    @apply hover:border-math-border/50;
+    @apply hover:shadow-sm dark:hover:shadow-primary/5;
+  }
+
+  .subtitle-container {
+    perspective: 1000px;
+    
+    .subtitle-text {
+      backface-visibility: hidden;
+      transform-style: preserve-3d;
+      background: linear-gradient(
+        45deg,
+        var(--subtitle-gradient-start),
+        var(--subtitle-gradient-end)
+      );
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      
+      animation: subtitle-gradient 8s linear infinite;
+      background-size: 200% 200%;
+    }
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r;
+    &.primary {
+      @apply from-blue-500 via-blue-600 to-blue-700
+             dark:from-blue-400 dark:via-blue-500 dark:to-blue-600;
+    }
+    &.accent {
+      @apply from-pink-500 via-purple-500 to-indigo-500
+             dark:from-pink-400 dark:via-purple-400 dark:to-indigo-400;
+    }
+  }
+
+  .hover-lift {
+    @apply transition-transform duration-300 ease-out;
+    &:hover {
+      @apply -translate-y-1;
+    }
+  }
+
+  .glow {
+    @apply relative;
+    &::after {
+      @apply content-[''] absolute inset-0 z-[-1];
+      @apply bg-gradient-glow;
+      @apply blur-xl opacity-0 transition-opacity duration-300;
+    }
+    &:hover::after {
+      @apply opacity-100;
+    }
+  }
+
+  .prose {
+    @apply max-w-none;
+    @apply sm:max-w-[95%] md:max-w-[90%] lg:max-w-[85%] xl:max-w-[80%] 2xl:max-w-[75%];
+    @apply mx-auto;
+  }
+
+  // Enhance text readability on different screen sizes
+  .text-adaptive {
+    @apply text-sm sm:text-base md:text-lg lg:text-xl;
+    @apply leading-relaxed sm:leading-relaxed md:leading-relaxed;
+    @apply tracking-wide sm:tracking-normal md:tracking-normal;
+  }
 }
 
 @keyframes grid-flow {
@@ -215,6 +729,41 @@
   }
   100% {
     transform: translateY(100%);
+  }
+}
+
+@keyframes subtitle-gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes highlight {
+  0% {
+    background-color: var(--primary-20);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes equation-highlight {
+  0% { @apply bg-primary/20; }
+  100% { @apply bg-primary/5; }
+}
+
+@keyframes highlight {
+  from {
+    @apply bg-primary/20 dark:bg-primary/25;
+  }
+  to {
+    @apply bg-primary/5 dark:bg-primary/10;
   }
 }
 

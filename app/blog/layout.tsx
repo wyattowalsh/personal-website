@@ -1,7 +1,6 @@
 // app/blog/layout.tsx
 
 import React from "react";
-import ScrollIndicator from "@/components/ScrollIndicator";
 import BlogTitle from "@/components/BlogTitle";
 
 export default function BlogLayout({

@@ -16,7 +16,6 @@ import GistWrapper from "@/components/GistWrapper";
 import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
 import Math from "@/components/Math";
-import { useEquations } from './contexts/equations-context';
 
 import {
   Accordion,
@@ -39,7 +38,30 @@ type GistWrapperProps = {
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
         wrapper: ({ children }) => (
-            <div className="prose prose-lg md:prose-xl lg:prose-2xl max-w-[90ch] lg:max-w-[100ch] xl:max-w-[110ch] 2xl:max-w-[120ch] mx-auto">
+            <div className={cn(
+                "prose prose-lg md:prose-xl lg:prose-2xl",
+                "max-w-[90ch] lg:max-w-[100ch] xl:max-w-[110ch] 2xl:max-w-[120ch]",
+                "mx-auto",
+                "[&_strong]:no-underline", // Add this
+                "[&_em]:no-underline",     // Add this
+                "prose-strong:no-underline prose-em:no-underline", // Add this
+                // Add styles for heading link positioning
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:relative",
+                "[&_.anchor-link]:absolute [&_.anchor-link]:right-0",
+                "[&_.anchor-link]:top-1/2 [&_.anchor-link]:-translate-y-1/2",
+                "[&_.anchor-link]:opacity-0 [&_:hover_.anchor-link]:opacity-100",
+                "[&_.anchor-link]:transition-opacity [&_.anchor-link]:duration-200",
+                // Update heading link styles
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:w-full",
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:flex",
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:items-center",
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:justify-between",
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:gap-4",
+                // Update anchor link styles
+                "[&_.anchor-link]:static",
+                "[&_.anchor-link]:transform-none",
+                "[&_.anchor-link]:flex-shrink-0"
+            )}>
                 <article className="relative w-full max-w-none">
                     {children}
                 </article>
@@ -48,20 +70,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
         h1: ({ children }) => (
             <h1 className={cn(
-                "scroll-m-20",
-                "text-3xl font-display font-bold tracking-tight",
                 "sm:text-4xl md:text-5xl lg:text-6xl",
                 "mt-8 mb-4",
                 "text-foreground dark:text-primary-foreground",
-                "border-b border-border-40 dark:border-border-60",
                 "pb-4",
                 "bg-clip-text bg-gradient-to-r from-primary via-primary-80 to-primary",
                 "hover:text-transparent transition-colors duration-300",
-                "relative",
-                "after:content-[''] after:absolute after:bottom-0 after:left-0",
-                "after:w-0 after:h-[2px] after:bg-primary",
-                "after:transition-all after:duration-300",
-                "hover:after:w-full"
+                "relative"
             )}>
                 {children}
             </h1>
@@ -74,17 +89,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "sm:text-3xl md:text-4xl lg:text-5xl",
                 "mt-10 mb-4",
                 "text-foreground dark:text-primary-foreground",
-                "border-b border-border-40 dark:border-border-60",
                 "pb-2",
                 "relative group",
                 "transition-all duration-300 ease-out",
                 "hover:text-primary",
-                "before:content-['#'] before:absolute before:-left-6",
-                "before:text-primary before:opacity-0",
-                "before:transition-opacity before:duration-300",
-                "group-hover:before:opacity-100"
+                // Remove right padding since we're using flexbox
+                "flex items-center justify-between gap-4"
             )}>
-                {children}  
+                <span className="flex-1 min-w-0">{children}</span>
             </h2>
         ),
 
@@ -95,15 +107,12 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "sm:text-2xl md:text-3xl",
                 "mt-8 mb-4",
                 "text-foreground dark:text-primary-foreground",
-                "relative inline-block",
-                "after:content-[''] after:absolute after:bottom-0 after:left-0",
-                "after:w-full after:h-[1px] after:bg-primary-30",
-                "after:transform after:scale-x-0 after:origin-bottom-right",
-                "after:transition-transform after:duration-300",
-                "hover:after:scale-x-100 hover:after:origin-bottom-left",
-                "hover:text-primary transition-colors duration-300"
+                "relative group",
+                "hover:text-primary transition-colors duration-300",
+                // Remove right padding and update flex layout
+                "flex items-center justify-between gap-4"
             )}>
-                {children}
+                <span className="flex-1 min-w-0">{children}</span>
             </h3>
         ),
 
@@ -206,7 +215,19 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </div>
         ),
 
-        
+        code: ({ children }) => (
+            <code className={cn(
+                "relative rounded px-[0.4em] py-[0.2em]",
+                "bg-muted text-accent-foreground",
+                "font-mono font-medium text-[0.9em]", // Update font styling
+                "before:hidden after:hidden",
+                "break-words",
+                "tracking-tight",
+                "[font-variation-settings:'wght'_500]" // Add this for variable fonts
+            )}>
+                {children}
+            </code>
+        ),
 
         img: ({ src, alt }) => (
             <div className={cn(
@@ -233,7 +254,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                     height={630}
                     quality={95}
                     placeholder="blur"
-                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAAAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4cHRocHCIkJR8nODE+MTAxODYzQEhcTkBEV0U3Ol9kaVpZWjY+SmxdbWdlXXJ5Y2f/2wBDARUXFx4cHhocHBodHiIeIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAAAAAAAAAAAAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDABQODxIPDRQSEBIXFRQdHx4cHRocHCIkJR8nODE+MTAxODYzQEhcTkBEV0U3Ol9kaVpZWjY+SmxdbWdlXXJ5Y2f/2wBDARUXFx4cHhocHBodHiIeIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiIiL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 />
                 {alt && (
                     <div className={cn(
@@ -250,21 +271,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </div>
         ),
 
-        strong: ({ children }) => (
-            <strong className={cn(
-                "font-semibold relative",
-                "text-primary dark:text-primary-foreground",
-                "dark:font-medium",
-                "px-1 py-0.5 rounded",
-                "bg-primary/5 dark:bg-primary-10",
-                "transition-all duration-300",
-                "hover:bg-primary-10 dark:hover:bg-primary-20",
-                "border-b border-primary-20 dark:border-primary-30",
-                "hover:border-primary-40 dark:hover:border-primary-50"
-            )}>
-                {children}
-            </strong>
-        ),
+        // Replace custom 'strong' component with default
+        strong: (props) => <strong {...props} />,
+
+        // Replace custom 'em' component with default
+        em: (props) => <em {...props} />,
 
         Alert: (props) => (
             <div className="my-8">
@@ -288,8 +299,76 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         Tooltip,
 
         Separator: () => (
-            <div className="my-8">
-                <Separator className="dark:bg-border-50" />
+            <div className={cn(
+                "my-12 relative flex items-center justify-center",
+                "group"
+            )}>
+                {/* Left gradient line */}
+                <div className={cn(
+                    "flex-1 h-[1px]",
+                    "bg-gradient-to-r from-transparent via-border to-border dark:via-border-50 dark:to-border-50",
+                    "transform transition-transform duration-500",
+                    "group-hover:scale-x-95 group-hover:translate-x-2"
+                )} />
+
+                {/* Center logo container */}
+                <div className={cn(
+                    "relative mx-4",
+                    "w-8 h-8 sm:w-10 sm:h-10",
+                    "rounded-full",
+                    "border-2 border-border dark:border-border-50",
+                    "bg-background dark:bg-card-30",
+                    "overflow-hidden",
+                    "transform transition-all duration-500",
+                    "group-hover:scale-110 group-hover:rotate-180",
+                    "group-hover:shadow-lg dark:group-hover:shadow-primary/20",
+                    "group-hover:border-primary dark:group-hover:border-primary-50"
+                )}>
+                    <Image
+                        src="/logo.webp"
+                        alt="Logo"
+                        width={40}
+                        height={40}
+                        className={cn(
+                            "w-full h-full",
+                            "object-cover",
+                            "transition-all duration-500",
+                            "group-hover:scale-110"
+                        )}
+                    />
+                    {/* Glow effect */}
+                    <div className={cn(
+                        "absolute inset-0",
+                        "bg-gradient-to-tr from-primary-20/0 via-primary-20/0 to-primary-20",
+                        "opacity-0 group-hover:opacity-100",
+                        "transition-opacity duration-500",
+                        "pointer-events-none"
+                    )} />
+                </div>
+
+                {/* Right gradient line */}
+                <div className={cn(
+                    "flex-1 h-[1px]",
+                    "bg-gradient-to-l from-transparent via-border to-border dark:via-border-50 dark:to-border-50",
+                    "transform transition-transform duration-500",
+                    "group-hover:scale-x-95 group-hover:-translate-x-2"
+                )} />
+
+                {/* Decorative dots */}
+                <div className={cn(
+                    "absolute left-1/4 -translate-x-1/2",
+                    "w-1 h-1 rounded-full",
+                    "bg-border dark:bg-border-50",
+                    "transition-all duration-500",
+                    "group-hover:scale-150 group-hover:bg-primary"
+                )} />
+                <div className={cn(
+                    "absolute right-1/4 translate-x-1/2",
+                    "w-1 h-1 rounded-full",
+                    "bg-border dark:bg-border-50",
+                    "transition-all duration-500",
+                    "group-hover:scale-150 group-hover:bg-primary"
+                )} />
             </div>
         ),
 
@@ -394,7 +473,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                     "after:w-full after:h-[1px] after:bg-primary",
                     "after:transform after:scale-x-0 after:origin-bottom-right",
                     "after:transition-transform after:duration-300",
-                    "hover:after:scale-x-100 hover:after:origin-bottom-left"
+                    "hover:after:scale-x-100 hover:after:origin-bottom-left",
                 )}
             >
                 {children}
@@ -548,6 +627,65 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         ),
 
         Math,
+
+        a: ({ href, children }) => {
+            if (!href) return <span>{children}</span>;
+            
+            const isExternal = href.match(/^(https?:\/\/|mailto:|tel:)/i);
+            const isAnchor = href.startsWith('#');
+            
+            const classes = cn(
+                "relative group",
+                "inline-flex items-center gap-1",
+                "text-primary hover:text-primary-foreground",
+                "transition-all duration-300",
+                "decoration-primary/30",
+                "hover:decoration-primary-foreground/50",
+            );
+
+            // Handle anchor links
+            if (isAnchor) {
+                return (
+                    <a href={href} className={classes}>
+                        {children}
+                    </a>
+                );
+            }
+
+            // Handle external links
+            if (isExternal) {
+                return (
+                    <a 
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={classes}
+                    >
+                        {children}
+                        <ExternalLink 
+                            className={cn(
+                                "w-3.5 h-3.5 ml-0.5",
+                                "transition-all duration-300",
+                                "opacity-50 group-hover:opacity-100",
+                                "group-hover:transform",
+                                "group-hover:translate-x-0.5",
+                                "group-hover:-translate-y-0.5"
+                            )}
+                        />
+                    </a>
+                );
+            }
+
+            // Handle internal links
+            return (
+                <Link 
+                    href={href}
+                    className={classes}
+                >
+                    {children}
+                </Link>
+            );
+        },
 
         ...components,
     };

@@ -1,6 +1,8 @@
 "use client";
 
 import SocialLink from "./SocialLink";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 import {
   faCodepen,
   faGithub,
@@ -32,7 +34,7 @@ export const links = [
   },
   {
     name: "Reddit",
-    url: "https://www.reddit.com/user/w4wdev",
+    url: "https://www.reddit.com/user/onelonedatum",
     icon: faReddit,
     color: "#FF4500",
   },
@@ -63,13 +65,74 @@ export const links = [
   color: link.color || "var(--primary-color)",
 }));
 
-
 export default function Links() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.3
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 20
+      }
+    }
+  };
+
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 pt-4">
-      {links.map((link) => (
-        <SocialLink key={link.name} link={link} />
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className={cn(
+        // Responsive grid
+        "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
+        "gap-3 sm:gap-4 md:gap-6 lg:gap-8",
+        // Responsive padding
+        "p-3 sm:p-4 md:p-6 lg:p-8",
+        // Container styling
+        "w-full max-w-[95vw] md:max-w-5xl mx-auto",
+        "rounded-xl",
+        // Theme-aware background
+        "bg-gradient-to-br",
+        "from-background/30 to-background/10",
+        "dark:from-background/20 dark:to-background/5",
+        // Enhanced blur and border
+        "backdrop-blur-sm",
+        "border border-primary/5",
+        "dark:border-primary/10",
+        // Improved shadows
+        "shadow-xl shadow-primary/5",
+        "dark:shadow-primary/10",
+        // Smooth transitions
+        "transition-colors duration-300"
+      )}
+    >
+      {links.map((link, index) => (
+        <motion.div
+          key={link.name}
+          variants={itemVariants}
+          custom={index}
+          className={cn(
+            "w-full",
+            // Ensure minimum touch target size
+            "min-h-[100px] sm:min-h-[120px]"
+          )}
+        >
+          <SocialLink link={link} />
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 }

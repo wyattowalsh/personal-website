@@ -13,7 +13,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { ChevronDown, ChevronUp } from "lucide-react"; // Change import to use separate icons
+import { ChevronDown, ChevronUp, MoreHorizontal } from "lucide-react"; // Change import to use separate icons
 import { Button } from "@/components/ui/button";
 import {
 	Tooltip,
@@ -25,25 +25,42 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
+import Link from "next/link";
 
+// Update Post interface to match metadata
 interface Post {
 	slug: string;
 	title: string;
 	summary: string;
 	date: string;
-	updated?: string;
 	tags: string[];
-	image?: string;
-	readingTime?: string;
 	content: string;
+	image?: string;
+	updated?: string;
+	readingTime?: string;
+	sortings?: {
+		byDate: {
+			asc: string[];
+			desc: string[];
+		};
+		byTitle: {
+			asc: string[];
+			desc: string[];
+		};
+	};
 }
 
 interface SearchBarProps {
-	posts: Post[]; // Make sure Post type includes content field
+	posts: Post[];
 	tags: string[];
 }
 
-const SearchBar = ({ posts, tags }: SearchBarProps) => {
+const SearchBar: React.FC<SearchBarProps> = ({ posts, tags }) => {
+	// Filter out invalid posts
+	const validPosts = useMemo(() => 
+		posts.filter(post => post.title && post.date && post.tags)
+	, [posts]);
+
 	// Ensure stable initial states
 	const [mounted, setMounted] = useState(false);
 	const [query, setQuery] = useState("");
@@ -52,14 +69,20 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 	const [sortMethod, setSortMethod] = useState<string>("date");
 	const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
 
-	// Mount effect to initialize results with sorted posts
+	// Update mount effect to handle empty posts
 	useEffect(() => {
-		const sortedPosts = [...posts].sort(
+		if (!validPosts.length) {
+			console.warn("No valid posts found");
+			setResults([]);
+			return;
+		}
+
+		const sortedPosts = [...validPosts].sort(
 			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
 		);
 		setResults(sortedPosts);
 		setMounted(true);
-	}, [posts]);
+	}, [validPosts]);
 
 	// Memoize the Fuse instance
 	const fuse = useMemo(
@@ -181,7 +204,8 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 						"max-h-[120px] sm:max-h-none",
 						"overflow-y-auto sm:overflow-visible",
 						"scrollbar-thin scrollbar-thumb-primary/20",
-						"scrollbar-track-transparent"
+						"scrollbar-track-transparent",
+						"items-center" // Add this
 					)}
 				>
 					{tags.map((tag) => (
@@ -201,6 +225,15 @@ const SearchBar = ({ posts, tags }: SearchBarProps) => {
 							<TagLink tag={tag} isNested />
 						</motion.div>
 					))}
+
+						<Link href="/blog/tags">
+							<Badge
+								variant="secondary"
+								className="bg-secondary hover:bg-secondary/80 text-secondary-foreground cursor-pointer"
+							>
+								all tags
+							</Badge>
+						</Link>
 				</div>
 
 				{/* Sort Controls - Responsive layout */}

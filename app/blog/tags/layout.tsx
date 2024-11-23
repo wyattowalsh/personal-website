@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { getAllTags } from "@/lib/posts";
 import { Badge } from "@/components/ui/badge";
 import PostCard from "@/components/PostCard"; // Ensure this is the correct import path
+import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default async function TagsLayout({
   children,
@@ -14,12 +15,9 @@ export default async function TagsLayout({
 
   return (
     <section className="container mx-auto px-4">
+      <ParticlesBackground />
       <div className="py-4">
-        <nav className="flex flex-wrap gap-2 mb-4">
-          <Link href="/blog" className="text-muted-foreground hover:text-primary transition-colors">
-            ← Back to all posts
-          </Link>
-          <Separator orientation="vertical" className="mx-2" />
+        <nav className="flex flex-wrap gap-2 mb-4 items-center justify-center">
           {tags.map((tag) => (
             <Link key={tag} href={`/blog/tags/${tag}`}>
               <Badge

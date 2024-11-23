@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import NotFoundContent from "@/components/NotFoundContent";
 import { cn } from "@/lib/utils";
+import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default function NotFound() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
@@ -47,6 +48,7 @@ export default function NotFound() {
         isLoaded ? "opacity-100" : "opacity-0"
       )}
     >
+      <ParticlesBackground />
       {/* Animated background grid with perspective effect */}
       <div 
         className="absolute inset-0 overflow-hidden"

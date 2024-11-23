@@ -1,19 +1,33 @@
-import { type ClassValue, clsx } from "clsx";
+import { ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-
+ 
 export function cn(...inputs: ClassValue[]) {
-	return twMerge(clsx(inputs));
+  return twMerge(clsx(inputs));
 }
 
 export const formatDate = (
   date: string,
-  locale: string,
+  locale = "en-US",
   options?: Intl.DateTimeFormatOptions
 ): string => {
   try {
-    // Parse the date string as UTC
-    const utcDate = new Date(date + 'T00:00:00Z');
-    return new Intl.DateTimeFormat(locale, options).format(utcDate);
+    const utcDate = new Date(date + 'Z'); // Force UTC 
+    
+    // Default formatting options for consistent, beautiful dates
+    const defaultOptions: Intl.DateTimeFormatOptions = {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC'
+    };
+
+    // Merge with any custom options
+    const dateFormatter = new Intl.DateTimeFormat(
+      locale, 
+      options || defaultOptions
+    );
+
+    return dateFormatter.format(utcDate);
   } catch {
     return "Invalid Date";
   }

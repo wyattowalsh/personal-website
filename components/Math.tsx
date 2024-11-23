@@ -1,166 +1,126 @@
 "use client";
 
-import { useMemo, useState, useEffect } from 'react';
-import { cn } from "@/lib/utils";
-import { Copy, Check, Hash } from "lucide-react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import katex from 'katex';
-
-let globalEquationCounter = 1;
+import { cn } from "@/lib/utils";
+import { Link, Copy } from "lucide-react";
+import { useMathContext } from "./MathContext";
 
 interface MathProps {
-  children: string;
-  options?: katex.KatexOptions;
-  className?: string;
+  children?: string;
+  display?: boolean;
+  options?: any;
+  label?: string;
+  number?: number;
 }
 
-export function Math({ children = '', display = false, options }) {
-  const [equationNumber, setEquationNumber] = useState<number | null>(null);
+export default function Math({ children = '', display = false, options = {}, label, number }: MathProps) {
   const [copied, setCopied] = useState(false);
-  const Wrapper = display ? 'div' : 'span';
-
-  useEffect(() => {
-    if (display) {
-      setEquationNumber(globalEquationCounter++);
+  const mathRef = useRef<HTMLDivElement>(null);
+  const { getNextNumber } = useMathContext();
+  const numberRef = useRef<number | null>(null);
+  
+  // Get equation number only once and store it in ref
+  const equationId = useMemo(() => {
+    if (!display) return undefined;
+    if (label) return label;
+    if (typeof number === 'number') return number;
+    if (numberRef.current === null) {
+      numberRef.current = getNextNumber();
     }
-  }, [display]);
+    return numberRef.current;
+  }, [display, label, number, getNextNumber]);
 
-  if (typeof children !== 'string') {
-    throw new Error('Children prop must be a katex string');
-  }
+  // Handle clicking equation number
+  const handleEquationClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const id = `eq-${equationId}`;
+    
+    // Update URL hash
+    window.history.pushState({}, '', `#${id}`);
+    
+    // Scroll to equation
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const handleCopy = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const url = `${window.location.href.split('#')[0]}#eq-${equationId}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const renderedKatex = useMemo(() => {
-    let result;
     const cleanMath = children.trim().replace(/^\$\$(.*)\$\$$/s, '$1');
-
     try {
-      result = katex.renderToString(cleanMath, {
-        ...options,
+      return katex.renderToString(cleanMath, {
         displayMode: display,
         throwOnError: true,
         globalGroup: true,
         trust: true,
         strict: false,
+        fleqn: false,
+        ...options
       });
     } catch (error) {
-      console.error(error);
-      result = katex.renderToString(cleanMath, {
-        ...options,
+      console.error('KaTeX error:', error);
+      return katex.renderToString(cleanMath, {
         displayMode: display,
         throwOnError: false,
         strict: 'ignore',
-        globalGroup: true,
-        trust: true,
+        ...options
       });
     }
+  }, [children, display, options]);
 
-    return result;
-  }, [children, options, display]);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(children);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  useEffect(() => {
+    if (mathRef.current && window.location.hash === `#eq-${equationId}`) {
+      mathRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [equationId]);
 
   if (!display) {
     return (
-      <Wrapper 
-        className={cn(
-          "math-inline relative group",
-          "px-2 py-0.5 rounded-md",
-          "bg-math-bg/40 dark:bg-math-bg/20",
-          "border border-math-border/30",
-          "transition-all duration-300",
-          "hover:bg-math-bg/60 dark:hover:bg-math-bg/40",
-          "hover:border-math-border/50",
-          "hover:shadow-sm dark:hover:shadow-primary/5",
-        )}
-        dangerouslySetInnerHTML={{ __html: renderedKatex || '' }}
+      <span 
+        className="math-inline"
+        dangerouslySetInnerHTML={{ __html: renderedKatex }}
       />
     );
   }
 
   return (
-    <div className={cn(
-      "math-display not-prose group",
-      "relative w-full my-8",
-      "transition-all duration-300",
-    )}>
-      {/* Backdrop blur effect */}
-      <div className={cn(
-        "absolute inset-0",
-        "bg-math-bg/30 dark:bg-math-bg/10",
-        "backdrop-blur-[1px]",
-        "rounded-xl",
-        "transition-opacity duration-300",
-        "opacity-0 group-hover:opacity-100"
-      )} />
-
-      {/* Main equation container */}
-      <Wrapper
-        id={`equation-${equationNumber}`}
-        className={cn(
-          "relative z-10",
-          "px-8 py-6",
-          "rounded-xl border border-math-border",
-          "bg-math-bg/95 dark:bg-math-bg/80",
-          "shadow-math hover:shadow-math-hover",
-          "transition-all duration-300",
-          "group-hover:border-primary/30",
-          // Scrollbar styling
-          "overflow-x-auto overflow-y-hidden",
-          "scrollbar-thin scrollbar-track-transparent",
-          "scrollbar-thumb-math-controls-text/20",
-          "hover:scrollbar-thumb-math-controls-text/30"
-        )}
-        dangerouslySetInnerHTML={{ __html: renderedKatex || '' }}
+    <div 
+      ref={mathRef}
+      id={`eq-${equationId}`}
+      className="math-display group relative"
+    >
+      <div
+        className="math-content"
+        dangerouslySetInnerHTML={{ __html: renderedKatex }}
       />
-
-      {/* Equation number badge */}
-      <a
-        href={`#equation-${equationNumber}`}
-        className={cn(
-          "absolute -left-10 top-1/2 -translate-y-1/2",
-          "flex items-center gap-1.5",
-          "px-3 py-1.5 rounded-full",
-          "bg-math-controls-bg/95 dark:bg-math-controls-bg/90",
-          "text-math-controls-text",
-          "border border-math-border",
-          "text-xs font-medium",
-          "shadow-sm",
-          "backdrop-blur-sm",
-          "transition-all duration-300",
-          "opacity-100 translate-x-0"
-        )}
-      >
-        <Hash className="h-3.5 w-3.5" />
-        <span>{equationNumber}</span>
-      </a>
-
-      {/* Copy button */}
-      <button
-        onClick={handleCopy}
-        className={cn(
-          "absolute -top-3 -right-3 z-20",
-          "flex items-center gap-2",
-          "px-3 py-1.5 rounded-full",
-          "bg-math-controls-bg/95 dark:bg-math-controls-bg/90",
-          "text-math-controls-text hover:text-math-controls-text-hover",
-          "border border-math-border",
-          "text-xs font-medium",
-          "shadow-sm hover:shadow-md",
-          "backdrop-blur-sm",
-          "transition-all duration-300",
-          "opacity-0 scale-95",
-          "group-hover:opacity-100 group-hover:scale-100",
-          "hover:scale-105"
-        )}
-      >
-        {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-        <span>{copied ? 'Copied' : 'Copy'}</span>
-      </button>
+      {equationId && (
+        <>
+          <button
+            onClick={handleCopy}
+            className="equation-link"
+            title="Copy link to equation"
+          >
+            {copied ? <Copy className="h-4 w-4" /> : <Link className="h-4 w-4" />}
+          </button>
+          <button
+            onClick={handleEquationClick}
+            className="equation-number"
+            title="Click to link to this equation"
+          >
+            ({equationId})
+          </button>
+        </>
+      )}
     </div>
   );
 }
-
-export default Math;

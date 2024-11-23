@@ -1,68 +1,101 @@
 {
     "background": {
         "color": {
-            "value": "#ffffff"
+            "value": "#f9f9f9"
         }
     },
     "particles": {
         "number": {
-            "value": 50,
+            "value": 120,
             "density": {
                 "enable": true,
-                "area": 800
+                "area": 1000
             }
         },
         "color": {
-            "value": ["#ff7f50", "#ff6347", "#ff4500"]
+            "value": ["#ff8c00", "#ffa500", "#ffd700", "#f0e68c", "#fffacd", "#ffe4b5"]
         },
         "shape": {
             "type": "image",
             "image": {
-                "src": "path/to/butterfly.png",
-                "width": 100,
-                "height": 100
+                "src": "/butterfly.webp",
+                "width": 60,
+                "height": 60
             }
         },
         "opacity": {
-            "value": 0.9,
-            "random": true
+            "value": {
+                "min": 0.3,
+                "max": 0.6
+            },
+            "random": true,
+            "animation": {
+                "enable": true,
+                "speed": 1.5,
+                "minimumValue": 0.2,
+                "sync": false
+            }
         },
         "size": {
             "value": {
                 "min": 10,
                 "max": 20
             },
-            "random": true
+            "random": true,
+            "animation": {
+                "enable": true,
+                "speed": 2,
+                "minimumValue": 8,
+                "sync": false
+            }
         },
         "move": {
             "enable": true,
             "speed": 2,
-            "direction": "none",
+            "direction": "top-right",
             "outModes": {
                 "default": "out"
-            }
+            },
+            "random": false,
+            "straight": false
         }
     },
     "interactivity": {
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": "repulse"
+                "mode": ["grab"]
             },
             "onClick": {
                 "enable": true,
-                "mode": "push"
+                "mode": ["bubble", "push"]
             }
         },
         "modes": {
-            "repulse": {
-                "distance": 100,
-                "duration": 0.4
+            "grab": {
+                "distance": 200,
+                "line_linked": {
+                    "opacity": 0.5
+                }
+            },
+            "bubble": {
+                "distance": 150,
+                "size": 30,
+                "duration": 2.5,
+                "opacity": 0.9
             },
             "push": {
-                "quantity": 4
+                "quantity": 6
             }
         }
     },
-    "detectRetina": true
+    "fullScreen": {
+        "enable": true,
+        "zIndex": -1
+    },
+    "detectRetina": true,
+    "fpsLimit": 60,
+    "smooth": true,
+    "pauseOnBlur": true,
+    "pauseOnOutsideViewport": true
 }

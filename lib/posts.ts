@@ -1,12 +1,8 @@
 import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
-import { Post } from "@/types/Post";
-import { existsSync } from 'fs';
-import { readFile } from 'fs/promises';
-import { cache } from 'react';
+import { promises as fs } from 'fs';  // Update import
 import { LRUCache } from 'lru-cache';
-
 
 // Update the posts directory path to ensure it's absolute
 const postsDirectory = path.join(process.cwd(), "app/blog/posts");
@@ -24,21 +20,41 @@ export interface PostMetaData {
   readingTime: string;
 }
 
+// Update interfaces to use created/updated instead of date
 export interface PostMetadata {
   slug: string;
   title: string;
-  date: string;
-  tags?: string[];
-  summary?: string;
+  summary: string;
+  created: string;    // Changed from date
+  updated: string;    // Now required
+  tags: string[];
   image?: string;
   caption?: string;
-  updated?: string;
+  content?: string;
   readingTime?: string;
+  adjacent?: {
+    prev: AdjacentPost | null;
+    next: AdjacentPost | null;
+  };
 }
 
 export interface AdjacentPost {
   slug: string;
   title: string;
+}
+
+// Update interfaces to use created/updated instead of date
+export interface Post {
+  slug: string;
+  title: string;
+  created: string;    // Changed from date
+  updated: string;    // Now required
+  tags: string[];
+  summary: string;
+  content: string;
+  image?: string;
+  caption?: string;
+  readingTime?: string;
 }
 
 export async function getAllMdxFiles(dir: string, files: string[] = []): Promise<string[]> {
@@ -61,6 +77,7 @@ export async function getAllMdxFiles(dir: string, files: string[] = []): Promise
   return files;
 }
 
+// Update getSortedPostsData to use created date for sorting
 export async function getSortedPostsData(): Promise<{ posts: Post[]; total: number }> {
   try {
     const files = await getAllMdxFiles(postsDirectory);
@@ -79,12 +96,12 @@ export async function getSortedPostsData(): Promise<{ posts: Post[]; total: numb
         slug,
         ...(matterResult.data as {
           title: string;
-          date: string;
+          created: string;    // Changed from date
+          updated: string;    // Now required
           tags: string[];
           summary: string;
           image?: string;
           caption?: string;
-          updated?: string;
         }),
         content: matterResult.content,
         readingTime: stats.text,
@@ -92,7 +109,7 @@ export async function getSortedPostsData(): Promise<{ posts: Post[]; total: numb
     }));
 
     const sortedPosts = allPostsData.sort((a, b) =>
-      new Date(b.date) > new Date(a.date) ? 1 : -1
+      new Date(b.created) > new Date(a.created) ? 1 : -1  // Changed from date to created
     );
 
     return { posts: sortedPosts, total: sortedPosts.length };
@@ -129,95 +146,56 @@ const postsCache = new LRUCache<string, PostMetadata | Post[]>({
   ttl: 1000 * 60 * 60, // 1 hour
 } as PostsCacheType);
 
-// Cached version of getPostBySlug
-export const getPostBySlug = cache(async (slug: string | string[]): Promise<PostMetadata | null> => {
-  const cacheKey = Array.isArray(slug) ? slug.join('/') : slug;
-  const cached = postsCache.get(cacheKey);
-  if (cached) return cached as PostMetadata;
-
-  try {
-    const slugPath = Array.isArray(slug) ? slug.join("/") : slug;
-    const fullPath = path.join(postsDirectory, slugPath, "page.mdx");
-    
-    if (!existsSync(fullPath)) {
-      console.warn(`Post not found at: ${fullPath}`);
-      return null;
-    }
-
-    const fileContents = await readFile(fullPath, "utf8");
-    const matterResult = matter(fileContents);
-    const stats = readingTime(matterResult.content);
-
-    let imagePath = matterResult.data.image;
-    if (imagePath) {
-      if (imagePath.startsWith("./") || imagePath.startsWith("../")) {
-        const imageFullPath = path.join(path.dirname(fullPath), imagePath);
-        imagePath =
-          "/" +
-          path.relative(path.join(process.cwd(), "public"), imageFullPath).replace(/\\/g, "/");
-      }
-    }
-
-    const result = {
-      slug: slugPath,
-      content: matterResult.content,
-      image: imagePath,
-      title: matterResult.data.title || "Untitled Post",
-      date: matterResult.data.date,
-      updated: matterResult.data.updated,
-      summary: matterResult.data.summary,
-      tags: matterResult.data.tags,
-      readingTime: stats.text,
-    };
-
-    postsCache.set(cacheKey, result);
-    return result;
-  } catch (error) {
-    console.error(`Error fetching post by slug: ${slug}`, error);
-    return null;
-  }
-});
-
-// Add other cached versions of functions
-export const getAllPosts = cache(async () => {
+// Replace getAllPosts implementation
+export async function getAllPosts(): Promise<Post[]> {
   const cacheKey = 'all-posts';
   const cached = postsCache.get(cacheKey);
   if (cached) return cached as Post[];
 
   try {
-    const files = await getAllMdxFiles(postsDirectory);
-    const allPostsData = await Promise.all(files.map(async (file) => {
-      const { readFile } = await import("fs/promises");
-      const fileContents = await readFile(file, "utf8");
-      const matterResult = matter(fileContents);
-      const relativePath = path.relative(postsDirectory, file);
-      const slug = path.dirname(relativePath).replace(/\\/g, "/");
-      const stats = readingTime(matterResult.content);
-      return {
-        slug,
-        ...(matterResult.data as {
-          title: string;
-          date: string;
-          tags: string[];
-          summary: string;
-          image?: string;
-          caption?: string;
-          updated?: string;
-        }),
-        content: matterResult.content,
-        readingTime: stats.text,
-      };
-    }));
-    const result = allPostsData.sort((a, b) =>
-      new Date(b.date) > new Date(a.date) ? 1 : -1
-    );
-    postsCache.set(cacheKey, result);
-    return result;
+    const cacheDir = path.join(process.cwd(), '.cache');
+    const metadata = await fs.readFile(path.join(cacheDir, 'posts-metadata.json'), 'utf-8');
+    const metadataJson = JSON.parse(metadata);
+
+    if (!metadataJson || !Object.keys(metadataJson).length) {
+      console.warn('No posts found in cache, falling back to filesystem');
+      return await getSortedPostsData().then(result => result.posts);
+    }
+
+    const allPostsData = Object.values(metadataJson);
+    postsCache.set(cacheKey, allPostsData);
+    return allPostsData as Post[];
   } catch (error) {
     console.error("Error getting all posts:", error);
-    return [];
+    // Fallback to direct file system reading if cache fails
+    return await getSortedPostsData().then(result => result.posts);
   }
-});
+}
+
+// Update getPostBySlug implementation
+export async function getPostBySlug(slug: string | string[]): Promise<PostMetadata | null> {
+  const cacheKey = Array.isArray(slug) ? slug.join('/') : slug;
+  const cached = postsCache.get(cacheKey);
+  if (cached) return cached as PostMetadata;
+
+  try {
+    const cacheDir = path.join(process.cwd(), '.cache');
+    const metadata = await fs.readFile(path.join(cacheDir, 'posts-metadata.json'), 'utf-8');
+    const metadataJson = JSON.parse(metadata);
+
+    const postMetadata = metadataJson[cacheKey];
+    if (!postMetadata) {
+      console.warn(`Post not found for slug: ${cacheKey}`);
+      return null;
+    }
+
+    postsCache.set(cacheKey, postMetadata);
+    return postMetadata;
+  } catch (error) {
+    console.error(`Error fetching post by slug: ${slug}`, error);
+    return null;
+  }
+}
 
 export async function getAllTags() {
   try {
@@ -248,7 +226,7 @@ export async function getAdjacentPosts(currentSlug: string | string[]): Promise<
   try {
     const posts = await getAllPosts();
     const normalizedSlug = Array.isArray(currentSlug) ? currentSlug.join('/') : currentSlug;
-    const currentIndex = posts.findIndex(post => post.slug === normalizedSlug);
+    const currentIndex = posts.findIndex((post: Post) => post.slug === normalizedSlug);
     
     if (currentIndex === -1) {
       return { prevPost: undefined, nextPost: undefined };

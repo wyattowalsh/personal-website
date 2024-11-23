@@ -1,111 +1,124 @@
 {
-    "background": {
-      "color": {
-        "value": "#000000"
-      }
+  "background": {
+    "color": {
+      "value": "#000000"
     },
-    "fpsLimit": 60,
-    "particles": {
-      "number": {
-        "value": 150,
-        "density": {
-          "enable": true,
-          "area": 800
-        }
-      },
-      "color": {
-        "value": ["#ffffff", "#ffd700", "#ff4500"]
-      },
-      "shape": {
-        "type": "star"
-      },
-      "opacity": {
-        "value": {
-          "min": 0.5,
-          "max": 1
-        },
-        "random": true
-      },
-      "size": {
-        "value": {
-          "min": 1,
-          "max": 3
-        },
-        "random": true
-      },
-      "rotate": {
-        "value": 0,
-        "random": true,
-        "direction": "clockwise",
-        "animation": {
-          "enable": true,
-          "speed": 2,
-          "sync": false
-        }
-      },
-      "move": {
+    "image": "radial-gradient(circle, rgba(15,15,40,1) 0%, rgba(0,0,0,1) 100%)",
+    "position": "50% 50%",
+    "repeat": "no-repeat",
+    "size": "cover"
+  },
+  "fpsLimit": 120,
+  "particles": {
+    "number": {
+      "value": 300,
+      "density": {
         "enable": true,
-        "speed": 0.2,
-        "direction": "none",
-        "outModes": {
-          "default": "out"
-        },
-        "trail": {
-          "enable": false
-        }
-      },
-      "twinkle": {
-        "particles": {
-          "enable": true,
-          "frequency": 0.1,
-          "opacity": 1
-        }
-      },
-      "zIndex": {
-        "value": {
-          "min": 0,
-          "max": 100
-        }
-      },
-      "life": {
-        "count": 0,
-        "delay": {
-          "random": {
-            "enable": true,
-            "minimumValue": 0
-          },
-          "value": 0
-        },
-        "duration": {
-          "random": {
-            "enable": true,
-            "minimumValue": 0.1
-          },
-          "value": 3
-        }
+        "area": 1200
       }
     },
-    "interactivity": {
-      "events": {
-        "onHover": {
-          "enable": false
-        },
-        "onClick": {
-          "enable": true,
-          "mode": "repulse"
-        }
+    "color": {
+      "value": ["#ffffff", "#ffd700", "#ff4500", "#87ceeb", "#f0e68c"]
+    },
+    "shape": {
+      "type": "star"
+    },
+    "opacity": {
+      "value": {
+        "min": 0.1,
+        "max": 1
       },
-      "modes": {
-        "repulse": {
-          "distance": 200,
-          "duration": 0.4,
-          "factor": 100,
-          "speed": 1,
-          "maxSpeed": 50,
-          "easing": "ease-out-quad"
-        }
+      "random": true
+    },
+    "size": {
+      "value": {
+        "min": 1,
+        "max": 6
+      },
+      "random": true
+    },
+    "rotate": {
+      "value": 0,
+      "random": true,
+      "direction": "clockwise",
+      "animation": {
+        "enable": true,
+        "speed": 6,
+        "sync": false
       }
     },
-    "detectRetina": true
-  }
-  
+    "move": {
+      "enable": true,
+      "speed": {
+        "min": 0.2,
+        "max": 0.5
+      },
+      "direction": "none",
+      "outModes": {
+        "default": "out"
+      },
+      "trail": {
+        "enable": true,
+        "length": 15,
+        "fillColor": "#000000"
+      }
+    },
+    "life": {
+      "count": 0,
+      "duration": {
+        "random": {
+          "enable": true,
+          "minimumValue": 2
+        },
+        "value": 6
+      },
+      "delay": {
+        "random": {
+          "enable": true,
+          "minimumValue": 0.5
+        },
+        "value": 1
+      }
+    },
+    "twinkle": {
+      "particles": {
+        "enable": true,
+        "frequency": 0.01,
+        "opacity": 1
+      }
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 200
+      }
+    }
+  },
+  "interactivity": {
+    "events": {
+      "onHover": {
+        "enable": true,
+        "mode": "attract"
+      },
+      "onClick": {
+        "enable": true,
+        "mode": "repulse"
+      }
+    },
+    "modes": {
+      "repulse": {
+        "distance": 350,
+        "duration": 0.5,
+        "factor": 150,
+        "speed": 2,
+        "maxSpeed": 70,
+        "easing": "ease-in-out-quad"
+      },
+      "attract": {
+        "distance": 250,
+        "duration": 0.4
+      }
+    }
+  },
+  "detectRetina": true
+}

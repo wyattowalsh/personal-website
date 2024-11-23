@@ -6,14 +6,28 @@ import { cn } from "@/lib/utils";
 
 const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
   const [showButton, setShowButton] = useState(false);
+  const [hasOverflow, setHasOverflow] = useState(false);
 
   useEffect(() => {
+    const checkOverflow = () => {
+      const contentHeight = document.documentElement.scrollHeight;
+      const viewportHeight = window.innerHeight;
+      setHasOverflow(contentHeight > viewportHeight);
+    };
+
     const handleScroll = () => {
       setShowButton(window.scrollY > 300);
     };
 
+    // Check overflow on mount and window resize
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("resize", checkOverflow);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const scrollToTop = () => {
@@ -24,9 +38,9 @@ const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <div className="relative min-h-full overflow-y-scroll">
+    <div className={`relative min-h-full ${hasOverflow ? 'overflow-y-auto' : 'overflow-y-hidden'}`}>
       {children}
-      {showButton && (
+      {hasOverflow && showButton && (
         <button
           onClick={scrollToTop}
           className="fixed z-50 p-3 rounded-full shadow-lg backdrop-blur-sm bottom-4 right-4 sm:bottom-6 sm:right-6 md:bottom-8 md:right-8 bg-gray-100/80 dark:bg-gray-800/80 hover:bg-gray-200/90 dark:hover:bg-gray-700/90 text-gray-700 dark:text-gray-300 transition-all duration-300 ease-in-out hover:scale-110 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 dark:focus-visible:ring-primary/50 w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14"

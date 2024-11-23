@@ -1,76 +1,91 @@
 {
-    "background": {
-      "color": {
-        "value": "#000000"
-      }
+  "background": {
+    "color": {
+      "value": "#1a1a1a"
     },
-    "particles": {
-      "number": {
-        "value": 200,
-        "density": {
-          "enable": true,
-          "area": 1000
-        }
-      },
-      "color": {
-        "value": ["#00ff00", "#00cc00", "#009900"]
-      },
-      "shape": {
-        "type": "char",
-        "character": {
-          "value": ["✦", "★", "✧", "❖", "✪", "⚙", "☯", "☮", "✈", "☘", "♬", "♫", "☀", "☁", "⚡", "❄", "☂", "☕", "♛", "♞", "♜", "♝", "♚", "♔", "♕", "♖", "♗", "♘", "♙", "♟", "❤", "☾", "☽", "⚑", "✉", "☢", "☣", "♲", "⚛", "⌘", "☠", "☤", "⚕", "♿", "⚠", "♻", "☃", "♺", "⚓", "⛵", "✈", "⌛", "⏳", "⚔", "⚖", "⚙", "✂", "✒", "✏", "⌨", "✇", "✍", "✎", "✁", "★", "☆", "✦", "✧", "✩", "✪", "✫", "✬", "✭", "✮", "✯", "☉", "⌂", "⌘", "☇", "☈", "☢", "☣", "☤", "☥", "☦", "☧", "☨", "☩", "☪", "☫", "☬", "☭", "☮", "☯", "☽", "☾", "☿", "♀", "♁", "♂", "♃", "♄", "♅", "♆", "♇", "♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"],
-          "font": "Verdana, Geneva, sans-serif",
-          "style": "",
-          "weight": "700",
-          "fill": true
-        }
-      },
-      "opacity": {
-        "value": 0.9,
-        "random": true,
-        "animation": {
-          "enable": true,
-          "speed": 3,
-          "minimumValue": 0.1,
-          "sync": false
-        }
-      },
-      "size": {
-        "value": {
-          "min": 14,
-          "max": 20
-        }
-      },
-      "move": {
+    "opacity": 0.95
+  },
+  "particles": {
+    "number": {
+      "value": 400,
+      "density": {
         "enable": true,
-        "speed": 8,
-        "direction": "bottom",
-        "outModes": {
-          "default": "out"
-        },
-        "gravity": {
-          "enable": true,
-          "acceleration": 10
-        }
+        "area": 1600
+      }
+    },
+    "color": {
+      "value": ["#00ff00", "#00cc00", "#007700"]
+    },
+    "shape": {
+      "type": "char",
+      "character": {
+        "value": ["✦", "✪", "⚙", "☯", "✧", "★", "♛"],
+        "style": "normal",
+        "weight": "bold",
+        "fill": true
+      }
+    },
+    "opacity": {
+      "value": 0.8,
+      "random": true,
+      "animation": {
+        "enable": true,
+        "speed": 5,
+        "minimumValue": 0.3,
+        "sync": false
+      }
+    },
+    "size": {
+      "value": {
+        "min": 8,
+        "max": 14
       },
-      "zIndex": {
-        "value": {
-          "min": 0,
-          "max": 100
-        },
-        "opacityRate": 1
+      "animation": {
+        "enable": true,
+        "speed": 1,
+        "minimumValue": 6
       }
     },
-    "interactivity": {
-      "events": {
-        "onHover": {
-          "enable": false
-        },
-        "onClick": {
-          "enable": false
-        }
+    "move": {
+      "enable": true,
+      "speed": 5,
+      "direction": "top",
+      "outModes": {
+        "default": "out"
+      },
+      "gravity": {
+        "enable": true,
+        "acceleration": 7
       }
     },
-    "detectRetina": true
-  }
-  
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 60
+      },
+      "opacityRate": 0.95
+    }
+  },
+  "interactivity": {
+    "events": {
+      "onHover": {
+        "enable": true,
+        "mode": "trail"
+      },
+      "onClick": {
+        "enable": true,
+        "mode": "pause"
+      }
+    },
+    "modes": {
+      "trail": {
+        "delay": 0.005,
+        "quantity": 8
+      },
+      "pause": {}
+    }
+  },
+  "detectRetina": true,
+  "pauseOnBlur": true,
+  "pauseOnOutsideViewport": true
+}

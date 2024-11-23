@@ -45,6 +45,8 @@ $math-text-color: hsl(222, 47%, 11%); // Slate-900
 $math-index-color: hsl(215, 20%, 65%); // Slate-500
 $math-inline-bg: hsla(210, 40%, 98%, 0.9);
 $math-display-bg: hsla(210, 40%, 98%, 0.95);
+$math-display-number: hsl(215, 20%, 65%); // Slate-500
+$math-display-number-hover: hsl(222.2, 47.4%, 11.2%); // Slate-900
 
 // Light Mode Variables
 @use 'sass:map';
@@ -92,6 +94,26 @@ $dark-math-colors: (
   'math-controls-hover': 'hsla(222.2, 84%, 4.9%, 1)',
   'math-controls-text': '148 163 184', // RGB values for slate-400
   'math-controls-text-hover': '241 245 249', // RGB values for slate-100
+);
+
+// Add new enhanced gradient variables
+$enhanced-gradients: (
+  'primary': (
+    'light': 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)',
+    'dark': 'linear-gradient(135deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%)'
+  ),
+  'accent': (
+    'light': 'linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #db2777 100%)',
+    'dark': 'linear-gradient(135deg, #f9a8d4 0%, #f472b6 50%, #ec4899 100%)'
+  )
+);
+
+// Add new animation timing variables
+$animation-timing: (
+  'fast': 200ms,
+  'normal': 300ms,
+  'slow': 500ms,
+  'very-slow': 1000ms
 );
 
 // Light Theme Variables
@@ -183,6 +205,8 @@ $dark-math-colors: (
   --math-controls-hover: hsla(210, 40%, 95%, 1);
   --math-controls-text: hsl(215.4, 16.3%, 46.9%);
   --math-controls-text-hover: hsl(222.2, 47.4%, 11.2%);
+  --math-display-number: hsl(215, 20%, 65%);
+  --math-display-number-hover: hsl(215, 20%, 40%);
 
   // Enhanced 404 page variables
   --cyber-grid-color: rgba(59, 130, 246, 0.1);
@@ -213,6 +237,44 @@ $dark-math-colors: (
   @each $name, $value in $light-math-colors {
     --#{$name}: #{$value};
   }
+
+  // Header specific colors
+  --post-header-gradient-from: rgb(255, 255, 255);
+  --post-header-gradient-via: rgb(249, 250, 251);
+  --post-header-gradient-to: rgb(243, 244, 246);
+  --post-header-border: rgb(229, 231, 235);
+  --post-header-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --post-header-hover-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --post-header-image-overlay: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0.8) 100%
+  );
+
+  // Back link specific colors
+  --back-link-bg: rgba(255, 255, 255, 0.8);
+  --back-link-hover-bg: rgba(255, 255, 255, 0.95);
+  --back-link-border: rgba(229, 231, 235, 0.5);
+  --back-link-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.1);
+  --back-link-hover-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.05);
+
+  --subtitle-gradient-start: #3b82f6;
+  --subtitle-gradient-end: #ec4899;
+
+  // Selection colors
+  --selection-bg: hsl(321, 100%, 78%, 0.2); // Soft pink
+  --selection-text: hsl(321, 100%, 45%); // Deep pink
+  --selection-heading-bg: hsl(262, 100%, 78%, 0.25); // Soft purple
+  --selection-heading-text: hsl(262, 100%, 45%); // Deep purple
 }
 
 // Dark Theme Variables
@@ -304,6 +366,8 @@ $dark-math-colors: (
   --math-controls-hover: hsla(222.2, 84%, 4.9%, 1);
   --math-controls-text: hsl(215, 20.2%, 65.1%);
   --math-controls-text-hover: hsl(210, 40%, 98%);
+  --math-display-number: hsl(215, 20%, 65%);
+  --math-display-number-hover: hsl(215, 20%, 90%);
 
   // Enhanced 404 page variables
   --cyber-grid-color: rgba(59, 130, 246, 0.2);
@@ -328,4 +392,42 @@ $dark-math-colors: (
   @each $name, $value in $dark-math-colors {
     --#{$name}: #{$value};
   }
+
+  // Header specific colors
+  --post-header-gradient-from: rgb(17, 24, 39);
+  --post-header-gradient-via: rgb(31, 41, 55);
+  --post-header-gradient-to: rgb(55, 65, 81);
+  --post-header-border: rgb(75, 85, 99);
+  --post-header-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5),
+    0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --post-header-hover-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.5),
+    0 8px 10px -6px rgba(0, 0, 0, 0.4);
+  --post-header-image-overlay: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.4) 50%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+
+  // Back link specific colors
+  --back-link-bg: rgba(17, 24, 39, 0.8);
+  --back-link-hover-bg: rgba(31, 41, 55, 0.95);
+  --back-link-border: rgba(75, 85, 99, 0.5);
+  --back-link-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.3);
+  --back-link-hover-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    0 2px 4px rgba(0, 0, 0, 0.2);
+
+  --subtitle-gradient-start: #60a5fa;
+  --subtitle-gradient-end: #f472b6;
+
+  // Selection colors
+  --selection-bg: hsl(321, 90%, 65%, 0.2); // Bright pink
+  --selection-text: hsl(321, 90%, 75%); // Light pink
+  --selection-heading-bg: hsl(262, 90%, 65%, 0.25); // Bright purple
+  --selection-heading-text: hsl(262, 90%, 75%); // Light purple
 }

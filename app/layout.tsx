@@ -11,6 +11,7 @@ import KaTeXLoader from "@/components/KaTeXLoader";
 import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
 import { GoogleTagManager } from '@next/third-parties/google'
+import { cn } from "@/lib/utils";
 
 config.autoAddCss = false;
 
@@ -23,10 +24,12 @@ const montserrat = Montserrat({
 	subsets: ["latin"],
 	display: "swap",
 	variable: "--font-montserrat",
+	preload: true,
+	fallback: ['system-ui', 'arial']
 });
 
 export const metadata: Metadata = {
-	title: "Welcome to Wyatt's Personal Web App",
+	title: "w4w.dev | Wyatt Walsh",
 	description: "Wyatt's personal web app with social links, blog, and more.",
 	icons: {
 		icon: "/logo.webp",
@@ -40,20 +43,32 @@ export default function RootLayout({
 }) {
 	return (
 		<StrictMode>
-		<html lang="en" suppressHydrationWarning>
-		<GoogleTagManager gtmId="GTM-P7VFKNK6" />
+		<html lang="en" suppressHydrationWarning className="antialiased">
+			<GoogleTagManager gtmId="GTM-P7VFKNK6" />
 			<body
-				className={`min-h-screen bg-background font-sans antialiased ${montserrat.variable} ${firaCode.variable}`}
-			>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<Header />
-					<CustomScrollbars>{children}</CustomScrollbars>
-				</ThemeProvider>
+				className={cn(
+					"min-h-screen bg-background font-sans",
+					"motion-safe:transition-colors motion-safe:duration-300",
+					"selection:bg-primary/20 selection:text-primary",
+					"scrollbar-thin scrollbar-track-transparent",
+					"scrollbar-thumb-primary/10 hover:scrollbar-thumb-primary/20",
+					montserrat.variable,
+					firaCode.variable
+				)}
+				suppressHydrationWarning>
+						<ThemeProvider
+							attribute="class"
+							defaultTheme="system"
+							enableSystem
+							disableTransitionOnChange
+						>
+								<div className="relative flex min-h-screen flex-col">
+									<Header />
+									<main className="flex-1">
+										<CustomScrollbars>{children}</CustomScrollbars>
+									</main>
+								</div>
+						</ThemeProvider>
 				<ScrollIndicator />
 				<KaTeXLoader />
 			</body>

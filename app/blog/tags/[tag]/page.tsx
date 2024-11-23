@@ -2,7 +2,6 @@ import { getAllPosts, getAllTags } from "@/lib/posts";
 import PostCard from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import PostHeader from "@/components/PostHeader"; // Ensure this is the correct import path
 
 interface TagPageProps {
 	params: Promise<{ tag: string }>;
