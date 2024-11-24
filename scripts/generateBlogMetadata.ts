@@ -4,6 +4,7 @@ import { promises as fs } from 'fs';
 import readingTime from "reading-time";
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { logger } from './utils/logger';
 
 const execAsync = promisify(exec);
 
@@ -43,10 +44,27 @@ interface PostMetadata {
   };
 }
 
-function isValidDate(dateString: string | null): boolean {
+function normalizeDate(date: string | null | undefined): string | undefined {
+  if (!date) return undefined;
+  try {
+    // Remove any trailing Z if it exists
+    const cleanDate = date.endsWith('Z') ? date.slice(0, -1) : date;
+    const parsed = new Date(cleanDate);
+    if (isNaN(parsed.getTime())) return undefined;
+    return parsed.toISOString().slice(0, -1); // Remove Z
+  } catch {
+    return undefined;
+  }
+}
+
+function isValidDate(dateString: string | null | undefined): boolean {
   if (!dateString) return false;
-  const date = new Date(dateString);
-  return !isNaN(date.getTime());
+  try {
+    const date = new Date(dateString);
+    return !isNaN(date.getTime());
+  } catch {
+    return false;
+  }
 }
 
 async function getAllMdxFiles(dir: string, files: string[] = []): Promise<string[]> {
@@ -81,29 +99,29 @@ async function getFileGitDates(filePath: string) {
     );
 
     // Clean and validate dates
-    const createdDate = created.trim();
-    const updatedDate = updated.trim();
+    const createdDate = normalizeDate(created.trim());
+    const updatedDate = normalizeDate(updated.trim());
 
     return {
-      created: isValidDate(createdDate) ? createdDate : null,
-      updated: isValidDate(updatedDate) ? updatedDate : undefined // Convert null to undefined
+      created: createdDate ?? null,
+      updated: updatedDate
     };
   } catch (error) {
     console.warn(`Failed to get git dates for ${filePath}:`, error);
-    return { created: null, updated: undefined }; // Convert null to undefined
+    return { created: null, updated: undefined };
   }
 }
 
 async function generateMetadata() {
   try {
-    console.log('Starting metadata generation...');
+    logger.header('Generating Blog Metadata');
     
     // Create cache directory if it doesn't exist
     await fs.mkdir(cacheDirectory, { recursive: true });
-    console.log(`Cache directory ensured at: ${cacheDirectory}`);
+    logger.info(`Cache directory ensured at: ${cacheDirectory}`);
 
     const files = await getAllMdxFiles(postsDirectory);
-    console.log(`Found ${files.length} MDX files.`);
+    logger.success(`Found ${files.length} MDX files.`);
 
     const metadata: Record<string, PostMetadata> = {};
     const slugs: string[] = [];
@@ -123,19 +141,19 @@ async function generateMetadata() {
       const gitDates = await getFileGitDates(file);
 
       // Ensure we have a valid created date
-      let created = data.created;
-      if (!isValidDate(created)) {
-        created = gitDates.created;
-        if (!isValidDate(created)) {
-          created = fileStats.birthtime.toISOString();
-        }
+      let created = normalizeDate(data.created);
+      if (!created) {
+        created = gitDates.created ?? fileStats.birthtime.toISOString().slice(0, -1);
       }
 
       // Ensure we have a valid updated date or undefined
-      let updated = gitDates.updated;
-      if (!isValidDate(updated)) {
-        updated = fileStats.mtime.toISOString();
-      }
+      let updated = normalizeDate(gitDates.updated) ?? 
+                   fileStats.mtime.toISOString().slice(0, -1);
+
+      // Sort tags alphabetically
+      const sortedTags = (data.tags || []).sort((a: string, b: string) => 
+        a.toLowerCase().localeCompare(b.toLowerCase())
+      );
 
       slugs.push(slug);
       metadata[slug] = {
@@ -143,16 +161,16 @@ async function generateMetadata() {
         title: data.title,
         summary: data.summary || '',
         created,
-        updated, // This will now be string | undefined
+        updated,
         date: created, // Keep for compatibility
-        tags: data.tags || [],
+        tags: sortedTags, // Use sorted tags
         image: data.image,
         caption: data.caption,
         content: content, // Include full content for search
         readingTime: stats.text,
       };
 
-      console.log(`Processed metadata for: ${slug} (created: ${created})`);
+      console.log(`Processed metadata for: ${slug} (created: ${created}, updated: ${updated})`);
     }));
 
     // Sort slugs by created date
@@ -223,10 +241,9 @@ async function generateMetadata() {
       'utf8'
     );
 
-    console.log('Successfully generated posts metadata');
+    logger.success('Generated posts metadata successfully');
   } catch (error) {
-    console.error('Error generating posts metadata:', error);
-    process.exit(1);
+    logger.fatal('Error generating posts metadata', error as Error);
   }
 }
 

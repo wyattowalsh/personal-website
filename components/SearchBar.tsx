@@ -32,11 +32,12 @@ interface Post {
 	slug: string;
 	title: string;
 	summary: string;
-	date: string;
+	created: string;    // Changed from date
+	updated?: string;   // Added
+	date?: string;      // Keep for backward compatibility
 	tags: string[];
 	content: string;
 	image?: string;
-	updated?: string;
 	readingTime?: string;
 	sortings?: {
 		byDate: {
@@ -55,11 +56,16 @@ interface SearchBarProps {
 	tags: string[];
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ posts, tags }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 	// Filter out invalid posts
 	const validPosts = useMemo(() => 
-		posts.filter(post => post.title && post.date && post.tags)
+		posts.filter(post => post.title && post.created && post.tags)
 	, [posts]);
+
+	// Sort tags alphabetically
+	const tags = useMemo(() => 
+		[...unsortedTags].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+	, [unsortedTags]);
 
 	// Ensure stable initial states
 	const [mounted, setMounted] = useState(false);
@@ -78,7 +84,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags }) => {
 		}
 
 		const sortedPosts = [...validPosts].sort(
-			(a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+			(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
 		);
 		setResults(sortedPosts);
 		setMounted(true);
@@ -129,7 +135,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags }) => {
 			}
 			// Default to date sorting
 			return (
-				(new Date(b.date).getTime() - new Date(a.date).getTime()) * modifier
+				(new Date(b.created).getTime() - new Date(a.created).getTime()) * modifier
 			);
 		});
 

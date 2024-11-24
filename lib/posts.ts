@@ -146,7 +146,35 @@ const postsCache = new LRUCache<string, PostMetadata | Post[]>({
   ttl: 1000 * 60 * 60, // 1 hour
 } as PostsCacheType);
 
-// Replace getAllPosts implementation
+// Add this interface to properly type the cached metadata
+interface CachedMetadata {
+  slug: string;
+  title: string;
+  summary: string;
+  created: string;
+  updated?: string;
+  tags: string[];
+  image?: string;
+  caption?: string;
+  content: string;
+  readingTime: string;
+  adjacent?: {
+    prev: AdjacentPost | null;
+    next: AdjacentPost | null;
+  };
+  sortings?: {
+    byDate: {
+      asc: string[];
+      desc: string[];
+    };
+    byTitle: {
+      asc: string[];
+      desc: string[];
+    };
+  };
+}
+
+// Update getAllPosts implementation with proper typing
 export async function getAllPosts(): Promise<Post[]> {
   const cacheKey = 'all-posts';
   const cached = postsCache.get(cacheKey);
@@ -155,16 +183,29 @@ export async function getAllPosts(): Promise<Post[]> {
   try {
     const cacheDir = path.join(process.cwd(), '.cache');
     const metadata = await fs.readFile(path.join(cacheDir, 'posts-metadata.json'), 'utf-8');
-    const metadataJson = JSON.parse(metadata);
+    const metadataJson: Record<string, CachedMetadata> = JSON.parse(metadata);
 
     if (!metadataJson || !Object.keys(metadataJson).length) {
       console.warn('No posts found in cache, falling back to filesystem');
       return await getSortedPostsData().then(result => result.posts);
     }
 
-    const allPostsData = Object.values(metadataJson);
+    const allPostsData = Object.values(metadataJson).map(post => ({
+      slug: post.slug,
+      title: post.title,
+      created: post.created,
+      updated: post.updated || post.created,
+      tags: post.tags,
+      summary: post.summary,
+      content: post.content,
+      image: post.image,
+      caption: post.caption,
+      readingTime: post.readingTime,
+      date: post.created // Add date field for backward compatibility
+    }));
+    
     postsCache.set(cacheKey, allPostsData);
-    return allPostsData as Post[];
+    return allPostsData;
   } catch (error) {
     console.error("Error getting all posts:", error);
     // Fallback to direct file system reading if cache fails

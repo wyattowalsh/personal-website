@@ -1,50 +1,22 @@
-import { ISourceOptions } from "tsparticles-engine";
 import { configUrls } from "./configUrls";
 
-interface ParticleConfig {
-  name: string;
-  config: ISourceOptions;
-}
+// Define types based on the configUrls structure
+type Theme = 'light' | 'dark';
+type ParticleConfigUrls = readonly string[];
+type ConfigUrls = Record<Theme, ParticleConfigUrls>;
 
-const defaultFontConfig = {
-  font: {
-    family: "Verdana",
-    size: 16,
-    weight: "400",
-    style: "normal",
-    fill: true,
-  },
-};
-
-const configMap: Record<'light' | 'dark', ParticleConfig[]> = {
-  light: [
-    // Add your light theme particle configurations here
-    { name: "exampleLight", config: { ...defaultFontConfig } },
-  ],
-  dark: [
-    // Add your dark theme particle configurations here
-    { name: "exampleDark", config: { ...defaultFontConfig } },
-  ],
-};
-
-export const getRandomConfig = (theme: 'light' | 'dark'): ISourceOptions => {
-  const configs = configMap[theme];
-  return configs[Math.floor(Math.random() * configs.length)].config;
-};
-
-export const getConfigByName = (theme: 'light' | 'dark', name: string): ISourceOptions | undefined => {
-  return configMap[theme].find(c => c.name === name)?.config;
-};
-
-export const getAllConfigs = (theme: 'light' | 'dark'): ISourceOptions[] => {
-  return configMap[theme].map(c => c.config);
-};
-
-export const getRandomConfigUrl = (theme: 'light' | 'dark'): string => {
+export const getRandomConfigUrl = (theme: Theme): string => {
   const urls = configUrls[theme];
+  // Check for empty arrays or undefined
+  if (!urls?.length) {
+    console.warn(`No particle configs found for theme: ${theme}`);
+    return theme === 'dark' 
+      ? '/particles/dark/stars.json'
+      : '/particles/light/net.json';
+  }
   return urls[Math.floor(Math.random() * urls.length)];
 };
 
-export const getAllConfigUrls = (theme: 'light' | 'dark'): readonly string[] => {
+export const getAllConfigUrls = (theme: Theme): ParticleConfigUrls => {
   return configUrls[theme];
 };

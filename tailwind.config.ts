@@ -136,7 +136,7 @@ const config: Config = {
         fadeIn: 'fadeIn 1s forwards',
         float: 'float 4s ease-in-out infinite',
         glitch: 'glitch 2s ease-in-out infinite',
-        gradient: 'gradientText 5s ease infinite',
+        gradient: 'gradient 8s linear infinite',
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         rotateCube: "rotateCube 2s infinite linear",
         'code-blink': 'code-blink 1s ease-in-out infinite',
@@ -151,7 +151,6 @@ const config: Config = {
         'gradient-x': 'gradient-x 15s ease infinite',
         'gradient-y': 'gradient-y 15s ease infinite',
         'gradient-xy': 'gradient-xy 15s ease infinite',
-        'gradient': 'gradient 8s linear infinite',
         'subtitle-fade': 'subtitleFade 0.5s ease-out forwards',
         'subtitle-slide': 'subtitleSlide 0.5s ease-out forwards',
       },
@@ -555,9 +554,12 @@ const config: Config = {
           textShadow: '0 0 10px var(--primary-foreground), 0 0 20px var(--primary-foreground)',
         },
       };
-      addUtilities(newUtilities, ['responsive', 'hover']);
+      addUtilities(newUtilities, {
+        respectPrefix: true,
+        respectImportant: true
+      });
     },
-    function({ addComponents, theme }) {
+    function({ addComponents, theme }: PluginAPI) {
       addComponents({
         '.bg-gradient-glow': {
           backgroundImage: `linear-gradient(to right, ${theme('colors.primary.DEFAULT')}, ${theme('colors.accent.DEFAULT')})`,

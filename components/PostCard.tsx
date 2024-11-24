@@ -13,6 +13,15 @@ import TagLink from "@/components/TagLink";
 import { cn } from "@/lib/utils";
 import { Calendar, Clock } from "lucide-react";
 
+// Add the same helper function
+function isDifferentDate(date1: string | undefined, date2: string | undefined): boolean {
+  if (!date1 || !date2) return false;
+  // Remove any milliseconds and 'Z' suffix for comparison
+  const clean1 = date1.split('.')[0].replace('Z', '');
+  const clean2 = date2.split('.')[0].replace('Z', '');
+  return clean1 !== clean2;
+}
+
 interface PostCardProps {
   post: {
     slug: string;
@@ -101,10 +110,6 @@ const PostCard = ({ post, className }: PostCardProps) => {
                   >
                     {formatDate(created)}
                   </time>
-                  {/* Show update indicator if post was updated later */}
-                  {updated && new Date(updated) > new Date(created) && (
-                    <span className="text-muted-foreground/60 ml-1">(Updated)</span>
-                  )}
                 </span>
               )}
               {readingTime && (

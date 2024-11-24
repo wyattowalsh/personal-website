@@ -12,25 +12,22 @@ import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
 
-// Update PostMetadata interface
-interface PostMetadata {
-  slug: string;
-  title: string;
-  created: string;   // Changed from date
-  updated: string;   // Now required
-  tags: string[];
-  summary: string;
-  content?: string;
-  image?: string;
-  caption?: string;
-  readingTime?: string;
-}
+// Remove the local PostMetadata interface since we're importing it
 
 interface PostHeaderState {
   post: PostMetadata | null;
   isLoading: boolean;
   error: string | null;
   imageLoaded: boolean;
+}
+
+// Add a helper function at the top of the file
+function isDifferentDate(date1: string | undefined, date2: string | undefined): boolean {
+  if (!date1 || !date2) return false;
+  // Remove any milliseconds and 'Z' suffix for comparison
+  const clean1 = date1.split('.')[0].replace('Z', '');
+  const clean2 = date2.split('.')[0].replace('Z', '');
+  return clean1 !== clean2;
 }
 
 export default function PostHeader() {
@@ -43,7 +40,7 @@ export default function PostHeader() {
 
   const pathname = usePathname();
 
-  // Add better error handling
+  // Move fetchPost outside of state initialization
   useEffect(() => {
     const controller = new AbortController();
 
@@ -55,7 +52,7 @@ export default function PostHeader() {
           throw new Error('Invalid slug');
         }
 
-        const response = await fetch(`/api/blog/metadata/${slug}`, {
+        const response = await fetch(`/api/blog/posts/metadata/${slug}`, {
           signal: controller.signal,
           headers: {
             "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
@@ -259,8 +256,8 @@ export default function PostHeader() {
             </div>
           )}
 
-          {/* Last Updated - Only show if update date is later than create date */}
-          {state.post.updated && new Date(state.post.updated) > new Date(state.post.created) && (
+          {/* Last Updated - Only show if update date is different from create date */}
+          {state.post.updated && isDifferentDate(state.post.updated, state.post.created) && (
             <div className={cn(
               "flex items-center gap-2 group",
               "text-muted-foreground/80",

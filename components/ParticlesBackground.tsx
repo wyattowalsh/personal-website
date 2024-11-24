@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import type { Container, Engine } from "@tsparticles/engine";
 import { loadAll } from "@tsparticles/all";
@@ -10,71 +10,88 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function ParticlesBackground() {
   const [init, setInit] = useState(false);
-  const { theme } = useTheme();
-  const [key, setKey] = useState(0); // Add key for forcing re-render
+  const { theme, systemTheme } = useTheme();
+  const [currentConfigUrl, setCurrentConfigUrl] = useState<string>("");
+  const engineRef = useRef<Engine | null>(null);
 
   // Initialize particle engine once
   useEffect(() => {
     const initEngine = async () => {
-      await initParticlesEngine(async (engine: Engine) => {
-        await loadAll(engine);
-      });
-      setInit(true);
+      try {
+        await initParticlesEngine(async (engine) => {
+          engineRef.current = engine;
+          await loadAll(engine);
+        });
+        setInit(true);
+      } catch (error) {
+        console.error("Failed to initialize particles engine:", error);
+      }
     };
     initEngine();
+
+    return () => {
+      engineRef.current = null;
+    };
   }, []);
 
-  // Force re-render when theme changes
+  // Update config when theme changes
   useEffect(() => {
-    setKey(prev => prev + 1);
-  }, [theme]);
+    const effectiveTheme = theme === 'system' ? systemTheme : theme;
+    const newConfigUrl = getRandomConfigUrl(effectiveTheme === 'dark' ? 'dark' : 'light');
+    setCurrentConfigUrl(newConfigUrl);
+  }, [theme, systemTheme]);
 
   const particlesLoaded = useCallback(async (container?: Container) => {
-    await container?.refresh();
+    if (container) {
+      await container.refresh();
+    }
   }, []);
+
+  if (!init || !currentConfigUrl) return null;
 
   return (
     <AnimatePresence mode="wait">
-      {init && (
-        <motion.div
-          key={key} // Add key here to force re-render
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 -z-10"
-          transition={{ duration: 0.8 }}
-        >
-          <Particles
-            id={`tsparticles-${key}`} // Make ID unique on theme change
-            className="absolute inset-0"
-            url={getRandomConfigUrl(theme === "dark" ? "dark" : "light")}
-            particlesLoaded={particlesLoaded}
-            options={{
-              fullScreen: false,
-              detectRetina: true,
-              fpsLimit: 120,
-              interactivity: {
-                detectsOn: "window",
-                events: {
-                  onHover: {
-                    enable: true,
-                    mode: "grab"
-                  },
-                  resize: true
+      <motion.div
+        key={currentConfigUrl}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 -z-10"
+        transition={{ duration: 0.8 }}
+      >
+        <Particles
+          id={`tsparticles-${currentConfigUrl}`}
+          className="absolute inset-0"
+          url={currentConfigUrl}
+          particlesLoaded={particlesLoaded}
+          options={{
+            fullScreen: false,
+            detectRetina: true,
+            fpsLimit: 120,
+            interactivity: {
+              detectsOn: "window",
+              events: {
+                onHover: {
+                  enable: true,
+                  mode: "grab"
                 },
-                modes: {
-                  grab: {
-                    distance: 140,
-                    links: {
-                      opacity: 0.5
-                    }
+                resize: {
+                  enable: true,
+                  delay: 0.5
+                }
+              },
+              modes: {
+                grab: {
+                  distance: 140,
+                  links: {
+                    opacity: 0.5
                   }
                 }
               }
-            }}
-          />
-        </motion.div>
-      )}
+            }
+          }}
+        />
+      </motion.div>
     </AnimatePresence>
   );
 }

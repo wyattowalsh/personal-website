@@ -7,8 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "predev": "ts-node --project tsconfig.scripts.json scripts/generateParticleConfigUrls.ts && ts-node --project tsconfig.scripts.json scripts/generateBlogMetadata.ts",
-    "prebuild": "ts-node -P tsconfig.scripts.json scripts/generateBlogMetadata.ts",
+    "generate-particles": "ts-node --project tsconfig.scripts.json scripts/generateParticleConfigUrls.ts",
+    "predev": "npm run generate-particles && ts-node --project tsconfig.scripts.json scripts/generateBlogMetadata.ts",
+    "prebuild": "npm run generate-particles && ts-node -P tsconfig.scripts.json scripts/generateBlogMetadata.ts",
     "postbuild": "next-sitemap"
   },
   "dependencies": {

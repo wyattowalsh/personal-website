@@ -2,20 +2,71 @@
 ### *My Personal Web App* 🤖✨
 
 ---
-
-<p>
-![GitHub commit activity](https://img.shields.io/github/commit-activity/t/wyattowalsh/personal-website?style=for-the-badge&logo=github)
-![Website](https://img.shields.io/website?url=https%3A%2F%2Fw4w.dev)
+<!-- 
 [![Vercel](https://img.shields.io/badge/hosted_on-Vercel-000?logo=vercel&style=for-the-badge)](https://vercel.com)
-[![Next.js](https://img.shields.io/badge/Next.js-15-000?logo=next.js&logoColor=white&style=for-the-badge)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-v4+-3178C6?logo=typescript&style=for-the-badge)](https://www.typescriptlang.org)
-[![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3-06B6D4?logo=tailwindcss&style=for-the-badge)](https://tailwindcss.com)
-[![shadcn/ui](https://img.shields.io/badge/shadcn/ui-stable-000?style=for-the-badge)](https://ui.shadcn.dev)
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Fw4w.dev&style=for-the-badge)](https://w4w.dev)
+
+[![Next.js](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org)
+[![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)](https://reactjs.org)
 [![MDX](https://img.shields.io/badge/MDX-v2-000?logo=mdx&style=for-the-badge)](https://mdxjs.com)
+
+[![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![LaTeX](https://img.shields.io/badge/latex-%23008080.svg?style=for-the-badge&logo=latex&logoColor=white)](https://www.latex-project.org)
+
+[![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)](https://sass-lang.com)
+[![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+
+[![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com)
 [![Giscus](https://img.shields.io/badge/Giscus-enabled-9B83FF?logo=github&style=for-the-badge)](https://giscus.app)
-[![YOURLS](https://img.shields.io/badge/YOURLS-v1.9+-3178C6?logo=link&style=for-the-badge)](https://yourls.org)
+
+[![NPM](https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white)](https://www.npmjs.com)
 [![npm](https://img.shields.io/npm/v/next?label=npm&logo=npm&style=for-the-badge)](https://www.npmjs.com/package/next)
-<p>
+
+[![Node.js](https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+
+[![YOURLS](https://img.shields.io/badge/YOURLS-v1.9+-3178C6?logo=link&style=for-the-badge)](https://yourls.org)
+
+[![GitHub commit activity](https://img.shields.io/github/commit-activity/t/wyattowalsh/personal-website?style=for-the-badge&logo=github)](https://github.com/wyattowalsh/personal-website) -->
+
+
+<p align="center">
+    <!-- Deployment -->
+    <img src="https://img.shields.io/badge/hosted_on-Vercel-000?logo=vercel&style=for-the-badge" alt="Vercel">
+    <img src="https://img.shields.io/website?url=https%3A%2F%2Fw4w.dev&style=for-the-badge" alt="Website">
+
+    <!-- Frameworks -->
+    <img src="https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js">
+    <img src="https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB" alt="React">
+    <img src="https://img.shields.io/badge/MDX-v2-000?logo=mdx&style=for-the-badge" alt="MDX">
+
+    <!-- Languages -->
+    <img src="https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E" alt="JavaScript">
+    <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+    <img src="https://img.shields.io/badge/latex-%23008080.svg?style=for-the-badge&logo=latex&logoColor=white" alt="LaTeX">
+    
+    <!-- Styling -->
+    <img src="https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white" alt="SASS">
+    <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS">
+    
+    <!-- Tools -->
+    <img src="https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white" alt="Visual Studio Code">
+    <img src="https://img.shields.io/badge/Giscus-enabled-9B83FF?logo=github&style=for-the-badge" alt="Giscus">
+    
+    <!-- Package Managers -->
+    <img src="https://img.shields.io/badge/NPM-%23CB3837.svg?style=for-the-badge&logo=npm&logoColor=white" alt="NPM">
+    <img src="https://img.shields.io/npm/v/next?label=npm&logo=npm&style=for-the-badge" alt="npm (Next.js)">
+    
+    <!-- Backends -->
+    <img src="https://img.shields.io/badge/node.js-6DA55F?style=for-the-badge&logo=node.js&logoColor=white" alt="Node.js">
+    
+    <!-- URL Shortening -->
+    <img src="https://img.shields.io/badge/YOURLS-v1.9+-3178C6?logo=link&style=for-the-badge" alt="YOURLS">
+    
+    <!-- Commit Activity -->
+    <img src="https://img.shields.io/github/commit-activity/t/wyattowalsh/personal-website?style=for-the-badge&logo=github" alt="GitHub Commit Activity">
+</p>
+
 
 ---
 

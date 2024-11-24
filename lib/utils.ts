@@ -6,12 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const formatDate = (
-  date: string,
+  date: string | undefined,
   locale = "en-US",
   options?: Intl.DateTimeFormatOptions
 ): string => {
   try {
-    const utcDate = new Date(date + 'Z'); // Force UTC 
+    if (!date) return "Invalid Date";
+    // Remove any trailing Z if it exists and force UTC
+    const cleanDate = date.endsWith('Z') ? date : date + 'Z';
+    const utcDate = new Date(cleanDate);
+    if (isNaN(utcDate.getTime())) return "Invalid Date";
     
     // Default formatting options for consistent, beautiful dates
     const defaultOptions: Intl.DateTimeFormatOptions = {
