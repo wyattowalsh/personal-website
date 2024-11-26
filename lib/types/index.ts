@@ -23,6 +23,18 @@ export interface AdjacentPost {
   title: string
 }
 
+export interface PostMetadata {
+  slug: string;
+  title: string;
+  summary?: string;
+  content: string;
+  created: string;
+  updated?: string;
+  tags: string[];
+  image?: string;
+  readingTime?: string;
+}
+
 // Service types
 export interface PreprocessStats {
   duration: number

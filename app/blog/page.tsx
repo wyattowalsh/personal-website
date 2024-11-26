@@ -1,19 +1,28 @@
 // app/blog/page.tsx
 
 import SearchBar from "@/components/SearchBar";
-import { getAllPosts, getAllTags } from "@/lib/posts";
+import { getAllTags, getAllPosts } from "@/lib/services";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
-export default async function BlogPage() {
+export default async function BlogPostsPage() { // Renamed from BlogPage
   const [posts, tags] = await Promise.all([
     getAllPosts(),
     getAllTags()
   ]);
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <>
       <ParticlesBackground />
-      <SearchBar posts={posts} tags={tags} />
-    </div>
+      <div className="py-8">
+        <SearchBar posts={posts} tags={tags} />
+        <div className="grid gap-4 mt-8">
+          {posts.map((post) => (
+            <article key={post.slug}>
+              {/* Post content */}
+            </article>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }

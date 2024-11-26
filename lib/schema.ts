@@ -1,6 +1,7 @@
 import { links } from '@/components/Links';
 import { Post } from './posts';
 import { cache } from 'react';
+import { getConfig } from './config';
 
 interface BreadcrumbItem {
   name: string;
@@ -21,65 +22,82 @@ export function generateArticleStructuredData(post: Post, siteUrl: string) {
       name: 'Wyatt Walsh',
       url: siteUrl,
     },
-    // ...additional properties...
   };
 }
 
 // Cache the generation of the website schema
 export const generateWebSiteSchema = cache((url = 'https://w4w.dev') => {
-  const currentYear = new Date().getFullYear()
-  const socialLinks = links.filter(link => !link.url.startsWith('/'))
+  const config = getConfig();
+  const currentYear = new Date().getFullYear();
 
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: 'Wyatt Walsh',
-    alternateName: ['W4W', 'wyattowalsh'],
-    url,
-    description: 'Personal website and blog covering software engineering, data science, and technology',
+    name: config.site.title,
+    alternateName: ['w4w', 'wyattowalsh'],
+    url: config.site.url,
+    description: config.site.description,
     author: {
       '@type': 'Person',
-      name: 'Wyatt Walsh',
-      url,
-      sameAs: socialLinks.map(link => link.url),
-      jobTitle: 'Software Engineer',
-      alumniOf: {
-        '@type': 'CollegeOrUniversity',
-        name: 'University of California, Berkeley'
-      },
-      knowsAbout: [
-        'Software Engineering',
-        'Data Science',
-        'Machine Learning',
-        'Web Development'
+      name: config.site.author.name,
+      url: config.site.url,
+      email: config.site.author.email,
+      sameAs: [
+        `https://github.com/${config.site.author.github}`,
+        `https://twitter.com/${config.site.author.twitter}`,
+        `https://linkedin.com/in/${config.site.author.linkedin}`
       ]
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Wyatt Walsh',
+      name: config.site.author.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${url}/logo.webp`
+        url: `${config.site.url}/logo.webp`
       }
     },
     copyrightYear: currentYear,
     copyrightHolder: {
       '@type': 'Person',
-      name: 'Wyatt Walsh'
+      name: config.site.author.name
     },
     inLanguage: 'en-US',
     license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
-    version: '0.1.0',
-    applicationCategory: 'Blog',
     keywords: [
       'Software Engineering',
-      'Data Science',
-      'Machine Learning',
-      'Web Development',
-      'Technology'
+      'Web Development', 
+      'Technology',
+      'Blog'
     ]
-  }
-})
+  };
+});
+
+export function generateArticleSchema(post: any) {
+  const config = getConfig();
+  
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.summary,
+    image: post.image ? [`${config.site.url}${post.image}`] : [],
+    datePublished: post.created,
+    dateModified: post.updated || post.created,
+    author: {
+      '@type': 'Person',
+      name: config.site.author.name,
+      url: config.site.url
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: config.site.author.name,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${config.site.url}/logo.webp`
+      }
+    }
+  };
+}
 
 // ...existing code...
 

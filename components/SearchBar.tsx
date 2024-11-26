@@ -157,6 +157,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		);
 	};
 
+	// Add this function to clean up URLs
+	const cleanUrl = (slug: string) => {
+		// Remove any trailing /page or just / from the slug
+		return slug.replace(/\/(page)?$/, '');
+	};
+
 	if (!mounted) {
 		return null; // Prevent hydration issues by not rendering until mounted
 	}
@@ -325,7 +331,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 					results.length === 1 ? (
 						// Single result - centered
 						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
-							<PostCard post={results[0]} className="h-full" />
+							<PostCard 
+								post={{
+									...results[0],
+									slug: cleanUrl(results[0].slug)
+								}} 
+								className="h-full" 
+							/>
 						</div>
 					) : (
 						// Multiple results with staggered animation
@@ -342,7 +354,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 									delay: Math.min(idx * 0.1, 0.8),
 								}}
 							>
-								<PostCard post={post} className="h-full" />
+								<PostCard 
+									post={{
+										...post,
+										slug: cleanUrl(post.slug)
+									}} 
+									className="h-full" 
+								/>
 							</motion.div>
 						))
 					)

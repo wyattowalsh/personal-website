@@ -8,7 +8,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { AdjacentPost } from "@/lib/posts";
-import { getAdjacentPosts } from "@/lib/metadata";
+import { getAdjacentPosts } from "@/lib/services";
 
 export default function PostPagination() {
   const [state, setState] = useState<{

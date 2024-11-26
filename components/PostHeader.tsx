@@ -7,10 +7,12 @@ import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import type { PostMetadata } from "@/lib/posts";
+import type { PostMetadata } from "@/lib/types"; // Update import path
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
+import { getPost } from "@/lib/services"; // Add this import
+import { backend } from '@/lib/services/backend';  // Add this import
 
 // Remove the local PostMetadata interface since we're importing it
 
@@ -40,43 +42,47 @@ export default function PostHeader() {
 
   const pathname = usePathname();
 
-  // Move fetchPost outside of state initialization
   useEffect(() => {
-    const controller = new AbortController();
+    let mounted = true;
 
     const fetchPost = async () => {
       try {
-        setState((prev) => ({ ...prev, isLoading: true, error: null }));
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
         const slug = pathname.split("/blog/posts/")[1];
+        
         if (!slug) {
+          console.error('Invalid pathname:', pathname);
           throw new Error('Invalid slug');
         }
 
-        const response = await fetch(`/api/blog/posts/metadata/${slug}`, {
-          signal: controller.signal,
-          headers: {
-            "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
-          },
-        });
+        console.log('Attempting to fetch post:', slug);
+        let metadata = await getPost(slug);
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // If post not found, try rebuilding cache
+        if (!metadata) {
+          console.log('Post not found, rebuilding cache...');
+          await backend.rebuildCache();
+          metadata = await getPost(slug);
         }
-
-        const { metadata } = await response.json();
         
-        // Validate required fields
-        if (!metadata?.title || !metadata?.created || !metadata?.tags) {
-          throw new Error('Invalid post metadata');
+        if (!mounted) return;
+
+        if (!metadata) {
+          console.error('Post still not found after cache rebuild:', slug);
+          throw new Error('Post not found');
         }
 
-        setState((prev) => ({ ...prev, post: metadata, isLoading: false }));
+        console.log('Successfully loaded post:', metadata);
+        setState(prev => ({ ...prev, post: metadata, isLoading: false }));
       } catch (error) {
-        if (error instanceof Error && error.name === "AbortError") return;
-
+        if (!mounted) return;
         const errorMessage = error instanceof Error ? error.message : "Failed to load post";
-        console.error("Error loading post:", errorMessage);
-        setState((prev) => ({
+        console.error("Error loading post:", {
+          error,
+          pathname,
+          slug: pathname.split("/blog/posts/")[1]
+        });
+        setState(prev => ({
           ...prev,
           error: errorMessage,
           isLoading: false,
@@ -85,7 +91,10 @@ export default function PostHeader() {
     };
 
     fetchPost();
-    return () => controller.abort();
+    
+    return () => {
+      mounted = false;
+    };
   }, [pathname]);
 
   const handleImageLoad = () => {

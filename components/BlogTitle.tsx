@@ -213,7 +213,7 @@ const BlogTitle = () => {
 	}, []);
 
 	return (
-		<motion.div className="relative w-full py-2 sm:py-3 md:py-4 overflow-hidden pt-0" suppressHydrationWarning>
+		<motion.div className="relative w-full py-1 sm:py-2 md:py-3 overflow-hidden pt-0" suppressHydrationWarning>
 			<div className="max-w-4xl mx-auto mt-0">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
@@ -224,7 +224,8 @@ const BlogTitle = () => {
 						id="title-container"
 						className={cn(
 							"relative rounded-2xl overflow-hidden perspective-1000",
-							"p-6 sm:p-8 md:p-12",
+							"min-h-[120px] sm:min-h-[150px] md:min-h-[180px]", // Reduced heights
+							"flex items-center justify-center",
 							"backdrop-blur-[20px]",
 							"bg-gradient-to-br from-black/40 via-black/60 to-black/40",
 							"dark:from-white/10 dark:via-white/20 dark:to-white/10",
@@ -246,11 +247,11 @@ const BlogTitle = () => {
 								/>
 							))}
 
-						<div className="relative z-10 text-center">
+						<div className="relative z-10 w-full">
 							<motion.h1
 								className={cn(
-									"text-4xl sm:text-5xl md:text-6xl font-bold",
-									"p-2 select-none",
+									"text-3xl sm:text-4xl md:text-5xl font-bold", // Slightly reduced text sizes
+									"p-1 select-none text-center", // Reduced padding
 									"filter drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]",
 									styles['title']
 								)}

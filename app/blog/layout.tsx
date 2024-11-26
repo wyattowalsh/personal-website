@@ -3,18 +3,18 @@
 import React from "react";
 import BlogTitle from "@/components/BlogTitle";
 
-export default function BlogLayout({
-	children,
+export default function BlogRootLayout({
+  children,
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return (
-		<>
-			<main className="min-h-screen mx-auto p-4 sm:p-6 lg:p-8 max-w-[100ch] lg:max-w-[110ch] xl:max-w-[120ch] 2xl:max-w-[130ch]">
-				<BlogTitle />
-				<hr />
-				{children}
-			</main>
-		</>
-	);
+  return (
+    <div className="min-h-screen">
+      <BlogTitle />
+      <hr className="border-border my-4" />
+      <main className="container mx-auto px-4">
+        {children}
+      </main>
+    </div>
+  );
 }

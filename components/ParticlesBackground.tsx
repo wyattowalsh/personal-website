@@ -1,21 +1,41 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import Particles from "@tsparticles/react"; // Import only the necessary module
 import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
+import { type Container, type Engine } from "@tsparticles/engine";
+import dynamic from 'next/dynamic';
+
+// Dynamically import Particles
+const Particles = dynamic(() => import("@tsparticles/react"), {
+  ssr: false,
+  loading: () => <></>,
+});
 
 export default function ParticlesBackground() {
   const [init, setInit] = useState(false);
-  const { theme, systemTheme } = useTheme();
+  const { theme, systemTheme, resolvedTheme } = useTheme();
   const [currentConfigUrl, setCurrentConfigUrl] = useState<string>("");
   const engineRef = useRef<Engine | null>(null);
+  const containerRef = useRef<Container | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Handle mounting
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Initialize particle engine once
   useEffect(() => {
+    if (!mounted) return;
+
     const initEngine = async () => {
       try {
+        const { initParticlesEngine } = await import("@tsparticles/react");
+        const { loadAll } = await import("@tsparticles/all");
+        
         await initParticlesEngine(async (engine) => {
           engineRef.current = engine;
           await loadAll(engine);
@@ -25,27 +45,57 @@ export default function ParticlesBackground() {
         console.error("Failed to initialize particles engine:", error);
       }
     };
+
     initEngine();
 
     return () => {
-      engineRef.current = null;
+      if (engineRef.current) {
+        engineRef.current = null;
+      }
     };
+  }, [mounted]);
+
+  // Cleanup function for particles container
+  const cleanup = useCallback(() => {
+    if (containerRef.current) {
+      containerRef.current.destroy();
+      containerRef.current = null;
+    }
   }, []);
 
   // Update config when theme changes
   useEffect(() => {
-    const effectiveTheme = theme === 'system' ? systemTheme : theme;
-    const newConfigUrl = getRandomConfigUrl(effectiveTheme === 'dark' ? 'dark' : 'light');
-    setCurrentConfigUrl(newConfigUrl);
-  }, [theme, systemTheme]);
+    if (!mounted || !init) return;
+
+    const currentTheme = resolvedTheme as 'light' | 'dark';
+    if (!currentTheme) return;
+
+    const updateParticles = async () => {
+      // Clean up existing particles
+      cleanup();
+
+      // Small delay to ensure cleanup is complete
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Get new config and update
+      const newConfigUrl = getRandomConfigUrl(currentTheme);
+      setCurrentConfigUrl(newConfigUrl);
+    };
+
+    updateParticles();
+
+    return () => cleanup();
+  }, [resolvedTheme, init, mounted, cleanup]);
 
   const particlesLoaded = useCallback(async (container?: Container) => {
     if (container) {
+      containerRef.current = container;
       await container.refresh();
     }
   }, []);
 
-  if (!init || !currentConfigUrl) return null;
+  // Don't render anything until mounted and initialized
+  if (!mounted || !init || !currentConfigUrl) return null;
 
   return (
     <AnimatePresence mode="wait">

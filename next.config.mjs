@@ -38,15 +38,10 @@ import rehypeInferReadingTimeMeta from "rehype-infer-reading-time-meta"
 import rehypePrismPlus from "rehype-prism-plus"
 import rehypeSemanticBlockquotes from "rehype-semantic-blockquotes"
 
-const withBundleAnalytics = withBundleAnalyzer({
-  enabled: process.env.ANALYZE === 'true',
-})
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
   
-  // Enhanced image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [],
@@ -54,7 +49,6 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
   },
 
-  // Feed/RSS rewrites with cache headers
   async rewrites() {
     return [
       {
@@ -77,7 +71,6 @@ const nextConfig = {
     ]
   },
 
-  // Enhanced headers
   async headers() {
     return [
       {
@@ -96,30 +89,82 @@ const nextConfig = {
     ]
   },
 
-  // Webpack optimization
   webpack: (config, { dev, isServer }) => {
+
+    // Add resolve configuration for third-party-capital
+    config.resolve = {
+      ...config.resolve,
+      fallback: {
+        ...config.resolve?.fallback,
+        fs: false,
+        path: false
+      }
+    };
+
+    // Production optimizations
     if (!dev && !isServer) {
-      config.optimization.splitChunks.cacheGroups.styles = {
-        name: 'styles',
-        test: /\.(css|scss)$/,
-        chunks: 'all',
-        enforce: true,
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          minSize: 20000,
+          maxSize: 90000,
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            framework: {
+              chunks: 'all',
+              name: 'framework',
+              test: /(?<!node_modules.*)[\\/]node_modules[\\/](react|react-dom|scheduler|next|@next|framer-motion)[\\/]/,
+              priority: 40,
+              enforce: true,
+              reuseExistingChunk: true
+            },
+            lib: {
+              test: /[\\/]node_modules[\\/]/,
+              name(module) {
+                const match = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/);
+                return match ? `npm.${match[1].replace('@', '')}` : 'lib';
+              },
+              priority: 30,
+              minChunks: 1,
+              reuseExistingChunk: true
+            }
+          }
+        }
       }
     }
+
     return config
   },
+
+  // Update Sass options at the root level
+  sassOptions: {
+    api: 'modern', // Use modern Sass API
+    outputStyle: 'compressed',
+  },
+
+  experimental: {
+    mdxRs: false,
+    serverActions: {
+      enabled: true
+    },
+    typedRoutes: true,
+    optimizeCss: true,
+    // esmExternals: 'loose',
+  }
 }
 
+// Set up MDX configuration
 const withMDX = createMDX({
   options: {
+    format: 'mdx',
     remarkPlugins: [
+      // Keep existing plugins but reorder them
+      remarkFrontmatter,
+      remarkMdxFrontmatter,
       remarkGfm,
       remarkMath,
-      [remarkMdxMathEnhanced, { 
-        component: 'Math',
-        numbering: 'auto',
-        labelTemplate: 'eq'
-      }],
       remarkEmoji,
       remarkCodeBlocks,
       remarkCodeFrontmatter,
@@ -128,121 +173,34 @@ const withMDX = createMDX({
       remarkCodesandbox,
       remarkCustomHeaderId,
       remarkDefinitionList,
-      [remarkDocx, {
-        imageResolver: (src) => {
-          if (src.startsWith('http')) return src
-          return src.startsWith('/') ? src : `/${src}`
-        }
-      }],
+      [remarkDocx, { imageResolver: (src) => src.startsWith('http') ? src : src.startsWith('/') ? src : `/${src}` }],
       remarkEmbedImages,
       remarkExtendedTable,
-      remarkFrontmatter,
       remarkAlert,
       remarkHint,
       remarkOembed,
       remarkSmartypants,
       remarkSources,
-      remarkMdxFrontmatter,
-      remarkToc,
+      remarkToc
     ],
     rehypePlugins: [
       rehypeSlug,
-      [rehypeAutolinkHeadings, {
-        behavior: 'append',
-        properties: {
-          className: [
-            'anchor-link',
-            'opacity-0',
-            'absolute',
-            'right-0',
-            'top-1/2',
-            '-translate-y-1/2',
-            'w-6',
-            'h-6',
-            'flex',
-            'items-center',
-            'justify-center',
-            'rounded-md',
-            'transition-all',
-            'duration-200',
-            'ease-in-out',
-            'group-hover:opacity-100',
-            'hover:text-primary',
-            'hover:scale-125',
-            'hover:bg-primary/10', 
-            'dark:hover:bg-primary/20',
-            'focus:outline-none',
-            'focus:ring-2',
-            'focus:ring-primary/20',
-            'active:scale-95'
-          ],
-          ariaLabel: 'Direct link to heading',
-          tabIndex: 0,
-        },
-        content: {
-          type: 'element',
-          tagName: 'span',
-          properties: { 
-            className: ['anchor-icon', 'relative']
-          },
-          children: [{
-            type: 'element',
-            tagName: 'svg',
-            properties: {
-              xmlns: 'http://www.w3.org/2000/svg',
-              width: 16,
-              height: 16,
-              fill: 'none', 
-              stroke: 'currentColor',
-              strokeWidth: 2,
-              strokeLinecap: 'round',
-              strokeLinejoin: 'round',
-              className: [
-                'transition-transform',
-                'duration-200',
-                'ease-out',
-                'hover:stroke-width-3',
-                'group-hover:animate-pulse'
-              ],
-              viewBox: '0 0 24 24'
-            },
-            children: [{
-              type: 'element',
-              tagName: 'path',
-              properties: {
-                d: 'M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71',
-              }
-            }, {
-              type: 'element',
-              tagName: 'path',
-              properties: {
-                d: 'M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71',
-              }
-            }]
-          }]
-        }
-      }],
+      [rehypeAutolinkHeadings, { behavior: 'append' }],
       rehypeKatex,
       rehypeCallouts,
       rehypeCitation,
       rehypeColorChips,
       rehypeInferReadingTimeMeta,
-      [rehypePrismPlus, {
-        ignoreMissing: true,
-        showLineNumbers: true,
-      }],
-      rehypeSemanticBlockquotes,
-    ],
-    format: 'mdx',
-  },
+      [rehypePrismPlus, { ignoreMissing: true, showLineNumbers: true }],
+      rehypeSemanticBlockquotes
+    ]
+  }
 })
 
-// Compose configurations
-export default withBundleAnalytics(withMDX({
-  ...nextConfig,
-  // Enable experimental features
-  experimental: {
-    mdxRs: true,
-    serverActions: true
-  }
-}))
+// Initialize bundle analyzer
+const withBundleAnalytics = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true'
+})
+
+// Compose and export config
+export default withBundleAnalytics(withMDX(nextConfig))
