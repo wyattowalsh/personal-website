@@ -1,22 +1,36 @@
+import { ISourceOptions } from "tsparticles-engine";
 import { configUrls } from "./configUrls";
 
-// Define types based on the configUrls structure
 type Theme = 'light' | 'dark';
-type ParticleConfigUrls = readonly string[];
-type ConfigUrls = Record<Theme, ParticleConfigUrls>;
 
 export const getRandomConfigUrl = (theme: Theme): string => {
-  const urls = configUrls[theme];
-  // Check for empty arrays or undefined
-  if (!urls?.length) {
-    console.warn(`No particle configs found for theme: ${theme}`);
-    return theme === 'dark' 
-      ? '/particles/dark/stars.json'
-      : '/particles/light/net.json';
+  const configs = configUrls[theme];
+  if (!configs.length) {
+    // Return a default config from the opposite theme or a fallback
+    const oppositeTheme = theme === 'dark' ? 'light' : 'dark';
+    return configUrls[oppositeTheme][0]?.url ?? '';
   }
-  return urls[Math.floor(Math.random() * urls.length)];
+  const randomIndex = Math.floor(Math.random() * configs.length);
+  return configs[randomIndex].url;
 };
 
-export const getAllConfigUrls = (theme: Theme): ParticleConfigUrls => {
-  return configUrls[theme];
+export const getConfigByName = (theme: Theme, name: string): string | undefined => {
+  return configUrls[theme].find(config => config.url.includes(name))?.url;
+};
+
+export const getAllConfigUrls = (theme: Theme): readonly string[] => {
+  return configUrls[theme].map(config => config.url);
+};
+
+export const getConfigByHash = (theme: Theme, hash: string): string | undefined => {
+  return configUrls[theme].find(config => config.hash === hash)?.url;
+};
+
+export const getMostRecent = (theme: Theme): string => {
+  const configs = configUrls[theme];
+  return configs.reduce((latest, current) => {
+    return new Date(latest.lastModified) > new Date(current.lastModified) 
+      ? latest 
+      : current;
+  }).url;
 };

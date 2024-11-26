@@ -26,6 +26,9 @@ import { motion } from "framer-motion";
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { backend } from '@/lib/services/backend';
+import { PostMetadata } from '@/lib/types';
+
 
 // Update Post interface to match metadata
 interface Post {

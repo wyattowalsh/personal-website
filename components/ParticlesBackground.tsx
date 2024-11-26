@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import type { Container, Engine } from "@tsparticles/engine";
-import { loadAll } from "@tsparticles/all";
+import Particles from "@tsparticles/react"; // Import only the necessary module
 import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";

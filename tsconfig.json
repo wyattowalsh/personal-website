@@ -7,13 +7,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
-    "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -37,15 +36,22 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "noUnusedLocals": true, // Report errors on unused locals
+    "noUnusedParameters": true, // Report errors on unused parameters
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "exactOptionalPropertyTypes": true, // Ensure optional properties are strictly typed
+    "allowJs": true
   },
   "include": [
-    "**/*.mdx",
+    "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "next-env.d.ts",
-    ".next/types/**/*.ts"
-, "next-sitemap.config.js"  ],
+    ".next/types/**/*.ts",
+    "next-sitemap.config.js"
+  ],
   "exclude": [
     "node_modules"
   ]

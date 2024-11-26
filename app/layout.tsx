@@ -12,6 +12,9 @@ import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
 import { GoogleTagManager } from '@next/third-parties/google'
 import { cn } from "@/lib/utils";
+import { getDefaultMetadata } from '@/lib/metadata'
+import { generateWebSiteSchema } from '@/lib/schema'
+import Script from 'next/script';
 
 config.autoAddCss = false;
 
@@ -28,13 +31,7 @@ const montserrat = Montserrat({
 	fallback: ['system-ui', 'arial']
 });
 
-export const metadata: Metadata = {
-	title: "w4w.dev | Wyatt Walsh",
-	description: "Wyatt's personal web app with social links, blog, and more.",
-	icons: {
-		icon: "/logo.webp",
-	},
-};
+export const metadata: Metadata = getDefaultMetadata();
 
 export default function RootLayout({
 	children,
@@ -45,6 +42,13 @@ export default function RootLayout({
 		<StrictMode>
 		<html lang="en" suppressHydrationWarning className="antialiased">
 			<GoogleTagManager gtmId="GTM-P7VFKNK6" />
+			<Script
+				id="schema-website"
+				type="application/ld+json"
+				dangerouslySetInnerHTML={{
+					__html: JSON.stringify(generateWebSiteSchema())
+				}}
+			/>
 			<body
 				className={cn(
 					"min-h-screen bg-background font-sans",
