@@ -57,7 +57,7 @@ const PostCard = ({ post, className }: PostCardProps) => {
         href={{
           pathname: '/blog/posts/[slug]',
           query: { slug }
-        }} 
+        }}
         className="block h-full no-underline"
       >
         <Card className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col">

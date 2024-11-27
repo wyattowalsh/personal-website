@@ -315,10 +315,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 					results.length === 1 ? (
 						// Single result - centered
 						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
-							<PostCard 
-								post={results[0]} // Pass post directly without cleaning
-								className="h-full" 
-							/>
+								<Link 
+									href={{
+										pathname: '/blog/posts/[slug]',
+										query: { slug: results[0].slug }
+									}}
+								>
+									<PostCard 
+										post={results[0]}
+										className="h-full" 
+									/>
+								</Link>
 						</div>
 					) : (
 						// Multiple results with staggered animation
@@ -335,10 +342,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 									delay: Math.min(idx * 0.1, 0.8),
 								}}
 							>
-								<PostCard 
-									post={post} // Ensure the post object has the correct slug
-									className="h-full" 
-								/>
+									<Link 
+										href={{
+											pathname: '/blog/posts/[slug]',
+											query: { slug: post.slug }
+										}}
+									>
+										<PostCard 
+											post={post}
+											className="h-full" 
+										/>
+									</Link>
 							</motion.div>
 						))
 					)
