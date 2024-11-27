@@ -8,7 +8,7 @@ const execAsync = promisify(exec);
 
 // Create a cache instance for git data
 const gitCache = new LRUCache<string, {
-  created: string | null;
+  firstModified: string | null;
   lastModified: string | null;
 }>({ 
   max: 500, // Maximum 500 entries
@@ -23,15 +23,16 @@ export async function getGitFileData(filePath: string) {
       return cached;
     }
 
-    // If not in cache, get from git
-    const [created, updated] = await Promise.all([
-      execAsync(`git log --follow --format=%aI --reverse "${filePath}" | head -1`),
+    // Get the first commit date (when file was added) using --diff-filter=A
+    // and the last modification date
+    const [firstCommit, lastCommit] = await Promise.all([
+      execAsync(`git log --diff-filter=A --format=%aI "${filePath}"`),
       execAsync(`git log -1 --format=%aI "${filePath}"`)
     ]);
 
     const result = {
-      created: created.stdout.trim() || null,
-      lastModified: updated.stdout.trim() || null
+      firstModified: firstCommit.stdout.trim() || null,
+      lastModified: lastCommit.stdout.trim() || null
     };
 
     // Cache the result
@@ -40,6 +41,6 @@ export async function getGitFileData(filePath: string) {
     return result;
   } catch (error) {
     console.error(`Git data error for ${filePath}:`, error);
-    return { created: null, lastModified: null };
+    return { firstModified: null, lastModified: null };
   }
 }
