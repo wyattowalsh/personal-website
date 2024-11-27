@@ -1,4 +1,9 @@
-import { glob as globWithCallback } from 'glob';
-import { promisify } from 'util';
+import type { GlobOptions } from 'glob';
+import { glob } from 'glob';
 
-export const glob = promisify(globWithCallback);
+// Use glob's native promise support with proper type definitions
+export const globAsync = async (pattern: string, options: GlobOptions = {}): Promise<string[]> => {
+  const results = await glob(pattern, options);
+  // Convert Path[] to string[] if necessary
+  return results.map(result => result.toString());
+};

@@ -2,7 +2,7 @@ import { Feed } from 'feed';
 import { LRUCache } from 'lru-cache';
 import Fuse from 'fuse.js';
 import { promisify } from 'util';
-import { glob } from '@/lib/utils/glob';
+import { globAsync } from '@/lib/utils/glob';
 import matter from 'gray-matter';
 import path from 'path';
 import { getGitFileData } from '../utils/git';
@@ -240,38 +240,58 @@ class BackendService {
 
   private async processAllPosts(): Promise<PostMetadata[]> {
     try {
-      const files = await glob('app/blog/posts/**/page.mdx', {
+      logger.info('Starting post processing...');
+      
+      // Use globAsync instead of glob
+      const files = await globAsync('**/page.mdx', {
         absolute: true,
-        cwd: process.cwd(),
+        cwd: path.join(process.cwd(), 'app/blog/posts'),
       });
 
       if (!Array.isArray(files)) {
         throw new Error('Failed to get post files');
       }
 
+      logger.info(`Found ${files.length} posts to process`);
+  
+      // Add timeout to post processing
+      const processWithTimeout = async (file: string) => {
+        return Promise.race([
+          (async () => {
+            try {
+              const slug = path
+                .dirname(file)
+                .split('/posts/')[1]
+                .split('/page')[0];
+              
+              logger.info(`Processing post: ${slug}`);
+              const gitData = await getGitFileData(file);
+              return await this.processPost(file, slug, gitData);
+            } catch (error) {
+              logger.error(`Failed to process file ${file}:`, error as Error);
+              return null;
+            }
+          })(),
+          new Promise<null>((_, reject) => 
+            setTimeout(() => reject(new Error(`Timeout processing ${file}`)), 10000)
+          )
+        ]).catch(error => {
+          logger.error(`Timed out processing ${file}:`, error as Error);
+          return null;
+        });
+      };
+  
       const processedPosts = await Promise.all(
-        files.map(async (file) => {
-          try {
-            // Get the directory name containing page.mdx as the slug
-            const slug = path
-              .dirname(file)           // Get full directory path
-              .split('/posts/')[1]     // Split on posts/ and take everything after
-              .split('/page')[0];      // Remove /page from the end if it exists
-            
-            const gitData = await getGitFileData(file);
-            return await this.processPost(file, slug, gitData);
-          } catch (error) {
-            logger.error(`Failed to process file ${file}:`, error as Error);
-            return null;
-          }
-        })
+        files.map(processWithTimeout)
       );
-
-      return processedPosts
-        .filter((post): post is PostMetadata => post !== null)
-        .sort((a, b) => 
-          new Date(b.created).getTime() - new Date(a.created).getTime()
-        );
+  
+      const validPosts = processedPosts.filter((post): post is PostMetadata => post !== null);
+      
+      logger.info(`Successfully processed ${validPosts.length} of ${files.length} posts`);
+  
+      return validPosts.sort((a, b) => 
+        new Date(b.created).getTime() - new Date(a.created).getTime()
+      );
     } catch (maybeError: unknown) {
       const error = toError(maybeError);
       logger.error('Failed to process posts:', error);
