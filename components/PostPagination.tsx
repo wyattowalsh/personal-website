@@ -30,12 +30,17 @@ export default function PostPagination() {
         const slug = pathname.split("/blog/posts/")[1];
         if (!slug) return;
         
-        const data = await getAdjacentPosts(slug);
+        const response = await fetch(`/api/posts/${slug}/adjacent`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch adjacent posts');
+        }
+        
+        const data = await response.json();
         setState(prev => ({
           ...prev,
           data: {
-            prevPost: data?.prevPost || null,
-            nextPost: data?.nextPost || null
+            prevPost: data.prevPost,
+            nextPost: data.nextPost
           },
           isLoading: false
         }));
@@ -91,7 +96,7 @@ export default function PostPagination() {
             href={{
               pathname: '/blog/posts/[slug]',
               query: { slug: nextPost.slug }
-            }} 
+            }}
             className="group"
           >
             <motion.div
@@ -149,7 +154,7 @@ export default function PostPagination() {
             href={{
               pathname: '/blog/posts/[slug]',
               query: { slug: prevPost.slug }
-            }} 
+            }}
             className="group"
           >
             <motion.div

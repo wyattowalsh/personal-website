@@ -341,7 +341,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 									damping: 15,
 									delay: Math.min(idx * 0.1, 0.8),
 								}}
-							>
+								>
 									<Link 
 										href={{
 											pathname: '/blog/posts/[slug]',

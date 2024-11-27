@@ -132,33 +132,37 @@ export default function PostHeader() {
         const slug = pathname.split("/blog/posts/")[1];
         
         if (!slug) {
-          console.error('Invalid pathname:', pathname);
           throw new Error('Invalid slug');
         }
 
-        // Update API endpoint path
-        const response = await fetch(`/api/blog/posts/${slug}`);
+        // Direct fetch from backend service instead of API route
+        const response = await fetch(`/api/posts/${slug}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
         if (!response.ok) {
-          throw new Error('Failed to fetch post');
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const data = await response.json();
         
-        if (!mounted) return;
-
         if (!data) {
           throw new Error('Post not found');
         }
 
-        // The API now returns the post data directly
-        setState(prev => ({ ...prev, post: data, isLoading: false }));
+        setState(prev => ({ 
+          ...prev, 
+          post: data,
+          isLoading: false 
+        }));
       } catch (error) {
-        if (!mounted) return;
-        const errorMessage = error instanceof Error ? error.message : "Failed to load post";
         console.error("Error loading post:", error);
         setState(prev => ({
           ...prev,
-          error: errorMessage,
+          error: error instanceof Error ? error.message : "Failed to load post",
           isLoading: false,
         }));
       }
