@@ -122,7 +122,12 @@ export default function SocialLink({ link }: SocialLinkProps) {
   );
 
   return isInternalLink ? (
-    <Link href={link.url} className={sharedClassName}>
+    <Link 
+      href={{
+        pathname: link.url
+      }} 
+      className={sharedClassName}
+    >
       {content}
     </Link>
   ) : (

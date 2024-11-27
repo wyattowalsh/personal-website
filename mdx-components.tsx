@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import type { MDXComponents } from "mdx/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -627,7 +627,25 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </details>
         ),
 
-        Math,
+        Math: ({ children, ...props }: JSX.IntrinsicAttributes & MathProps) => {
+            return (
+                <Suspense fallback={<div className="animate-pulse h-8 bg-muted rounded" />}>
+                    <Math {...props}>{children}</Math>
+                </Suspense>
+            );
+        },
+
+        'math-display': ({ children, label, number }: { children: string, label?: string, number?: number }) => {
+            return (
+                <Math display={true} label={label} number={number}>
+                    {children}
+                </Math>
+            );
+        },
+
+        'math-inline': ({ children }: { children: string }) => {
+            return <Math display={false}>{children}</Math>;
+        },
 
         a: ({ href, children }) => {
             if (!href) return <span>{children}</span>;
@@ -687,6 +705,15 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 </Link>
             );
         },
+
+        // Add handlers for KaTeX math delimiters
+        'math': ({ children }) => (
+            <Math display={false}>{children}</Math>
+        ),
+        
+        'math-display': ({ children }) => (
+            <Math display={true}>{children}</Math>
+        ),
 
         ...components,
     };

@@ -3,8 +3,6 @@ import path from 'path';
 import chalk from 'chalk';
 import { backend } from '../lib/services/backend';
 import { logger } from '../lib/utils/logger';
-import { processFiles } from './index';
-import { backend } from '../lib/services/backend';
 import { fileURLToPath } from 'url';
 
 // Enhanced error handling setup using global process
@@ -19,7 +17,7 @@ globalThis.process.on('uncaughtException', (error) => {
 });
 
 // Main processing function with enhanced error handling and logging
-export async function processFiles(isDev = false): Promise<PreprocessStats> {
+async function processFiles(isDev = false): Promise<PreprocessStats> {
   const startTime = Date.now();
   
   try {
@@ -30,7 +28,7 @@ export async function processFiles(isDev = false): Promise<PreprocessStats> {
     logger.step('Cleaning cache directories...');
     await backend.cleanup();
 
-    // Run preprocessing
+    // Run preprocessing and ensure indices are created
     logger.step('Running preprocessing pipeline...');
     const stats = await backend.preprocess(isDev);
 
@@ -53,10 +51,11 @@ export async function processFiles(isDev = false): Promise<PreprocessStats> {
   }
 }
 
-// Simplified script runners
+// Simplified script runners with ensure cache
 const scripts = {
   predev: async () => {
     try {
+      await backend.ensurePreprocessed();
       await processFiles(true);
       logger.success('Development preprocessing complete!');
     } catch (error) {
@@ -67,6 +66,7 @@ const scripts = {
 
   prebuild: async () => {
     try {
+      await backend.ensurePreprocessed();
       await processFiles(false);
       logger.success('Production preprocessing complete!');
     } catch (error) {
@@ -83,14 +83,5 @@ if (require.main === module) {
     .catch(() => process.exit(1));
 }
 
-// Update exports
-module.exports = {
-  scripts: {
-    predev: async () => {
-      // ...existing code...
-    },
-    prebuild: async () => {
-      // ...existing code...
-    }
-  }
-};
+// Export scripts
+module.exports = { scripts };

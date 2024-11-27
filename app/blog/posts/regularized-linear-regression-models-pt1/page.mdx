@@ -118,7 +118,7 @@ $$
 \hat{\boldsymbol{\beta}}_{\text{OLS}} = \arg \min_{\boldsymbol{\beta}} \Big\{ \frac{1}{2n} \|\mathbf{y} - \mathbf{X}\boldsymbol{\beta}\|_2^2 \Big\}
 $$
 
-The 1/(2n) term is added in order to simplify solving the gradient and allow the objective function to converge to the expected value of the model error by **the Law of Large Numbers**.
+The $\frac{1}{2n}$ term is added in order to simplify solving the gradient and allow the objective function to converge to the expected value of the model error by **the Law of Large Numbers**.
 
 Aided by the problem’s unconstrained nature, a closed-form solution for the OLS estimator can be obtained by setting the gradient of the loss function (objective) equal to zero and solving the resultant equation for the coefficient vector, **β̂**. This produces the following estimator:
 
@@ -128,25 +128,21 @@ $$
 
 However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (<a href="#equation-8">Eq. #8</a>) is convex since any local optimality of a convex function is also global optimality and therefore unique.
 
-One possible way to show this is through the second-order convexity conditions, which state that a function is convex if it is continuous, twice differentiable, and has an associated Hessian matrix that is positive semi-definite. Due to its quadratic nature, the OLS loss function (<a href="#equation-8">Eq. #8</a>) is both continuous and twice differentiable, satisfying the first two conditions.
+One possible way to show this is through the second-order convexity conditions, which state that a function is convex if it is continuous, twice differentiable, and has an associated Hessian matrix that is positive semi-definite. Due to its quadratic nature, the OLS loss function (<a href="#eq-8">Eq. #8</a>) is both continuous and twice differentiable, satisfying the first two conditions.
 
 To establish the last condition, the OLS Hessian matrix is found as:
 
 $$
-\mathbf{H} = \nabla^2 L(\boldsymbol{\beta}) = \frac{2}{n}\mathbf{X}^\top\mathbf{X}
+\mathbf{H} = 2\mathbf{X}^\top\mathbf{X}
 $$
 
 Furthermore, this Hessian can be shown to be positive semi-definite as:
 
 $$
-\begin{aligned}
-\mathbf{v}^\top\mathbf{H}\mathbf{v} &= \frac{2}{n}\mathbf{v}^\top(\mathbf{X}^\top\mathbf{X})\mathbf{v} \\[0.5em]
-&= \frac{2}{n}(\mathbf{X}\mathbf{v})^\top(\mathbf{X}\mathbf{v}) \\[0.5em]
-&= \frac{2}{n}\|\mathbf{X}\mathbf{v}\|_2^2 \geq 0 \quad \forall \mathbf{v} \in \mathbb{R}^{p+1}
-\end{aligned}
+\boldsymbol{\beta}^\top(2\mathbf{X}^\top\mathbf{X})\boldsymbol{\beta} = 2(\mathbf{X}\boldsymbol{\beta})^\top\mathbf{X}\boldsymbol{\beta} = 2\|\mathbf{X}\boldsymbol{\beta}\|_2^2 \geq 0 \quad \forall \boldsymbol{\beta} \in \mathbb{R}^{p+1}
 $$
 
-Thus, by the second-order conditions for convexity, the OLS loss function (<a href="#equation-8">Eq. #8</a>) is convex, thus the estimator found above (<a href="#equation-9">Eq. #9</a>) is the ***unique*** global minimizer to the OLS problem.
+Thus, by the second-order conditions for convexity, the OLS loss function (<a href="#eq-8">Eq. #8</a>) is convex, thus the estimator found above (<a href="#eq-9">Eq. #9</a>) is the ***unique*** global minimizer to the OLS problem.
 
 ### Implementing the Estimator Using Python and NumPy
 

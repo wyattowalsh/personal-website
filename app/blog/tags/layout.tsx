@@ -1,9 +1,8 @@
 import React from "react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { getAllTags } from "@/lib/posts";
+import { getAllTags } from "@/lib/services/backend";
 import { Badge } from "@/components/ui/badge";
-import PostCard from "@/components/PostCard"; // Ensure this is the correct import path
 import ParticlesBackground from "@/components/ParticlesBackground";
 
 export default async function TagsLayout({

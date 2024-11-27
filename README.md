@@ -76,6 +76,29 @@
 
 ---
 
+## Key Features 🔑
+
+- Custom link tree with social media links and contact information with a [particles](https://particles.js.org/) background.
+- Blog supporting:
+  - MDX content with frontmatter metadata.
+  - LaTeX math rendering with [KaTeX](https://katex.org/)
+    - Inline and block math equations.
+    - Equation autonumbering
+    - Copy-to-clipboard support for underlying LaTeX code + autolinked anchor url
+  - Gist embedding with [Super React Gist](https://github.com/GeorgeGkas/super-react-gist)
+  - Full-text search with [Fuse.js](https://fusejs.io/)
+  - Reading time estimation with [reading-time](https://github.com/ngryman/reading-time)
+  - Pagination
+  - Tags with tag page + indices
+  - RSS feed generation with [feed](https://github.com/jpmonette/feed)
+  - Automatic created and modified dates (with optional frontmatter override)
+- Custom 404 page with more particles!
+- Predev + Prebuild scripts for pre-computation of data for faster builds.
+- Light + Dark mode theme toggling with local storage persistence.
+- Linkshortener with [YOURLS](https://yourls.org/).
+
+---
+
 ## Tech Stack 🥞
 
 - **[Vercel](https://vercel.com/)**: A global hosting and deployment platform for frontend web projects.  

@@ -1,19 +1,81 @@
-const { Feed } = require('feed');
-const { LRUCache } = require('lru-cache');
-const Fuse = require('fuse.js');
-const { promisify } = require('util');
-const glob = require('glob');
-const matter = require('gray-matter');
-const path = require('path'); // Add direct import for path
-const { getGitFileData } = require('../utils/git');
-const { getConfig } = require('../config');
-const { logger } = require('../utils/logger');
+import { Feed } from 'feed';
+import { LRUCache } from 'lru-cache';
+import Fuse from 'fuse.js';
+import { promisify } from 'util';
+import { glob } from '@/lib/utils/glob';
+import matter from 'gray-matter';
+import path from 'path';
+import { getGitFileData } from '../utils/git';
+import { getConfig } from '../config';
+import { logger } from '../utils/logger';
+
+// Type definitions
+export interface Post {
+  slug: string;
+  title: string;
+  date: string;
+  content: string;
+  tags: string[];
+  summary?: string;
+  image?: string;
+  created: string;
+  updated: string;
+}
+
+interface PostMetadata {
+  title: string;
+  slug: string;
+  summary: string;
+  content: string;
+  created: string;
+  updated?: string;
+  tags: string[];
+  image?: string;
+}
+
+interface SearchIndex {
+  fuse: Fuse<PostMetadata>;
+}
+
+interface PreprocessStats {
+  duration: number;
+  postsProcessed: number;
+  searchIndexSize: number;
+  cacheSize: number;
+  errors: Error[];
+}
+
+// Replace the error handling utilities with this improved version
+const isError = (error: unknown): error is Error => {
+  return error instanceof Error;
+};
+
+const toError = (maybeError: unknown): Error => {
+  if (isError(maybeError)) return maybeError;
+
+  try {
+    return new Error(
+      typeof maybeError === 'object' 
+        ? JSON.stringify(maybeError) 
+        : String(maybeError)
+    );
+  } catch {
+    // If JSON.stringify fails, fallback to String()
+    return new Error(String(maybeError));
+  }
+};
 
 // Use dynamic imports for fs only since it's not available in browser
 const isNode = typeof window === 'undefined';
-const getFs = async () => isNode ? require('fs').promises : null;
+const getFs = async () => isNode ? (await import('fs')).promises : null;
 
-const globAsync = promisify(glob);
+const ensureFs = async () => {
+  const fs = await getFs();
+  if (!fs) {
+    throw new Error('File system is not available');
+  }
+  return fs;
+};
 
 // Constants - path is available in both Node.js and browser environments
 const CACHE_DIR = '.cache';
@@ -24,11 +86,18 @@ const INDICES = {
   RSS: path.join(CACHE_DIR, 'rss.xml'),
 } as const;
 
+const ensureNodeEnv = () => {
+  if (!isNode) {
+    throw new Error('This operation is only available in Node.js environment');
+  }
+};
+
 class BackendService {
   private static instance: BackendService;
   private searchIndex: SearchIndex | null = null;
   private readonly postCache: LRUCache<string, PostMetadata>;
-  private readonly tagCache: LRUCache<string, string[]>;
+  // Fix: Update tagCache type to store PostMetadata[] instead of string[]
+  private readonly tagCache: LRUCache<string, PostMetadata[]>;
 
   private constructor() {
     this.postCache = new LRUCache({ max: 500, ttl: 1000 * 60 * 60 }); // 1 hour
@@ -43,47 +112,61 @@ class BackendService {
   }
 
   public async preprocess(isDev = false): Promise<PreprocessStats> {
+    ensureNodeEnv();
     const startTime = Date.now();
     const errors: Error[] = [];
     logger.info(`Starting ${isDev ? 'development' : 'production'} preprocessing...`);
 
-    const fs = await getFs();
-    await fs.mkdir(CACHE_DIR, { recursive: true });
+    try {
+      const fs = await ensureFs();
+      await fs.mkdir(CACHE_DIR, { recursive: true });
 
-    // 1. Process all posts and generate metadata
-    const posts = await this.processAllPosts();
+      // 1. Process all posts and generate metadata
+      const posts = await this.processAllPosts();
 
-    // 2. Generate search index
-    const searchIndex = await this.generateSearchIndex(posts);
+      // 2. Generate search index
+      const searchIndex = await this.generateSearchIndex(posts);
 
-    // 3. Generate tag index
-    const tagIndex = await this.generateTagIndex(posts);
+      // 3. Generate tag index
+      const tagIndex = await this.generateTagIndex(posts);
 
-    // 4. Pre-compute RSS feed (only in production)
-    if (!isDev) {
-      await this.generateRSSFeed(posts);
+      // 4. Pre-compute RSS feed (only in production)
+      if (!isDev) {
+        await this.generateRSSFeed(posts);
+      }
+
+      // 5. Save indices to disk for quick startup
+      await Promise.all([
+        fs.writeFile(INDICES.METADATA, JSON.stringify(posts)),
+        fs.writeFile(INDICES.SEARCH, JSON.stringify(searchIndex)),
+        fs.writeFile(INDICES.TAGS, JSON.stringify(tagIndex)),
+      ]);
+
+      const duration = Date.now() - startTime;
+      return {
+        duration,
+        postsProcessed: posts.length,
+        searchIndexSize: JSON.stringify(searchIndex).length,
+        cacheSize: this.postCache.size,
+        errors,
+      };
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error('Preprocessing failed:', error);
+      errors.push(error);
+      return {
+        duration: Date.now() - startTime,
+        postsProcessed: 0,
+        searchIndexSize: 0,
+        cacheSize: this.postCache.size,
+        errors,
+      };
     }
-
-    // 5. Save indices to disk for quick startup
-    await Promise.all([
-      fs.writeFile(INDICES.METADATA, JSON.stringify(posts)),
-      fs.writeFile(INDICES.SEARCH, JSON.stringify(searchIndex)),
-      fs.writeFile(INDICES.TAGS, JSON.stringify(tagIndex)),
-    ]);
-
-    const duration = Date.now() - startTime;
-    return {
-      duration,
-      postsProcessed: posts.length,
-      searchIndexSize: JSON.stringify(searchIndex).length,
-      cacheSize: this.postCache.size,
-      errors,
-    };
   }
 
   private async processPost(file: string, slug: string, gitData: any): Promise<PostMetadata> {
     try {
-      const fs = await getFs();
+      const fs = await ensureFs();
       const content = await fs.readFile(file, 'utf-8');
       const { data, content: postContent } = matter(content);
 
@@ -97,13 +180,13 @@ class BackendService {
         }
       };
 
-      // Normalize dates with fallbacks
-      const created = normalizeDate(data.created) || 
-                     normalizeDate(gitData.firstModified) || 
+      // Use frontmatter dates first, fall back to git metadata only if not provided
+      const created = normalizeDate(data.created) ?? 
+                     normalizeDate(gitData.firstModified) ?? 
                      new Date().toISOString();
       
-      const updated = normalizeDate(data.updated) || 
-                     normalizeDate(gitData.lastModified) || 
+      const updated = normalizeDate(data.updated) ?? 
+                     normalizeDate(gitData.lastModified) ?? 
                      created;
 
       const metadata: PostMetadata = {
@@ -111,23 +194,27 @@ class BackendService {
         slug: String(slug),
         summary: String(data.summary || ''),
         content: String(postContent || ''),
-        created,
-        updated,
+        created, // Frontmatter date takes precedence
+        updated, // Frontmatter date takes precedence
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
         image: data.image
       };
 
       logger.info(`Processed post ${slug} with created: ${created}, updated: ${updated}`);
       return metadata;
-    } catch (error) {
-      logger.error(`Error processing post ${slug}:`, error as Error);
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error(`Error processing post ${slug}:`, error);
       throw error;
     }
   }
 
   private async processAllPosts(): Promise<PostMetadata[]> {
     try {
-      const files = await globAsync('app/blog/posts/**/page.mdx');
+      const files = await glob('app/blog/posts/**/page.mdx', {
+        absolute: true,
+        cwd: process.cwd(),
+      });
 
       if (!Array.isArray(files)) {
         throw new Error('Failed to get post files');
@@ -156,8 +243,9 @@ class BackendService {
         .sort((a, b) => 
           new Date(b.created).getTime() - new Date(a.created).getTime()
         );
-    } catch (error) {
-      logger.error('Failed to process posts:', error as Error);
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error('Failed to process posts:', error);
       return [];
     }
   }
@@ -183,6 +271,8 @@ class BackendService {
   }
 
   private async generateRSSFeed(posts: PostMetadata[]): Promise<void> {
+    ensureNodeEnv();
+    
     const config = getConfig();
     const feed = new Feed({
       title: config.site.title,
@@ -216,66 +306,128 @@ class BackendService {
       });
     });
 
-    const fs = await getFs();
-    await fs.writeFile(INDICES.RSS, feed.rss2());
+    try {
+      const fs = await ensureFs();
+      await fs.writeFile(INDICES.RSS, feed.rss2());
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error('Failed to generate RSS feed:', error);
+      throw error;
+    }
   }
 
-  private async ensurePreprocessed() {
+  public async ensurePreprocessed() {
     if (!isNode) {
       logger.warning('Cache operations skipped in browser');
       return;
     }
     
     try {
-      const fs = await getFs();
-      if (!fs) {
-        logger.warning('File system not available');
-        return;
-      }
-      
+      const fs = await ensureFs();
       await fs.mkdir(CACHE_DIR, { recursive: true });
       
-      // Try to access cache files
       try {
         await Promise.all([
           fs.access(INDICES.METADATA),
           fs.access(INDICES.TAGS)
         ]);
-      } catch {
+      } catch (maybeError: unknown) {
+        const error = toError(maybeError);
         // If files don't exist, run preprocessing
         logger.info('Cache files not found, running preprocessing...');
         await this.preprocess(true);
       }
-    } catch (error) {
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
       logger.error('Failed to ensure cache:', error);
       throw error;
     }
   }
 
   public async search(query: string): Promise<PostMetadata[]> {
-    if (!this.searchIndex) {
-      const fs = await getFs();
-      const data = await fs.readFile(INDICES.SEARCH, 'utf-8');
-      this.searchIndex = JSON.parse(data);
+    try {
+      if (!this.searchIndex) {
+        const fs = await ensureFs();
+        const data = await fs.readFile(INDICES.SEARCH, 'utf-8');
+        const parsed = JSON.parse(data) as SearchIndex;
+        if (!parsed || !parsed.fuse) {
+          throw new Error('Invalid search index format');
+        }
+        this.searchIndex = parsed;
+      }
+
+      if (!this.searchIndex.fuse) {
+        throw new Error('Search index is corrupted');
+      }
+
+      return this.searchIndex.fuse.search(query).map(result => result.item);
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error('Search failed:', error);
+      return [];
     }
-    return this.searchIndex.fuse.search(query).map(result => result.item);
   }
 
-  public async getPostsByTag(tag: string): Promise<PostMetadata[]> {
-    await this.ensurePreprocessed();
-    const cached = this.tagCache.get(tag);
-    if (cached) return cached;
+  public async getPostsByTag(tag: string): Promise<Post[]> {
+    const posts = await this.getPostMetadataByTag(tag);
+    return posts.map(post => ({
+      slug: post.slug,
+      title: post.title,
+      date: post.created, // Use created date for backwards compatibility
+      content: post.content,
+      tags: post.tags,
+      summary: post.summary || '',
+      image: post.image,
+      created: post.created,
+      updated: post.updated || post.created // Fallback to created date if updated is not available
+    }));
+  }
 
-    const fs = await getFs();
-    const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
+  private async getPostMetadataByTag(tag: string): Promise<PostMetadata[]> {
+    await this.ensurePreprocessed();
+    
+    const cached = this.tagCache.get(tag);
+    // Add type guard to ensure cached is PostMetadata[]
+    if (cached && Array.isArray(cached) && cached.every(post => 
+      post && 
+      typeof post === 'object' && 
+      'slug' in post && 
+      'title' in post
+    )) {
+      return cached;
+    }
+
+    const fs = await ensureFs();
+    const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8')) as Record<string, string[]>;
     const slugs = tagIndex[tag] || [];
-    const posts = await Promise.all(slugs.map(slug => this.getPost(slug)));
+    
+    // Filter out null values from the result
+    const posts = (await Promise.all(
+      slugs.map(slug => this.getPostMetadata(slug))
+    )).filter((post): post is PostMetadata => post !== null);
 
     this.tagCache.set(tag, posts);
     return posts;
   }
 
-  public async getPost(slug: string): Promise<PostMetadata | null> {
+  public async getPost(slug: string): Promise<Post | null> {
+    const post = await this.getPostMetadata(slug);
+    if (!post) return null;
+    
+    return {
+      slug: post.slug,
+      title: post.title,
+      date: post.created,
+      content: post.content,
+      tags: post.tags,
+      summary: post.summary || '', // Ensure summary has a default value
+      image: post.image,
+      created: post.created,
+      updated: post.updated || post.created // Use created date as fallback for updated
+    };
+  }
+
+  private async getPostMetadata(slug: string): Promise<PostMetadata | null> {
     try {
       // Skip cache operations in browser
       if (!isNode) {
@@ -299,18 +451,13 @@ class BackendService {
       let metadata: PostMetadata[] = [];
       
       try {
-        const fs = await getFs();
-        if (!fs) {
-          logger.warning('File system not available');
-          return null;
-        }
+        const fs = await ensureFs();
         const rawMetadata = await fs.readFile(metadataPath, 'utf-8');
         metadata = JSON.parse(rawMetadata);
       } catch (readError) {
         logger.warning(`Metadata file read failed, attempting rebuild: ${readError}`);
         await this.rebuildCache();
-        const fs = await getFs();
-        if (!fs) return null;
+        const fs = await ensureFs();
         const rawMetadata = await fs.readFile(metadataPath, 'utf-8');
         metadata = JSON.parse(rawMetadata);
       }
@@ -325,8 +472,9 @@ class BackendService {
       this.postCache.set(slug, post);
       return post;
       
-    } catch (error) {
-      logger.error('Error in getPost:', error as Error);
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error('Error in getPost:', error);
       return null;
     }
   }
@@ -337,22 +485,39 @@ class BackendService {
     await this.preprocess(true);
   }
 
-  public async getAllPosts(): Promise<PostMetadata[]> {
+  public async getAllPosts(): Promise<Post[]> {
+    const posts = await this.getAllPostMetadata();
+    return posts.map(post => ({
+      slug: post.slug,
+      title: post.title,
+      date: post.created, // Use created date for backwards compatibility
+      content: post.content,
+      tags: post.tags,
+      summary: post.summary || '', // Provide default for optional summary
+      image: post.image,
+      created: post.created,
+      updated: post.updated || post.created // Use created date as fallback for updated
+    }));
+  }
+
+  private async getAllPostMetadata(): Promise<PostMetadata[]> {
     try {
       await this.ensurePreprocessed(); // This must complete before continuing
-      const fs = await getFs();
+      const fs = await ensureFs();
       
       try {
-        const metadata = JSON.parse(await fs.readFile(INDICES.METADATA, 'utf-8'));
-        return metadata;
+        const rawMetadata = await fs.readFile(INDICES.METADATA, 'utf-8');
+        return JSON.parse(rawMetadata);
       } catch (readError) {
         // If reading fails, try rebuilding cache once
         logger.warning('Metadata file read failed, rebuilding cache...');
         await this.rebuildCache();
-        const metadata = JSON.parse(await fs.readFile(INDICES.METADATA, 'utf-8'));
-        return metadata;
+        const fs = await ensureFs();
+        const rawMetadata = await fs.readFile(INDICES.METADATA, 'utf-8');
+        return JSON.parse(rawMetadata);
       }
-    } catch (error) {
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
       logger.error('Error fetching all posts:', error);
       return [];
     }
@@ -361,7 +526,7 @@ class BackendService {
   public async getAllTags(): Promise<string[]> {
     try {
       await this.ensurePreprocessed(); // This must complete before continuing
-      const fs = await getFs();
+      const fs = await ensureFs();
       
       try {
         const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
@@ -373,7 +538,8 @@ class BackendService {
         const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
         return Object.keys(tagIndex);
       }
-    } catch (error) {
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
       logger.error('Error fetching all tags:', error);
       return [];
     }
@@ -381,6 +547,7 @@ class BackendService {
 
   public async cleanup(): Promise<void> {
     try {
+      ensureNodeEnv();
       // Reset caches first
       this.postCache.clear();
       this.tagCache.clear();
@@ -388,33 +555,99 @@ class BackendService {
 
       // Then try to remove the cache directory
       try {
-        const fs = await getFs();
+        const fs = await ensureFs();
         await fs.rm(CACHE_DIR, { recursive: true, force: true });
-      } catch (rmError) {
+      } catch (maybeError: unknown) {
+        const error = toError(maybeError);
         logger.warning('Cache directory removal failed, may not exist');
       }
 
       logger.success('Cache cleared');
-    } catch (error) {
-      logger.error('Failed to clean cache:', error as Error);
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error('Failed to clean cache:', error);
       throw error;
+    }
+  }
+
+  public async getAdjacentPosts(slug: string): Promise<{
+    prevPost: Post | null;
+    nextPost: Post | null;
+  }> {
+    const { prevPost, nextPost } = await this.getAdjacentPostMetadata(slug);
+    return {
+      prevPost: prevPost ? {
+        slug: prevPost.slug,
+        title: prevPost.title,
+        date: prevPost.created,
+        content: prevPost.content,
+        tags: prevPost.tags,
+        summary: prevPost.summary || '', // Provide default for optional summary
+        image: prevPost.image,
+        created: prevPost.created,
+        updated: prevPost.updated || prevPost.created // Use created date as fallback for updated
+      } : null,
+      nextPost: nextPost ? {
+        slug: nextPost.slug,
+        title: nextPost.title,
+        date: nextPost.created,
+        content: nextPost.content,
+        tags: nextPost.tags,
+        summary: nextPost.summary || '', // Provide default for optional summary
+        image: nextPost.image,
+        created: nextPost.created,
+        updated: nextPost.updated || nextPost.created // Use created date as fallback for updated
+      } : null
+    };
+  }
+
+  private async getAdjacentPostMetadata(slug: string): Promise<{
+    prevPost: PostMetadata | null;
+    nextPost: PostMetadata | null;
+  }> {
+    try {
+      const posts = await this.getAllPostMetadata();
+      // Sort by frontmatter created date in reverse chronological order
+      const sortedPosts = [...posts].sort((a, b) => 
+        new Date(b.created).getTime() - new Date(a.created).getTime()
+      );
+
+      const currentIndex = sortedPosts.findIndex(post => post.slug === slug);
+      if (currentIndex === -1) {
+        return { prevPost: null, nextPost: null };
+      }
+
+      // Previous = post with more recent created date (newer post)
+      // Next = post with older created date (earlier post)
+      return {
+        prevPost: currentIndex > 0 ? sortedPosts[currentIndex - 1] : null,
+        nextPost: currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null
+      };
+    } catch (maybeError: unknown) {
+      const error = toError(maybeError);
+      logger.error(`Error fetching adjacent posts for ${slug}:`, error);
+      return { prevPost: null, nextPost: null };
     }
   }
 }
 
 // Exports
-module.exports = {
-  backend: BackendService.getInstance(),
-  getPost: async (slug: string) => {
-    try {
-      return await BackendService.getInstance().getPost(slug);
-    } catch (error) {
-      logger.error('Error in getPost:', error as Error);
-      return null;
-    }
-  },
-  searchPosts: async (query) => BackendService.getInstance().search(query),
-  getPostsByTag: async (tag) => BackendService.getInstance().getPostsByTag(tag),
-  predevBackend: async () => BackendService.getInstance().preprocess(true),
-  prebuildBackend: async () => BackendService.getInstance().preprocess(false)
+export const backend = BackendService.getInstance();
+
+export const getPost = async (slug: string) => {
+  try {
+    return await BackendService.getInstance().getPost(slug);
+  } catch (maybeError: unknown) {
+    const error = toError(maybeError);
+    logger.error('Error in getPost:', error);
+    return null;
+  }
 };
+
+export const searchPosts = async (query: string) => BackendService.getInstance().search(query);
+export const getPostsByTag = async (tag: string) => BackendService.getInstance().getPostsByTag(tag);
+export const predevBackend = async () => BackendService.getInstance().preprocess(true);
+export const prebuildBackend = async () => BackendService.getInstance().preprocess(false);
+export const getAllPosts = async () => backend.getAllPosts();
+export const getAllTags = async () => backend.getAllTags();
+export const getAdjacentPosts = async (slug: string) => backend.getAdjacentPosts(slug);

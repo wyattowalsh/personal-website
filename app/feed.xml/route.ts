@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cache } from 'react';
 import { Feed } from 'feed';
-import { getAllPosts } from '@/lib/posts';
+import { getAllPosts } from '@/lib/services/backend';
 import { getSiteConfig } from '@/lib/config';
 
 // Removed exports of 'dynamic' and 'revalidate'

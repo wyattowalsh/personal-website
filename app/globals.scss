@@ -184,6 +184,14 @@
       @apply bg-primary/5;
       animation: highlight 2s ease-out;
     }
+
+    // Ensure math content is properly positioned
+    .math-content {
+      @apply relative py-2;
+      @apply overflow-x-auto overflow-y-hidden;
+      @apply scrollbar-thin scrollbar-track-transparent;
+      @apply scrollbar-thumb-math; // Use new custom utility
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -482,157 +490,74 @@
     @apply bg-math-bg/95 dark:bg-math-bg/80;
     @apply shadow-math hover:shadow-math-hover;
     @apply transition-all duration-300;
-    @apply hover:border-primary/30;
-
-    .math-content {
-      @apply overflow-x-auto overflow-y-hidden;
-      @apply scrollbar-thin;
-      @apply scrollbar-track-transparent;
-      @apply scrollbar-thumb-rounded;
-      
-      &::-webkit-scrollbar-thumb {
-        @apply bg-math-controls-text/20 hover:bg-math-controls-text/30;
-      }
+    // Replace @apply group with direct class
+    &:not(.no-group) {
+      isolation: isolate;
+      /* Add the group class via composition */
+      composes: group from global;
     }
 
-    .math-link-button {
-      @apply absolute right-2 top-2;
-      @apply p-2 rounded-full;
-      @apply opacity-0 hover:opacity-100;
-      @apply transition-opacity duration-200;
-      @apply hover:bg-math-controls-bg;
-      @apply text-math-controls-text;
-      @apply hover:text-math-controls-text-hover;
-    }
-
-    // Style for equation numbers
-    .katex {
-      text-align: center;
-      
-      .tag {
-        @apply text-math-controls-text;
-        @apply transition-colors duration-300;
-        position: absolute;
-        right: -1em;  // Adjust this value as needed
-      }
-
-      // Add clickable behavior to equation numbers
-      .tag:hover {
-        @apply text-math-controls-text-hover;
-        cursor: pointer;
-      }
-
-      // Ensure equation content doesn't overlap with tag
-      .katex-html {
-        position: relative;
-      }
-    }
-
-    .equation-number {
-      @apply absolute right-2 bottom-2 text-math-display-number;
-      transition: color 0.3s ease;
-    }
-
-    .equation-number:hover {
-      @apply text-math-display-number-hover;
-      cursor: pointer;
-    }
-
-    .equation-number-container {
-      @apply absolute right-4 bottom-4;
+    // Enhanced controls container
+    .equation-controls {
+      @apply absolute top-2 right-2; // Move to top-right
       @apply flex items-center gap-2;
+      @apply opacity-0 group-hover:opacity-100;
+      @apply transition-opacity duration-200;
+      @apply z-20;
     }
 
+    // Copy button styles
+    .copy-button {
+      @apply p-1.5 rounded-md;
+      @apply text-math-controls-text hover:text-math-controls-text-hover;
+      @apply bg-transparent hover:bg-math-controls-bg;
+      @apply transition-all duration-200;
+      @apply transform hover:scale-110;
+    }
+
+    // Link button styles 
+    .link-button {
+      @apply p-1.5 rounded-md ml-1;
+      @apply text-math-controls-text hover:text-math-controls-text-hover;
+      @apply bg-transparent hover:bg-math-controls-bg;
+      @apply transition-all duration-200;
+      @apply transform hover:scale-110;
+    }
+
+    // Update equation number styles
     .equation-number {
-      @apply text-math-display-number text-sm;
-      @apply transition-all duration-300;
-      @apply hover:text-math-display-number-hover;
-      @apply cursor-pointer;
-      @apply select-none;
-      @apply flex items-center gap-1;
-      
-      &:hover {
-        @apply scale-105;
-      }
+      @apply absolute right-3 bottom-2; // Move to bottom-right
+      @apply text-sm font-medium px-2 py-1 rounded-md;
+      @apply text-math-controls-text hover:text-math-controls-text-hover;
+      @apply bg-transparent hover:bg-math-controls-bg;
+      @apply transition-all duration-200;
+      @apply cursor-pointer select-none;
+      @apply z-10; // Keep below controls
+    }
 
-      &::before {
-        content: "";
-        @apply absolute -inset-2;
+    // Add hover state
+    &:hover {
+      @apply border-primary/30;
+      
+      .equation-controls,
+      .equation-number {
+        @apply opacity-100;
       }
     }
 
-    // Highlight the equation when targeted by URL hash
+    // Ensure math content is properly positioned
+    .math-content {
+      @apply relative py-2; // Add padding to avoid overlap
+      @apply overflow-x-auto overflow-y-hidden;
+      @apply scrollbar-thin scrollbar-track-transparent;
+      @apply scrollbar-thumb-math; // Use our new custom utility
+    }
+
+    // Target state highlight
     &:target {
       @apply ring-2 ring-primary/50;
       @apply bg-primary/5;
-    }
-
-    // Add anchor link styles
-    &.anchor-equation {
-      @apply cursor-pointer;
-      
-      .anchor-icon {
-        @apply absolute left-0 top-1/2 -translate-y-1/2 -translate-x-full;
-        @apply opacity-0 transition-opacity duration-200;
-        @apply text-math-controls-text w-4 h-4 mx-2;
-      }
-  
-      &:hover {
-        .anchor-icon {
-          @apply opacity-100;
-        }
-      }
-    }
-
-    &.anchor-equation {
-      @apply relative;
-      
-      .anchor-link {
-        @apply absolute -left-6 top-1/2;
-        @apply -translate-y-1/2;
-        @apply opacity-0;
-        @apply text-math-controls-text;
-        @apply transition-all duration-200;
-        @apply cursor-pointer;
-        @apply p-1;
-        @apply rounded-md;
-        @apply hover:bg-math-controls-bg;
-        @apply hover:text-math-controls-text-hover;
-  
-        &:focus-visible {
-          @apply opacity-100 outline-none ring-2 ring-primary;
-        }
-      }
-  
-      &:hover {
-        .anchor-link {
-          @apply opacity-100;
-        }
-      }
-    }
-
-    .equation-link {
-      @apply absolute -left-5 top-1/2 -translate-y-1/2;
-      @apply opacity-0 transition-all duration-200;
-      @apply text-muted-foreground hover:text-primary;
-      @apply p-1 rounded-md hover:bg-primary/5;
-      @apply scale-90 hover:scale-100;
-      @apply hover:opacity-100;
-    }
-
-    .equation-number {
-      @apply absolute right-4 bottom-4;
-      @apply text-sm text-muted-foreground;
-      @apply transition-all duration-200;
-      @apply opacity-60 hover:opacity-100;
-      @apply select-none cursor-pointer;
-      @apply hover:text-primary;
-    }
-
-    &:target {
-      @apply ring-2 ring-primary/20;
-      @apply bg-primary/5;
-      animation: equation-highlight 1.5s ease-out;
+      animation: equation-highlight 2s ease-out;
     }
   }
 

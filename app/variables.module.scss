@@ -275,6 +275,10 @@ $animation-timing: (
   --selection-text: hsl(321, 100%, 45%); // Deep pink
   --selection-heading-bg: hsl(262, 100%, 78%, 0.25); // Soft purple
   --selection-heading-text: hsl(262, 100%, 45%); // Deep purple
+
+  // Add scrollbar colors
+  --math-controls-text: 100, 116, 139; // RGB values for slate-500
+  --math-controls-text-hover: 15, 23, 42; // RGB values for slate-900
 }
 
 // Dark Theme Variables
@@ -430,4 +434,8 @@ $animation-timing: (
   --selection-text: hsl(321, 90%, 75%); // Light pink
   --selection-heading-bg: hsl(262, 90%, 65%, 0.25); // Bright purple
   --selection-heading-text: hsl(262, 90%, 75%); // Light purple
+
+  // Add scrollbar colors
+  --math-controls-text: 148, 163, 184; // RGB values for slate-400
+  --math-controls-text-hover: 241, 245, 249; // RGB values for slate-100
 }

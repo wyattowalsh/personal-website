@@ -53,7 +53,13 @@ const PostCard = ({ post, className }: PostCardProps) => {
       whileHover={{ y: -5 }}
       className={cn("transition-transform duration-300 h-full", className)}
     >
-      <Link href={`/blog/posts/${slug}`} className="block h-full no-underline">
+      <Link 
+        href={{
+          pathname: '/blog/posts/[slug]',
+          query: { slug }
+        }} 
+        className="block h-full no-underline"
+      >
         <Card className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col">
           <div className="relative aspect-video w-full">
             <Image

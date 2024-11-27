@@ -1,4 +1,4 @@
-import { getAllPosts, getAllTags } from "@/lib/posts";
+import { getAllPosts, getAllTags } from "@/lib/services/backend";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";

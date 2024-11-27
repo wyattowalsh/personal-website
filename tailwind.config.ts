@@ -103,6 +103,10 @@ const config: Config = {
         'selection-text': 'var(--selection-text)',
         'selection-heading-bg': 'var(--selection-heading-bg)',
         'selection-heading-text': 'var(--selection-heading-text)',
+        'math-scrollbar': {
+          DEFAULT: 'rgb(var(--math-controls-text) / 0.2)',
+          hover: 'rgb(var(--math-controls-text) / 0.3)',
+        },
       },
       fontFamily: {
         sans: ['var(--font-sans)', 'sans-serif'],
@@ -552,6 +556,24 @@ const config: Config = {
         },
         '.text-shadow-glow-dark': {
           textShadow: '0 0 10px var(--primary-foreground), 0 0 20px var(--primary-foreground)',
+        },
+        '.scrollbar-math': {
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'var(--math-controls-text)',
+            opacity: '0.2',
+          },
+          '&:hover::-webkit-scrollbar-thumb': {
+            opacity: '0.3',
+          },
+        },
+        // Add custom scrollbar utilities
+        '.scrollbar-thumb-math': {
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgb(var(--math-controls-text) / 0.2)',
+          },
+          '&:hover::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgb(var(--math-controls-text) / 0.3)',
+          },
         },
       };
       addUtilities(newUtilities, {

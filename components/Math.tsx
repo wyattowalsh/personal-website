@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import katex from 'katex';
 import { cn } from "@/lib/utils";
-import { Link, Copy } from "lucide-react";
+import { Link, Copy, Check } from "lucide-react";
 import { useMathContext } from "./MathContext";
 
 interface MathProps {
@@ -16,10 +16,16 @@ interface MathProps {
 
 export default function Math({ children = '', display = false, options = {}, label, number }: MathProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedEquation, setCopiedEquation] = useState(false);
   const mathRef = useRef<HTMLDivElement>(null);
   const { getNextNumber } = useMathContext();
   const numberRef = useRef<number | null>(null);
   
+  // Add logging for debugging
+  useEffect(() => {
+    console.debug('[Math] Rendering equation:', { display, label, number });
+  }, [display, label, number]);
+
   // Get equation number only once and store it in ref
   const equationId = useMemo(() => {
     if (!display) return undefined;
@@ -55,10 +61,18 @@ export default function Math({ children = '', display = false, options = {}, lab
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleCopyEquation = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigator.clipboard.writeText(children);
+    setCopiedEquation(true);
+    setTimeout(() => setCopiedEquation(false), 2000);
+  };
+
   const renderedKatex = useMemo(() => {
-    const cleanMath = children.trim().replace(/^\$\$(.*)\$\$$/s, '$1');
+    // Remove need to clean math content since remark-math handles it
     try {
-      return katex.renderToString(cleanMath, {
+      return katex.renderToString(children, {
         displayMode: display,
         throwOnError: true,
         globalGroup: true,
@@ -69,7 +83,7 @@ export default function Math({ children = '', display = false, options = {}, lab
       });
     } catch (error) {
       console.error('KaTeX error:', error);
-      return katex.renderToString(cleanMath, {
+      return katex.renderToString(children, {
         displayMode: display,
         throwOnError: false,
         strict: 'ignore',
@@ -97,29 +111,55 @@ export default function Math({ children = '', display = false, options = {}, lab
     <div 
       ref={mathRef}
       id={`eq-${equationId}`}
-      className="math-display group relative"
+      className={cn(
+        "math-display group", // Add group here instead of in SCSS
+        "relative my-8 px-8 py-6",
+        "rounded-xl border border-math-border",
+        "bg-math-bg/95 dark:bg-math-bg/80",
+        "shadow-math hover:shadow-math-hover",
+        "transition-all duration-300"
+      )}
     >
       <div
         className="math-content"
         dangerouslySetInnerHTML={{ __html: renderedKatex }}
       />
+      <div className="equation-controls">
+        <button
+          onClick={handleCopyEquation}
+          className="copy-button"
+          title="Copy equation"
+          aria-label="Copy equation"
+        >
+          {copiedEquation ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Copy className="h-4 w-4" />
+          )}
+        </button>
+        <button
+          onClick={handleCopy}
+          className="link-button"
+          title="Copy link to equation"
+          aria-label="Copy link to equation"
+        >
+          {copied ? (
+            <Check className="h-4 w-4 text-green-500" />
+          ) : (
+            <Link className="h-4 w-4" />
+          )}
+        </button>
+      </div>
       {equationId && (
-        <>
-          <button
-            onClick={handleCopy}
-            className="equation-link"
-            title="Copy link to equation"
-          >
-            {copied ? <Copy className="h-4 w-4" /> : <Link className="h-4 w-4" />}
-          </button>
-          <button
-            onClick={handleEquationClick}
-            className="equation-number"
-            title="Click to link to this equation"
-          >
-            ({equationId})
-          </button>
-        </>
+        <div 
+          onClick={handleEquationClick}
+          className="equation-number"
+          title="Click to link to this equation"
+          role="button"
+          tabIndex={0}
+        >
+          ({equationId})
+        </div>
       )}
     </div>
   );

@@ -213,7 +213,7 @@ const BlogTitle = () => {
 	}, []);
 
 	return (
-		<motion.div className="relative w-full overflow-hidden py-0" suppressHydrationWarning>
+		<motion.div className="relative w-full" suppressHydrationWarning>
 			<div className="max-w-4xl mx-auto mt-0">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}

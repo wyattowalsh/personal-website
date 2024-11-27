@@ -1,5 +1,5 @@
 import { links } from '@/components/Links';
-import { Post } from './posts';
+import { Post } from '@/lib/services/backend';
 import { cache } from 'react';
 import { getConfig } from './config';
 
@@ -98,8 +98,6 @@ export function generateArticleSchema(post: any) {
     }
   };
 }
-
-// ...existing code...
 
 export const generateBreadcrumbSchema = cache(
   (items: BreadcrumbItem[], baseUrl = 'https://w4w.dev') => {

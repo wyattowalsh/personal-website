@@ -11,8 +11,6 @@ import type { PostMetadata } from "@/lib/types"; // Update import path
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
-import { getPost } from "@/lib/services"; // Add this import
-import { backend } from '@/lib/services/backend';  // Add this import
 
 // Remove the local PostMetadata interface since we're importing it
 
@@ -35,6 +33,84 @@ function isDifferentDate(date1: string | undefined, date2: string | undefined): 
   } catch {
     return false;
   }
+}
+
+interface MetadataItemProps {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  dateTime?: string;
+  label?: string;
+}
+
+function MetadataItem({ icon, children, dateTime, label }: MetadataItemProps) {
+  return (
+    <div 
+      className={cn(
+        "flex items-center gap-2 group",
+        "hover:text-primary transition-all duration-300"
+      )}
+      aria-label={label}
+    >
+      <span className={cn(
+        "transition-transform duration-300",
+        "group-hover:scale-110"
+      )}>
+        {icon}
+      </span>
+      {dateTime ? (
+        <time dateTime={dateTime} className="font-medium">
+          {children}
+        </time>
+      ) : (
+        <span className="font-medium">{children}</span>
+      )}
+    </div>
+  );
+}
+
+// Add a new MetadataTagsProps interface
+interface MetadataTagsProps {
+  tags: string[];
+}
+
+// Add a new MetadataTags component
+function MetadataTags({ tags }: MetadataTagsProps) {
+  return (
+    <div 
+      className={cn(
+        "flex items-center gap-2 group",
+        "hover:text-primary transition-all duration-300"
+      )}
+      aria-label="Post tags"
+    >
+      <span className={cn(
+        "transition-transform duration-300",
+        "group-hover:scale-110"
+      )}>
+        <Tag className="h-5 w-5" />
+      </span>
+      <div className="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <Link 
+            key={tag}
+            href={`/blog/tags/${tag}`}
+            aria-label={`View posts tagged with ${tag}`}
+            className="transition-transform duration-300 hover:scale-105"
+          >
+            <Badge
+              variant="secondary"
+              className={cn(
+                "transition-colors duration-300",
+                "hover:bg-primary hover:text-primary-foreground"
+              )}
+            >
+              #{tag}
+            </Badge>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default function PostHeader() {
@@ -60,21 +136,22 @@ export default function PostHeader() {
           throw new Error('Invalid slug');
         }
 
-        // Use fetch instead of direct backend call
-        const response = await fetch(`/api/posts/${slug}`);
+        // Update API endpoint path
+        const response = await fetch(`/api/blog/posts/${slug}`);
         if (!response.ok) {
           throw new Error('Failed to fetch post');
         }
         
-        const metadata = await response.json();
+        const data = await response.json();
         
         if (!mounted) return;
 
-        if (!metadata) {
+        if (!data) {
           throw new Error('Post not found');
         }
 
-        setState(prev => ({ ...prev, post: metadata, isLoading: false }));
+        // The API now returns the post data directly
+        setState(prev => ({ ...prev, post: data, isLoading: false }));
       } catch (error) {
         if (!mounted) return;
         const errorMessage = error instanceof Error ? error.message : "Failed to load post";
@@ -98,18 +175,35 @@ export default function PostHeader() {
     setState((prev) => ({ ...prev, imageLoaded: true }));
   };
 
-  if (state.isLoading) {
+  if (state.error || !state.post) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <LoadingSpinner />
+      <div 
+        role="alert"
+        className="text-destructive text-center p-4 rounded-lg bg-destructive/10"
+      >
+        <h2 className="text-lg font-semibold mb-2">Error Loading Post</h2>
+        <p>{state.error || "Post not found"}</p>
       </div>
     );
   }
 
-  if (state.error || !state.post) {
+  if (state.isLoading) {
     return (
-      <div className="text-destructive text-center p-4">
-        {state.error || "Post not found"}
+      <div 
+        role="status"
+        aria-label="Loading post"
+        className="animate-pulse space-y-8 max-w-5xl mx-auto"
+      >
+        <div className="aspect-[21/9] bg-muted rounded-xl" />
+        <div className="space-y-4 px-4">
+          <div className="h-12 bg-muted rounded w-3/4" />
+          <div className="h-4 bg-muted rounded w-1/2" />
+          <div className="flex gap-2">
+            {[1,2,3].map(i => (
+              <div key={i} className="h-6 w-20 bg-muted rounded" />
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
@@ -141,6 +235,8 @@ export default function PostHeader() {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
+      role="banner"
+      aria-label="Post header"
     >
       {/* Hero Image Container */}
       <div className={cn(
@@ -150,7 +246,7 @@ export default function PostHeader() {
       )}>
         <Image
           src={state.post.image || "/logo.webp"}
-          alt={state.post.title}
+          alt={state.post.image ? `Header image for ${state.post.title}` : "Default post header image"}
           fill
           priority
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
@@ -236,85 +332,44 @@ export default function PostHeader() {
         )}>
           {/* Created Date */}
           {state.post.created && (
-            <div className={cn(
-              "flex items-center gap-2 group",
-              "hover:text-primary transition-all duration-300"
-            )}>
-              <Calendar className={cn(
-                "h-4 w-4 sm:h-5 sm:w-5",
-                "transition-transform duration-300",
-                "group-hover:scale-110"
-              )} />
-              <time 
-                dateTime={state.post.created}
-                className="font-medium"
-              >
-                {formatDate(state.post.created)}
-              </time>
-            </div>
+            <MetadataItem 
+              icon={<Calendar className="h-5 w-5" />}
+              dateTime={state.post.created}
+              label="Post creation date"
+            >
+              {formatDate(state.post.created)}
+            </MetadataItem>
           )}
 
           {/* Reading Time */}
           {state.post.readingTime && (
-            <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              <span>{state.post.readingTime}</span>
-            </div>
+            <MetadataItem 
+              icon={<Clock className="h-5 w-5" />}
+              label="Estimated reading time"
+            >
+              {state.post.readingTime}
+            </MetadataItem>
           )}
 
           {/* Last Updated - Only show if update date is different from create date */}
           {state.post.updated && isDifferentDate(state.post.updated, state.post.created) && (
-            <div className={cn(
-              "flex items-center gap-2 group",
-              "text-muted-foreground/80",
-              "hover:text-primary transition-all duration-300"
-            )}>
-              <Edit className={cn(
-                "h-5 w-5",
-                "transition-transform duration-300",
-                "group-hover:scale-110"
-              )} />
+            <MetadataItem 
+              icon={<Edit className="h-5 w-5" />}
+              dateTime={state.post.updated}
+              label="Last updated date"
+            >
               <span className="flex items-center gap-1">
-                {state.post.updated && new Date(state.post.updated).toString() !== 'Invalid Date' ? (
-                  <time 
-                    dateTime={state.post.updated}
-                    className="font-medium"
-                  >
-                    {formatDate(state.post.updated)}
-                  </time>
-                ) : null}
+                {formatDate(state.post.updated)}
                 <span className="text-muted-foreground/60">(Updated)</span>
               </span>
-            </div>
+            </MetadataItem>
+          )}
+
+          {/* Tags - Now integrated into metadata section */}
+          {state.post.tags && state.post.tags.length > 0 && (
+            <MetadataTags tags={state.post.tags} />
           )}
         </div>
-
-        {/* Tags */}
-        {state.post.tags && state.post.tags.length > 0 && (
-          <div className={cn(
-            "flex flex-wrap items-center gap-2",
-            "animate-fade-in"
-          )}>
-            <Tag className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-            <div className="flex flex-wrap gap-2">
-              {state.post.tags.map((tag) => (
-                <Link key={tag} href={`/blog/tags/${tag}`}>
-                  <Badge
-                    variant="secondary"
-                    className={cn(
-                      "transition-all duration-300",
-                      "hover:bg-primary hover:text-primary-foreground",
-                      "cursor-pointer",
-                      "transform hover:scale-105"
-                    )}
-                  >
-                    #{tag}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </motion.header>
   );

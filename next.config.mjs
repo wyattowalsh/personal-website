@@ -160,11 +160,13 @@ const withMDX = createMDX({
   options: {
     format: 'mdx',
     remarkPlugins: [
+      // Move math plugins to the front
+      remarkMath,
+      remarkMdxMathEnhanced,
       // Keep existing plugins but reorder them
       remarkFrontmatter,
       remarkMdxFrontmatter,
       remarkGfm,
-      remarkMath,
       remarkEmoji,
       remarkCodeBlocks,
       remarkCodeFrontmatter,
@@ -184,9 +186,10 @@ const withMDX = createMDX({
       remarkToc
     ],
     rehypePlugins: [
+      // Move KaTeX plugin to front
+      rehypeKatex,
       rehypeSlug,
       [rehypeAutolinkHeadings, { behavior: 'append' }],
-      rehypeKatex,
       rehypeCallouts,
       rehypeCitation,
       rehypeColorChips,

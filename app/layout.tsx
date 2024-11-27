@@ -34,9 +34,7 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   ...getDefaultMetadata(),
   other: {
-    ...getDefaultMetadata().other,
-    "google-site-verification": process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
-  },
+    ...getDefaultMetadata().other },
   // JSON-LD schema
   alternates: {
     types: {

@@ -10,7 +10,8 @@ export interface Post {
   updated?: string
   tags: string[]
   image?: string
-  readingTime: string
+  caption?: string
+  readingTime?: string
   wordCount: number
   adjacent?: {
     prev: AdjacentPost | null
@@ -23,16 +24,33 @@ export interface AdjacentPost {
   title: string
 }
 
-export interface PostMetadata {
-  slug: string;
-  title: string;
+export interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
   summary?: string;
-  content: string;
-  created: string;
-  updated?: string;
-  tags: string[];
-  image?: string;
-  readingTime?: string;
+  content?: string;
+}
+
+// Configuration types
+export interface Config {
+  site: {
+    title: string;
+    description: string;
+    url: string;
+    author: {
+      name: string;
+      email: string;
+      twitter?: string;
+      github?: string;
+      linkedin?: string;
+    }
+  };
+  blog: {
+    postsPerPage: number;
+    featuredLimit: number;
+  };
+  cache: {
+    ttl: number;
+    maxSize: number;
+  };
 }
 
 // Service types
@@ -54,7 +72,7 @@ export interface SearchResult<T> {
   }>
 }
 
-// Configuration schemas
+// Configuration schema
 export const ConfigSchema = z.object({
   site: z.object({
     title: z.string(),
@@ -76,9 +94,7 @@ export const ConfigSchema = z.object({
   })
 })
 
-export type Config = z.infer<typeof ConfigSchema>
-
-// Export utility types
+// Utility types
 export type CoreContent<T> = Omit<T, '_id' | '_raw' | 'body'>
 export type DeepPartial<T> = {
   [P in keyof T]?: T[P] extends object ? DeepPartial<T[P]> : T[P]

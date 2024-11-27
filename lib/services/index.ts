@@ -24,6 +24,17 @@ const INDICES = {
   RSS: path.join(CACHE_DIR, 'rss.xml'),
 } as const
 
+export interface PostMetadata {
+  title: string;
+  slug: string;
+  summary: string;
+  content: string;
+  created: string;
+  updated?: string;
+  tags: string[];
+  image?: string;
+}
+
 interface SearchIndex {
   posts: PostMetadata[]
   fuse: Fuse<PostMetadata>
@@ -41,7 +52,8 @@ class BackendService {
   private static instance: BackendService
   private searchIndex: SearchIndex | null = null
   private readonly postCache: LRUCache<string, PostMetadata>
-  private readonly tagCache: LRUCache<string, string[]>
+  // Update tagCache type to store PostMetadata array
+  private readonly tagCache: LRUCache<string, PostMetadata[]>
   
   private constructor() {
     this.postCache = new LRUCache({ 
@@ -109,7 +121,10 @@ class BackendService {
   }
 
   private async processAllPosts(): Promise<PostMetadata[]> {
-    const files = await glob('app/blog/posts/**/*.mdx');
+    const files = await glob('app/blog/posts/**/*.mdx', {
+      absolute: true,
+      cwd: process.cwd()
+    });
     
     if (!Array.isArray(files)) {
       throw new Error('Failed to get post files');
@@ -209,23 +224,46 @@ class BackendService {
 
   // Runtime methods
   public async search(query: string): Promise<PostMetadata[]> {
-    if (!this.searchIndex) {
-      const data = await fs.readFile(INDICES.SEARCH, 'utf-8')
-      this.searchIndex = JSON.parse(data)
+    try {
+      if (!this.searchIndex) {
+        const data = await fs.readFile(INDICES.SEARCH, 'utf-8')
+        const parsed = JSON.parse(data) as SearchIndex;
+        if (!parsed || !parsed.fuse) {
+          throw new Error('Invalid search index format');
+        }
+        this.searchIndex = parsed;
+      }
+
+      if (!this.searchIndex || !this.searchIndex.fuse) {
+        throw new Error('Search index is corrupted');
+      }
+
+      return this.searchIndex.fuse.search(query).map(result => result.item);
+    } catch (error) {
+      console.error('Search failed:', error);
+      return [];
     }
-    return this.searchIndex.fuse.search(query).map(result => result.item)
   }
 
   public async getPostsByTag(tag: string): Promise<PostMetadata[]> {
-    const cached = this.tagCache.get(tag)
-    if (cached) return cached
+    const cached = this.tagCache.get(tag);
+    // Add type guard to ensure cached is PostMetadata[]
+    if (cached && Array.isArray(cached) && cached.every(post => 
+      post && 
+      typeof post === 'object' && 
+      'slug' in post && 
+      'title' in post
+    )) {
+      return cached;
+    }
 
-    const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'))
-    const slugs = tagIndex[tag] || []
-    const posts = await Promise.all(slugs.map(slug => this.getPost(slug)))
+    const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8')) as Record<string, string[]>;
+    const slugs = tagIndex[tag] || [];
+    const posts = await Promise.all(slugs.map(slug => this.getPost(slug)));
+    const validPosts = posts.filter((post): post is PostMetadata => post !== null);
     
-    this.tagCache.set(tag, posts)
-    return posts
+    this.tagCache.set(tag, validPosts);
+    return validPosts;
   }
 
   public async getPost(slug: string): Promise<PostMetadata | null> {

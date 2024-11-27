@@ -2,7 +2,7 @@ import { LRUCache } from 'lru-cache';
 import { z } from 'zod';
 import { NextResponse, NextRequest } from 'next/server';
 import { logger } from '@/lib/utils';
-import { Config } from '../types';
+import { Config } from '@/lib/types';
 
 // API Error handling
 export class ApiError extends Error {
@@ -80,14 +80,17 @@ export class ApiMiddleware {
   private async checkRateLimit(req: NextRequest): Promise<void> {
     if (!this.config.rateLimit) return;
 
-    const ip = req.ip ?? 'anonymous';
+    const forwarded = req.headers.get('x-forwarded-for')?.split(',')[0];
+    const realIp = req.headers.get('x-real-ip');
+    const ip = forwarded || realIp || 'anonymous';
+    
     const key = `${ip}:${req.url}`;
     const tokens = this.tokenCache.get(key) || [];
     const now = Date.now();
     const validTokens = tokens.filter(t => now - t < this.config.rateLimit!.interval);
 
     if (validTokens.length >= this.config.rateLimit.maxRequests) {
-      throw new ApiError(429, 'Rate limit exceeded');
+        throw new ApiError(429, 'Rate limit exceeded');
     }
 
     this.tokenCache.set(key, [...validTokens, now]);

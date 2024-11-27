@@ -1,6 +1,6 @@
-const chalk = require('chalk');
+import chalk from 'chalk';
 
-const logger = {
+export const logger = {
   info: (msg: string) => console.log(
     chalk.blue('ℹ'),
     chalk.blue.dim('info'),
@@ -41,5 +41,3 @@ const logger = {
     msg
   )
 };
-
-module.exports = { logger };

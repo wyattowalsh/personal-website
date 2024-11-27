@@ -1,20 +1,25 @@
 // app/api/blog/posts/metadata/[slug]/route.ts
 import { NextRequest } from 'next/server';
-import { commonMiddleware, schemas } from '@/lib/api/middleware';
 import { getPostMetadata } from '@/lib/metadata';
 
-export const GET = commonMiddleware.cached.withMiddleware(async (req: NextRequest) => {
-  const { searchParams } = new URL(req.url);
-  const slug = searchParams.get('slug');
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ slug: string }> }
+) {
+  const { slug } = await params;
 
-  // Validate slug
-  await schemas.slug.parseAsync({ slug });
-
-  // Get post metadata
-  const metadata = await getPostMetadata(slug);
-  if (!metadata) {
-    throw new Error('Post not found');
+  try {
+    const metadata = await getPostMetadata(slug);
+    if (!metadata) {
+      return new Response(null, { status: 404 });
+    }
+    
+    return Response.json(metadata, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
+      }
+    });
+  } catch (error) {
+    return new Response(null, { status: 500 });
   }
-
-  return Response.json({ metadata });
-});
+}

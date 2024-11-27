@@ -27,7 +27,6 @@ import TagLink from "@/components/TagLink"; // Ensure this is the correct import
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { backend } from '@/lib/services/backend';
-import { PostMetadata } from '@/lib/types';
 import type { PostMetadata } from '@/lib/types';
 
 // Update interface to extend PostMetadata

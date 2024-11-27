@@ -8,7 +8,9 @@ const defaultConfig: Config = {
     author: {
       name: 'Wyatt Walsh',
       email: 'mail@w4w.dev',
-      twitter: '@wyattowalsh'
+      twitter: '@wyattowalsh',
+      github: 'wyattowalsh',
+      linkedin: 'wyattowalsh',
     }
   },
   blog: {
@@ -57,3 +59,23 @@ export const config = getConfig();
 
 // Export types
 export type { Config };
+
+export interface SiteConfig {
+  title: string;
+  description: string;
+  url: string;
+  author: {
+    name: string;
+    email: string;
+  };
+}
+
+export const getSiteConfig = (): SiteConfig => ({
+  title: 'Your Site Title',
+  description: 'Your site description',
+  url: process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
+  author: {
+    name: 'Your Name',
+    email: 'your@email.com'
+  }
+});

@@ -1,4 +1,4 @@
-import { getAllPosts, getAllTags } from "@/lib/posts";
+import { getAllPosts, getAllTags } from "@/lib/services/backend";
 import PostCard from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
