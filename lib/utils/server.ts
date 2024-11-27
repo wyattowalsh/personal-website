@@ -70,7 +70,17 @@ export async function removeFile(filePath: string): Promise<void> {
 
 export async function clearDirectory(dirPath: string): Promise<void> {
   try {
-    await fs.rm(dirPath, { recursive: true, force: true });
+    const files = await fs.readdir(dirPath);
+    for (const file of files) {
+      const filePath = path.join(dirPath, file);
+      const stat = await fs.lstat(filePath);
+      if (stat.isDirectory()) {
+        await clearDirectory(filePath);
+        await fs.rmdir(filePath);
+      } else {
+        await fs.unlink(filePath);
+      }
+    }
     await fs.mkdir(dirPath, { recursive: true });
   } catch (error) {
     logger.error(`Failed to clear directory ${dirPath}:`, error as Error);
