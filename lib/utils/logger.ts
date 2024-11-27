@@ -1,6 +1,6 @@
-import chalk from 'chalk';
+const chalk = require('chalk');
 
-export const logger = {
+const logger = {
   info: (msg: string) => console.log(
     chalk.blue('ℹ'),
     chalk.blue.dim('info'),
@@ -39,15 +39,7 @@ export const logger = {
     chalk.cyan.dim('step'),
     chalk.gray('→'),
     msg
-  ),
-  timing: (label: string, duration: number) => console.log(
-    chalk.magenta('⏱'),
-    chalk.magenta.dim('timing'),
-    chalk.gray('→'),
-    `${label}: ${duration.toFixed(2)}ms`
-  ),
-  divider: () => console.log(
-    chalk.dim('-------------------------------------------')
-  ),
-  newline: () => console.log()
+  )
 };
+
+module.exports = { logger };

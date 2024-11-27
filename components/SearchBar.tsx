@@ -28,35 +28,26 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { backend } from '@/lib/services/backend';
 import { PostMetadata } from '@/lib/types';
+import type { PostMetadata } from '@/lib/types';
 
-
-// Update Post interface to match metadata
-interface Post {
-	slug: string;
-	title: string;
-	summary: string;
-	created: string;    // Changed from date
-	updated?: string;   // Added
-	date?: string;      // Keep for backward compatibility
-	tags: string[];
-	content: string;
-	image?: string;
-	readingTime?: string;
-	sortings?: {
-		byDate: {
-			asc: string[];
-			desc: string[];
-		};
-		byTitle: {
-			asc: string[];
-			desc: string[];
-		};
-	};
+// Update interface to extend PostMetadata
+interface Post extends PostMetadata {
+  // Add any additional fields needed for the UI
+  sortings?: {
+    byDate: {
+      asc: string[];
+      desc: string[];
+    };
+    byTitle: {
+      asc: string[];
+      desc: string[];
+    };
+  };
 }
 
 interface SearchBarProps {
-	posts: Post[];
-	tags: string[];
+  posts: PostMetadata[];
+  tags: string[];
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
@@ -80,18 +71,18 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 
 	// Update mount effect to handle empty posts
 	useEffect(() => {
-		if (!validPosts.length) {
-			console.warn("No valid posts found");
+		if (!posts?.length) {
+			console.warn("No posts provided to SearchBar");
 			setResults([]);
 			return;
 		}
 
-		const sortedPosts = [...validPosts].sort(
+		const sortedPosts = [...posts].sort(
 			(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
 		);
 		setResults(sortedPosts);
 		setMounted(true);
-	}, [validPosts]);
+	}, [posts]);
 
 	// Memoize the Fuse instance
 	const fuse = useMemo(
@@ -155,12 +146,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 				? prevTags.filter((t) => t !== tag)
 				: [...prevTags, tag]
 		);
-	};
-
-	// Add this function to clean up URLs
-	const cleanUrl = (slug: string) => {
-		// Remove any trailing /page or just / from the slug
-		return slug.replace(/\/(page)?$/, '');
 	};
 
 	if (!mounted) {
@@ -332,10 +317,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 						// Single result - centered
 						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
 							<PostCard 
-								post={{
-									...results[0],
-									slug: cleanUrl(results[0].slug)
-								}} 
+								post={results[0]} // Pass post directly without cleaning
 								className="h-full" 
 							/>
 						</div>
@@ -343,7 +325,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 						// Multiple results with staggered animation
 						results.map((post, idx) => (
 							<motion.div
-								key={post.slug}
+								key={`${post.slug}-${idx}`}
 								className="h-full"
 								initial={{ opacity: 0, y: 20 }}
 								animate={{ opacity: 1, y: 0 }}
@@ -355,10 +337,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 								}}
 							>
 								<PostCard 
-									post={{
-										...post,
-										slug: cleanUrl(post.slug)
-									}} 
+									post={post} // Ensure the post object has the correct slug
 									className="h-full" 
 								/>
 							</motion.div>

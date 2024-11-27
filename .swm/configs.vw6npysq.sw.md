@@ -1047,24 +1047,6 @@ const nextConfig = {
   },
 
   webpack: (config, { dev, isServer }) => {
-    // Remove existing JSON rules first
-    config.module.rules = config.module.rules.filter(rule => 
-      !rule.test || !rule.test.toString().includes('.json')
-    );
-
-    // Add rule for handling JSON and CommonJS modules
-    config.module.rules.push({
-      test: /\.json$/,
-      type: 'javascript/auto',
-      resolve: {
-        fullySpecified: false
-      },
-      use: [
-        {
-          loader: 'json-loader'
-        }
-      ]
-    });
 
     // Add resolve configuration for third-party-capital
     config.resolve = {
@@ -1111,6 +1093,12 @@ const nextConfig = {
     }
 
     return config
+  },
+
+  // Update Sass options at the root level
+  sassOptions: {
+    api: 'modern', // Use modern Sass API
+    outputStyle: 'compressed',
   },
 
   experimental: {
@@ -1278,24 +1266,6 @@ const nextConfig = {
   },
 
   webpack: (config, { dev, isServer }) => {
-    // Remove existing JSON rules first
-    config.module.rules = config.module.rules.filter(rule => 
-      !rule.test || !rule.test.toString().includes('.json')
-    );
-
-    // Add rule for handling JSON and CommonJS modules
-    config.module.rules.push({
-      test: /\.json$/,
-      type: 'javascript/auto',
-      resolve: {
-        fullySpecified: false
-      },
-      use: [
-        {
-          loader: 'json-loader'
-        }
-      ]
-    });
 
     // Add resolve configuration for third-party-capital
     config.resolve = {
@@ -1342,6 +1312,12 @@ const nextConfig = {
     }
 
     return config
+  },
+
+  // Update Sass options at the root level
+  sassOptions: {
+    api: 'modern', // Use modern Sass API
+    outputStyle: 'compressed',
   },
 
   experimental: {
@@ -1422,13 +1398,14 @@ export default withBundleAnalytics(withMDX(nextConfig))
   "version": "0.6.0",
   "private": true,
   "scripts": {
-    "predev": "ts-node -r tsconfig-paths/register scripts/predev.ts",
+    "predev": "NODE_ENV=development ts-node -r tsconfig-paths/register --project tsconfig.scripts.json scripts/predev.ts",
     "dev": "next dev",
-    "prebuild": "ts-node -r tsconfig-paths/register scripts/prebuild.ts",
+    "prebuild": "NODE_ENV=production ts-node -r tsconfig-paths/register --project tsconfig.scripts.json scripts/prebuild.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf .next .cache node_modules/",
+    "lclean": "rimraf .next .cache node_modules/.cache",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -1473,7 +1450,7 @@ export default withBundleAnalytics(withMDX(nextConfig))
     "@types/react-dom": "^18",
     "@vercel/otel": "^1.10.0",
     "autoprefixer": "^10.4.20",
-    "chalk": "^5.3.0",
+    "chalk": "^4.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "critters": "^0.0.20",
@@ -1584,8 +1561,14 @@ export default withBundleAnalytics(withMDX(nextConfig))
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^3.8.0"
-  }
-}
+  },
+  "type": "commonjs",
+  "ts-node": {
+    "transpileOnly": true,
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
 ```
 
 ---
@@ -2241,8 +2224,8 @@ export default config;
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -2280,7 +2263,6 @@ export default config;
     "node_modules"
   ]
 }
-
 ```
 
 ---

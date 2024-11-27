@@ -1,20 +1,21 @@
-import { Feed } from 'feed';
-import { LRUCache } from 'lru-cache';
-import Fuse from 'fuse.js';
-import { promises as fs } from 'fs';
-import path from 'path';
-import { promisify } from 'util';
-import { glob as globCallback } from 'glob';
-import matter from 'gray-matter';
-// Fix imports with correct paths without .js extension
-import { getGitFileData } from '@/lib/utils/git';  // Remove .js extension
-import { getConfig } from '@/lib/config';
-import { logger } from '@/lib/utils/logger';
-import type { PostMetadata, PreprocessStats } from '@/lib/types';
+const { Feed } = require('feed');
+const { LRUCache } = require('lru-cache');
+const Fuse = require('fuse.js');
+const { promisify } = require('util');
+const glob = require('glob');
+const matter = require('gray-matter');
+const path = require('path'); // Add direct import for path
+const { getGitFileData } = require('../utils/git');
+const { getConfig } = require('../config');
+const { logger } = require('../utils/logger');
 
-const glob = promisify(globCallback);
+// Use dynamic imports for fs only since it's not available in browser
+const isNode = typeof window === 'undefined';
+const getFs = async () => isNode ? require('fs').promises : null;
 
-// Constants
+const globAsync = promisify(glob);
+
+// Constants - path is available in both Node.js and browser environments
 const CACHE_DIR = '.cache';
 const INDICES = {
   SEARCH: path.join(CACHE_DIR, 'search.json'),
@@ -22,11 +23,6 @@ const INDICES = {
   TAGS: path.join(CACHE_DIR, 'tags.json'),
   RSS: path.join(CACHE_DIR, 'rss.xml'),
 } as const;
-
-interface SearchIndex {
-  posts: PostMetadata[];
-  fuse: Fuse<PostMetadata>;
-}
 
 class BackendService {
   private static instance: BackendService;
@@ -51,6 +47,7 @@ class BackendService {
     const errors: Error[] = [];
     logger.info(`Starting ${isDev ? 'development' : 'production'} preprocessing...`);
 
+    const fs = await getFs();
     await fs.mkdir(CACHE_DIR, { recursive: true });
 
     // 1. Process all posts and generate metadata
@@ -86,78 +83,67 @@ class BackendService {
 
   private async processPost(file: string, slug: string, gitData: any): Promise<PostMetadata> {
     try {
+      const fs = await getFs();
       const content = await fs.readFile(file, 'utf-8');
       const { data, content: postContent } = matter(content);
+
+      // Ensure consistent ISO string format for dates
+      const normalizeDate = (date: string | Date | undefined) => {
+        if (!date) return undefined;
+        try {
+          return new Date(date).toISOString();
+        } catch {
+          return undefined;
+        }
+      };
+
+      // Normalize dates with fallbacks
+      const created = normalizeDate(data.created) || 
+                     normalizeDate(gitData.firstModified) || 
+                     new Date().toISOString();
       
-      // Validate required fields
-      if (!data.title) {
-        logger.warning(`Post ${slug} missing title, using slug`);
-        data.title = slug;
-      }
+      const updated = normalizeDate(data.updated) || 
+                     normalizeDate(gitData.lastModified) || 
+                     created;
 
-      // Set defaults for missing fields
-      const defaults = {
-        title: data.title || path.basename(file, '.mdx'),
-        created: gitData.firstModified || new Date().toISOString(),
-        tags: [],
-        updated: gitData.lastModified,
-        content: postContent || '',
-        slug: slug,
-        summary: data.summary || ''
-      };
-
-      // Merge with defaults and ensure data types
-      const metadata = {
-        ...defaults,
-        ...data,
-        // Ensure required fields are present and valid
-        title: String(data.title || defaults.title),
+      const metadata: PostMetadata = {
+        title: String(data.title || slug),
         slug: String(slug),
-        tags: Array.isArray(data.tags) ? data.tags.map(String) : defaults.tags,
-        created: data.created?.toISOString?.() || defaults.created,
-        updated: data.updated?.toISOString?.() || defaults.updated,
-        content: String(postContent || defaults.content),
-        summary: String(data.summary || defaults.summary)
+        summary: String(data.summary || ''),
+        content: String(postContent || ''),
+        created,
+        updated,
+        tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
+        image: data.image
       };
 
-      return metadata as PostMetadata;
+      logger.info(`Processed post ${slug} with created: ${created}, updated: ${updated}`);
+      return metadata;
     } catch (error) {
       logger.error(`Error processing post ${slug}:`, error as Error);
-      // Return basic valid metadata
-      return {
-        title: slug,
-        slug: slug,
-        created: new Date().toISOString(),
-        tags: ['uncategorized'],
-        content: '',
-        summary: 'No summary available'
-      };
+      throw error;
     }
   }
 
   private async processAllPosts(): Promise<PostMetadata[]> {
     try {
-      const files = await glob('app/blog/posts/**/*.mdx');
-      
+      const files = await globAsync('app/blog/posts/**/page.mdx');
+
       if (!Array.isArray(files)) {
         throw new Error('Failed to get post files');
       }
-      
+
       const processedPosts = await Promise.all(
         files.map(async (file) => {
           try {
-            const slug = path.basename(file, '.mdx');
-            const gitData = await getGitFileData(file);
+            // Get the directory name containing page.mdx as the slug
+            const slug = path
+              .dirname(file)           // Get full directory path
+              .split('/posts/')[1]     // Split on posts/ and take everything after
+              .split('/page')[0];      // Remove /page from the end if it exists
             
-            // Use cached data if available and not stale
-            const cached = this.postCache.get(slug);
-            if (cached && cached.updated === gitData.lastModified) {
-              return cached;
-            }
-
-            const post = await this.processPost(file, slug, gitData);
-            this.postCache.set(slug, post);
-            return post;
+            const gitData = await getGitFileData(file);
+            return await this.processPost(file, slug, gitData);
           } catch (error) {
             logger.error(`Failed to process file ${file}:`, error as Error);
             return null;
@@ -165,7 +151,6 @@ class BackendService {
         })
       );
 
-      // Filter out failed posts and sort by date
       return processedPosts
         .filter((post): post is PostMetadata => post !== null)
         .sort((a, b) => 
@@ -231,11 +216,45 @@ class BackendService {
       });
     });
 
+    const fs = await getFs();
     await fs.writeFile(INDICES.RSS, feed.rss2());
+  }
+
+  private async ensurePreprocessed() {
+    if (!isNode) {
+      logger.warning('Cache operations skipped in browser');
+      return;
+    }
+    
+    try {
+      const fs = await getFs();
+      if (!fs) {
+        logger.warning('File system not available');
+        return;
+      }
+      
+      await fs.mkdir(CACHE_DIR, { recursive: true });
+      
+      // Try to access cache files
+      try {
+        await Promise.all([
+          fs.access(INDICES.METADATA),
+          fs.access(INDICES.TAGS)
+        ]);
+      } catch {
+        // If files don't exist, run preprocessing
+        logger.info('Cache files not found, running preprocessing...');
+        await this.preprocess(true);
+      }
+    } catch (error) {
+      logger.error('Failed to ensure cache:', error);
+      throw error;
+    }
   }
 
   public async search(query: string): Promise<PostMetadata[]> {
     if (!this.searchIndex) {
+      const fs = await getFs();
       const data = await fs.readFile(INDICES.SEARCH, 'utf-8');
       this.searchIndex = JSON.parse(data);
     }
@@ -243,9 +262,11 @@ class BackendService {
   }
 
   public async getPostsByTag(tag: string): Promise<PostMetadata[]> {
+    await this.ensurePreprocessed();
     const cached = this.tagCache.get(tag);
     if (cached) return cached;
 
+    const fs = await getFs();
     const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
     const slugs = tagIndex[tag] || [];
     const posts = await Promise.all(slugs.map(slug => this.getPost(slug)));
@@ -256,8 +277,16 @@ class BackendService {
 
   public async getPost(slug: string): Promise<PostMetadata | null> {
     try {
-      console.log('Getting post for slug:', slug);
+      // Skip cache operations in browser
+      if (!isNode) {
+        logger.warning('Cache operations skipped in browser');
+        return null;
+      }
 
+      await this.ensurePreprocessed();
+      
+      console.log('Getting post for slug:', slug);
+      
       // Check cache first
       const cached = this.postCache.get(slug);
       if (cached) {
@@ -265,73 +294,39 @@ class BackendService {
         return cached;
       }
 
-      // Check if metadata file exists
+      // Try to read from metadata file
       const metadataPath = INDICES.METADATA;
+      let metadata: PostMetadata[] = [];
+      
       try {
-        await fs.access(metadataPath);
-      } catch (error) {
-        console.error('Metadata file not found:', metadataPath);
-        // Try to rebuild the cache
-        await this.preprocess(true);
+        const fs = await getFs();
+        if (!fs) {
+          logger.warning('File system not available');
+          return null;
+        }
+        const rawMetadata = await fs.readFile(metadataPath, 'utf-8');
+        metadata = JSON.parse(rawMetadata);
+      } catch (readError) {
+        logger.warning(`Metadata file read failed, attempting rebuild: ${readError}`);
+        await this.rebuildCache();
+        const fs = await getFs();
+        if (!fs) return null;
+        const rawMetadata = await fs.readFile(metadataPath, 'utf-8');
+        metadata = JSON.parse(rawMetadata);
       }
 
-      // Read and parse metadata
-      const rawMetadata = await fs.readFile(metadataPath, 'utf-8');
-      console.log('Raw metadata file size:', rawMetadata.length);
-
-      const metadata = JSON.parse(rawMetadata);
-      console.log('Total posts in metadata:', metadata.length);
-      
-      const post = metadata.find((p: PostMetadata) => {
-        console.log('Comparing slugs:', p.slug, slug);
-        return p.slug === slug;
-      });
-      
+      // Find the post
+      const post = metadata.find(p => p.slug === slug);
       if (!post) {
-        console.warn('No post found for slug:', slug);
-        // Check if the MDX file exists directly
-        const possiblePaths = [
-          path.join(process.cwd(), 'app/blog/posts', `${slug}.mdx`),
-          path.join(process.cwd(), 'app/blog/posts', slug, 'index.mdx')
-        ];
-        
-        for (const filepath of possiblePaths) {
-          try {
-            await fs.access(filepath);
-            console.log('Found MDX file at:', filepath);
-            // Process the post directly
-            const gitData = await getGitFileData(filepath);
-            const newPost = await this.processPost(filepath, slug, gitData);
-            // Update cache
-            this.postCache.set(slug, newPost);
-            return newPost;
-          } catch {}
-        }
         return null;
       }
 
-      // Validate and cache the post
-      const validated = {
-        ...post,
-        title: post.title || slug,
-        slug: post.slug || slug,
-        tags: Array.isArray(post.tags) ? post.tags : ['uncategorized'],
-        created: post.created || new Date().toISOString(),
-        content: post.content || '',
-        summary: post.summary || ''
-      };
-
-      this.postCache.set(slug, validated);
-      console.log('Returning validated post:', validated);
-      return validated;
+      // Cache and return
+      this.postCache.set(slug, post);
+      return post;
+      
     } catch (error) {
-      console.error('Error in getPost:', {
-        error,
-        stack: error instanceof Error ? error.stack : undefined,
-        slug,
-        cacheDir: CACHE_DIR,
-        metadataPath: INDICES.METADATA
-      });
+      logger.error('Error in getPost:', error as Error);
       return null;
     }
   }
@@ -344,8 +339,19 @@ class BackendService {
 
   public async getAllPosts(): Promise<PostMetadata[]> {
     try {
-      const metadata = JSON.parse(await fs.readFile(INDICES.METADATA, 'utf-8'));
-      return metadata;
+      await this.ensurePreprocessed(); // This must complete before continuing
+      const fs = await getFs();
+      
+      try {
+        const metadata = JSON.parse(await fs.readFile(INDICES.METADATA, 'utf-8'));
+        return metadata;
+      } catch (readError) {
+        // If reading fails, try rebuilding cache once
+        logger.warning('Metadata file read failed, rebuilding cache...');
+        await this.rebuildCache();
+        const metadata = JSON.parse(await fs.readFile(INDICES.METADATA, 'utf-8'));
+        return metadata;
+      }
     } catch (error) {
       logger.error('Error fetching all posts:', error);
       return [];
@@ -354,8 +360,19 @@ class BackendService {
 
   public async getAllTags(): Promise<string[]> {
     try {
-      const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
-      return Object.keys(tagIndex);
+      await this.ensurePreprocessed(); // This must complete before continuing
+      const fs = await getFs();
+      
+      try {
+        const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
+        return Object.keys(tagIndex);
+      } catch (readError) {
+        // If reading fails, try rebuilding cache once
+        logger.warning('Tags file read failed, rebuilding cache...');
+        await this.rebuildCache();
+        const tagIndex = JSON.parse(await fs.readFile(INDICES.TAGS, 'utf-8'));
+        return Object.keys(tagIndex);
+      }
     } catch (error) {
       logger.error('Error fetching all tags:', error);
       return [];
@@ -364,39 +381,40 @@ class BackendService {
 
   public async cleanup(): Promise<void> {
     try {
-      await fs.rm(CACHE_DIR, { recursive: true, force: true });
+      // Reset caches first
       this.postCache.clear();
       this.tagCache.clear();
       this.searchIndex = null;
-      logger.success('Cache directories cleaned');
+
+      // Then try to remove the cache directory
+      try {
+        const fs = await getFs();
+        await fs.rm(CACHE_DIR, { recursive: true, force: true });
+      } catch (rmError) {
+        logger.warning('Cache directory removal failed, may not exist');
+      }
+
+      logger.success('Cache cleared');
     } catch (error) {
-      logger.error('Failed to clean cache directories:', error as Error);
+      logger.error('Failed to clean cache:', error as Error);
       throw error;
     }
   }
 }
 
-// Export singleton instance
-export const backend = BackendService.getInstance();
-
-// Helper functions - remove cache wrapper
-export const getPost = async (slug: string) => {
-  return await backend.getPost(slug);
-};
-
-export const searchPosts = async (query: string) => {
-  return await backend.search(query);
-};
-
-export const getPostsByTag = async (tag: string) => {
-  return await backend.getPostsByTag(tag);
-};
-
-// Preprocessing scripts remain the same
-export const predevBackend = async (): Promise<PreprocessStats> => {
-  return await backend.preprocess(true);
-};
-
-export const prebuildBackend = async () => {
-  await backend.preprocess(false);
+// Exports
+module.exports = {
+  backend: BackendService.getInstance(),
+  getPost: async (slug: string) => {
+    try {
+      return await BackendService.getInstance().getPost(slug);
+    } catch (error) {
+      logger.error('Error in getPost:', error as Error);
+      return null;
+    }
+  },
+  searchPosts: async (query) => BackendService.getInstance().search(query),
+  getPostsByTag: async (tag) => BackendService.getInstance().getPostsByTag(tag),
+  predevBackend: async () => BackendService.getInstance().preprocess(true),
+  prebuildBackend: async () => BackendService.getInstance().preprocess(false)
 };

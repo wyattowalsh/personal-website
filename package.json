@@ -3,9 +3,9 @@
   "version": "0.6.0",
   "private": true,
   "scripts": {
-    "predev": "ts-node -r tsconfig-paths/register scripts/predev.ts",
+    "predev": "NODE_ENV=development ts-node -r tsconfig-paths/register --project tsconfig.scripts.json scripts/predev.ts",
     "dev": "next dev",
-    "prebuild": "ts-node -r tsconfig-paths/register scripts/prebuild.ts",
+    "prebuild": "NODE_ENV=production ts-node -r tsconfig-paths/register --project tsconfig.scripts.json scripts/prebuild.ts",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -55,7 +55,7 @@
     "@types/react-dom": "^18",
     "@vercel/otel": "^1.10.0",
     "autoprefixer": "^10.4.20",
-    "chalk": "^5.3.0",
+    "chalk": "^4.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "critters": "^0.0.20",
@@ -166,5 +166,13 @@
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^3.8.0"
+  },
+  "type": "commonjs",
+  "ts-node": {
+    "transpileOnly": true,
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
   }
 }

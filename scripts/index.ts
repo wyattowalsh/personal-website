@@ -1,12 +1,11 @@
 #!/usr/bin/env node
-
-import * as path from 'path';
-import * as process from 'process';
+import path from 'path';
 import chalk from 'chalk';
-// Update to relative paths
 import { backend } from '../lib/services/backend';
-import type { PreprocessStats } from '../lib/types';
-import { logger } from '@/lib/utils/logger';
+import { logger } from '../lib/utils/logger';
+import { processFiles } from './index';
+import { backend } from '../lib/services/backend';
+import { fileURLToPath } from 'url';
 
 // Enhanced error handling setup using global process
 globalThis.process.on('unhandledRejection', (error) => {
@@ -55,13 +54,13 @@ export async function processFiles(isDev = false): Promise<PreprocessStats> {
 }
 
 // Simplified script runners
-export const scripts = {
+const scripts = {
   predev: async () => {
     try {
       await processFiles(true);
       logger.success('Development preprocessing complete!');
     } catch (error) {
-      logger.error('Development preprocessing failed!', error as Error);
+      logger.error('Development preprocessing failed!', error);
       process.exit(1);
     }
   },
@@ -71,15 +70,27 @@ export const scripts = {
       await processFiles(false);
       logger.success('Production preprocessing complete!');
     } catch (error) {
-      logger.error('Production preprocessing failed!', error as Error);
+      logger.error('Production preprocessing failed!', error);
       process.exit(1);
     }
   }
-} as const;
+};
 
-// Auto-execute if run directly
+// Remove ESM-specific code
 if (require.main === module) {
   const isDev = process.argv.includes('--dev');
   (isDev ? scripts.predev() : scripts.prebuild())
     .catch(() => process.exit(1));
 }
+
+// Update exports
+module.exports = {
+  scripts: {
+    predev: async () => {
+      // ...existing code...
+    },
+    prebuild: async () => {
+      // ...existing code...
+    }
+  }
+};

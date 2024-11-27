@@ -25,11 +25,16 @@ interface PostHeaderState {
 
 // Add a helper function at the top of the file
 function isDifferentDate(date1: string | undefined, date2: string | undefined): boolean {
-  if (!date1 || !date2) return false;
-  // Remove any milliseconds and 'Z' suffix for comparison
-  const clean1 = date1.split('.')[0].replace('Z', '');
-  const clean2 = date2.split('.')[0].replace('Z', '');
-  return clean1 !== clean2;
+  try {
+    if (!date1 || !date2) return false;
+    // Parse dates and convert to UTC ISO strings for comparison
+    const d1 = new Date(date1).toISOString();
+    const d2 = new Date(date2).toISOString();
+    // Compare only date portions (remove time)
+    return d1.split('T')[0] !== d2.split('T')[0];
+  } catch {
+    return false;
+  }
 }
 
 export default function PostHeader() {
@@ -55,33 +60,25 @@ export default function PostHeader() {
           throw new Error('Invalid slug');
         }
 
-        console.log('Attempting to fetch post:', slug);
-        let metadata = await getPost(slug);
-
-        // If post not found, try rebuilding cache
-        if (!metadata) {
-          console.log('Post not found, rebuilding cache...');
-          await backend.rebuildCache();
-          metadata = await getPost(slug);
+        // Use fetch instead of direct backend call
+        const response = await fetch(`/api/posts/${slug}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch post');
         }
+        
+        const metadata = await response.json();
         
         if (!mounted) return;
 
         if (!metadata) {
-          console.error('Post still not found after cache rebuild:', slug);
           throw new Error('Post not found');
         }
 
-        console.log('Successfully loaded post:', metadata);
         setState(prev => ({ ...prev, post: metadata, isLoading: false }));
       } catch (error) {
         if (!mounted) return;
         const errorMessage = error instanceof Error ? error.message : "Failed to load post";
-        console.error("Error loading post:", {
-          error,
-          pathname,
-          slug: pathname.split("/blog/posts/")[1]
-        });
+        console.error("Error loading post:", error);
         setState(prev => ({
           ...prev,
           error: errorMessage,
@@ -278,12 +275,14 @@ export default function PostHeader() {
                 "group-hover:scale-110"
               )} />
               <span className="flex items-center gap-1">
-                <time 
-                  dateTime={state.post.updated}
-                  className="font-medium"
-                >
-                  {formatDate(state.post.updated)}
-                </time>
+                {state.post.updated && new Date(state.post.updated).toString() !== 'Invalid Date' ? (
+                  <time 
+                    dateTime={state.post.updated}
+                    className="font-medium"
+                  >
+                    {formatDate(state.post.updated)}
+                  </time>
+                ) : null}
                 <span className="text-muted-foreground/60">(Updated)</span>
               </span>
             </div>

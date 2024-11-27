@@ -213,7 +213,7 @@ const BlogTitle = () => {
 	}, []);
 
 	return (
-		<motion.div className="relative w-full py-1 sm:py-2 md:py-3 overflow-hidden pt-0" suppressHydrationWarning>
+		<motion.div className="relative w-full overflow-hidden py-0" suppressHydrationWarning>
 			<div className="max-w-4xl mx-auto mt-0">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
@@ -247,11 +247,11 @@ const BlogTitle = () => {
 								/>
 							))}
 
-						<div className="relative z-10 w-full">
+						<div className="relative z-10 w-full h-full flex items-center justify-center">
 							<motion.h1
 								className={cn(
 									"text-3xl sm:text-4xl md:text-5xl font-bold", // Slightly reduced text sizes
-									"p-1 select-none text-center", // Reduced padding
+									"p-1 select-none", // Removed text-center as parent handles centering
 									"filter drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]",
 									styles['title']
 								)}
