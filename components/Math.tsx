@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Link, Copy, Check } from "lucide-react";
 import { useMathContext } from "./MathContext";
 
-interface MathProps {
+export interface MathProps {  // Add export here
   children?: string;
   display?: boolean;
   options?: any;

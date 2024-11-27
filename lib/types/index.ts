@@ -4,8 +4,8 @@ import { z } from 'zod'
 export interface Post {
   slug: string
   title: string
-  summary: string
-  content: string
+  summary?: string  // Make optional since not all posts may have summaries
+  content: string  // Keep required here
   created: string
   updated?: string
   tags: string[]
@@ -25,8 +25,7 @@ export interface AdjacentPost {
 }
 
 export interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
-  summary?: string;
-  content?: string;
+  // Should inherit optional summary from Post now
 }
 
 // Configuration types

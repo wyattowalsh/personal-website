@@ -5,6 +5,14 @@ import { backend } from '../lib/services/backend';
 import { logger } from '../lib/utils/logger';
 import { fileURLToPath } from 'url';
 
+// Add PreprocessStats interface
+interface PreprocessStats {
+  postsProcessed: number;
+  searchIndexSize: number;
+  cacheSize: number;
+  errors: Error[];
+}
+
 // Enhanced error handling setup using global process
 globalThis.process.on('unhandledRejection', (error) => {
   logger.error('Unhandled rejection:', error as Error);
@@ -51,37 +59,44 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
   }
 }
 
-// Simplified script runners with ensure cache
+// Define scripts object (without export)
 const scripts = {
   predev: async () => {
     try {
-      await backend.ensurePreprocessed();
-      await processFiles(true);
+      logger.info('Starting development preprocessing...');
+      await backend.cleanup();
+      const stats = await backend.preprocess(true);
       logger.success('Development preprocessing complete!');
-    } catch (error) {
-      logger.error('Development preprocessing failed!', error);
+      return stats;
+    } catch (error: unknown) {
+      logger.error('Development preprocessing failed!', error as Error);
       process.exit(1);
     }
   },
 
   prebuild: async () => {
     try {
-      await backend.ensurePreprocessed();
-      await processFiles(false);
+      logger.info('Starting production preprocessing...');
+      await backend.cleanup();
+      const stats = await backend.preprocess(false);
       logger.success('Production preprocessing complete!');
-    } catch (error) {
-      logger.error('Production preprocessing failed!', error);
+      return stats;
+    } catch (error: unknown) {
+      logger.error('Production preprocessing failed!', error as Error);
       process.exit(1);
     }
   }
 };
 
-// Remove ESM-specific code
+// Handle direct script execution
 if (require.main === module) {
   const isDev = process.argv.includes('--dev');
   (isDev ? scripts.predev() : scripts.prebuild())
-    .catch(() => process.exit(1));
+    .catch((error: unknown) => {
+      logger.error('Script execution failed:', error as Error);
+      process.exit(1);
+    });
 }
 
-// Export scripts
-module.exports = { scripts };
+// Single export statement
+export { scripts };

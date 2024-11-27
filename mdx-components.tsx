@@ -15,7 +15,9 @@ import { Tooltip } from "@/components/ui/tooltip";
 import GistWrapper from "@/components/GistWrapper";
 import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
-import Math from "@/components/Math";
+import Math, { MathProps } from "@/components/Math";
+import type { UrlObject } from 'url';
+import { Route as NextRoute } from 'next';
 
 import {
   Accordion,
@@ -35,6 +37,9 @@ interface GistWrapperProps {
     url?: string;
     id?: string;
 }
+
+type Route = string | Partial<URL>
+type Href = Route | URL
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
@@ -698,7 +703,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             // Handle internal links
             return (
                 <Link 
-                    href={href}
+                    href={href as NextRoute} // Updated type casting
                     className={classes}
                 >
                     {children}
@@ -711,10 +716,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             <Math display={false}>{children}</Math>
         ),
         
-        'math-display': ({ children }) => (
-            <Math display={true}>{children}</Math>
-        ),
-
         ...components,
     };
 }

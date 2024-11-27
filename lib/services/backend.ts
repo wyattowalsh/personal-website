@@ -8,6 +8,7 @@ import path from 'path';
 import { getGitFileData } from '../utils/git';
 import { getConfig } from '../config';
 import { logger } from '../utils/logger';
+import fs from 'fs/promises';
 
 // Type definitions
 export interface Post {
@@ -112,37 +113,49 @@ class BackendService {
   }
 
   public async preprocess(isDev = false): Promise<PreprocessStats> {
-    ensureNodeEnv();
+    ensureNodeEnv(); // Add this line to ensure we're in Node environment
     const startTime = Date.now();
     const errors: Error[] = [];
-    logger.info(`Starting ${isDev ? 'development' : 'production'} preprocessing...`);
-
+    
     try {
-      const fs = await ensureFs();
-      await fs.mkdir(CACHE_DIR, { recursive: true });
+      logger.info(`Starting ${isDev ? 'development' : 'production'} preprocessing...`);
+      
+      // Use fs with await
+      await fs.mkdir(CACHE_DIR, { recursive: true })
+        .catch(() => logger.warning('Cache directory already exists'));
 
-      // 1. Process all posts and generate metadata
+      // Clear existing cache
+      await this.cleanup();
+
+      // Process posts with progress logging
+      logger.step('Processing posts...');
       const posts = await this.processAllPosts();
+      logger.info(`Processed ${posts.length} posts`);
 
-      // 2. Generate search index
+      // Generate indices with progress logging
+      logger.step('Generating search index...');
       const searchIndex = await this.generateSearchIndex(posts);
-
-      // 3. Generate tag index
+      
+      logger.step('Generating tag index...');
       const tagIndex = await this.generateTagIndex(posts);
 
-      // 4. Pre-compute RSS feed (only in production)
-      if (!isDev) {
-        await this.generateRSSFeed(posts);
-      }
-
-      // 5. Save indices to disk for quick startup
+      // Save to disk with progress logging
+      logger.step('Saving cache files...');
+      
       await Promise.all([
-        fs.writeFile(INDICES.METADATA, JSON.stringify(posts)),
-        fs.writeFile(INDICES.SEARCH, JSON.stringify(searchIndex)),
-        fs.writeFile(INDICES.TAGS, JSON.stringify(tagIndex)),
+        fs.writeFile(INDICES.METADATA, JSON.stringify(posts))
+          .then(() => logger.info('Saved metadata')),
+        fs.writeFile(INDICES.SEARCH, JSON.stringify(searchIndex))
+          .then(() => logger.info('Saved search index')),
+        fs.writeFile(INDICES.TAGS, JSON.stringify(tagIndex))
+          .then(() => logger.info('Saved tag index')),
+        !isDev ? this.generateRSSFeed(posts)
+          .then(() => logger.info('Generated RSS feed')) : Promise.resolve()
       ]);
 
       const duration = Date.now() - startTime;
+      logger.success(`Preprocessing complete in ${duration}ms!`);
+
       return {
         duration,
         postsProcessed: posts.length,
@@ -150,17 +163,33 @@ class BackendService {
         cacheSize: this.postCache.size,
         errors,
       };
-    } catch (maybeError: unknown) {
-      const error = toError(maybeError);
-      logger.error('Preprocessing failed:', error);
-      errors.push(error);
-      return {
-        duration: Date.now() - startTime,
-        postsProcessed: 0,
-        searchIndexSize: 0,
-        cacheSize: this.postCache.size,
-        errors,
-      };
+
+    } catch (error) {
+      logger.error('Preprocessing failed:', error as Error);
+      errors.push(error as Error);
+      throw error;
+    }
+  }
+
+  public async cleanup(): Promise<void> {
+    try {
+      ensureNodeEnv();
+      // Clear memory caches
+      this.postCache.clear();
+      this.tagCache.clear();
+      this.searchIndex = null;
+
+      // Remove cache directory
+      await fs.rm(CACHE_DIR, { recursive: true, force: true })
+        .catch(() => logger.warning('No cache directory to remove'));
+      
+      // Recreate empty cache directory
+      await fs.mkdir(CACHE_DIR, { recursive: true });
+      
+      logger.success('Cache cleared successfully');
+    } catch (error) {
+      logger.error('Failed to clean cache:', error as Error);
+      throw error;
     }
   }
 
@@ -542,31 +571,6 @@ class BackendService {
       const error = toError(maybeError);
       logger.error('Error fetching all tags:', error);
       return [];
-    }
-  }
-
-  public async cleanup(): Promise<void> {
-    try {
-      ensureNodeEnv();
-      // Reset caches first
-      this.postCache.clear();
-      this.tagCache.clear();
-      this.searchIndex = null;
-
-      // Then try to remove the cache directory
-      try {
-        const fs = await ensureFs();
-        await fs.rm(CACHE_DIR, { recursive: true, force: true });
-      } catch (maybeError: unknown) {
-        const error = toError(maybeError);
-        logger.warning('Cache directory removal failed, may not exist');
-      }
-
-      logger.success('Cache cleared');
-    } catch (maybeError: unknown) {
-      const error = toError(maybeError);
-      logger.error('Failed to clean cache:', error);
-      throw error;
     }
   }
 
