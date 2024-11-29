@@ -11,12 +11,15 @@ import ParticleControls from "./ParticleControls";
 
 export default function ParticlesBackground() {
   const [init, setInit] = useState(false);
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme, theme } = useTheme();
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<Container | null>(null);
   const [mounted, setMounted] = useState(false);
   const [currentConfigUrl, setCurrentConfigUrl] = useState<string>("");
-  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">("light");
+
+  // Initialize theme
+  const initialTheme = resolvedTheme || theme || "light";
+  const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(initialTheme as "light" | "dark");
 
   // Handle mounting
   useEffect(() => {
@@ -24,26 +27,36 @@ export default function ParticlesBackground() {
     return () => setMounted(false);
   }, []);
 
-  // Initialize particle engine once
+  // Initialize particle engine once and set initial config
   useEffect(() => {
     if (!mounted) return;
 
-    initParticlesEngine(async (engine) => {
-      await loadSlim(engine);
-    }).then(() => {
+    const initEngine = async () => {
+      await initParticlesEngine(async (engine) => {
+        await loadSlim(engine);
+      });
       setInit(true);
-    });
-  }, [mounted]);
 
-  // Update theme and config when theme changes
+      // Set initial config after engine is initialized
+      const theme = resolvedTheme as "light" | "dark" || currentTheme;
+      const initialConfig = getRandomConfigUrl(theme);
+      setCurrentConfigUrl(initialConfig);
+    };
+
+    initEngine();
+  }, [mounted]); // Only run on mount
+
+  // Update theme effect
   useEffect(() => {
-    if (!mounted || !init) return;
+    if (!mounted || !init || !resolvedTheme) return;
+    
     const theme = resolvedTheme as "light" | "dark";
-    if (!theme) return;
-    setCurrentTheme(theme);
-    const newConfigUrl = getRandomConfigUrl(theme);
-    setCurrentConfigUrl(newConfigUrl);
-  }, [resolvedTheme, init, mounted]);
+    if (theme !== currentTheme) {
+      setCurrentTheme(theme);
+      const newConfigUrl = getRandomConfigUrl(theme);
+      setCurrentConfigUrl(newConfigUrl);
+    }
+  }, [resolvedTheme, init, mounted, currentTheme]);
 
   const particlesLoaded = useCallback(async (container?: Container) => {
     if (container) {
@@ -70,12 +83,12 @@ export default function ParticlesBackground() {
   }, []);
 
   const handleRefresh = useCallback(() => {
-    const currentTheme = resolvedTheme as 'light' | 'dark';
-    const newConfigUrl = getRandomConfigUrl(currentTheme);
+    const theme = resolvedTheme as 'light' | 'dark' || currentTheme;
+    const newConfigUrl = getRandomConfigUrl(theme);
     setCurrentConfigUrl(newConfigUrl);
-  }, [resolvedTheme]);
+  }, [resolvedTheme, currentTheme]);
 
-  if (!mounted || !init || !currentConfigUrl) return null;
+  if (!mounted || !init) return null;
 
   return (
     <>
@@ -85,12 +98,14 @@ export default function ParticlesBackground() {
         exit={{ opacity: 0 }}
         className="fixed inset-0 -z-10"
       >
-        <Particles
-          id={`tsparticles-${currentConfigUrl}`}
-          className="absolute inset-0"
-          url={currentConfigUrl}
-          particlesLoaded={particlesLoaded}
-        />
+        {currentConfigUrl && (
+          <Particles
+            id={`tsparticles-${currentConfigUrl}`}
+            className="absolute inset-0"
+            url={currentConfigUrl}
+            particlesLoaded={particlesLoaded}
+          />
+        )}
       </motion.div>
 
       <ParticleControls

@@ -279,6 +279,11 @@ $animation-timing: (
   // Add scrollbar colors
   --math-controls-text: 100, 116, 139; // RGB values for slate-500
   --math-controls-text-hover: 15, 23, 42; // RGB values for slate-900
+
+  // New CSS variables for primary and accent colors
+  --primary: 59, 130, 246; // Tailwind blue-500
+  --primary-light: 147, 197, 253; // Tailwind blue-300
+  --accent: 251, 146, 60; // Tailwind orange-400
 }
 
 // Dark Theme Variables
@@ -438,4 +443,9 @@ $animation-timing: (
   // Add scrollbar colors
   --math-controls-text: 148, 163, 184; // RGB values for slate-400
   --math-controls-text-hover: 241, 245, 249; // RGB values for slate-100
+
+  // New CSS variables for primary and accent colors
+  --primary: 147, 197, 253; // Tailwind blue-300
+  --primary-light: 191, 219, 254; // Tailwind blue-200
+  --accent: 253, 186, 116; // Tailwind orange-300
 }

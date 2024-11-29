@@ -280,40 +280,61 @@ const InteractivitySchema = z.object({
   }).optional(),
 });
 
-// Update the full configuration schema
+// Add missing schemas
+const ThemeSchema = z.object({
+  name: z.string(),
+  default: z.object({
+    value: z.boolean().optional(),
+    mode: z.string().optional()
+  }).optional(),
+  options: z.any().optional()
+});
+
+const FullScreenSchema = z.union([
+  z.boolean(),
+  z.object({
+    enable: z.boolean().optional(),
+    zIndex: z.number().optional()
+  })
+]);
+
+// Update TsParticlesConfigSchema to match IOptions interface
 const TsParticlesConfigSchema = z.object({
+  autoPlay: z.boolean().optional(),
   background: BackgroundSchema.optional(),
-  particles: ParticlesSchema.optional(),
-  interactivity: InteractivitySchema.optional(),
+  backgroundMask: z.object({
+    cover: z.object({
+      color: ColorSchema.optional(),
+      opacity: z.number().optional()
+    }).optional(),
+    enable: z.boolean().optional()
+  }).optional(),
+  clear: z.boolean().optional(),
+  delay: NumberOrMinMaxSchema.optional(),
   detectRetina: z.boolean().optional(),
-  fullScreen: z.union([
-    z.boolean(),
-    z.object({
-      enable: z.boolean().optional(),
-      zIndex: z.number().optional(),
-    }),
-  ]).optional(),
+  duration: NumberOrMinMaxSchema.optional(),
   fpsLimit: z.number().optional(),
-  smooth: z.boolean().optional(),
+  fullScreen: FullScreenSchema.optional(),
+  interactivity: InteractivitySchema.optional(),
+  key: z.string().optional(),
+  manualParticles: z.array(z.any()).optional(),
+  name: z.string().optional(),
+  particles: ParticlesSchema.optional(),
   pauseOnBlur: z.boolean().optional(),
   pauseOnOutsideViewport: z.boolean().optional(),
-  themes: z.array(
-    z.object({
-      name: z.string(),
-      default: z.object({
-        value: z.boolean().optional(),
-        mode: z.string().optional(),
-      }).optional(),
-      options: z.any().optional(),
-    })
-  ).optional(),
-  responsive: z.array(
-    z.object({
-      maxWidth: z.number().optional(),
-      options: z.any().optional(),
-      mode: z.string().optional(),
-    })
-  ).optional(),
+  preset: z.union([
+    z.string(),
+    z.array(z.string())
+  ]).optional(),
+  responsive: z.array(z.object({
+    maxWidth: z.number(),
+    options: z.any(),
+    mode: z.string().optional()
+  })).optional(),
+  smooth: z.boolean().optional(),
+  style: z.record(z.any()).optional(),
+  themes: z.array(ThemeSchema).optional(),
+  zLayers: z.number().optional()
 });
 
 interface ParticleConfig {
@@ -330,26 +351,40 @@ async function calculateFileHash(filePath: string): Promise<string> {
   return crypto.createHash('md5').update(content).digest('hex');
 }
 
+// Update validateParticleConfig function to handle more edge cases
 async function validateParticleConfig(filePath: string): Promise<void> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const json = JSON.parse(content);
 
-    // Validate the configuration
+    // Pre-validate mandatory fields
+    const mandatoryFields = ['particles', 'background', 'interactivity'];
+    for (const field of mandatoryFields) {
+      if (!json[field]) {
+        throw new Error(`Missing mandatory field: ${field}`);
+      }
+    }
+
     const result = TsParticlesConfigSchema.safeParse(json);
 
     if (!result.success) {
       const errorDetails = result.error.issues
-        .map(
-          (issue) => `  - ${issue.path.join('.')}: ${issue.message}`
-        )
+        .map(issue => `  - ${issue.path.join('.')}: ${issue.message}`)
         .join('\n');
 
       throw new Error(
-        `Invalid particle configuration in ${path.basename(
-          filePath
-        )}:\n${errorDetails}`
+        `Invalid particle configuration in ${path.basename(filePath)}:\n${errorDetails}`
       );
+    }
+
+    // Additional validation for background image paths if present
+    if (json.background?.image) {
+      const imagePath = path.join(process.cwd(), 'public', json.background.image);
+      try {
+        await fs.access(imagePath);
+      } catch {
+        throw new Error(`Background image not found: ${json.background.image}`);
+      }
     }
   } catch (error) {
     if (error instanceof SyntaxError) {

@@ -11,7 +11,9 @@
     "lint": "next lint",
     "clean": "rimraf .next .cache node_modules/",
     "lclean": "rimraf .next .cache node_modules/.cache",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@babel/preset-typescript": "^7.26.0",
@@ -172,8 +174,18 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^3.2.2",
+    "@storybook/addon-essentials": "^8.4.6",
+    "@storybook/addon-interactions": "^8.4.6",
+    "@storybook/addon-onboarding": "^8.4.6",
+    "@storybook/blocks": "^8.4.6",
+    "@storybook/nextjs": "^8.4.6",
+    "@storybook/react": "^8.4.6",
+    "@storybook/test": "^8.4.6",
     "@tailwindcss/typography": "^0.5.15",
     "@types/react-scroll": "^1.8.10",
+    "eslint-plugin-storybook": "^0.11.1",
+    "storybook": "^8.4.6",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",

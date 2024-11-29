@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Settings, Play, Pause, RefreshCw } from "lucide-react";
@@ -26,25 +26,56 @@ export default function ParticleControls({
   currentConfigUrl,
 }: ParticleControlsProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const configs = getAllConfigUrls(theme);
+  const configs = useMemo(() => getAllConfigUrls(theme), [theme]);
+
+  useEffect(() => {
+    if (!configs.find((config) => config.url === currentConfigUrl)) {
+      const firstConfig = configs[0]?.url;
+      if (firstConfig) {
+        onConfigChange(firstConfig);
+      }
+    }
+  }, [configs, currentConfigUrl, onConfigChange]);
+
+  const buttonBaseStyles = cn(
+    "p-2 rounded-full",
+    "backdrop-blur-md",
+    "transition-all duration-300",
+    // Light mode
+    "bg-white/80 hover:bg-white/90",
+    "border border-slate-200",
+    "text-slate-600 hover:text-slate-900",
+    // Dark mode
+    "dark:bg-slate-800/80 dark:hover:bg-slate-800/90",
+    "dark:border-slate-700",
+    "dark:text-slate-300 dark:hover:text-slate-100",
+    // Shadows
+    "shadow-lg",
+    "hover:shadow-xl"
+  );
+
+  const menuBaseStyles = cn(
+    "backdrop-blur-md rounded-lg p-2",
+    // Light mode
+    "bg-white/80",
+    "border border-slate-200",
+    // Dark mode
+    "dark:bg-slate-800/80",
+    "dark:border-slate-700",
+    // Transitions
+    "transition-all duration-300"
+  );
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "fixed bottom-4 right-4 z-50",
-        "flex flex-col items-end gap-2"
-      )}
+      className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2"
     >
       <motion.div
         className={cn(
-          "bg-background/80 dark:bg-background/60",
-          "backdrop-blur-md rounded-lg p-2",
-          "border border-primary/10 dark:border-primary/20",
-          "shadow-lg",
-          "transition-all duration-300",
-          isOpen ? "translate-y-0" : "translate-y-full opacity-0"
+          menuBaseStyles,
+          isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         )}
       >
         <div className="flex flex-col gap-2">
@@ -53,11 +84,16 @@ export default function ParticleControls({
               key={config.url}
               onClick={() => onConfigChange(config.url)}
               className={cn(
-                "px-4 py-2 rounded-md",
-                "text-sm font-medium",
+                "px-4 py-2 rounded-md text-sm font-medium",
                 "transition-colors duration-200",
-                "hover:bg-primary/10 dark:hover:bg-primary/20",
-                config.url === currentConfigUrl && "bg-primary/20 dark:bg-primary/30"
+                // Light mode
+                "text-slate-600 hover:text-slate-900",
+                "hover:bg-slate-200/50",
+                // Dark mode
+                "dark:text-slate-300 dark:hover:text-slate-100",
+                "dark:hover:bg-slate-700/50",
+                // Active state
+                config.url === currentConfigUrl && "bg-slate-200/70 dark:bg-slate-700/70"
               )}
             >
               {config.url.split("/").pop()?.split(".")[0]}
@@ -67,19 +103,12 @@ export default function ParticleControls({
       </motion.div>
 
       <div className="flex gap-2">
+        {/* Control buttons using buttonBaseStyles */}
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(!isOpen)}
-          className={cn(
-            "p-2 rounded-full",
-            "bg-background/80 dark:bg-background/60",
-            "backdrop-blur-md",
-            "border border-primary/10 dark:border-primary/20",
-            "shadow-lg",
-            "transition-colors duration-200",
-            "hover:bg-primary/10 dark:hover:bg-primary/20"
-          )}
+          className={buttonBaseStyles}
         >
           <Settings className="w-5 h-5" />
         </motion.button>
@@ -88,15 +117,7 @@ export default function ParticleControls({
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={isPaused ? onResume : onPause}
-          className={cn(
-            "p-2 rounded-full",
-            "bg-background/80 dark:bg-background/60",
-            "backdrop-blur-md",
-            "border border-primary/10 dark:border-primary/20",
-            "shadow-lg",
-            "transition-colors duration-200",
-            "hover:bg-primary/10 dark:hover:bg-primary/20"
-          )}
+          className={buttonBaseStyles}
         >
           {isPaused ? (
             <Play className="w-5 h-5" />
@@ -109,15 +130,7 @@ export default function ParticleControls({
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={onRefresh}
-          className={cn(
-            "p-2 rounded-full",
-            "bg-background/80 dark:bg-background/60",
-            "backdrop-blur-md",
-            "border border-primary/10 dark:border-primary/20",
-            "shadow-lg",
-            "transition-colors duration-200",
-            "hover:bg-primary/10 dark:hover:bg-primary/20"
-          )}
+          className={buttonBaseStyles}
         >
           <RefreshCw className="w-5 h-5" />
         </motion.button>

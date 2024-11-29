@@ -36,40 +36,122 @@
 }
 
 .enhanced-title-landing {
-  font-size: 3.5rem;
-  font-weight: 700;
-  background: var(--gradient-text);
-  background-size: 200% 200%;
+  // Base styles
+  @apply relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl;
+  @apply font-bold tracking-tight;
+  @apply select-none cursor-default;
+  
+  // Custom gradient text with enhanced colors
+  background: linear-gradient(
+    135deg,
+    #60a5fa 0%,    // Blue
+    #3b82f6 25%,   // Darker blue
+    #8b5cf6 50%,   // Purple
+    #6366f1 75%,   // Indigo
+    #60a5fa 100%   // Back to blue
+  );
+  background-size: 400% 400%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: titleGradient 5s ease infinite;
-  text-transform: none;
-  position: relative;
-  font-family: var(--font-enhanced-title);
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-  @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold;
-  letter-spacing: -0.02em;
+  animation: titleGradient 8s ease infinite;
 
-  @screen sm {
-    letter-spacing: -0.03em;
+  // Advanced glow effect
+  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.2));
+  
+  // Responsive letter spacing
+  letter-spacing: -0.02em;
+  @screen sm { letter-spacing: -0.03em; }
+  @screen lg { letter-spacing: -0.04em; }
+
+  // Dark mode specific styles
+  .dark & {
+    background: linear-gradient(
+      135deg,
+      #93c5fd 0%,    // Lighter blue
+      #60a5fa 25%,   // Blue
+      #a78bfa 50%,   // Light purple
+      #818cf8 75%,   // Light indigo
+      #93c5fd 100%   // Back to lighter blue
+    );
+    background-size: 400% 400%;
+    filter: drop-shadow(0 0 12px rgba(147, 197, 253, 0.3));
   }
 
-  @screen lg {
-    letter-spacing: -0.04em;
+  // Hover effects
+  &:hover {
+    animation-play-state: paused;
+    
+    &::before {
+      opacity: 1;
+      transform: translateY(0) scale(1.05);
+    }
+  }
+
+  // Pseudo-element for enhanced glow
+  &::before {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    opacity: 0.5;
+    filter: blur(24px);
+    transform: translateY(2px) scale(1);
+    transition: all 0.5s ease;
+    z-index: -1;
+  }
+
+  // Screen size specific enhancements
+  @screen md {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+
+    &:hover {
+      transform: rotateX(5deg);
+    }
+  }
+
+  // Enhanced mobile experience
+  @media (hover: none) {
+    animation: titleGradientMobile 12s linear infinite;
+    
+    &::before {
+      animation: titleGlowMobile 4s ease-in-out infinite;
+    }
   }
 }
 
+// Enhanced gradient animation
 @keyframes titleGradient {
-  0% {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(15deg);
+  }
+}
+
+// Mobile-specific animations
+@keyframes titleGradientMobile {
+  0%, 100% {
     background-position: 0% 50%;
   }
-
   50% {
     background-position: 100% 50%;
   }
+}
 
-  100% {
-    background-position: 0% 50%;
+@keyframes titleGlowMobile {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(2px) scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: translateY(1px) scale(1.02);
   }
 }
 
@@ -293,7 +375,13 @@ html.dark .enhanced-animated-text {
 
 .imageContainer {
   width: 100%;
-  max-width: 256px;
+  // Adjust max-width for different screen sizes
+  max-width: 160px; // Default for mobile
+  @screen sm { max-width: 180px; }
+  @screen md { max-width: 200px; }
+  @screen lg { max-width: 220px; }
+  @screen xl { max-width: 240px; }
+  
   margin: 0 auto;
   perspective: 1000px;
   
@@ -308,7 +396,7 @@ html.dark .enhanced-animated-text {
       transparent 50%,
       var(--primary) 100%
     );
-    opacity: 0.5;
+    opacity: 0.8;
     z-index: -1;
     transition: all 0.5s ease;
     animation: rotate 10s linear infinite;
@@ -316,33 +404,33 @@ html.dark .enhanced-animated-text {
 
   .imageGlow {
     position: absolute;
-    inset: -20px;
+    // Adjust glow size based on container
+    inset: -15%;
     background: radial-gradient(
       circle at center,
-      rgba(var(--primary-rgb), 0.2) 0%,
+      rgba(var(--primary-rgb), 0.3) 0%,
       transparent 70%
     );
-    opacity: 0;
+    opacity: 0.5;
     transition: opacity 0.5s ease;
     filter: blur(15px);
     z-index: -1;
   }
 
-  &:hover {
-    .imageGlow {
-      opacity: 1;
-    }
-
-    &::before {
-      opacity: 0.8;
-      filter: blur(3px);
+  // Enhanced float animation for larger screens
+  @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+    animation: float 6s ease-in-out infinite;
+    
+    &:hover {
+      animation-play-state: paused;
     }
   }
 }
 
 .profileImage {
+  @apply w-full h-full;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  filter: brightness(1) contrast(1);
+  filter: brightness(1.05) contrast(1.05);
   transform-style: preserve-3d;
   
   &:hover {

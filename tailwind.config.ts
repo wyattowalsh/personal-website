@@ -47,6 +47,7 @@ const config: Config = {
         foreground: withOpacityValue('--foreground'),
         primary: {
           DEFAULT: withOpacityValue('--primary'),
+          light: withOpacityValue('--primary-light'),
           foreground: withOpacityValue('--primary-foreground'),
           20: 'rgb(var(--primary-rgb) / 0.2)',
           30: 'rgb(var(--primary-rgb) / 0.3)',

@@ -110,8 +110,13 @@ export default function HomePage() {
                 )}
                 src="/logo.webp"
                 alt="Logo — Wyatt Walsh"
-                width={256}
-                height={256}
+                width={240}  // Set to largest size
+                height={240} // Set to largest size
+                sizes="(max-width: 640px) 160px,
+                       (max-width: 768px) 180px,
+                       (max-width: 1024px) 200px,
+                       (max-width: 1280px) 220px,
+                       240px"
                 priority
                 quality={100}
               />

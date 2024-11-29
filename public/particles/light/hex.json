@@ -1,57 +1,47 @@
 {
-    "autoPlay": true,
     "background": {
         "color": {
             "value": "#fafafa"
-        },
-        "image": "/asfalt-dark.webp",
-        "position": "center",
-        "repeat": "repeat",
-        "size": "cover"
+        }
     },
     "particles": {
         "number": {
-            "value": 150,
+            "value": 80,
             "density": {
                 "enable": true,
-                "area": 1000
+                "area": 800
             }
         },
         "color": {
             "value": ["#6a9fb5", "#4db6ac", "#00796b", "#ade8f4"]
         },
         "shape": {
-            "type": ["circle", "polygon", "star"],
+            "type": "polygon",
             "polygon": {
                 "sides": 6
-            },
-            "star": {
-                "sides": 5
             }
         },
         "opacity": {
             "value": {
                 "min": 0.3,
-                "max": 0.9
+                "max": 0.8
             },
-            "random": true,
             "animation": {
                 "enable": true,
-                "speed": 2,
+                "speed": 1,
                 "minimumValue": 0.3,
                 "sync": false
             }
         },
         "size": {
             "value": {
-                "min": 6,
-                "max": 15
+                "min": 8,
+                "max": 12
             },
-            "random": true,
             "animation": {
                 "enable": true,
-                "speed": 3,
-                "minimumValue": 5,
+                "speed": 2,
+                "minimumValue": 6,
                 "sync": false
             }
         },
@@ -61,65 +51,42 @@
             "direction": "none",
             "outModes": {
                 "default": "bounce"
-            },
-            "trail": {
-                "enable": true,
-                "length": 10,
-                "fillColor": "#ffffff"
             }
         },
         "links": {
             "enable": true,
             "distance": 150,
             "color": "#4db6ac",
-            "opacity": 0.5,
-            "width": 1.5
+            "opacity": 0.4,
+            "width": 1
         }
     },
     "interactivity": {
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": ["bubble", "repulse", "connect"],
-                "parallax": {
-                    "enable": true,
-                    "force": 60,
-                    "smooth": 10
-                }
+                "mode": "bubble"
             },
             "onClick": {
                 "enable": true,
-                "mode": ["remove", "push"]
+                "mode": "push"
             }
         },
         "modes": {
             "bubble": {
                 "distance": 200,
-                "size": 25,
-                "duration": 3,
+                "size": 20,
+                "duration": 2,
                 "opacity": 0.8
             },
-            "repulse": {
-                "distance": 250,
-                "duration": 1.5
-            },
-            "connect": {
-                "distance": 120,
-                "links": {
-                    "opacity": 0.9
-                }
-            },
             "push": {
-                "quantity": 5
-            },
-            "remove": {
-                "quantity": 2
+                "quantity": 4
             }
         }
     },
+    "fullScreen": {
+        "enable": false
+    },
     "detectRetina": true,
-    "fpsLimit": 60,
-    "pauseOnBlur": true,
-    "smooth": true,
-    "zLayers": 100
+    "fpsLimit": 60
 }

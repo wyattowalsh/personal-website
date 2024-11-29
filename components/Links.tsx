@@ -62,7 +62,7 @@ export const links = [
   },
 ].map((link) => ({
   ...link,
-  color: link.color || "var(--primary-color)",
+  color: link.color || "#6a9fb5",
 }));
 
 export default function Links() {
@@ -72,7 +72,7 @@ export default function Links() {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.3
+        delayChildren: 0.3,
       }
     }
   };
@@ -96,27 +96,33 @@ export default function Links() {
       initial="hidden"
       animate="visible"
       className={cn(
-        // Responsive grid
+        // Grid layout
         "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
-        "gap-3 sm:gap-4 md:gap-6 lg:gap-8",
-        // Responsive padding
-        "p-3 sm:p-4 md:p-6 lg:p-8",
-        // Container styling
-        "w-full max-w-[95vw] md:max-w-5xl mx-auto",
-        "rounded-xl",
-        // Theme-aware background
+        "gap-4 sm:gap-6 md:gap-8 lg:gap-10",
+        "p-4 sm:p-6 md:p-8 lg:p-10",
+        // Container dimensions
+        "w-full max-w-[95vw] md:max-w-6xl mx-auto",
+        "rounded-2xl",
+        // Enhanced glass effect with proper contrast
+        "bg-white/5 dark:bg-slate-900/10",
+        "backdrop-blur-xl",
+        // Themed borders
+        "border border-primary/10 dark:border-primary-light/10",
+        // Dynamic shadows
+        "shadow-xl shadow-black/5 dark:shadow-black/20",
+        "hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary-light/20",
+        // Enhanced gradients using theme colors
         "bg-gradient-to-br",
-        "from-background/30 to-background/10",
-        "dark:from-background/20 dark:to-background/5",
-        // Enhanced blur and border
-        "backdrop-blur-sm",
-        "border border-primary/5",
-        "dark:border-primary/10",
-        // Improved shadows
-        "shadow-xl shadow-primary/5",
-        "dark:shadow-primary/10",
+        "from-primary/5 via-transparent to-accent/5",
+        "dark:from-primary-light/5 dark:via-transparent dark:to-accent/5",
         // Smooth transitions
-        "transition-colors duration-300"
+        "transition-all duration-500 ease-in-out",
+        // Enhanced background effects
+        "after:absolute after:inset-0 after:-z-10",
+        "after:bg-gradient-to-br after:from-white/10 after:to-primary/5",
+        "after:dark:from-primary-light/5 after:dark:to-transparent",
+        "after:rounded-2xl after:blur-3xl after:transition-opacity",
+        "hover:after:opacity-100"
       )}
     >
       {links.map((link, index) => (
@@ -126,8 +132,13 @@ export default function Links() {
           custom={index}
           className={cn(
             "w-full",
-            // Ensure minimum touch target size
-            "min-h-[100px] sm:min-h-[120px]"
+            "min-h-[100px] sm:min-h-[120px]",
+            // Add hover state feedback
+            "group",
+            "transition-transform duration-500",
+            "hover:z-10",
+            // Ensure proper stacking
+            "relative isolate",
           )}
         >
           <SocialLink link={link} />

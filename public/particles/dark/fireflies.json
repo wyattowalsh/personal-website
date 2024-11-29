@@ -2,13 +2,6 @@
     "background": {
         "color": {
             "value": "#030316"
-        },
-        "image": "radial-gradient(circle, rgba(0,0,0,1) 0%, rgba(20,20,60,1) 80%, rgba(0,0,0,1) 100%)",
-        "imageOverlay": {
-            "url": "star-overlay.webp",
-            "position": "center",
-            "size": "cover",
-            "opacity": 0.6
         }
     },
     "particles": {

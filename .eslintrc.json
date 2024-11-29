@@ -1,10 +1,21 @@
 {
-  "extends": ["next/core-web-vitals", "next", "prettier"],
-  "plugins": ["mdx"],
+  "extends": [
+    "next/core-web-vitals",
+    "next",
+    "prettier",
+    "plugin:storybook/recommended"
+  ],
+  "plugins": [
+    "mdx"
+  ],
   "overrides": [
     {
-      "files": ["*.mdx"],
-      "extends": ["plugin:mdx/recommended"]
+      "files": [
+        "*.mdx"
+      ],
+      "extends": [
+        "plugin:mdx/recommended"
+      ]
     }
   ]
 }

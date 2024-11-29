@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
+import styles from '../app/page.module.scss';
 
 const WORDS = [
     "cybernetic architect",
@@ -103,24 +104,7 @@ export default function LandingTitle() {
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={cn(
-          // Responsive typography
-          "relative text-4xl sm:text-5xl md:text-7xl lg:text-8xl",
-          "font-bold tracking-tight leading-none py-2",
-          // Gradient text
-          "bg-gradient-to-r",
-          "from-blue-600 via-purple-600 to-pink-600",
-          "dark:from-blue-400 dark:via-purple-400 dark:to-pink-400",
-          "bg-clip-text text-transparent",
-          // Hover effects
-          "transition-all duration-700",
-          "hover:scale-[1.02]",
-          "cursor-default select-none",
-          // Glow effects
-          "animate-title-glow",
-          "[text-shadow:0_0_30px_var(--primary-rgb,0,0,0,0.2)]",
-          "dark:[text-shadow:0_0_30px_var(--primary-rgb,255,255,255,0.2)]"
-        )}
+        className={cn(styles['enhanced-title-landing'])}
         data-text="Wyatt Walsh"
       >
         Wyatt Walsh
