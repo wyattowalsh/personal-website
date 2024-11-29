@@ -76,14 +76,14 @@ export default function LandingTitle() {
 
   return (
     <motion.div
-      ref={ref}
-      style={{ opacity, scale }}
-      className={cn(
-        // Base styles
-        "relative z-10",
-        // Responsive padding
-        "py-8 sm:py-12 md:py-16 lg:py-24",
-        "px-4 sm:px-6 md:px-8 lg:px-10",
+	ref={ref}
+	style={{ opacity, scale }}
+	className={cn(
+		// Base styles
+		"relative z-10",
+		// Responsive padding (further reduced)
+		"py-2 sm:py-4 md:py-6 lg:py-8",  // Reduced from py-4/6/8/12
+   		"px-4 sm:px-6 md:px-8 lg:px-10",
         "flex flex-col items-center",
         // Theme-aware background
         "bg-gradient-to-br",

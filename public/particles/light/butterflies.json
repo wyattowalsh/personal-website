@@ -2,14 +2,19 @@
     "background": {
         "color": {
             "value": "#f9f9f9"
-        }
+        },
+        "image": "",
+        "position": "50% 50%",
+        "repeat": "no-repeat",
+        "size": "cover",
+        "opacity": 1
     },
     "particles": {
         "number": {
             "value": 120,
             "density": {
                 "enable": true,
-                "area": 1000
+                "area": 1200
             }
         },
         "color": {
@@ -21,71 +26,106 @@
                 "src": "/butterfly.webp",
                 "width": 60,
                 "height": 60
+            },
+            "options": {
+                "polygon": {
+                    "sides": 5
+                }
             }
         },
         "opacity": {
             "value": {
                 "min": 0.3,
-                "max": 0.6
-            },
-            "random": true,
-            "animation": {
-                "enable": true,
-                "speed": 1.5,
-                "minimumValue": 0.2,
-                "sync": false
-            }
-        },
-        "size": {
-            "value": {
-                "min": 10,
-                "max": 20
+                "max": 0.8
             },
             "random": true,
             "animation": {
                 "enable": true,
                 "speed": 2,
-                "minimumValue": 8,
+                "minimumValue": 0.3,
+                "sync": false
+            }
+        },
+        "size": {
+            "value": {
+                "min": 12,
+                "max": 25
+            },
+            "random": true,
+            "animation": {
+                "enable": true,
+                "speed": 3,
+                "minimumValue": 10,
                 "sync": false
             }
         },
         "move": {
             "enable": true,
-            "speed": 2,
+            "speed": 2.5,
             "direction": "top-right",
             "outModes": {
-                "default": "out"
+                "default": "out",
+                "bottom": "bounce"
             },
             "random": false,
-            "straight": false
+            "straight": false,
+            "path": {
+                "enable": true,
+                "options": {}
+            },
+            "trail": {
+                "enable": true,
+                "length": 5,
+                "fillColor": "#ffffff"
+            }
+        },
+        "links": {
+            "enable": true,
+            "distance": 120,
+            "color": "#ffa500",
+            "opacity": 0.5,
+            "width": 1
         }
     },
     "interactivity": {
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": ["grab"]
+                "mode": ["grab", "bubble"],
+                "parallax": {
+                    "enable": false,
+                    "force": 60,
+                    "smooth": 10
+                }
             },
             "onClick": {
                 "enable": true,
-                "mode": ["bubble", "push"]
-            }
+                "mode": ["bubble", "push", "repulse"]
+            },
+            "resize": true
         },
         "modes": {
             "grab": {
-                "distance": 200,
-                "line_linked": {
-                    "opacity": 0.5
+                "distance": 250,
+                "links": {
+                    "opacity": 0.7
                 }
             },
             "bubble": {
+                "distance": 200,
+                "size": 35,
+                "duration": 3,
+                "opacity": 1
+            },
+            "repulse": {
                 "distance": 150,
-                "size": 30,
-                "duration": 2.5,
-                "opacity": 0.9
+                "duration": 0.5
             },
             "push": {
-                "quantity": 6
+                "quantity": 8
+            },
+            "remove": {
+                "quantity": 4
             }
         }
     },
@@ -94,8 +134,31 @@
         "zIndex": -1
     },
     "detectRetina": true,
-    "fpsLimit": 60,
+    "fpsLimit": 90,
     "smooth": true,
     "pauseOnBlur": true,
-    "pauseOnOutsideViewport": true
+    "pauseOnOutsideViewport": true,
+    "themes": [
+        {
+            "name": "light",
+            "options": {
+                "background": {
+                    "color": "#ffffff"
+                }
+            }
+        },
+        {
+            "name": "dark",
+            "options": {
+                "background": {
+                    "color": "#000000"
+                },
+                "particles": {
+                    "color": {
+                        "value": ["#ffffff", "#aaaaaa"]
+                    }
+                }
+            }
+        }
+    ]
 }

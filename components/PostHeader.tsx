@@ -113,7 +113,8 @@ function MetadataTags({ tags }: MetadataTagsProps) {
   );
 }
 
-export default function PostHeader() {
+// Add this at the top of PostHeader.tsx, updating imports as needed
+const useSafePost = (pathname: string) => {
   const [state, setState] = useState<PostHeaderState>({
     post: null,
     isLoading: true,
@@ -121,49 +122,57 @@ export default function PostHeader() {
     imageLoaded: false,
   });
 
-  const pathname = usePathname();
-
   useEffect(() => {
     let mounted = true;
+    const controller = new AbortController();
 
     const fetchPost = async () => {
       try {
         setState(prev => ({ ...prev, isLoading: true, error: null }));
-        const slug = pathname.split("/blog/posts/")[1];
+        const slug = pathname.split("/posts/")[1]?.split("/")[0];
         
         if (!slug) {
-          throw new Error('Invalid slug');
+          throw new Error('Invalid URL format');
         }
 
-        // Direct fetch from backend service instead of API route
-        const response = await fetch(`/api/posts/${slug}`, {
+        // Use metadata endpoint instead for initial data
+        const response = await fetch(`/api/blog/posts/metadata/${slug}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
+          signal: controller.signal
         });
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          if (response.status === 404) {
+            throw new Error('Post not found');
+          }
+          throw new Error(`Failed to load post (${response.status})`);
         }
-        
+
         const data = await response.json();
-        
-        if (!data) {
-          throw new Error('Post not found');
-        }
+        if (!mounted) return;
 
         setState(prev => ({ 
           ...prev, 
-          post: data,
+          post: {
+            ...data,
+            title: data.title || "Untitled Post",
+            summary: data.summary || "",
+            created: data.created || data.date,
+            updated: data.updated || data.created || data.date,
+            tags: data.tags || [],
+            image: data.image || "/logo.webp"
+          },
           isLoading: false 
         }));
       } catch (error) {
+        if (!mounted) return;
         console.error("Error loading post:", error);
         setState(prev => ({
           ...prev,
-          error: error instanceof Error ? error.message : "Failed to load post",
+          error: error instanceof Error ? error.message : 'Failed to load post',
           isLoading: false,
+          post: null
         }));
       }
     };
@@ -172,8 +181,17 @@ export default function PostHeader() {
     
     return () => {
       mounted = false;
+      controller.abort();
     };
   }, [pathname]);
+
+  return state;
+};
+
+// Update the PostHeader component to use the new hook
+export default function PostHeader() {
+  const pathname = usePathname();
+  const state = useSafePost(pathname);
 
   const handleImageLoad = () => {
     setState((prev) => ({ ...prev, imageLoaded: true }));
@@ -181,13 +199,44 @@ export default function PostHeader() {
 
   if (state.error || !state.post) {
     return (
-      <div 
+      <motion.div 
         role="alert"
-        className="text-destructive text-center p-4 rounded-lg bg-destructive/10"
+        className={cn(
+          "text-center p-8 rounded-xl",
+          "bg-destructive/5 border border-destructive/20",
+          "max-w-5xl mx-auto space-y-4",
+          "backdrop-blur-sm",
+          "shadow-lg"
+        )}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
       >
-        <h2 className="text-lg font-semibold mb-2">Error Loading Post</h2>
-        <p>{state.error || "Post not found"}</p>
-      </div>
+        <h1 className={cn(
+          "text-3xl font-bold",
+          "bg-gradient-to-br from-destructive to-destructive/70",
+          "bg-clip-text text-transparent"
+        )}>
+          Post Not Found
+        </h1>
+        <p className="text-muted-foreground text-lg">
+          {state.error || "The requested blog post could not be found."}
+        </p>
+        <div className="pt-4">
+          <Link 
+            href="/blog"
+            className={cn(
+              "inline-flex items-center gap-2 px-4 py-2",
+              "bg-primary text-primary-foreground",
+              "rounded-lg shadow-md",
+              "hover:bg-primary/90 transition-colors",
+              "font-medium"
+            )}
+          >
+            Return to Blog
+          </Link>
+        </div>
+      </motion.div>
     );
   }
 

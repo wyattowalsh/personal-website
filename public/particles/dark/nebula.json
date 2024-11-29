@@ -1,17 +1,23 @@
 {
+  "autoPlay": true,
   "background": {
     "color": {
       "value": "#020202"
     },
-    "image": "radial-gradient(circle, #020202, #0a0a0a, #151515)"
+    "image": "radial-gradient(circle, #020202, #0a0a0a, #151515)",
+    "opacity": 1
   },
-  "fpsLimit": 165,
+  "fullScreen": {
+    "enable": false
+  },
+  "detectRetina": true,
+  "fpsLimit": 120,
   "particles": {
     "number": {
       "value": 250,
       "density": {
         "enable": true,
-        "area": 1500
+        "area": 800
       }
     },
     "color": {
@@ -19,8 +25,10 @@
     },
     "shape": {
       "type": ["circle", "star", "polygon", "triangle"],
-      "polygon": {
-        "sides": 6
+      "options": {
+        "polygon": {
+          "sides": 6
+        }
       }
     },
     "opacity": {
@@ -28,7 +36,6 @@
         "min": 0.1,
         "max": 1
       },
-      "random": true,
       "animation": {
         "enable": true,
         "speed": 1.2,
@@ -41,49 +48,44 @@
         "min": 1,
         "max": 10
       },
-      "random": true,
       "animation": {
         "enable": true,
-        "speed": 10,
+        "speed": 5,
         "minimumValue": 1,
         "sync": false
       }
     },
     "links": {
       "enable": true,
-      "distance": 180,
-      "color": ["#ffffff", "#00ff80"],
+      "distance": 150,
+      "color": {
+        "value": "#ffffff"
+      },
       "opacity": 0.4,
-      "width": 2.5,
-      "shadow": {
-        "enable": true,
-        "blur": 10,
-        "color": "#444444"
-      }
+      "width": 2
     },
     "move": {
       "enable": true,
-      "speed": 1.5,
+      "speed": 1,
       "direction": "none",
       "outModes": {
         "default": "out"
       },
-      "random": true,
       "straight": false,
       "trail": {
         "enable": true,
-        "length": 25,
-        "fillColor": "#020202"
-      },
-      "path": {
-        "enable": true,
-        "generator": "flowField"
+        "length": 20,
+        "fill": {
+          "color": "#020202"
+        }
       }
     },
-    "parallax": {
-      "enable": true,
-      "force": 150,
-      "smooth": 50
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 100
+      },
+      "opacityRate": 0.5
     }
   },
   "interactivity": {
@@ -95,33 +97,31 @@
       "onClick": {
         "enable": true,
         "mode": ["remove", "repulse"]
-      }
+      },
+      "resize": true
     },
     "modes": {
       "bubble": {
-        "distance": 400,
-        "size": 18,
-        "duration": 3.5,
-        "opacity": 1
-      },
-      "push": {
-        "quantity": 10
-      },
-      "remove": {
-        "quantity": 4
+        "distance": 250,
+        "size": 15,
+        "duration": 2,
+        "opacity": 0.8
       },
       "connect": {
-        "distance": 150,
+        "distance": 120,
         "links": {
           "opacity": 0.5
-        },
-        "radius": 80
+        }
       },
       "repulse": {
-        "distance": 300,
+        "distance": 200,
         "duration": 1
+      },
+      "remove": {
+        "quantity": 2
       }
     }
   },
-  "detectRetina": true
+  "pauseOnBlur": true,
+  "pauseOnOutsideViewport": true
 }

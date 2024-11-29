@@ -6,64 +6,78 @@
     },
     "particles": {
         "number": {
-            "value": 350,
+            "value": 400,
             "density": {
                 "enable": true,
-                "area": 500
+                "area": 800
             }
         },
         "color": {
-            "value": ["#bdd7ff", "#94bfff", "#e8f1ff", "#ffffff"]
+            "value": ["#bdd7ff", "#94bfff", "#e8f1ff", "#ffffff", "#d9e8ff"]
         },
         "shape": {
             "type": ["circle", "polygon", "star", "edge"],
             "options": {
                 "polygon": {
-                    "sides": 6
+                    "sides": 5
                 },
                 "star": {
-                    "sides": 4
+                    "sides": 6,
+                    "innerRadius": 2,
+                    "outerRadius": 5
                 }
             }
         },
         "opacity": {
             "value": {
-                "min": 0.2,
-                "max": 0.7
-            },
-            "random": true,
-            "animation": {
-                "enable": true,
-                "speed": 3,
-                "minimumValue": 0.2,
-                "sync": false
-            }
-        },
-        "size": {
-            "value": {
-                "min": 3,
-                "max": 10
+                "min": 0.1,
+                "max": 0.8
             },
             "random": true,
             "animation": {
                 "enable": true,
                 "speed": 2,
-                "minimumValue": 3,
+                "minimumValue": 0.1,
                 "sync": false
             }
         },
+        "size": {
+            "value": {
+                "min": 2,
+                "max": 12
+            },
+            "random": true,
+            "animation": {
+                "enable": true,
+                "speed": 1.5,
+                "minimumValue": 2,
+                "sync": false
+            }
+        },
+        "links": {
+            "enable": true,
+            "distance": 150,
+            "color": "#94bfff",
+            "opacity": 0.3,
+            "width": 1
+        },
         "move": {
             "enable": true,
-            "speed": 2,
-            "direction": "random",
+            "speed": 1.8,
+            "direction": "none",
             "outModes": {
                 "default": "out"
             },
             "straight": false,
             "trail": {
                 "enable": true,
-                "length": 10,
+                "length": 8,
                 "fillColor": "#f4f8ff"
+            },
+            "attract": {
+                "enable": true,
+                "rotateX": 600,
+                "rotateY": 1200
             }
         }
     },
@@ -71,31 +85,40 @@
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": ["grab", "bubble"]
+                "mode": ["grab", "bubble", "repulse"],
+                "parallax": {
+                    "enable": true,
+                    "smooth": 10,
+                    "force": 60
+                }
             },
             "onClick": {
                 "enable": true,
-                "mode": ["repulse", "add"]
+                "mode": ["push", "remove", "bubble"]
             }
         },
         "modes": {
             "grab": {
-                "distance": 200,
-                "lineLinked": {
+                "distance": 250,
+                "links": {
                     "opacity": 0.8
                 }
             },
             "bubble": {
-                "distance": 200,
-                "size": 20,
-                "duration": 4,
-                "opacity": 0.9
+                "distance": 250,
+                "size": 25,
+                "duration": 3,
+                "opacity": 0.8,
+                "speed": 2
             },
             "repulse": {
-                "distance": 400,
-                "duration": 0.6
+                "distance": 350,
+                "duration": 0.5
             },
-            "add": {
+            "push": {
+                "quantity": 10
+            },
+            "remove": {
                 "quantity": 5
             }
         }
@@ -112,7 +135,7 @@
                 },
                 "particles": {
                     "color": {
-                        "value": ["#bdd7ff", "#ffffff"]
+                        "value": ["#bdd7ff", "#94bfff", "#e8f1ff", "#ffffff"]
                     }
                 }
             }
@@ -123,5 +146,21 @@
         "zIndex": -2
     },
     "smooth": true,
-    "detectRetina": true
+    "detectRetina": true,
+    "fpsLimit": 120,
+    "responsive": [
+        {
+            "maxWidth": 768,
+            "options": {
+                "particles": {
+                    "number": {
+                        "value": 150
+                    },
+                    "move": {
+                        "speed": 1
+                    }
+                }
+            }
+        }
+    ]
 }

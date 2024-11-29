@@ -1,38 +1,73 @@
 "use client";
 
-import React, { Suspense, useEffect } from "react";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import PostHeader from "@/components/PostHeader";
 import PostPagination from "@/components/PostPagination";
 import Comments from "@/components/Comments";
-import { usePathname } from "next/navigation";
-import { MathProvider } from "@/components/MathContext";
+import { cn } from "@/lib/utils";
 
-export function PostLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
+interface PostLayoutProps {
+	children: React.ReactNode;
+}
 
-  // Reset equation numbers when pathname changes
-  useEffect(() => {
-    const mathContext = document.querySelector('[data-math-context]');
-    if (mathContext) {
-      const event = new CustomEvent('reset-equations');
-      mathContext.dispatchEvent(event);
-    }
-  }, [pathname]);
+export function PostLayout({ children }: PostLayoutProps) {
+	return (
+		<ErrorBoundary>
+			<article
+				className={cn(
+					"prose dark:prose-invert max-w-none",
+					"space-y-8",
+					"relative"
+				)}
+			>
+				<ErrorBoundary>
+					<Suspense
+						fallback={
+							<div className="w-full h-48 flex items-center justify-center">
+								<LoadingSpinner size="lg" />
+							</div>
+						}
+					>
+						<PostHeader />
+					</Suspense>
+				</ErrorBoundary>
 
-  return (
-    <article className="space-y-8 max-w-none w-full overflow-x-hidden">
-      <PostHeader />
-      <hr className="border-border-muted" />
-      <MathProvider>
-        <div data-math-context>
-          {children}
-        </div>
-      </MathProvider>
-      <hr className="border-border-muted" />
-      <PostPagination />
-      <hr className="border-border-muted" />
-      <Comments />
-    </article>
-  );
+				<hr className={cn("my-8", "border-border", "opacity-50")} />
+
+				<ErrorBoundary>
+					<div className={cn("prose-content", "relative z-10")}>{children}</div>
+				</ErrorBoundary>
+
+				<hr className={cn("my-8", "border-border", "opacity-50")} />
+
+				<ErrorBoundary>
+					<Suspense
+						fallback={
+							<div className="w-full h-24 flex items-center justify-center">
+								<LoadingSpinner />
+							</div>
+						}
+					>
+						<PostPagination />
+					</Suspense>
+				</ErrorBoundary>
+
+				<hr className={cn("my-8", "border-border", "opacity-50")} />
+
+				<ErrorBoundary>
+					<Suspense
+						fallback={
+							<div className="w-full h-24 flex items-center justify-center">
+								<LoadingSpinner />
+							</div>
+						}
+					>
+						<Comments />
+					</Suspense>
+				</ErrorBoundary>
+			</article>
+		</ErrorBoundary>
+	);
 }

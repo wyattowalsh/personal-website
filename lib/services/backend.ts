@@ -193,7 +193,7 @@ class BackendService {
     }
   }
 
-  private async processPost(file: string, slug: string, gitData: any): Promise<PostMetadata> {
+  private async processPost(file: string, gitData: any): Promise<PostMetadata> {
     try {
       const fs = await ensureFs();
       const content = await fs.readFile(file, 'utf-8');
@@ -217,6 +217,14 @@ class BackendService {
       const updated = normalizeDate(data.updated) ?? 
                      normalizeDate(gitData.lastModified) ?? 
                      created;
+
+      // Compute the slug as the relative path from 'app/blog/posts', without extension
+      const relativePath = path.relative(path.join(process.cwd(), 'app/blog'), file);
+      const slug = relativePath
+        .replace(/^posts[/\\]/, '') // Remove leading "posts/" or "posts\"
+        .replace(/\\/g, '/')        // Normalize path separators
+        .replace(/\/page\.mdx$/, '') // Remove "/page.mdx" suffix
+        .replace(/\.mdx$/, '');     // Remove extension
 
       const metadata: PostMetadata = {
         title: String(data.title || slug),
@@ -243,9 +251,9 @@ class BackendService {
       logger.info('Starting post processing...');
       
       // Use globAsync instead of glob
-      const files = await globAsync('**/page.mdx', {
+      const files = await globAsync('app/blog/posts/**/*.mdx', {
         absolute: true,
-        cwd: path.join(process.cwd(), 'app/blog/posts'),
+        cwd: process.cwd(),
       });
 
       if (!Array.isArray(files)) {
@@ -259,14 +267,8 @@ class BackendService {
         return Promise.race([
           (async () => {
             try {
-              const slug = path
-                .dirname(file)
-                .split('/posts/')[1]
-                .split('/page')[0];
-              
-              logger.info(`Processing post: ${slug}`);
               const gitData = await getGitFileData(file);
-              return await this.processPost(file, slug, gitData);
+              return await this.processPost(file, gitData);
             } catch (error) {
               logger.error(`Failed to process file ${file}:`, error as Error);
               return null;

@@ -43,35 +43,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
+        background: withOpacityValue('--background'),
+        foreground: withOpacityValue('--foreground'),
         primary: {
-          DEFAULT: 'rgb(var(--primary-rgb))',
-          foreground: 'var(--primary-foreground)',
+          DEFAULT: withOpacityValue('--primary'),
+          foreground: withOpacityValue('--primary-foreground'),
           20: 'rgb(var(--primary-rgb) / 0.2)',
           30: 'rgb(var(--primary-rgb) / 0.3)',
         },
-        'primary-foreground': 'var(--primary-foreground)',
-        secondary: 'var(--secondary)',
-        'secondary-foreground': 'var(--secondary-foreground)',
+        'primary-foreground': withOpacityValue('--primary-foreground'),
+        secondary: withOpacityValue('--secondary'),
+        'secondary-foreground': withOpacityValue('--secondary-foreground'),
         accent: {
-          DEFAULT: 'var(--accent)',
-          foreground: 'var(--accent-foreground)',
+          DEFAULT: withOpacityValue('--accent'),
+          foreground: withOpacityValue('--accent-foreground'),
           '20': 'rgb(var(--accent-rgb) / 0.2)',
           '40': 'rgb(var(--accent-rgb) / 0.4)',
         },
-        'accent-foreground': 'var(--accent-foreground)',
-        destructive: 'var(--destructive)',
-        'destructive-foreground': 'var(--destructive-foreground)',
-        muted: 'var(--muted)',
-        'muted-foreground': 'var(--muted-foreground)',
-        card: 'var(--card)',
-        'card-foreground': 'var(--card-foreground)',
-        popover: 'var(--popover)',
-        'popover-foreground': 'var(--popover-foreground)',
-        border: 'var(--border)',
-        input: 'var(--input)',
-        ring: 'var(--ring)',
+        'accent-foreground': withOpacityValue('--accent-foreground'),
+        destructive: withOpacityValue('--destructive'),
+        'destructive-foreground': withOpacityValue('--destructive-foreground'),
+        muted: withOpacityValue('--muted'),
+        'muted-foreground': withOpacityValue('--muted-foreground'),
+        card: withOpacityValue('--card'),
+        'card-foreground': withOpacityValue('--card-foreground'),
+        popover: withOpacityValue('--popover'),
+        'popover-foreground': withOpacityValue('--popover-foreground'),
+        border: withOpacityValue('--border'),
+        input: withOpacityValue('--input'),
+        ring: withOpacityValue('--ring'),
         'border-muted': 'var(--border-muted)',
         'math-bg': 'rgb(var(--math-bg) / <alpha-value>)',
         'math-bg-transparent': 'rgb(var(--math-bg-transparent) / <alpha-value>)',
@@ -109,9 +109,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
-        display: ['var(--font-display)', 'sans-serif'],
-        mono: ['var(--font-code)', 'monospace'],
+        sans: ['Montserrat', 'sans-serif'],
+        display: ['Oswald', 'sans-serif'],
+        mono: ['Fira Code', 'monospace'],
       },
       boxShadow: {
         glow: 'var(--shadow-glow)',
@@ -123,6 +123,7 @@ const config: Config = {
         'post-header-hover': 'var(--post-header-hover-shadow)',
         'back-link': 'var(--back-link-shadow)',
         'back-link-hover': 'var(--back-link-hover-shadow)',
+        neon: "0 0 10px var(--neon-color)",
       },
       borderRadius: {
         xl: 'var(--radius)',
@@ -135,6 +136,8 @@ const config: Config = {
         'header-overlay': 'var(--gradient-header-overlay)',
         'gradient-border': 'linear-gradient(90deg, #4facfe 0%, #00f2fe 100%)',
         'pagination-gradient': 'linear-gradient(135deg, var(--card-gradient-from), var(--card-gradient-to))',
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
       animation: {
         fadeIn: 'fadeIn 1s forwards',
@@ -157,6 +160,19 @@ const config: Config = {
         'gradient-xy': 'gradient-xy 15s ease infinite',
         'subtitle-fade': 'subtitleFade 0.5s ease-out forwards',
         'subtitle-slide': 'subtitleSlide 0.5s ease-out forwards',
+        'spin-slow': 'spin 10s linear infinite',
+        'pulse-fast': 'pulse 1s linear infinite',
+        'fade-in-up': 'fadeInUp 0.5s ease-out',
+        floating: 'floating 6s ease-in-out infinite', // Add this line
+        cursor: "cursorAnimation 0.5s infinite alternate",
+        'float-orb': 'floatOrb 20s ease-in-out infinite',
+        'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+        'gradient-shift': 'gradientShift 8s ease infinite',
+        'sparkle': 'sparkle 1.5s ease-in-out infinite',
+        'ripple': 'ripple 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+        'float-delayed': 'float 6s ease-in-out infinite 0.5s',
+        'glitch-flash': 'glitch-flash 3.5s ease infinite',
+        'morph-gradient': 'morph-gradient 10s ease infinite',
       },
       keyframes: {
         fadeIn: {
@@ -290,6 +306,56 @@ const config: Config = {
           '0%': { transform: 'translateY(100%)' },
           '100%': { transform: 'translateY(0)' },
         },
+        fadeInUp: {
+          '0%': { opacity: "0", transform: 'translateY(20px)' },
+          '100%': { opacity: "1", transform: 'translateY(0)' },
+        },
+        floating: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        cursorAnimation: {
+          "0%": { transform: "translate(-50%, -50%) scale(1)" },
+          "100%": { transform: "translate(-50%, -50%) scale(1.5)" },
+        },
+        floatOrb: {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(30px, -30px) scale(1.1)' }
+        },
+        pulseGlow: {
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '0.8' }
+        },
+        gradientShift: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' }
+        },
+        sparkle: {
+          '0%, 100%': { opacity: '0', transform: 'scale(0)' },
+          '50%': { opacity: '1', transform: 'scale(1)' },
+        },
+        ripple: {
+          '0%': { transform: 'scale(0)', opacity: '1' },
+          '100%': { transform: 'scale(4)', opacity: '0' },
+        },
+        'glitch-flash': {
+          '0%, 100%': { opacity: '1' },
+          '33%': { opacity: '0.8' },
+          '66%': { opacity: '0.9' },
+        },
+        'morph-gradient': {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          }
+        }
+      },
+      backdropBlur: {
+        xs: "2px",
       },
       transitionDuration: {
         '700': '700ms',

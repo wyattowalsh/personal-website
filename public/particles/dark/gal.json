@@ -1,92 +1,129 @@
 {
-  "background": {
-    "color": {
-      "value": "#101010"
+    "background": {
+        "color": {
+            "value": "#0f0f0f"
+        },
+        "gradient": {
+            "type": "radial",
+            "colors": [
+                { "value": "#0f0f0f" },
+                { "value": "#1a1a1a" },
+                { "value": "#2a2a2a" }
+            ]
+        },
+        "opacity": 1
     },
-    "gradient": {
-      "type": "radial",
-      "colors": [
-        { "value": "#101010" },
-        { "value": "#1a1a1a" }
-      ]
-    }
-  },
-  "particles": {
-    "number": {
-      "value": 200,
-      "density": {
-        "enable": true,
-        "area": 700
-      }
-    },
-    "color": {
-      "value": ["#ffffff", "#82ccdd", "#60a3bc", "#78e08f"],
-      "animation": {
-        "enable": true,
-        "speed": 10,
-        "sync": false
-      }
-    },
-    "shape": {
-      "type": ["circle", "polygon"],
-      "polygon": {
-        "sides": 8
-      }
-    },
-    "opacity": {
-      "value": {
-        "min": 0.3,
-        "max": 0.6
-      },
-      "random": true,
-      "animation": {
-        "enable": true,
-        "speed": 1,
-        "minimumValue": 0.1,
-        "sync": false
-      }
-    },
-    "size": {
-      "value": {
-        "min": 1,
-        "max": 7
-      },
-      "random": true
-    },
-    "move": {
-      "enable": true,
-      "speed": 1.5,
-      "direction": "none",
-      "outModes": {
-        "default": "out"
-      }
-    }
-  },
-  "interactivity": {
-    "events": {
-      "onHover": {
-        "enable": true,
-        "mode": ["grab", "bubble"]
-      },
-      "onClick": {
-        "enable": true,
-        "mode": ["push", "repulse"]
-      }
-    },
-    "modes": {
-      "grab": {
-        "distance": 200,
+    "particles": {
+        "number": {
+            "value": 120,
+            "density": {
+                "enable": true,
+                "area": 800
+            }
+        },
+        "color": {
+            "value": ["#ffffff", "#82ccdd", "#ff9ff3", "#ffbe76", "#6c5ce7", "#00cec9", "#fab1a0", "#fd79a8"],
+            "animation": {
+                "enable": true,
+                "speed": 8,
+                "sync": false
+            }
+        },
+        "shape": {
+            "type": ["circle", "polygon", "star"],
+            "polygon": {
+                "sides": 6
+            },
+            "stroke": {
+                "width": 0.2,
+                "color": "#1e1e1e"
+            }
+        },
+        "opacity": {
+            "value": {
+                "min": 0.3,
+                "max": 0.9
+            },
+            "random": true,
+            "animation": {
+                "enable": true,
+                "speed": 1.2,
+                "minimumValue": 0.3,
+                "sync": false
+            }
+        },
+        "size": {
+            "value": {
+                "min": 1,
+                "max": 8
+            },
+            "random": true,
+            "animation": {
+                "enable": true,
+                "speed": 1,
+                "minimumValue": 1,
+                "sync": false
+            }
+        },
         "links": {
-          "opacity": 0.7
+            "enable": true,
+            "distance": 150,
+            "color": "#ffffff",
+            "opacity": 0.3,
+            "width": 0.7,
+            "shadow": {
+                "enable": false
+            }
+        },
+        "move": {
+            "enable": true,
+            "speed": 1,
+            "direction": "none",
+            "outModes": {
+                "default": "out"
+            },
+            "random": true,
+            "straight": false,
+            "attract": {
+                "enable": true,
+                "rotateX": 800,
+                "rotateY": 1200
+            }
         }
-      },
-      "bubble": {
-        "distance": 250,
-        "size": 10,
-        "opacity": 0.8
-      }
-    }
-  },
-  "detectRetina": true,
-  "fpsLimit": 100
+    },
+    "interactivity": {
+        "events": {
+            "onHover": {
+                "enable": true,
+                "mode": ["grab", "bubble"]
+            },
+            "onClick": {
+                "enable": true,
+                "mode": ["push"]
+            },
+            "resize": true
+        },
+        "modes": {
+            "grab": {
+                "distance": 200,
+                "links": {
+                    "opacity": 0.8,
+                    "color": "#ffffff"
+                }
+            },
+            "bubble": {
+                "distance": 250,
+                "size": 10,
+                "duration": 2,
+                "opacity": 1,
+                "color": "#6c5ce7"
+            },
+            "push": {
+                "quantity": 3
+            }
+        }
+    },
+    "detectRetina": true,
+    "fpsLimit": 60,
+    "smooth": true
 }

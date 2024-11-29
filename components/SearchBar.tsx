@@ -26,39 +26,45 @@ import { motion } from "framer-motion";
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { backend } from '@/lib/services/backend';
-import type { PostMetadata } from '@/lib/types';
+import { backend } from "@/lib/services/backend";
+import type { PostMetadata } from "@/lib/types";
+import type { Route } from "next";
 
 // Update interface to extend PostMetadata
 interface Post extends PostMetadata {
-  // Add any additional fields needed for the UI
-  sortings?: {
-    byDate: {
-      asc: string[];
-      desc: string[];
-    };
-    byTitle: {
-      asc: string[];
-      desc: string[];
-    };
-  };
+	// Add any additional fields needed for the UI
+	sortings?: {
+		byDate: {
+			asc: string[];
+			desc: string[];
+		};
+		byTitle: {
+			asc: string[];
+			desc: string[];
+		};
+	};
 }
 
 interface SearchBarProps {
-  posts: PostMetadata[];
-  tags: string[];
+	posts: PostMetadata[];
+	tags: string[];
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 	// Filter out invalid posts
-	const validPosts = useMemo(() => 
-		posts.filter(post => post.title && post.created && post.tags)
-	, [posts]);
+	const validPosts = useMemo(
+		() => posts.filter((post) => post.title && post.created && post.tags),
+		[posts]
+	);
 
 	// Sort tags alphabetically
-	const tags = useMemo(() => 
-		[...unsortedTags].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-	, [unsortedTags]);
+	const tags = useMemo(
+		() =>
+			[...unsortedTags].sort((a, b) =>
+				a.toLowerCase().localeCompare(b.toLowerCase())
+			),
+		[unsortedTags]
+	);
 
 	// Ensure stable initial states
 	const [mounted, setMounted] = useState(false);
@@ -128,7 +134,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 			}
 			// Default to date sorting
 			return (
-				(new Date(b.created).getTime() - new Date(a.created).getTime()) * modifier
+				(new Date(b.created).getTime() - new Date(a.created).getTime()) *
+				modifier
 			);
 		});
 
@@ -152,7 +159,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 	}
 
 	return (
-		<div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
+		<div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 pt-0 mt-0">
 			{/* Search Input Section - Enhanced responsiveness */}
 			<div className="relative">
 				<div className="relative group">
@@ -225,14 +232,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 						</motion.div>
 					))}
 
-						<Link href="/blog/tags">
-							<Badge
-								variant="secondary"
-								className="bg-secondary hover:bg-secondary/80 text-secondary-foreground cursor-pointer"
-							>
-								all tags
-							</Badge>
-						</Link>
+					<Link href="/blog/tags">
+						<Badge
+							variant="secondary"
+							className="bg-secondary hover:bg-secondary/80 text-secondary-foreground cursor-pointer"
+						>
+							all tags
+						</Badge>
+					</Link>
 				</div>
 
 				{/* Sort Controls - Responsive layout */}
@@ -315,17 +322,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 					results.length === 1 ? (
 						// Single result - centered
 						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
-								<Link 
-									href={{
-										pathname: '/blog/posts/[slug]',
-										query: { slug: results[0].slug }
-									}}
-								>
-									<PostCard 
-										post={results[0]}
-										className="h-full" 
-									/>
-								</Link>
+							<Link href={`/blog/${results[0].slug}` as Route}>
+								<PostCard post={results[0]} className="h-full" />
+							</Link>
 						</div>
 					) : (
 						// Multiple results with staggered animation
@@ -341,18 +340,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 									damping: 15,
 									delay: Math.min(idx * 0.1, 0.8),
 								}}
-								>
-									<Link 
-										href={{
-											pathname: '/blog/posts/[slug]',
-											query: { slug: post.slug }
-										}}
-									>
-										<PostCard 
-											post={post}
-											className="h-full" 
-										/>
-									</Link>
+							>
+								<Link href={`/blog/${post.slug}` as Route}>
+									<PostCard post={post} className="h-full" />
+								</Link>
 							</motion.div>
 						))
 					)

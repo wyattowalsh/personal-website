@@ -1,32 +1,44 @@
-import { backend } from '@/lib/services/backend';
-import { ApiError } from '@/lib/api';
-import { schemas } from '@/lib/api/middleware';
+// app/blog/posts/[slug]/page.tsx
+import { backend } from '@/lib/services/backend'
+import { PostLayout } from '@/components/PostLayout'
+import { notFound } from 'next/navigation'
 
-type Params = Promise<{ slug: string }>;
+export default async function PostsLayout({ 
+  params: { slug },
+  children 
+}: {
+  params: { slug: string }
+  children: React.ReactNode
+}) {
+  try {
+    // Check if post exists before rendering
+    const post = await backend.getPost(slug)
+    if (!post) notFound()
+
+    // Pass the post data to PostLayout 
+    return <PostLayout post={post}>{children}</PostLayout>
+  } catch (error) {
+    notFound()
+  }
+}
+
+// app/api/blog/posts/[slug]/route.ts
+import { backend } from '@/lib/services/backend'
+import { NextResponse } from 'next/server'
 
 export async function GET(
   request: Request,
-  { params }: { params: Params }
-): Promise<Response> {
-  const { slug } = await params;
-  
-  return schemas.slug.parseAsync({ slug })
-    .then(() => backend.getPost(slug))
-    .then(post => {
-      if (!post) {
-        throw new ApiError(404, `Post ${slug} not found`);
-      }
-      
-      return Response.json(post, {
-        headers: {
-          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400'
-        }
-      });
-    })
-    .catch(error => {
-      if (error instanceof ApiError) {
-        return error.toResponse();
-      }
-      return new ApiError(500, 'Internal Server Error', { error }).toResponse();
-    });
+  { params }: { params: { slug: string } }
+) {
+  try {
+    const post = await backend.getPost(params.slug)
+    
+    if (!post) {
+      return new NextResponse('Post not found', { status: 404 })
+    }
+
+    return NextResponse.json(post)
+  } catch (error) {
+    return new NextResponse('Internal Server Error', { status: 500 })
+  }
 }

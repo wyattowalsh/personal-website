@@ -1,91 +1,116 @@
 {
+  "autoPlay": true,
   "background": {
     "color": {
-      "value": "#1a1a1a"
+      "value": "#0d1117"
     },
     "opacity": 0.95
   },
+  "fullScreen": {
+    "enable": false
+  },
+  "detectRetina": true,
+  "fpsLimit": 60,
   "particles": {
     "number": {
-      "value": 400,
+      "value": 300,
       "density": {
         "enable": true,
-        "area": 1600
+        "area": 1000
       }
     },
     "color": {
-      "value": ["#00ff00", "#00cc00", "#007700"]
+      "value": ["#00ff00", "#00cc00", "#007700", "#33ff33", "#66ff66"]
     },
     "shape": {
       "type": "char",
       "character": {
         "value": ["✦", "✪", "⚙", "☯", "✧", "★", "♛"],
-        "style": "normal",
+        "font": "Verdana",
+        "style": "italic",
         "weight": "bold",
         "fill": true
       }
     },
     "opacity": {
-      "value": 0.8,
-      "random": true,
+      "value": {
+        "min": 0.3,
+        "max": 0.8
+      },
       "animation": {
         "enable": true,
-        "speed": 5,
-        "minimumValue": 0.3,
+        "speed": 1.5,
+        "minimumValue": 0.2,
         "sync": false
       }
     },
     "size": {
       "value": {
-        "min": 8,
-        "max": 14
+        "min": 5,
+        "max": 10
       },
       "animation": {
         "enable": true,
-        "speed": 1,
-        "minimumValue": 6
+        "speed": 2,
+        "minimumValue": 3,
+        "sync": false
       }
     },
     "move": {
       "enable": true,
-      "speed": 5,
+      "speed": 3,
       "direction": "top",
       "outModes": {
         "default": "out"
       },
       "gravity": {
         "enable": true,
-        "acceleration": 7
+        "acceleration": 5
+      },
+      "trail": {
+        "enable": true,
+        "length": 5,
+        "fill": {
+          "color": "#0d1117"
+        }
       }
     },
     "zIndex": {
       "value": {
         "min": 0,
-        "max": 60
+        "max": 100
       },
-      "opacityRate": 0.95
+      "opacityRate": 0.5
     }
   },
   "interactivity": {
     "events": {
       "onHover": {
         "enable": true,
-        "mode": "trail"
+        "mode": ["grab", "trail"]
       },
       "onClick": {
         "enable": true,
-        "mode": "pause"
-      }
+        "mode": ["push"]
+      },
+      "resize": true
     },
     "modes": {
       "trail": {
-        "delay": 0.005,
-        "quantity": 8
+        "delay": 0.01,
+        "quantity": 3
       },
-      "pause": {}
+      "grab": {
+        "distance": 150,
+        "links": {
+          "opacity": 0.5
+        }
+      },
+      "push": {
+        "quantity": 4
+      }
     }
   },
-  "detectRetina": true,
   "pauseOnBlur": true,
   "pauseOnOutsideViewport": true
 }

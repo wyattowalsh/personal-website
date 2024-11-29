@@ -7,21 +7,21 @@
         "image": "/asfalt-dark.webp",
         "position": "center",
         "repeat": "repeat",
-        "size": "contain"
+        "size": "cover"
     },
     "particles": {
         "number": {
-            "value": 120,
+            "value": 150,
             "density": {
                 "enable": true,
-                "area": 900
+                "area": 1000
             }
         },
         "color": {
             "value": ["#6a9fb5", "#4db6ac", "#00796b", "#ade8f4"]
         },
         "shape": {
-            "type": ["circle", "polygon", "edge", "star"],
+            "type": ["circle", "polygon", "star"],
             "polygon": {
                 "sides": 6
             },
@@ -30,46 +30,62 @@
             }
         },
         "opacity": {
-            "value": 0.9,
+            "value": {
+                "min": 0.3,
+                "max": 0.9
+            },
             "random": true,
             "animation": {
                 "enable": true,
-                "speed": 2.5,
+                "speed": 2,
                 "minimumValue": 0.3,
                 "sync": false
             }
         },
         "size": {
             "value": {
-                "min": 5,
-                "max": 20
+                "min": 6,
+                "max": 15
             },
+            "random": true,
             "animation": {
                 "enable": true,
-                "speed": 4,
-                "minimumValue": 8,
+                "speed": 3,
+                "minimumValue": 5,
                 "sync": false
             }
         },
         "move": {
             "enable": true,
-            "speed": 4,
+            "speed": 2,
             "direction": "none",
             "outModes": {
-                "default": "destroy"
+                "default": "bounce"
             },
             "trail": {
                 "enable": true,
-                "length": 5,
-                "fillColor": "#fafafa"
+                "length": 10,
+                "fillColor": "#ffffff"
             }
+        },
+        "links": {
+            "enable": true,
+            "distance": 150,
+            "color": "#4db6ac",
+            "opacity": 0.5,
+            "width": 1.5
         }
     },
     "interactivity": {
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": ["bubble", "repulse", "connect"]
+                "mode": ["bubble", "repulse", "connect"],
+                "parallax": {
+                    "enable": true,
+                    "force": 60,
+                    "smooth": 10
+                }
             },
             "onClick": {
                 "enable": true,
@@ -79,29 +95,31 @@
         "modes": {
             "bubble": {
                 "distance": 200,
-                "size": 30,
-                "duration": 2,
-                "opacity": 0.7
+                "size": 25,
+                "duration": 3,
+                "opacity": 0.8
             },
             "repulse": {
-                "distance": 300,
-                "duration": 1
+                "distance": 250,
+                "duration": 1.5
             },
             "connect": {
-                "distance": 100,
+                "distance": 120,
                 "links": {
-                    "opacity": 0.8
+                    "opacity": 0.9
                 }
             },
             "push": {
-                "quantity": 7
+                "quantity": 5
             },
             "remove": {
-                "quantity": 3
+                "quantity": 2
             }
         }
     },
     "detectRetina": true,
+    "fpsLimit": 60,
     "pauseOnBlur": true,
-    "smooth": true
+    "smooth": true,
+    "zLayers": 100
 }

@@ -65,8 +65,8 @@ export default function HomePage() {
       variants={pageVariants}
       className={cn(
         "relative min-h-screen overflow-hidden",
-        "bg-gradient-to-b from-background via-background/95 to-background/90",
-        "dark:from-background dark:via-background/95 dark:to-background/90",
+        "bg-gradient-to-b from-background/50 via-background/50 to-background/50", // Modified opacity
+        "dark:from-background/50 dark:via-background/50 dark:to-background/50",
         styles.mainContainer
       )}
     >
@@ -80,7 +80,7 @@ export default function HomePage() {
       <motion.div
         ref={ref}
         className={cn(
-          "relative z-10 flex flex-col min-h-screen",
+          "relative z-10 flex flex-col justify-center min-h-screen", // Add 'justify-center'
           "px-4 sm:px-6 lg:px-8",
           "py-12 sm:py-16 lg:py-20",
           "max-w-7xl mx-auto w-full",
@@ -88,13 +88,9 @@ export default function HomePage() {
         )}
       >
         <AnimatePresence mode="wait">
-          <motion.div
-            className="flex flex-col items-center justify-center space-y-12"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: { opacity: 1 }
-            }}
-          >
+        <motion.div
+          className="flex flex-col items-center justify-center space-y-8"
+        >
             <motion.div 
               className={cn(styles.imageContainer, "relative group")}
               variants={imageContainerVariants}

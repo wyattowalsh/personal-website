@@ -2,7 +2,7 @@ import { Config, ConfigSchema } from '../types'
 
 const defaultConfig: Config = {
   site: {
-    title: "Wyatt Walsh's Blog",
+    title: "Wyatt Walsh",
     description: 'Articles about software engineering, data science, and technology',
     url: process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev',
     author: {
