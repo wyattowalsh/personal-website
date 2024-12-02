@@ -1,6 +1,7 @@
 // app/blog/layout.tsx
 import React from "react";
 import BlogTitle from "@/components/BlogTitle";
+import BlogFooter from "@/components/BlogFooter";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -29,6 +30,7 @@ export default function BlogRootLayout({
       <main className="container mx-auto">
         {children}
       </main>
+      <BlogFooter />
     </div>
   );
 }

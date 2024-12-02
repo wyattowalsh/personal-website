@@ -9,7 +9,7 @@ created: "2021-01-15"
 
 Hey there! 👋
 
-Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](/blog/regularized-linear-regression-models-pt1), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](/blog/regularized-linear-regression-models-pt2), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
+Welcome to the final part of a three-part deep-dive on **regularized linear regression modeling**! In [**part one**](./regularized-linear-regression-models-pt1), linear modeling was established with the derivation of OLS showing how to solve for model coefficients to make predictions of the response given new feature data. Next, in [**part two**](./regularized-linear-regression-models-pt2), **_overfitting_** issues of the OLS model were discussed and **_Ridge Regression_** was presented as a technique to help reduce overfitting through regularization. Building off the same concept as Ridge Regression, **_the Lasso_** and **_the Elastic Net_** are now presented. The series concludes with general considerations of use cases for the techniques presented.
 
 The models and included implementations were tested on a wine quality prediction dataset of which the code and results can be viewed at the project repository [**here**](http://github.com/wyattowalsh/regularized-linear-regression-deep-dive)**.**
 
@@ -17,7 +17,7 @@ The models and included implementations were tested on a wine quality prediction
 
 ## The Lasso for Regression
 
-The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function (<a href="#equation-7">Equation #7</a>), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
+The Lasso, or **_Least Absolute Shrinkage and Selection Operator_**, includes the addition of an **_L₁_** penalty to the OLS loss function (<a href="#eq-7">Equation #7</a>), bringing selective model parameters to zero for a large enough value of an associated tuning parameter, **_λ_**. In other words, **_the Lasso_** **performs automated feature selection** producing a vector of model coefficients with sparsity (amount of elements that are zero) varying on the magnitude of a tuning parameter.
 
 **_The Lasso_** loss function can be formalized as:
 
@@ -69,7 +69,7 @@ $$
 
 where **_rᵢ_** is the current model residual for all samples, **_n_**.
 
-When the number of samples is much greater than the number of features (**_n_** >> **_p_**), further efficiency improvements can be derived by using **covariance updates**. For these updates, the first term of the naive updates equation above (<a href="#equation-6">Eq. #6</a>) is replaced as shown by:
+When the number of samples is much greater than the number of features (**_n_** >> **_p_**), further efficiency improvements can be derived by using **covariance updates**. For these updates, the first term of the naive updates equation above (<a href="#eq-6">Eq. #6</a>) is replaced as shown by:
 
 $$
 \sum_{i=1}^{n} x_{i,j} r_i = \langle x_j, y \rangle - \sum_{k: |\beta_k| > 0} \langle x_j, x_k \rangle \beta_k
@@ -123,7 +123,7 @@ $$
 \beta_j = \frac{S(\beta_j^*, \lambda \alpha)}{1 + \lambda (1 - \alpha)}
 $$
 
-The soft-thresholding operator is the same operator applied in **_the Lasso_** update (<a href="#equation-5">Eq. #5</a>):
+The soft-thresholding operator is the same operator applied in **_the Lasso_** update (<a href="#eq-5">Eq. #5</a>):
 
 $$
 sign(\beta_j^*)(||\beta_j^*|| - \lambda\alpha) + 
@@ -157,6 +157,6 @@ I hope that these posts were informative and helpful for you to learn more about
 
 See [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
 
-If you are just now beginning the series, make sure to check out [**part one**](/blog/regularized-linear-regression-models-pt1) and [**part two**](/blog/regularized-linear-regression-models-pt2)!
+If you are just now beginning the series, make sure to check out [**part one**](./regularized-linear-regression-models-pt1) and [**part two**](./regularized-linear-regression-models-pt2)!
 
 Please leave a comment if you would like! I am always trying to improve my posts (logically, syntactically, or otherwise) and am happy to discuss anything related! 👋

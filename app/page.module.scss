@@ -37,88 +37,89 @@
 
 .enhanced-title-landing {
   // Base styles
-  @apply relative text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl;
-  @apply font-bold tracking-tight;
-  @apply select-none cursor-default;
+  @apply relative font-extrabold tracking-tight leading-none select-none cursor-default text-center;
   
-  // Custom gradient text with enhanced colors
+  // Responsive font sizes using clamp
+  font-size: clamp(2.5rem, 6vw, 9rem);
+  
+  // Advanced gradient text effect with CSS variables
   background: linear-gradient(
-    135deg,
-    #60a5fa 0%,    // Blue
-    #3b82f6 25%,   // Darker blue
-    #8b5cf6 50%,   // Purple
-    #6366f1 75%,   // Indigo
-    #60a5fa 100%   // Back to blue
+    90deg,
+    var(--title-gradient-start),
+    var(--title-gradient-end)
   );
-  background-size: 400% 400%;
+  background-size: 200% 200%;
+  background-clip: text;
   -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: titleGradient 8s ease infinite;
+  color: transparent;
+  animation: gradientAnimation 10s ease infinite;
 
-  // Advanced glow effect
-  filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.2));
-  
-  // Responsive letter spacing
-  letter-spacing: -0.02em;
-  @screen sm { letter-spacing: -0.03em; }
-  @screen lg { letter-spacing: -0.04em; }
-
-  // Dark mode specific styles
-  .dark & {
-    background: linear-gradient(
-      135deg,
-      #93c5fd 0%,    // Lighter blue
-      #60a5fa 25%,   // Blue
-      #a78bfa 50%,   // Light purple
-      #818cf8 75%,   // Light indigo
-      #93c5fd 100%   // Back to lighter blue
-    );
-    background-size: 400% 400%;
-    filter: drop-shadow(0 0 12px rgba(147, 197, 253, 0.3));
-  }
+  // 3D text shadow and filters
+  filter: drop-shadow(0 0 10px var(--title-shadow));
 
   // Hover effects
   &:hover {
     animation-play-state: paused;
-    
-    &::before {
-      opacity: 1;
-      transform: translateY(0) scale(1.05);
-    }
+    transform: perspective(600px) rotateY(15deg) rotateX(5deg) scale(1.05);
+    filter: brightness(1.2) drop-shadow(0 0 20px var(--title-shadow));
   }
 
-  // Pseudo-element for enhanced glow
-  &::before {
-    content: attr(data-text);
-    position: absolute;
-    inset: 0;
-    background: inherit;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    opacity: 0.5;
-    filter: blur(24px);
-    transform: translateY(2px) scale(1);
-    transition: all 0.5s ease;
-    z-index: -1;
+  // Dark mode styles via global class
+  :global(.dark) & {
+    background: linear-gradient(
+      90deg,
+      var(--title-gradient-start-dark),
+      var(--title-gradient-end-dark)
+    );
   }
+}
 
-  // Screen size specific enhancements
-  @screen md {
-    transform-style: preserve-3d;
-    perspective: 1000px;
-
-    &:hover {
-      transform: rotateX(5deg);
-    }
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
   }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(360deg);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(720deg);
+  }
+}
 
-  // Enhanced mobile experience
-  @media (hover: none) {
-    animation: titleGradientMobile 12s linear infinite;
-    
-    &::before {
-      animation: titleGlowMobile 4s ease-in-out infinite;
-    }
+@keyframes solarpunkFlow {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(15deg) brightness(1.1);
+  }
+}
+
+@keyframes ambientPulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+// Improved gradient animation
+@keyframes titleGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(15deg) brightness(1.1);
   }
 }
 
@@ -152,6 +153,27 @@
   50% {
     opacity: 0.6;
     transform: translateY(1px) scale(1.02);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }
 
@@ -464,3 +486,61 @@ html.dark .enhanced-animated-text {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+// Export variables using a local class
+.root {
+  :global(:root) {
+    --landing-title-gradient-light: #{variables.$landing-title-gradient-light};
+    --landing-title-gradient-dark: #{variables.$landing-title-gradient-dark};
+  }
+}
+
+// ...existing code...
+
+.enhancedTitleLanding {
+  position: relative;
+  background-size: 300% 300%;
+  background-image: linear-gradient(
+    60deg,
+    #3b82f6 0%,    // blue-500
+    #8b5cf6 33%,   // purple-500
+    #ec4899 66%,   // pink-500
+    #3b82f6 100%   // back to blue-500
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  
+  // Enhanced gradient animation
+  animation: titleGradient 8s ease infinite;
+  
+  // Simpler hover without perspective
+  &:hover {
+    animation-play-state: paused;
+    filter: brightness(1.2);
+  }
+
+  // Dark mode adjustments
+  :global(.dark) & {
+    background-image: linear-gradient(
+      60deg,
+      #60a5fa 0%,    // blue-400
+      #a78bfa 33%,   // purple-400
+      #f472b6 66%,   // pink-400
+      #60a5fa 100%   // back to blue-400
+    );
+  }
+}
+
+@keyframes titleGradient {
+  0%, 100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg) brightness(1);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(15deg) brightness(1.1);
+  }
+}
+
+// ...rest of existing code...

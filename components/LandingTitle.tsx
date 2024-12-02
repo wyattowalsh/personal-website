@@ -77,14 +77,14 @@ export default function LandingTitle() {
 
   return (
     <motion.div
-	ref={ref}
-	style={{ opacity, scale }}
-	className={cn(
-		// Base styles
-		"relative z-10",
-		// Responsive padding (further reduced)
-		"py-2 sm:py-4 md:py-6 lg:py-8",  // Reduced from py-4/6/8/12
-   		"px-4 sm:px-6 md:px-8 lg:px-10",
+      ref={ref}
+      style={{ opacity, scale }}
+      className={cn(
+        "relative z-10",
+        // Reduced padding
+        "py-1 sm:py-2 md:py-4 lg:py-6", // Further reduced
+        "px-2 sm:px-4 md:px-6 lg:px-8",
+        // Base styles
         "flex flex-col items-center",
         // Theme-aware background
         "bg-gradient-to-br",
@@ -101,39 +101,47 @@ export default function LandingTitle() {
         "transition-colors duration-300"
       )}
     >
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn(styles['enhanced-title-landing'])}
-        data-text="Wyatt Walsh"
+      <h1
+        className={cn(
+          // Base styles
+          "relative font-extrabold tracking-tight leading-none select-none cursor-default text-center",
+          // Adjusted responsive sizes
+          "text-4xl sm:text-5xl md:text-6xl lg:text-7xl",
+          // Enhanced gradient effect
+          "bg-clip-text text-transparent",
+          "bg-gradient-to-r",
+          "from-blue-600 via-purple-600 to-pink-600",
+          "dark:from-blue-400 dark:via-purple-400 dark:to-pink-400",
+          // Simpler hover effect without perspective
+          "hover:scale-102 transition-all duration-500",
+          // Enhanced shadow
+          "drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]",
+          "dark:drop-shadow-[0_0_15px_rgba(147,197,253,0.3)]",
+          // Custom gradient animation class
+          styles.enhancedTitleLanding
+        )}
       >
         Wyatt Walsh
-      </motion.h1>
+      </h1>
 
       <AnimatePresence mode="wait">
         <motion.div
           key={wordIndex}
-          className={cn(
-            "subtitle-container",
-            "w-full max-w-[90vw] sm:max-w-2xl",
-            "perspective-1000",
-            "px-4 sm:px-0"
-          )}
+          // Reduced gap between title and subtitle
+          className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2"
         >
           <motion.p
             className={cn(
-              // Responsive text
-              "mt-4 sm:mt-6",
-              "text-xl sm:text-2xl md:text-3xl",
-              "font-light text-center",
-              // Theme-aware styling
-              "bg-gradient-to-r",
+              // Reduced top margin
+              "mt-2 sm:mt-3",
+              // Rest of text styles
+              "text-lg sm:text-xl md:text-2xl lg:text-3xl",
+              "font-light text-center leading-relaxed tracking-wide",
+              // Enhanced gradient
+              "bg-gradient-to-r bg-clip-text text-transparent",
               "from-blue-500/90 via-purple-500/90 to-pink-500/90",
               "dark:from-blue-300/90 dark:via-purple-300/90 dark:to-pink-300/90",
-              "bg-clip-text text-transparent",
-              // Animation classes
-              "glitch-text",
-              "transition-colors duration-300"
+              "transition-all duration-300 ease-out"
             )}
             data-text={WORDS[wordIndex]}
           >

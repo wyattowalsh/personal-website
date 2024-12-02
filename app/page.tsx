@@ -22,7 +22,7 @@ export default function HomePage() {
   
   const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   const imageScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.85]);
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.4]);
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0.8]);
   const imageRotate = useTransform(scrollYProgress, [0, 0.5], [0, -5]);
 
   // Enhanced animations
