@@ -1,5 +1,24 @@
 // variables.module.scss
 
+// Base Gradients - Define these at the top of the file
+$landing-title-gradient-light: linear-gradient(
+  135deg,
+  #0ea5e9 0%,    // Sky-500
+  #6366f1 25%,   // Indigo-500
+  #8b5cf6 50%,   // Violet-500
+  #ec4899 75%,   // Pink-500
+  #0ea5e9 100%   // Back to Sky-500
+);
+
+$landing-title-gradient-dark: linear-gradient(
+  135deg,
+  #38bdf8 0%,    // Sky-400
+  #818cf8 25%,   // Indigo-400
+  #a78bfa 50%,   // Violet-400
+  #f472b6 75%,   // Pink-400
+  #38bdf8 100%   // Back to Sky-400
+);
+
 // Base Colors
 $color-hue: 198;
 $color-saturation: 33.6%;
@@ -114,6 +133,26 @@ $animation-timing: (
   'normal': 300ms,
   'slow': 500ms,
   'very-slow': 1000ms
+);
+
+// Light mode gradient
+$landing-title-gradient-light: linear-gradient(
+  135deg,
+  #0ea5e9 0%,    // Sky-500
+  #6366f1 25%,   // Indigo-500
+  #8b5cf6 50%,   // Violet-500
+  #ec4899 75%,   // Pink-500
+  #0ea5e9 100%   // Back to Sky-500
+);
+
+// Dark mode gradient
+$landing-title-gradient-dark: linear-gradient(
+  135deg,
+  #38bdf8 0%,    // Sky-400
+  #818cf8 25%,   // Indigo-400
+  #a78bfa 50%,   // Violet-400
+  #f472b6 75%,   // Pink-400
+  #38bdf8 100%   // Back to Sky-400
 );
 
 // Light Theme Variables
@@ -299,6 +338,14 @@ $animation-timing: (
   --caption-hover-fg: hsl(222.2, 47.4%, 11.2%);
   --caption-border: rgba(0, 0, 0, 0.1);
   --caption-hover-border: rgba(0, 0, 0, 0.2);
+
+  --landing-title-gradient-light: #{$landing-title-gradient-light};
+  --landing-title-gradient-dark: #{$landing-title-gradient-dark};
+
+  // Title specific variables
+  --title-gradient-start: #ff0080;
+  --title-gradient-end: #40e0d0;
+  --title-shadow: rgba(0, 0, 0, 0.4);
 }
 
 // Dark Theme Variables
@@ -478,4 +525,12 @@ $animation-timing: (
   --caption-hover-fg: hsl(210, 40%, 98%);
   --caption-border: rgba(255, 255, 255, 0.1);
   --caption-hover-border: rgba(255, 255, 255, 0.2);
+
+  --landing-title-gradient-light: #{$landing-title-gradient-light};
+  --landing-title-gradient-dark: #{$landing-title-gradient-dark};
+
+  // Title specific variables
+  --title-gradient-start-dark: #8a2be2;
+  --title-gradient-end-dark: #ff0080;
+  --title-shadow: rgba(255, 255, 255, 0.4);
 }

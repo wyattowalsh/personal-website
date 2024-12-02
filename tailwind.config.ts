@@ -185,6 +185,11 @@ const config: Config = {
         'spinner-rotate': 'rotateCube 2s infinite linear',
         'spinner-glitch': 'glitch 750ms infinite',
         'spinner-shift': 'glitch-shift 4s infinite linear alternate',
+        'title-float': 'titleFloat 6s ease-in-out infinite',
+        'title-glow': 'titleGlow 2s ease-in-out infinite',
+        'title-shimmer': 'titleShimmer 3s ease-in-out infinite',
+        gradientAnimation: 'gradientAnimation 8s ease infinite',
+        'text-gradient': 'textGradient 5s ease infinite',
       },
       keyframes: {
         fadeIn: {
@@ -347,8 +352,9 @@ const config: Config = {
           '50%': { opacity: '0.8' }
         },
         gradientShift: {
-          '0%, 100%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' }
+          '0%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+          '100%': { 'background-position': '0% 50%' },
         },
         sparkle: {
           '0%, 100%': { opacity: '0', transform: 'scale(0)' },
@@ -376,6 +382,27 @@ const config: Config = {
         'glitch-shift': {
           '0%': { transform: 'translateX(-2px)' },
           '100%': { transform: 'translateX(2px)' },
+        },
+        titleFloat: {
+          '0%, 100%': { transform: 'translateY(0) rotateX(0)' },
+          '50%': { transform: 'translateY(-10px) rotateX(5deg)' },
+        },
+        titleGlow: {
+          '0%, 100%': { filter: 'brightness(1) drop-shadow(0 0 10px rgba(var(--primary-rgb), 0.3))' },
+          '50%': { filter: 'brightness(1.2) drop-shadow(0 0 20px rgba(var(--primary-rgb), 0.5))' },
+        },
+        titleShimmer: {
+          '0%': { backgroundPosition: '200% 50%' },
+          '100%': { backgroundPosition: '-200% 50%' },
+        },
+        gradientAnimation: {
+          '0%': { 'background-position': '0% 50%' },
+          '50%': { 'background-position': '100% 50%' },
+          '100%': { 'background-position': '0% 50%' },
+        },
+        textGradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
         },
       },
       backdropBlur: {
@@ -609,11 +636,20 @@ const config: Config = {
         'glow': '0 0 10px var(--primary), 0 0 20px var(--primary)',
         'glow-dark': '0 0 10px var(--primary-foreground), 0 0 20px var(--primary-foreground)',
       },
+      transform: {
+        '3d': 'perspective(600px) rotateY(10deg)',
+      },
     },
   },
   future: {
     respectDefaultRingColorOpacity: true,
     disableColorOpacityUtilitiesByDefault: false,
+  },
+  variants: {
+    extend: {
+      transform: ['hover', 'responsive'],
+      animation: ['hover', 'focus'],
+    },
   },
   plugins: [
     typography,
