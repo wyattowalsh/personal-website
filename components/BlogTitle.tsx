@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import styles from './blogtitle.module.scss';
+import styles from '@/components/blogtitle.module.scss';
 
 const icons = [
 	Code,
@@ -214,7 +214,7 @@ const BlogTitle = () => {
 
 	return (
 		<motion.div className="relative w-full" suppressHydrationWarning>
-			<div className="max-w-4xl mx-auto mt-0">
+			<div className="max-w-4xl mx-auto mt-4">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
 					animate={{ opacity: 1, y: 0 }}

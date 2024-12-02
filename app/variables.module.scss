@@ -284,6 +284,21 @@ $animation-timing: (
   --primary: 59, 130, 246; // Tailwind blue-500
   --primary-light: 147, 197, 253; // Tailwind blue-300
   --accent: 251, 146, 60; // Tailwind orange-400
+
+  // Spinner variables
+  --spinner-primary: rgb(var(--primary-rgb));
+  --spinner-secondary: rgb(var(--secondary-rgb));
+  --spinner-accent: rgb(var(--accent-rgb));
+  --spinner-glitch-color1: rgba(255, 0, 255, 0.8);
+  --spinner-glitch-color2: rgba(0, 255, 255, 0.8);
+
+  // Caption colors for light theme
+  --caption-bg: rgba(255, 255, 255, 0.95);
+  --caption-hover-bg: rgba(255, 255, 255, 0.98);
+  --caption-fg: hsl(222.2, 47.4%, 11.2%);
+  --caption-hover-fg: hsl(222.2, 47.4%, 11.2%);
+  --caption-border: rgba(0, 0, 0, 0.1);
+  --caption-hover-border: rgba(0, 0, 0, 0.2);
 }
 
 // Dark Theme Variables
@@ -448,4 +463,19 @@ $animation-timing: (
   --primary: 147, 197, 253; // Tailwind blue-300
   --primary-light: 191, 219, 254; // Tailwind blue-200
   --accent: 253, 186, 116; // Tailwind orange-300
+
+  // Spinner variables
+  --spinner-primary: rgb(var(--primary-rgb));
+  --spinner-secondary: rgb(var(--secondary-rgb));
+  --spinner-accent: rgb(var(--accent-rgb));
+  --spinner-glitch-color1: rgba(255, 0, 255, 0.9);
+  --spinner-glitch-color2: rgba(0, 255, 255, 0.9);
+
+  // Caption colors for dark theme
+  --caption-bg: rgba(17, 24, 39, 0.95);
+  --caption-hover-bg: rgba(31, 41, 55, 0.98);
+  --caption-fg: hsl(210, 40%, 98%);
+  --caption-hover-fg: hsl(210, 40%, 98%);
+  --caption-border: rgba(255, 255, 255, 0.1);
+  --caption-hover-border: rgba(255, 255, 255, 0.2);
 }

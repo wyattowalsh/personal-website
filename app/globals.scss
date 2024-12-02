@@ -44,6 +44,11 @@
   .prose {
     @apply mx-auto;
     color: var(--foreground);
+
+    :first-child {
+      margin-top: 0;
+      padding-top: 0;
+    }
   }
 
   code {
@@ -398,14 +403,6 @@
   }
 }
 
-// Remove or adjust styles that may interfere with 'strong' and 'em'
-// For example, if you have:
-// strong, em {
-//   // Custom styles that affect nesting
-// }
-
-// Modify or remove these styles to prevent conflicts
-
 @keyframes glitch-anim {
   $steps: 20;
   @for $i from 0 through $steps {
@@ -562,8 +559,8 @@
   }
 
   .math-inline {
-    @apply relative inline-flex items-center;
-    @apply px-2 py-0.5 rounded-md;
+    @apply relative inline-flex items-center justify-center;
+    @apply px-2 py-1 rounded-md;
     @apply bg-math-bg/40 dark:bg-math-bg/20;
     @apply border border-math-border/30;
     @apply transition-all duration-300;
@@ -589,6 +586,108 @@
       
       animation: subtitle-gradient 8s linear infinite;
       background-size: 200% 200%;
+    }
+  }
+
+  // Add search-related components
+  .search-input {
+    @apply rounded-xl shadow-md;
+    @apply bg-white dark:bg-gray-800;
+    @apply placeholder-gray-500 text-gray-900 dark:text-gray-100;
+    @apply focus:outline-none focus:ring-4 focus:ring-blue-500/50;
+    @apply transition-shadow duration-300 ease-in-out;
+  }
+
+  .tag-badge {
+    @apply cursor-pointer px-3 py-1 rounded-full text-sm;
+    @apply bg-gray-200 dark:bg-gray-700;
+    @apply hover:bg-blue-500 hover:text-white;
+    @apply transition-colors duration-200;
+
+    &.active {
+      @apply bg-blue-500 text-white;
+    }
+  }
+
+  // Spinner components
+  .spinner {
+    --spinner-primary: var(--primary);
+    --spinner-secondary: var(--secondary);
+    --spinner-accent: var(--accent);
+    --spinner-bg: var(--background);
+    --spinner-size-sm: 32px;
+    --spinner-size-md: 48px;
+    --spinner-size-lg: 64px;
+  }
+
+  .cube-spinner {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+    width: var(--spinner-size-md);
+    height: var(--spinner-size-md);
+    
+    @media (min-width: 768px) {
+      width: var(--spinner-size-lg);
+      height: var(--spinner-size-lg);
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: rotateCube 2s infinite linear;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          45deg,
+          var(--spinner-primary) 0%,
+          var(--spinner-accent) 100%
+        );
+        opacity: 0.8;
+        backface-visibility: visible;
+        transition: all 0.3s ease;
+        box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
+      }
+
+      &::before {
+        transform: rotateY(90deg);
+      }
+
+      &::after {
+        transform: rotateX(90deg);
+      }
+    }
+  }
+
+  .glitch-base {
+    position: relative;
+    animation: glitch 750ms infinite;
+
+    &::before,
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      opacity: 0.8;
+    }
+
+    &::before {
+      animation: glitch-shift 4s infinite linear alternate-reverse;
+      clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+      transform: translateX(-2px);
+    }
+
+    &::after {
+      animation: glitch-shift 3s infinite linear alternate;
+      clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%);
+      transform: translateX(2px);
     }
   }
 }
@@ -636,6 +735,54 @@
     @apply text-sm sm:text-base md:text-lg lg:text-xl;
     @apply leading-relaxed sm:leading-relaxed md:leading-relaxed;
     @apply tracking-wide sm:tracking-normal md:tracking-normal;
+  }
+
+  // Update prose utility to match PostHeader width
+  .prose {
+    @apply w-full max-w-5xl mx-auto;
+    
+    // Add responsive padding for smaller screens
+    @apply px-4 sm:px-6 lg:px-8;
+    
+    // Ensure content remains readable on larger screens
+    @screen xl {
+      font-size: calc(14px + 0.2vw);
+      line-height: 1.75;
+    }
+
+    // Enhance table responsiveness
+    table {
+      @apply w-full my-8 overflow-x-auto block md:table;
+      
+      th, td {
+        @apply p-2 sm:p-3;
+        @apply text-sm sm:text-base;
+      }
+    }
+
+    // Adjust image responsiveness
+    img {
+      @apply w-full rounded-lg;
+      @apply my-8;
+      @apply mx-auto;
+      @apply max-w-full;
+      @apply h-auto;
+    }
+
+    // Enhance code block responsiveness
+    pre {
+      @apply my-8;
+      @apply p-4 sm:p-6;
+      @apply text-sm sm:text-base;
+      @apply overflow-x-auto;
+    }
+
+    // Adjust blockquote responsiveness
+    blockquote {
+      @apply my-8;
+      @apply pl-4 sm:pl-6;
+      @apply text-base sm:text-lg;
+    }
   }
 }
 
@@ -690,5 +837,29 @@
   to {
     @apply bg-primary/5 dark:bg-primary/10;
   }
+}
+
+// Add spinner animations
+@keyframes rotateCube {
+  from {
+    transform: rotateX(0) rotateY(0) rotateZ(0);
+  }
+  to {
+    transform: rotateX(360deg) rotateY(360deg) rotateZ(360deg);
+  }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+@keyframes glitch-shift {
+  0% { transform: translateX(-2px); }
+  100% { transform: translateX(2px); }
 }
 

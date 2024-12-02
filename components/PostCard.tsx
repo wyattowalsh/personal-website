@@ -5,6 +5,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
+import { useRouter } from "next/navigation"; // Add this import
 import { motion } from "framer-motion";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
@@ -41,6 +42,7 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post, className }: PostCardProps) => {
+	const router = useRouter(); // Add this
 	const {
 		slug,
 		title = "Untitled Post",
@@ -52,100 +54,126 @@ const PostCard = ({ post, className }: PostCardProps) => {
 		readingTime = "A few minutes",
 	} = post;
 
+	// Add navigation handler
+	const handleCardClick = () => {
+		router.push(`/blog/posts/${slug}`);
+	};
+
 	return (
-		<motion.div
-			whileHover={{ y: -5 }}
-			className={cn("transition-transform duration-300 h-full", className)}
-		>
-			<Link
-				href={`/blog/posts/${slug}` as Route} // Remove "posts/" from the path
-				className="block h-full no-underline"
+		<div className="block h-full">
+			<Card
+				onClick={handleCardClick}
+				className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col"
 			>
-				<Card className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col">
-					<div className="relative aspect-video w-full">
-						<Image
-							src={image}
-							alt={title}
-							fill
-							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-							className="object-cover transition-transform duration-500 hover:scale-105"
-							placeholder="blur"
-							blurDataURL="/logo.webp"
+				<div className="relative aspect-video w-full">
+					<Image
+						src={image}
+						alt={title}
+						fill
+						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+						className="object-cover transition-transform duration-500 hover:scale-105"
+						placeholder="blur"
+						blurDataURL="/logo.webp"
 						/>
-						{/* Enhanced gradient overlay for better contrast */}
-						<div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/50 to-black/80"></div>
+					{/* Updated gradient overlay */}
+					<div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/90"></div>
 
-						{/* Card content with guaranteed contrast */}
-						<div className="absolute bottom-0 left-0 right-0 p-4 z-10">
-							<h3
-								className={cn(
-									"text-xl font-semibold leading-tight",
-									"text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
-									"tracking-tight"
-								)}
-							>
-								{title}
-							</h3>
-							<p
-								className={cn(
-									"text-sm mt-1 line-clamp-2",
-									"text-gray-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
-									"leading-relaxed"
-								)}
-							>
-								{summary}
-							</p>
-						</div>
+					{/* Title and summary section */}
+					<div className="absolute bottom-0 left-0 right-0 p-4 z-[1]">
+						<h3
+							className={cn(
+								"text-xl font-semibold leading-tight mb-2",
+								"text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+								"tracking-tight"
+							)}
+						>
+							{title}
+						</h3>
+						<p
+							className={cn(
+								"text-sm line-clamp-2",
+								"text-gray-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+								"leading-relaxed"
+							)}
+						>
+							{summary}
+						</p>
 					</div>
+				</div>
 
-					<div className="p-4 flex flex-col flex-grow bg-gradient-to-b from-card to-card/95">
-						<div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-							{created && (
-								<span
-									className={cn(
-										"flex items-center gap-2 group",
-										"text-muted-foreground/80",
-										"transition-colors duration-300",
-										"hover:text-primary"
-									)}
+				{/* Metadata section - Updated styles */}
+				<div className="relative p-4 flex flex-col flex-grow bg-background/95 z-[2] pointer-events-none">
+					<div className="flex items-center justify-between mb-2 text-sm !text-muted-foreground">
+						{created && (
+							<span className="flex items-center gap-2">
+								<Calendar className="h-4 w-4" />
+								<time
+									dateTime={created}
+									className="font-medium !text-muted-foreground"
 								>
-									<Calendar
-										className={cn(
-											"h-4 w-4",
-											"transition-transform duration-300",
-											"group-hover:scale-110"
-										)}
-									/>
-									<time
-										dateTime={created}
-										className={cn(
-											"no-underline font-medium",
-											"transition-colors duration-300"
-										)}
-									>
-										{formatDate(created)}
-									</time>
-								</span>
-							)}
-							{readingTime && (
-								<span className="flex items-center gap-2">
-									<Clock className="h-4 w-4" />
-									<span className="no-underline">{readingTime}</span>
-								</span>
-							)}
-						</div>
-						<Separator className="my-2" />
-						{tags.length > 0 && (
-							<div className="flex flex-wrap gap-2 mt-auto">
-								{tags.map((tag) => (
-									<TagLink key={tag} tag={tag} isNested />
-								))}
-							</div>
+									{formatDate(created)}
+								</time>
+							</span>
+						)}
+						{readingTime && (
+							<span className="flex items-center gap-2">
+								<Clock className="h-4 w-4" />
+								<span className="!text-muted-foreground">{readingTime}</span>
+							</span>
 						)}
 					</div>
-				</Card>
-			</Link>
-		</motion.div>
+					<Separator className="my-2" />
+					{tags.length > 0 && (
+						<div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
+							{/* Sort tags case-insensitively but preserve original case for display */}
+							{[...tags]
+								.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+								.map((tag) => (
+									<Link
+										key={tag}
+										href={`/blog/tags/${tag}`}
+										onClick={(e) => {
+											e.stopPropagation();
+											e.preventDefault();
+											router.push(`/blog/tag/${tag}`);
+										}}
+										className={cn(
+											// Base styles
+											"inline-flex items-center pointer-events-auto",
+											"text-xs sm:text-sm font-medium",
+											"px-2 py-0.5 sm:px-2.5 sm:py-1",
+											"rounded-full",
+											"border transition-all duration-200",
+											"no-underline",
+											"transform-gpu hover:scale-[1.02] active:scale-[0.98]",
+											
+											// Light mode styles
+											"bg-white/50 hover:bg-primary/10",
+											"text-muted-foreground hover:text-primary",
+											"border-muted-foreground/20 hover:border-primary/50",
+											
+											// Dark mode styles
+											"dark:bg-white/5 dark:hover:bg-primary/20",
+											"dark:text-muted-foreground dark:hover:text-primary-light",
+											"dark:border-muted-foreground/10 dark:hover:border-primary/40",
+											
+											// Shadow effects
+											"shadow-sm hover:shadow-md",
+											"dark:shadow-none dark:hover:shadow-primary/20",
+											
+											// Focus styles
+											"focus:outline-none focus:ring-2 focus:ring-primary/40",
+											"dark:focus:ring-primary/40"
+										)}
+									>
+										#{tag}
+									</Link>
+								))}
+						</div>
+					)}
+				</div>
+			</Card>
+		</div>
 	);
 };
 

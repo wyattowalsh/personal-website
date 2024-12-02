@@ -4,6 +4,8 @@ import React, { Suspense, useEffect } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PostLayout } from "@/components/PostLayout";
 import { MathProvider } from "@/components/MathContext";
+import { cn } from "@/lib/utils";
+
 
 type Props = {
 	params: { slug: string };
@@ -22,7 +24,12 @@ function PostContent({ children }: { children: React.ReactNode }) {
 export default function PostsLayout({ children }: Props) {
 	return (
 		<div className="relative">
-			<div className="max-w-7xl lg:max-w-[80rem] xl:max-w-[90rem] 2xl:max-w-[100rem] mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+			<div className={cn(
+				"max-w-5xl mx-auto", // Match PostHeader max-width
+				"px-4 sm:px-6 lg:px-8", // Responsive padding for sides only
+				"pb-8", // Only add padding to bottom, remove top padding
+				"relative z-10"
+			)}>
 				<MathProvider>
 					<Suspense fallback={<LoadingSpinner />}>
 						<PostLayout>

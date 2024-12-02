@@ -19,6 +19,7 @@ export interface Post {
   tags: string[];
   summary?: string;
   image?: string;
+  caption?: string;  // Add this
   created: string;
   updated: string;
 }
@@ -234,7 +235,9 @@ class BackendService {
         created, // Frontmatter date takes precedence
         updated, // Frontmatter date takes precedence
         tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
-        image: data.image
+        image: data.image,
+        caption: data.caption, // Add this line to include caption from frontmatter
+        readingTime: data.readingTime // Optional: Include readingTime if you have it
       };
 
       logger.info(`Processed post ${slug} with created: ${created}, updated: ${updated}`);
@@ -471,8 +474,9 @@ class BackendService {
       date: post.created,
       content: post.content,
       tags: post.tags,
-      summary: post.summary || '', // Ensure summary has a default value
+      summary: post.summary || '',
       image: post.image,
+      caption: post.caption, // Add this
       created: post.created,
       updated: post.updated || post.created // Use created date as fallback for updated
     };

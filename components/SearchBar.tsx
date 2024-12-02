@@ -57,12 +57,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		[posts]
 	);
 
-	// Sort tags alphabetically
+	// Sort tags case-insensitively but preserve original case for display
 	const tags = useMemo(
-		() =>
-			[...unsortedTags].sort((a, b) =>
-				a.toLowerCase().localeCompare(b.toLowerCase())
-			),
+		() => [...unsortedTags].sort((a, b) => 
+			a.toLowerCase().localeCompare(b.toLowerCase())
+		),
 		[unsortedTags]
 	);
 
@@ -160,156 +159,197 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 
 	return (
 		<div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8 pt-0 mt-0">
-			{/* Search Input Section - Enhanced responsiveness */}
-			<div className="relative">
-				<div className="relative group">
-					<Input
-						type="text"
-						className={cn(
-							"w-full",
-							"p-3 sm:p-4",
-							"text-base sm:text-lg",
-							"bg-background/95 backdrop-blur-sm",
-							"border-2 border-border",
-							"hover:border-primary/50 focus:border-primary",
-							"dark:bg-gray-900/95 dark:text-gray-100",
-							"placeholder:text-muted-foreground/60",
-							"transition-all duration-300 ease-in-out",
-							"rounded-lg shadow-sm hover:shadow-md",
-							"focus:ring-2 focus:ring-primary/20",
-							"dark:focus:ring-primary/40"
-						)}
-						placeholder="Search posts by title, content, or tags..."
-						value={query}
-						onChange={handleSearch}
-					/>
-					<div
-						className={cn(
-							"absolute inset-x-0 bottom-0 h-0.5",
-							"bg-gradient-to-r from-primary/40 via-primary to-primary/40",
-							"transform scale-x-0 group-hover:scale-x-100",
-							"transition-transform duration-300"
-						)}
-					/>
-				</div>
-			</div>
+			 {/* Enhanced Search Input Section */}
+			 <div className="relative">
+        <div className="relative group">
+          <Input
+            type="text"
+            className={cn(
+              "w-full",
+              "p-3 sm:p-4",
+              "text-base sm:text-lg",
+              "bg-background/95 dark:bg-gray-900/95",
+              "border-2",
+              "border-border hover:border-primary/50 focus:border-primary",
+              "dark:border-gray-700 dark:hover:border-primary/50 dark:focus:border-primary",
+              "text-foreground dark:text-gray-100",
+              "placeholder:text-muted-foreground/60 dark:placeholder:text-gray-400/60",
+              "transition-all duration-300 ease-out",
+              "rounded-lg",
+              "shadow-sm hover:shadow-md dark:shadow-none dark:hover:shadow-primary/10",
+              "focus:ring-2 focus:ring-primary/20 dark:focus:ring-primary/30",
+              "backdrop-blur-sm"
+            )}
+            placeholder="Search posts by title, content, or tags..."
+            value={query}
+            onChange={handleSearch}
+          />
+          <div
+            className={cn(
+              "absolute inset-x-0 bottom-0 h-0.5",
+              "bg-gradient-to-r from-primary/40 via-primary to-primary/40",
+              "transform scale-x-0 group-hover:scale-x-100",
+              "transition-transform duration-300 ease-out"
+            )}
+          />
+        </div>
+      </div>
 
-			{/* Filters and Sort Section - Improved layout */}
-			<div
-				className={cn(
-					"flex flex-col gap-4",
-					"sm:flex-row sm:items-start",
-					"lg:items-center"
-				)}
-			>
-				{/* Tags Section - Better wrapping */}
-				<div
-					className={cn(
-						"flex-1",
-						"flex flex-wrap gap-2",
-						"max-h-[120px] sm:max-h-none",
-						"overflow-y-auto sm:overflow-visible",
-						"scrollbar-thin scrollbar-thumb-primary/20",
-						"scrollbar-track-transparent",
-						"items-center" // Add this
-					)}
-				>
-					{tags.map((tag) => (
-						<motion.div
-							key={tag}
-							onClick={() => toggleTag(tag)}
-							className={cn(
-								"cursor-pointer transition-all duration-200",
-								selectedTags.length > 0 && !selectedTags.includes(tag)
-									? "opacity-40 scale-95"
-									: "opacity-100 scale-100",
-								"hover:scale-105"
-							)}
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.95 }}
-						>
-							<TagLink tag={tag} isNested />
-						</motion.div>
-					))}
+      {/* Enhanced Filters and Sort Section */}
+      <div className={cn(
+        "flex flex-col gap-4",
+        "sm:flex-row sm:items-start",
+        "lg:items-center"
+      )}>
+        {/* Enhanced Tags Section */}
+        <div className={cn(
+          "flex-1",
+          "flex flex-wrap gap-1.5 sm:gap-2", // Reduced gap
+          "max-h-[120px] sm:max-h-none",
+          "overflow-y-auto sm:overflow-visible",
+          "scrollbar-thin scrollbar-thumb-primary/20 dark:scrollbar-thumb-primary/40",
+          "scrollbar-track-transparent",
+          "items-center",
+          "p-0.5 sm:p-1" // Smaller padding on mobile
+        )}>
+          {tags.map((tag) => (
+            <motion.button
+              key={tag}
+              onClick={() => toggleTag(tag)}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className={cn(
+                "inline-flex items-center",
+                "px-2 py-1 sm:px-2.5 sm:py-1 md:px-3 md:py-1.5", // Responsive padding
+                "rounded-full",
+                "text-xs sm:text-sm", // Smaller base text size
+                "font-medium",
+                "border-2 transition-all duration-200 ease-out",
+                "hover:shadow-md dark:hover:shadow-primary/20",
+                selectedTags.includes(tag)
+                  ? [
+                      "bg-primary/10 dark:bg-primary/20",
+                      "text-primary dark:text-primary-light",
+                      "border-primary/50 dark:border-primary/50",
+                      "hover:bg-primary/20 dark:hover:bg-primary/30",
+                      "hover:border-primary dark:hover:border-primary",
+                    ]
+                  : [
+                      "bg-background dark:bg-gray-900",
+                      "text-muted-foreground dark:text-gray-300",
+                      "border-border dark:border-gray-700",
+                      "hover:bg-accent/10 dark:hover:bg-accent/20",
+                      "hover:text-accent-foreground dark:hover:text-gray-200",
+                      "hover:border-accent/50 dark:hover:border-accent/50",
+                    ]
+              )}
+            >
+              #{tag}
+            </motion.button>
+          ))}
 
-					<Link href="/blog/tags">
-						<Badge
-							variant="secondary"
-							className="bg-secondary hover:bg-secondary/80 text-secondary-foreground cursor-pointer"
-						>
-							all tags
-						</Badge>
-					</Link>
-				</div>
+          {/* Enhanced All Tags Link */}
+          <Link
+            href="/blog/tags"
+            className={cn(
+              "inline-flex items-center",
+              "px-2 py-1 sm:px-2.5 sm:py-1 md:px-3 md:py-1.5", // Match tag padding
+              "rounded-full",
+              "text-xs sm:text-sm", // Match tag text size
+              "font-medium",
+              "border-2 transition-all duration-200 ease-out",
+              "hover:shadow-md dark:hover:shadow-primary/20",
+              "bg-background dark:bg-gray-900",
+              "text-muted-foreground dark:text-gray-300",
+              "border-border dark:border-gray-700",
+              "hover:bg-primary/10 dark:hover:bg-primary/20",
+              "hover:text-primary dark:hover:text-primary-light",
+              "hover:border-primary/50 dark:hover:border-primary/50",
+              "no-underline"
+            )}
+          >
+            all tags
+          </Link>
+        </div>
 
-				{/* Sort Controls - Responsive layout */}
-				<div
-					className={cn(
-						"flex items-center gap-3",
-						"sm:ml-auto",
-						"w-full sm:w-auto",
-						"justify-end"
-					)}
-				>
-					<Select value={sortMethod} onValueChange={setSortMethod}>
-						<SelectTrigger
-							className={cn(
-								"w-full sm:w-[180px]",
-								"bg-background/95 dark:bg-gray-800/95",
-								"backdrop-blur-sm",
-								"border-2 hover:border-primary/50",
-								"transition-all duration-200"
-							)}
-						>
-							<SelectValue placeholder="Sort by..." />
-						</SelectTrigger>
-						<SelectContent className="border-2 dark:border-gray-700">
-							<SelectItem value="date">Sort by Date</SelectItem>
-							<SelectItem value="title">Sort by Title</SelectItem>
-						</SelectContent>
-					</Select>
+        {/* Enhanced Sort Controls */}
+        <div className={cn(
+          "flex items-center gap-3",
+          "sm:ml-auto",
+          "w-full sm:w-auto",
+          "justify-end"
+        )}>
+          <Select value={sortMethod} onValueChange={setSortMethod}>
+            <SelectTrigger
+              className={cn(
+                "w-full sm:w-[180px]",
+                "bg-background/95 dark:bg-gray-800/95",
+                "backdrop-blur-sm",
+                "border-2",
+                "border-border hover:border-primary/50",
+                "dark:border-gray-700 dark:hover:border-primary/50",
+                "transition-all duration-200 ease-out",
+                "shadow-sm hover:shadow-md dark:shadow-none dark:hover:shadow-primary/10"
+              )}
+            >
+              <SelectValue placeholder="Sort by..." />
+            </SelectTrigger>
+            <SelectContent className="border-2 dark:border-gray-700">
+              <SelectItem value="date">Sort by Date</SelectItem>
+              <SelectItem value="title">Sort by Title</SelectItem>
+            </SelectContent>
+          </Select>
 
-					<TooltipProvider>
-						<Tooltip>
-							<TooltipTrigger asChild>
-								<Button
-									variant="outline"
-									size="icon"
-									onClick={() =>
-										setSortDirection((d) => (d === "asc" ? "desc" : "asc"))
-									}
-									className={cn(
-										"h-10 w-10",
-										"border-2 hover:border-primary/50",
-										"bg-background/95 dark:bg-gray-800/95",
-										"backdrop-blur-sm",
-										"hover:bg-accent/10 dark:hover:bg-gray-700",
-										"transition-all duration-200"
-									)}
-								>
-									{sortDirection === "asc" ? (
-										<ChevronUp className="h-4 w-4" />
-									) : (
-										<ChevronDown className="h-4 w-4" />
-									)}
-								</Button>
-							</TooltipTrigger>
-							<TooltipContent
-								className="bg-popover/95 backdrop-blur-sm"
-								sideOffset={5}
-							>
-								<p className="text-sm">
-									{sortDirection === "asc" ? "Ascending" : "Descending"}
-								</p>
-							</TooltipContent>
-						</Tooltip>
-					</TooltipProvider>
-				</div>
-			</div>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    setSortDirection((d) => (d === "asc" ? "desc" : "asc"))
+                  }
+                  className={cn(
+                    "h-10 w-10",
+                    "border-2",
+                    "border-border hover:border-primary/50",
+                    "dark:border-gray-700 dark:hover:border-primary/50",
+                    "bg-background/95 dark:bg-gray-800/95",
+                    "backdrop-blur-sm",
+                    "hover:bg-accent/10 dark:hover:bg-accent/20",
+                    "transition-all duration-200 ease-out",
+                    "shadow-sm hover:shadow-md dark:shadow-none dark:hover:shadow-primary/10"
+                  )}
+                >
+                  {sortDirection === "asc" ? (
+                    <ChevronUp className="h-4 w-4" />
+                  ) : (
+                    <ChevronDown className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent
+                className={cn(
+                  "bg-popover/95 dark:bg-gray-800/95",
+                  "backdrop-blur-sm",
+                  "border dark:border-gray-700",
+                  "shadow-lg dark:shadow-primary/20"
+                )}
+                sideOffset={5}
+              >
+                <p className="text-sm">
+                  {sortDirection === "asc" ? "Ascending" : "Descending"}
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
 
-			<Separator className="opacity-50" />
+      {/* Enhanced Separator */}
+      <Separator className="opacity-50 dark:opacity-30" />
 
-			{/* Results Grid - Responsive layout */}
+      {/* Results Grid - Responsive layout */}
 			<div
 				className={cn(
 					"grid gap-4 sm:gap-6 lg:gap-8",
@@ -322,9 +362,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 					results.length === 1 ? (
 						// Single result - centered
 						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
-							<Link href={`/blog/${results[0].slug}` as Route}>
 								<PostCard post={results[0]} className="h-full" />
-							</Link>
 						</div>
 					) : (
 						// Multiple results with staggered animation
@@ -341,9 +379,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 									delay: Math.min(idx * 0.1, 0.8),
 								}}
 							>
-								<Link href={`/blog/${post.slug}` as Route}>
-									<PostCard post={post} className="h-full" />
-								</Link>
+								<PostCard post={post} className="h-full" />
 							</motion.div>
 						))
 					)

@@ -26,7 +26,7 @@ export default function BlogRootLayout({
     <div className="min-h-screen">
       <BlogTitle />
       <hr className="border-border my-4" />
-      <main className="container mx-auto px-4">
+      <main className="container mx-auto">
         {children}
       </main>
     </div>

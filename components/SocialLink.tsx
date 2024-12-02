@@ -96,36 +96,33 @@ function darkenColor(hex: string, amount: number): string {
   return `#${rr}${gg}${bb}`;
 }
 
-// Enhanced color adjustment functions
+// Update adjustColorForMode function for better dark mode handling
 function adjustColorForMode(color: string, isDark: boolean) {
   const DEFAULT_COLOR = "#6a9fb5";
   const baseColor = color || DEFAULT_COLOR;
   const luminance = getLuminance(baseColor);
 
-  // Enhanced color adjustment for both modes
   const darkModeAdjustment = {
-    // For dark mode, make dark colors lighter and keep light colors relatively unchanged
     iconColor: luminance < 0.5
-      ? lightenColor(baseColor, 0.8)  // Significantly lighten dark colors
+      ? lightenColor(baseColor, 0.4)  // Slightly less lightening
       : luminance < 0.7
-        ? lightenColor(baseColor, 0.4) // Moderately lighten medium colors
-        : baseColor,                   // Keep light colors as is
+        ? lightenColor(baseColor, 0.3) // Slightly less lightening
+        : baseColor,
     bgStyle: `rgba(${hexToRGB(baseColor)}, 0.15)`,
     bgHoverStyle: `rgba(${hexToRGB(baseColor)}, 0.25)`,
-    textColor: "#ffffff",
-    iconBgColor: "rgba(255, 255, 255, 0.1)",
+    textColor: "#f8fafc", // slate-50
+    iconBgColor: "rgba(255, 255, 255, 0.05)", // More transparent in dark mode
   };
 
   const lightModeAdjustment = {
-    // For light mode, darken light colors and enhance dark colors
     iconColor: luminance > 0.7
-      ? darkenColor(baseColor, 0.6)   // Significantly darken very light colors
+      ? darkenColor(baseColor, 0.4)   // Slightly less darkening
       : luminance > 0.5
-        ? darkenColor(baseColor, 0.3) // Moderately darken light colors
-        : enhanceColor(baseColor, 0.2), // Slightly enhance dark colors
+        ? darkenColor(baseColor, 0.2) // Slightly less darkening
+        : baseColor,
     bgStyle: `rgba(${hexToRGB(baseColor)}, 0.1)`,
     bgHoverStyle: `rgba(${hexToRGB(baseColor)}, 0.15)`,
-    textColor: "#000000",
+    textColor: "#0f172a", // slate-900
     iconBgColor: "rgba(255, 255, 255, 0.95)",
   };
 
@@ -158,6 +155,40 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
   // Ensure default color from links array is used
   const colors = adjustColorForMode(link.color || "#6a9fb5", isDark);
 
+  // Update the icon container class names and styles
+  const iconContainerClassName = cn(
+    "relative flex items-center justify-center",
+    "w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
+    "rounded-xl",
+    // Enhanced contrast background
+    "bg-white/95 dark:bg-white/5", // Adjusted opacity for dark mode
+    "backdrop-blur-sm",
+    // Border and shadow for depth
+    "border border-black/5 dark:border-white/10",
+    "shadow-lg dark:shadow-black/30",
+    // Animations
+    "transform-gpu transition-all duration-500",
+    "group-hover:scale-110 group-hover:rotate-3",
+    // Additional contrast
+    "after:absolute after:inset-0 after:rounded-xl",
+    "after:bg-gradient-to-br",
+    "after:from-white/50 after:to-transparent dark:after:from-white/10 dark:after:to-transparent",
+    "after:opacity-0 group-hover:after:opacity-100",
+    "after:transition-opacity after:duration-500"
+  );
+
+  // Update the label class names
+  const labelClassName = cn(
+    "mt-4 text-sm md:text-base lg:text-lg",
+    "font-medium text-center",
+    "transition-all duration-500",
+    "group-hover:scale-105",
+    // Ensure text contrast and remove underline
+    "no-underline", // Add this class
+    "text-slate-900 dark:text-slate-100",
+    "drop-shadow-sm dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+  );
+
   const linkContent = (
     <motion.div
       className={cn(
@@ -187,24 +218,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
     >
       {/* Icon Container with guaranteed contrast */}
       <motion.div
-        className={cn(
-          "relative flex items-center justify-center",
-          "w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
-          "rounded-xl",
-          // Enhanced contrast background
-          "bg-white/95 dark:bg-white/10", // Add contrasting background
-          "backdrop-blur-sm",
-          // Border and shadow for depth
-          "border border-black/5 dark:border-white/10",
-          "shadow-lg dark:shadow-black/30",
-          // Animations
-          "transform-gpu transition-all duration-500",
-          "group-hover:scale-110 group-hover:rotate-3",
-          // Additional contrast
-          "after:absolute after:inset-0 after:rounded-xl",
-          "after:bg-white/50 dark:after:bg-black/20",
-          "after:backdrop-blur-sm"
-        )}
+        className={iconContainerClassName}
         style={{
           color: colors.iconColor,
           backgroundColor: colors.iconBgColor,
@@ -219,7 +233,8 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
             // Enhanced visibility
             "drop-shadow-md dark:drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]",
             // Hover effects
-            "group-hover:scale-110 group-hover:drop-shadow-lg",
+            "group-hover:scale-110 group-hover:rotate-3",
+            "group-hover:drop-shadow-lg"
           )}
           style={{ color: colors.iconColor }}
         />
@@ -227,15 +242,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
 
       {/* Label */}
       <span
-        className={cn(
-          "mt-4 text-sm md:text-base lg:text-lg",
-          "font-medium text-center",
-          "transition-all duration-500",
-          "group-hover:scale-105",
-          // Ensure text contrast
-          "text-gray-900 dark:text-white",
-          "drop-shadow-sm dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]",
-        )}
+        className={labelClassName}
       >
         {link.name}
       </span>
@@ -261,7 +268,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
 
   if (isInternalLink) {
     return (
-      <Link href={link.url} className="block w-full h-full rounded-2xl">
+      <Link href={link.url} className="block w-full h-full rounded-2xl no-underline">
         {linkContent}
       </Link>
     );
@@ -272,7 +279,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block w-full h-full rounded-2xl"
+      className="block w-full h-full rounded-2xl no-underline"
     >
       {linkContent}
     </a>

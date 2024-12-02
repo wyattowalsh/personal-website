@@ -108,6 +108,14 @@ const config: Config = {
           DEFAULT: 'rgb(var(--math-controls-text) / 0.2)',
           hover: 'rgb(var(--math-controls-text) / 0.3)',
         },
+        caption: {
+          bg: 'var(--caption-bg)',
+          'hover-bg': 'var(--caption-hover-bg)',
+          fg: 'var(--caption-fg)',
+          'hover-fg': 'var(--caption-hover-fg)',
+          border: 'var(--caption-border)',
+          'hover-border': 'var(--caption-hover-border)',
+        },
       },
       fontFamily: {
         sans: ['Montserrat', 'sans-serif'],
@@ -174,6 +182,9 @@ const config: Config = {
         'float-delayed': 'float 6s ease-in-out infinite 0.5s',
         'glitch-flash': 'glitch-flash 3.5s ease infinite',
         'morph-gradient': 'morph-gradient 10s ease infinite',
+        'spinner-rotate': 'rotateCube 2s infinite linear',
+        'spinner-glitch': 'glitch 750ms infinite',
+        'spinner-shift': 'glitch-shift 4s infinite linear alternate',
       },
       keyframes: {
         fadeIn: {
@@ -226,6 +237,8 @@ const config: Config = {
           "100%": {
             transform: "rotateX(360deg) rotateY(360deg) rotateZ(360deg)",
           },
+          'from': { transform: 'rotateX(0) rotateY(0) rotateZ(0)' },
+          'to': { transform: 'rotateX(360deg) rotateY(360deg) rotateZ(360deg)' },
         },
         'code-blink': {
           '0%, 100%': { opacity: '1' },
@@ -249,7 +262,13 @@ const config: Config = {
           },
           '10%, 100%': {
             textShadow: 'none'
-          }
+          },
+          '0%': { transform: 'translate(0)' },
+          '20%': { transform: 'translate(-2px, 2px)' },
+          '40%': { transform: 'translate(-2px, -2px)' },
+          '60%': { transform: 'translate(2px, 2px)' },
+          '80%': { transform: 'translate(2px, -2px)' },
+          '100%': { transform: 'translate(0)' },
         },
         'glitch-skew': {
           '0%': { transform: 'skew(0deg)' },
@@ -353,7 +372,11 @@ const config: Config = {
             'background-size': '200% 200%',
             'background-position': 'right center'
           }
-        }
+        },
+        'glitch-shift': {
+          '0%': { transform: 'translateX(-2px)' },
+          '100%': { transform: 'translateX(2px)' },
+        },
       },
       backdropBlur: {
         xs: "2px",
@@ -367,6 +390,11 @@ const config: Config = {
       typography: (theme: (path: string) => string) => ({
         DEFAULT: {
           css: {
+            // Update to remove default spacing
+            '> :first-child': {
+              marginTop: '0 !important',
+              paddingTop: '0 !important',
+            },
             color: 'var(--foreground)',
             maxWidth: '90ch',
             h1: {

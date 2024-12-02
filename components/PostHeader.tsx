@@ -11,6 +11,8 @@ import type { PostMetadata } from "@/lib/types"; // Update import path
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
+import { useRouter } from "next/navigation"; // Update import
+import { Separator } from "@/components/ui/separator";
 
 // Remove the local PostMetadata interface since we're importing it
 
@@ -73,10 +75,51 @@ interface MetadataTagsProps {
   tags: string[];
 }
 
-// Add a new MetadataTags component
+// Add a new ClientLink component for tag navigation
+function TagButton({ tag }: { tag: string }) {
+  const router = useRouter();
+  
+  return (
+    <button
+      onClick={() => router.push(`/blog/tags/${tag}`)}
+      className={cn(
+        // ... keep existing className ...
+        "inline-flex items-center pointer-events-auto",
+        "text-xs sm:text-sm font-medium",
+        "px-2 py-0.5 sm:px-2.5 sm:py-1",
+        "rounded-full",
+        "border transition-all duration-200",
+        "no-underline",
+        "transform-gpu hover:scale-[1.02] active:scale-[0.98]",
+        
+        // Light mode styles
+        "bg-white/50 hover:bg-primary/10",
+        "text-muted-foreground hover:text-primary",
+        "border-muted-foreground/20 hover:border-primary/50",
+        
+        // Dark mode styles
+        "dark:bg-white/5 dark:hover:bg-primary/20",
+        "dark:text-muted-foreground dark:hover:text-primary-light",
+        "dark:border-muted-foreground/10 dark:hover:border-primary/40",
+        
+        // Shadow effects
+        "shadow-sm hover:shadow-md",
+        "dark:shadow-none dark:hover:shadow-primary/20",
+        
+        // Focus styles
+        "focus:outline-none focus:ring-2 focus:ring-primary/40",
+        "dark:focus:ring-primary/40"
+      )}
+    >
+      #{tag}
+    </button>
+  );
+}
+
+// Update MetadataTags to use TagButton
 function MetadataTags({ tags }: MetadataTagsProps) {
   return (
-    <div 
+    <div
       className={cn(
         "flex items-center gap-2 group",
         "hover:text-primary transition-all duration-300"
@@ -89,24 +132,9 @@ function MetadataTags({ tags }: MetadataTagsProps) {
       )}>
         <Tag className="h-5 w-5" />
       </span>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5 sm:gap-2">
         {tags.map((tag) => (
-          <Link 
-            key={tag}
-            href={`/blog/tags/${tag}`}
-            aria-label={`View posts tagged with ${tag}`}
-            className="transition-transform duration-300 hover:scale-105"
-          >
-            <Badge
-              variant="secondary"
-              className={cn(
-                "transition-colors duration-300",
-                "hover:bg-primary hover:text-primary-foreground"
-              )}
-            >
-              #{tag}
-            </Badge>
-          </Link>
+          <TagButton key={tag} tag={tag} />
         ))}
       </div>
     </div>
@@ -128,14 +156,16 @@ const useSafePost = (pathname: string) => {
 
     const fetchPost = async () => {
       try {
-        setState(prev => ({ ...prev, isLoading: true, error: null }));
+        if (mounted) {
+          setState(prev => ({ ...prev, isLoading: true, error: null }));
+        }
+        
         const slug = pathname.split("/posts/")[1]?.split("/")[0];
         
         if (!slug) {
           throw new Error('Invalid URL format');
         }
 
-        // Use metadata endpoint instead for initial data
         const response = await fetch(`/api/blog/posts/metadata/${slug}`, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
@@ -161,7 +191,8 @@ const useSafePost = (pathname: string) => {
             created: data.created || data.date,
             updated: data.updated || data.created || data.date,
             tags: data.tags || [],
-            image: data.image || "/logo.webp"
+            image: data.image || "/logo.webp",
+            caption: data.caption || null, // Change this to null instead of empty string
           },
           isLoading: false 
         }));
@@ -188,16 +219,17 @@ const useSafePost = (pathname: string) => {
   return state;
 };
 
-// Update the PostHeader component to use the new hook
 export default function PostHeader() {
   const pathname = usePathname();
-  const state = useSafePost(pathname);
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const postData = useSafePost(pathname);
 
   const handleImageLoad = () => {
-    setState((prev) => ({ ...prev, imageLoaded: true }));
+    setImageLoaded(true);
   };
 
-  if (state.error || !state.post) {
+  // Use postData instead of state for rendering conditions
+  if (postData.error || !postData.post) {
     return (
       <motion.div 
         role="alert"
@@ -206,7 +238,7 @@ export default function PostHeader() {
           "bg-destructive/5 border border-destructive/20",
           "max-w-5xl mx-auto space-y-4",
           "backdrop-blur-sm",
-          "shadow-lg"
+          "shadow-lg",
         )}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -220,7 +252,7 @@ export default function PostHeader() {
           Post Not Found
         </h1>
         <p className="text-muted-foreground text-lg">
-          {state.error || "The requested blog post could not be found."}
+          {postData.error || "The requested blog post could not be found."}
         </p>
         <div className="pt-4">
           <Link 
@@ -240,7 +272,7 @@ export default function PostHeader() {
     );
   }
 
-  if (state.isLoading) {
+  if (postData.isLoading) {
     return (
       <div 
         role="status"
@@ -261,14 +293,17 @@ export default function PostHeader() {
     );
   }
 
+  console.log('Post data:', postData.post); // Add this debug line
+
   return (
     <motion.header
       className={cn(
-        // Base styles
+        // Remove any margin/padding at the top
         "relative overflow-hidden",
         "rounded-xl md:rounded-2xl lg:rounded-3xl",
         "max-w-5xl mx-auto",
         "border border-post-header-border",
+        "mt-0 pt-0",
         
         // Gradients and backgrounds
         "bg-gradient-to-br from-post-header-gradient-from via-post-header-gradient-via to-post-header-gradient-to",
@@ -283,7 +318,10 @@ export default function PostHeader() {
         "dark:from-post-header-gradient-from/90",
         "dark:via-post-header-gradient-via/90",
         "dark:to-post-header-gradient-to/90",
-        "dark:border-post-header-border/50"
+        "dark:border-post-header-border/50",
+        
+        // Ensure no padding or margin at the top
+        "pt-0 mt-0"
       )}
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -291,24 +329,27 @@ export default function PostHeader() {
       role="banner"
       aria-label="Post header"
     >
-      {/* Hero Image Container */}
+      {/* Image container - Ensure it's flush with the top */}
       <div className={cn(
         "relative w-full",
         "aspect-[21/9] sm:aspect-[2/1] md:aspect-[21/9]",
-        "overflow-hidden"
+        "overflow-hidden",
+        "rounded-t-xl md:rounded-t-2xl lg:rounded-t-3xl", // Match parent's top border radius
+        "pt-0 mt-0" // Ensure no padding or margin at the top
       )}>
         <Image
-          src={state.post.image || "/logo.webp"}
-          alt={state.post.image ? `Header image for ${state.post.title}` : "Default post header image"}
+          src={postData.post.image || "/logo.webp"}
+          alt={postData.post.image ? `Header image for ${postData.post.title}` : "Default post header image"}
           fill
           priority
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
           className={cn(
-            "object-cover object-center",
+            "object-cover w-full h-full", // Change h-auto to h-full
             "transform transition-all duration-700",
-            !state.imageLoaded && "blur-sm scale-105",
-            state.imageLoaded && "blur-0 scale-100",
-            "hover:scale-105 transition-transform duration-700"
+            !imageLoaded && "blur-sm scale-105",
+            imageLoaded && "blur-0 scale-100",
+            "hover:scale-105 transition-transform duration-700",
+            "mt-0 pt-0" // Remove any top margin/padding
           )}
           onLoad={handleImageLoad}
         />
@@ -316,27 +357,55 @@ export default function PostHeader() {
         {/* Image Overlay */}
         <div className={cn(
           "absolute inset-0",
-          "bg-post-header-image-overlay",
+          "bg-gradient-to-b",
+          "from-black/30 via-black/40 to-black/60",
+          "z-10", // Lower z-index than caption
           "transition-opacity duration-300",
-          "opacity-80 hover:opacity-60"
+          "opacity-60 hover:opacity-40"
         )} />
 
         {/* Caption */}
-        {state.post.caption && (
-          <p className={cn(
-            "absolute bottom-4 left-4",
-            "text-sm sm:text-base lg:text-lg",
-            "italic text-white",
-            "px-3 py-1.5",
-            "rounded-md",
-            "bg-black/50 backdrop-blur-sm",
-            "border border-white/10",
-            "shadow-lg",
-            "transition-all duration-300",
-            "hover:bg-black/60 hover:scale-105"
-          )}>
-            {state.post.caption}
-          </p>
+        {postData.post.caption && (
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className={cn(
+              // Positioning - adjusted for smaller size
+              "absolute bottom-3 sm:bottom-4 md:bottom-6", // Reduced bottom spacing
+              "left-3 sm:left-4 md:left-6", // Reduced left spacing
+              "right-3 sm:right-4 md:right-6", // Reduced right spacing
+              "md:right-auto", // Keep right auto on medium screens
+              "max-w-[95%] sm:max-w-[85%] md:max-w-[75%]", // Adjusted max widths
+              "z-20",
+
+              // Typography - made more responsive
+              "text-xs sm:text-sm md:text-base", // Smaller base size
+              "italic font-medium",
+              "leading-relaxed",
+              "line-clamp-2 sm:line-clamp-3", // Fewer lines on smallest screens
+              
+              // Container styling
+              "px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 md:py-2.5", // Reduced padding
+              "rounded-md sm:rounded-lg", // Smaller radius on mobile
+              "bg-caption-bg",
+              "text-caption-fg",
+              "backdrop-blur-md",
+              "border border-caption-border",
+              
+              // Shadow and effects
+              "shadow-sm sm:shadow-md lg:shadow-lg", // Progressive shadow
+              "transition-all duration-300",
+              
+              // Hover effects
+              "hover:bg-caption-hover-bg",
+              "hover:text-caption-hover-fg",
+              "hover:scale-[1.02] active:scale-[0.98]", // Added active state
+              "hover:border-caption-hover-border"
+            )}
+          >
+            {postData.post.caption}
+          </motion.p>
         )}
       </div>
 
@@ -359,18 +428,20 @@ export default function PostHeader() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          {state.post.title}
+          {postData.post.title}
         </motion.h1>
 
+        <Separator className="my-4" />
+
         {/* Summary */}
-        {state.post.summary && (
+        {postData.post.summary && (
           <p className={cn(
             "text-base sm:text-lg lg:text-xl",
             "text-muted-foreground",
             "leading-relaxed",
             "max-w-prose"
           )}>
-            {state.post.summary}
+            {postData.post.summary}
           </p>
         )}
 
@@ -384,43 +455,43 @@ export default function PostHeader() {
           "transition-colors duration-300"
         )}>
           {/* Created Date */}
-          {state.post.created && (
+          {postData.post.created && (
             <MetadataItem 
               icon={<Calendar className="h-5 w-5" />}
-              dateTime={state.post.created}
+              dateTime={postData.post.created}
               label="Post creation date"
             >
-              {formatDate(state.post.created)}
+              {formatDate(postData.post.created)}
             </MetadataItem>
           )}
 
           {/* Reading Time */}
-          {state.post.readingTime && (
+          {postData.post.readingTime && (
             <MetadataItem 
               icon={<Clock className="h-5 w-5" />}
               label="Estimated reading time"
             >
-              {state.post.readingTime}
+              {postData.post.readingTime}
             </MetadataItem>
           )}
 
           {/* Last Updated - Only show if update date is different from create date */}
-          {state.post.updated && isDifferentDate(state.post.updated, state.post.created) && (
+          {postData.post.updated && isDifferentDate(postData.post.updated, postData.post.created) && (
             <MetadataItem 
               icon={<Edit className="h-5 w-5" />}
-              dateTime={state.post.updated}
+              dateTime={postData.post.updated}
               label="Last updated date"
             >
               <span className="flex items-center gap-1">
-                {formatDate(state.post.updated)}
+                {formatDate(postData.post.updated)}
                 <span className="text-muted-foreground/60">(Updated)</span>
               </span>
             </MetadataItem>
           )}
 
           {/* Tags - Now integrated into metadata section */}
-          {state.post.tags && state.post.tags.length > 0 && (
-            <MetadataTags tags={state.post.tags} />
+          {postData.post.tags && postData.post.tags.length > 0 && (
+            <MetadataTags tags={postData.post.tags} />
           )}
         </div>
       </div>

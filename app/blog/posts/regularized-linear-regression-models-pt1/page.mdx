@@ -94,7 +94,7 @@ $$
 \text{SSE} = \sum_{i=1}^n (y_i - \hat{y}_i)^2 = \sum_{i=1}^n \Big(y_i - \sum_{j=1}^p x_{i,j}\hat{\beta}_j\Big)^2
 $$
 
-This same term can be expressed in vector notation as (<a href="#equation-7">Eq. #7</a>):
+This same term can be expressed in vector notation as (<a href="#eq-7">Eq. #7</a>):
 
 $$
 ||y - \hat{y}||_2^2 = ||y - X \hat{\beta}||_2^2
@@ -126,7 +126,7 @@ $$
 \hat{\boldsymbol{\beta}}_{\text{OLS}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}
 $$
 
-However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (<a href="#equation-8">Eq. #8</a>) is convex since any local optimality of a convex function is also global optimality and therefore unique.
+However, this may not be the only optimal estimator, thus its uniqueness should be proven. To do this, it will suffice to show that the loss function (<a href="#eq-8">Eq. #8</a>) is convex since any local optimality of a convex function is also global optimality and therefore unique.
 
 One possible way to show this is through the second-order convexity conditions, which state that a function is convex if it is continuous, twice differentiable, and has an associated Hessian matrix that is positive semi-definite. Due to its quadratic nature, the OLS loss function (<a href="#eq-8">Eq. #8</a>) is both continuous and twice differentiable, satisfying the first two conditions.
 

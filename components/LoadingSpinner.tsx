@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { cva, VariantProps } from "class-variance-authority";
-import styles from "./loadingspinner.module.scss";
 
 // Omit color from HTMLAttributes to avoid conflict
 type BaseSpinnerProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>;
@@ -21,9 +20,9 @@ const spinnerVariants = cva(
   {
     variants: {
       variant: {
-        glitch: cn(styles["glitch-base"], "glitch-effect"),
+        glitch: "glitch-base glitch-effect",
         ring: "ring-effect",
-        cube: styles["cube-base"],
+        cube: "cube-spinner",
         pulse: "pulse-effect",
         wave: "wave-effect",
       },
@@ -62,6 +61,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className={cn(
+          "spinner",
           "flex flex-col items-center gap-4",
           "p-6 rounded-xl",
           "bg-background/50 dark:bg-background/30",
@@ -120,8 +120,8 @@ const Spinner: React.FC<LoadingSpinnerProps> = ({
               spinnerVariants({ size, color })
             )}
           />
-          <div className={styles["glitch-layer-1"]} />
-          <div className={styles["glitch-layer-2"]} />
+          <div className="glitch-layer-1" />
+          <div className="glitch-layer-2" />
         </motion.div>
       );
 
@@ -159,9 +159,9 @@ const Spinner: React.FC<LoadingSpinnerProps> = ({
 
     case "cube":
       return (
-        <div className={styles["cube-spinner"]}>
+        <div className="cube-spinner">
           <motion.div
-            className={styles["cube"]}
+            className="cube"
             animate={{
               rotateX: [0, 360],
               rotateY: [0, 360],

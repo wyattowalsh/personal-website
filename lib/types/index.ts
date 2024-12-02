@@ -26,6 +26,7 @@ export interface AdjacentPost {
 
 export interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
   // Should inherit optional summary from Post now
+  caption?: string; // Make sure caption is included
 }
 
 // Configuration types
