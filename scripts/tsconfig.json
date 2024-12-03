@@ -1,10 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "CommonJS",
     "moduleResolution": "Node",
-    "allowJs": true,
-    "outDir": "../dist"
+    "outDir": "../dist",
+    "noEmit": false,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["./*"],
+      "lib/*": ["lib/*"]
+    }
   },
   "include": ["./**/*"],
   "exclude": ["node_modules"]

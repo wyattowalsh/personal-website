@@ -41,6 +41,19 @@
     text-decoration: underline;
   }
 
+  .badge {
+    @apply inline-flex items-center justify-center;
+    @apply px-2 py-1 rounded-full;
+    @apply text-sm font-medium;
+    @apply transition-colors duration-200;
+    @apply bg-accent/10 dark:bg-accent/20;
+    @apply text-foreground dark:text-foreground;
+    @apply border border-accent/20 dark:border-accent/30;
+    &:hover {
+      @apply text-foreground dark:text-foreground;
+    }
+  }
+
   .prose {
     @apply mx-auto;
     color: var(--foreground);

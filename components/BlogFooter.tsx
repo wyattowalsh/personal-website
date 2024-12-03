@@ -4,8 +4,9 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 import { links } from './Links';
+import { RssIcon, FileJson, AtomIcon } from 'lucide-react';
 
 const FooterLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
   <Link 
@@ -17,6 +18,26 @@ const FooterLink = ({ href, children }: { href: string; children: React.ReactNod
       "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded"
     )}
   >
+    {children}
+  </Link>
+);
+
+const FeedLink = ({ href, icon: Icon, children }: { 
+  href: string; 
+  icon: React.ElementType;
+  children: React.ReactNode 
+}) => (
+  <Link 
+    href={href}
+    className={cn(
+      "text-sm text-muted-foreground/90 no-underline",
+      "hover:text-primary transition-colors duration-200",
+      "hover:scale-105 transform-gpu",
+      "focus:outline-none focus:ring-2 focus:ring-primary/50 rounded",
+      "flex items-center gap-2"
+    )}
+  >
+    <Icon className="w-4 h-4" />
     {children}
   </Link>
 );
@@ -126,7 +147,11 @@ const BlogFooter = () => {
                     {link.name}
                   </FooterLink>
                 ))}
-              <FooterLink href="/rss.xml">RSS Feed</FooterLink>
+              <div className="flex flex-col gap-1 items-center">
+                <FeedLink href="/feed.xml" icon={RssIcon}>RSS</FeedLink>
+                <FeedLink href="/feed.atom" icon={AtomIcon}>Atom</FeedLink>
+                <FeedLink href="/feed.json" icon={FileJson}>JSON</FeedLink>
+              </div>
             </nav>
           </div>
         </div>

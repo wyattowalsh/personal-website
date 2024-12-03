@@ -1,68 +1,80 @@
 {
+    "autoPlay": true,
     "background": {
         "color": {
-            "value": "#f5f5f5"
+            "value": "#ffffff"
         },
         "image": "",
         "position": "center",
         "repeat": "no-repeat",
         "size": "cover"
     },
+    "backgroundMask": {
+        "enable": false,
+        "cover": {
+            "color": {
+                "value": "#ffffff"
+            },
+            "opacity": 1
+        }
+    },
     "particles": {
         "number": {
-            "value": 120,
+            "value": 100,
             "density": {
                 "enable": true,
-                "area": 1200
+                "area": 1000
             }
         },
         "color": {
-            "value": ["#222222", "#555555", "#777777", "#999999"]
+            "value": ["#1e1e1e", "#3c3c3c", "#565656", "#777777"]
         },
         "shape": {
-            "type": ["circle", "square", "triangle", "polygon"],
-            "polygon": {
-                "sides": 5
+            "type": ["circle", "square", "triangle"],
+            "options": {
+                "circle": {},
+                "square": {},
+                "triangle": {}
             }
         },
         "opacity": {
             "value": {
-                "min": 0.4,
-                "max": 0.9
+                "min": 0.5,
+                "max": 0.8
             },
             "random": true,
             "animation": {
                 "enable": true,
-                "speed": 1.2,
-                "minimumValue": 0.3,
+                "speed": 1.5,
+                "minimumValue": 0.4,
                 "sync": false
             }
         },
         "size": {
             "value": {
                 "min": 2,
-                "max": 6
+                "max": 5
             },
             "random": true,
             "animation": {
                 "enable": true,
-                "speed": 3,
-                "minimumValue": 1.5,
+                "speed": 2,
+                "minimumValue": 1,
                 "sync": false
             }
         },
         "links": {
             "enable": true,
-            "distance": 140,
+            "distance": 120,
             "color": {
-                "value": "#444444"
+                "value": "#cccccc"
             },
-            "opacity": 0.6,
-            "width": 1
+            "opacity": 0.7,
+            "width": 1.2
         },
         "move": {
             "enable": true,
-            "speed": 1.8,
+            "speed": 1.5,
             "direction": "none",
             "outModes": {
                 "default": "out"
@@ -71,8 +83,8 @@
             "straight": false,
             "attract": {
                 "enable": true,
-                "rotateX": 3000,
-                "rotateY": 3000
+                "rotateX": 2000,
+                "rotateY": 2000
             }
         }
     },
@@ -83,8 +95,8 @@
                 "mode": ["grab", "bubble"],
                 "parallax": {
                     "enable": true,
-                    "force": 50,
-                    "smooth": 10
+                    "force": 60,
+                    "smooth": 15
                 }
             },
             "onClick": {
@@ -95,27 +107,36 @@
         },
         "modes": {
             "grab": {
-                "distance": 250,
+                "distance": 200,
                 "links": {
-                    "opacity": 1
+                    "opacity": 0.9
                 }
             },
             "bubble": {
-                "distance": 200,
-                "size": 10,
-                "opacity": 0.8,
-                "duration": 2
+                "distance": 150,
+                "size": 8,
+                "opacity": 0.9,
+                "duration": 1.5
             },
             "push": {
-                "quantity": 6
+                "quantity": 4
             },
             "repulse": {
-                "distance": 150,
-                "duration": 0.8
+                "distance": 100,
+                "duration": 0.6
             }
         }
     },
     "detectRetina": true,
     "smooth": true,
-    "fpsLimit": 60
+    "fpsLimit": 60,
+    "style": {
+        "position": "absolute",
+        "zIndex": 0
+    },
+    "fullScreen": {
+        "enable": true,
+        "zIndex": -1
+    },
+    "zLayers": 3
 }

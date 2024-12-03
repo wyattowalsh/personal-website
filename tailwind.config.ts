@@ -58,8 +58,11 @@ const config: Config = {
         accent: {
           DEFAULT: withOpacityValue('--accent'),
           foreground: withOpacityValue('--accent-foreground'),
+          '10': 'rgb(var(--accent-rgb) / 0.1)',
           '20': 'rgb(var(--accent-rgb) / 0.2)',
+          '30': 'rgb(var(--accent-rgb) / 0.3)',
           '40': 'rgb(var(--accent-rgb) / 0.4)',
+          '50': 'rgb(var(--accent-rgb) / 0.5)',
         },
         'accent-foreground': withOpacityValue('--accent-foreground'),
         destructive: withOpacityValue('--destructive'),
@@ -115,6 +118,14 @@ const config: Config = {
           'hover-fg': 'var(--caption-hover-fg)',
           border: 'var(--caption-border)',
           'hover-border': 'var(--caption-hover-border)',
+        },
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'bg-card': 'var(--bg-card)',
+        'bg-card-hover': 'var(--bg-card-hover)',
+        'tag': {
+          DEFAULT: 'var(--tag-text)',
+          hover: 'var(--tag-text-hover)',
         },
       },
       fontFamily: {
@@ -190,6 +201,12 @@ const config: Config = {
         'title-shimmer': 'titleShimmer 3s ease-in-out infinite',
         gradientAnimation: 'gradientAnimation 8s ease infinite',
         'text-gradient': 'textGradient 5s ease infinite',
+        'tag-float': 'tag-float 3s ease-in-out infinite',
+        'tag-glow': 'tag-glow 2s ease-in-out infinite',
+        'tag-shimmer': 'tag-shimmer 3s linear infinite',
+        'tag-pulse': 'tag-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'tag-shine': 'tag-shine 1.5s ease-in-out infinite',
+        'tag-bounce': 'tag-bounce 0.5s ease-in-out',
       },
       keyframes: {
         fadeIn: {
@@ -262,7 +279,7 @@ const config: Config = {
           '6%': {
             textShadow: 'var(--glitch-shadow-1)'
           },
-          '8%': {
+          '8%': { 
             textShadow: 'var(--glitch-shadow-2)'
           },
           '10%, 100%': {
@@ -403,6 +420,34 @@ const config: Config = {
         textGradient: {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
+        },
+        'tag-float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
+        'tag-glow': {
+          '0%, 100%': { 
+            boxShadow: '0 0 5px rgba(var(--primary-rgb), 0.3), 0 0 10px rgba(var(--primary-rgb), 0.2)'
+          },
+          '50%': { 
+            boxShadow: '0 0 10px rgba(var(--primary-rgb), 0.5), 0 0 20px rgba(var(--primary-rgb), 0.3)'
+          }
+        },
+        'tag-shimmer': {
+          '0%': { backgroundPosition: '200% 50%' },
+          '100%': { backgroundPosition: '-200% 50%' }
+        },
+        'tag-pulse': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
+        'tag-shine': {
+          '0%': { backgroundPosition: '200% center' },
+          '100%': { backgroundPosition: '-200% center' },
+        },
+        'tag-bounce': {
+          '0%, 100%': { transform: 'scale(1)' },
+          '50%': { transform: 'scale(0.97)' },
         },
       },
       backdropBlur: {

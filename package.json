@@ -3,9 +3,10 @@
   "version": "0.6.0",
   "private": true,
   "scripts": {
-    "predev": "NODE_ENV=development ts-node -r tsconfig-paths/register --project tsconfig.scripts.json scripts/predev.ts",
-    "dev": "next dev",
-    "prebuild": "NODE_ENV=production ts-node -r tsconfig-paths/register --project tsconfig.scripts.json scripts/prebuild.ts",
+    "preprocess": "ts-node -r tsconfig-paths/register scripts/index.ts",
+    "predev": "NODE_ENV=development npm run preprocess",
+    "dev": "DEBUG=true LOG_LEVEL=debug next dev",
+    "prebuild": "NODE_ENV=production npm run preprocess",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",

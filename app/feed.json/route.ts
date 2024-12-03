@@ -1,18 +1,13 @@
 import { NextResponse } from 'next/server';
 import { cache } from 'react';
 import { Feed } from 'feed';
-import { backend } from '@/lib/server'; // Fix: import from server instead of services/backend
-import { getConfig } from '@/lib/core'; // Fix: import from core instead of config
+import { backend } from '@/lib/server';
+import { getConfig } from '@/lib/core';
 
-// Removed exports of 'dynamic' and 'revalidate'
-// export const dynamic = 'force-dynamic';
-// export const revalidate = 3600; // Revalidate every hour
-
-// Use cache to precompute the feed
-const generateFeed = cache(async () => {
+const generateJsonFeed = cache(async () => {
   try {
-    const site = getConfig().site; // Fix: use getConfig directly
-    const posts = await backend.getAllPosts(); // Fix: use backend instance directly
+    const site = getConfig().site;
+    const posts = await backend.getAllPosts();
 
     const feed = new Feed({
       title: site.title,
@@ -48,20 +43,19 @@ const generateFeed = cache(async () => {
       });
     });
 
-    return feed.rss2();
+    return feed.json1();
   } catch (error) {
-    console.error('Error generating feed:', error);
-    return ''; // Return empty string or default feed content
+    console.error('Error generating JSON feed:', error);
+    return '';
   }
 });
 
 export async function GET() {
-  const rssFeed = await generateFeed();
+  const jsonFeed = await generateJsonFeed();
 
-  return new Response(rssFeed, {
+  return new Response(jsonFeed, {
     headers: {
-      'Content-Type': 'application/xml; charset=utf-8',
-      // Control caching via headers
+      'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
     },
   });

@@ -1,41 +1,33 @@
 {
+    "autoPlay": true,
     "background": {
         "color": {
-            "value": "#030316"
+            "value": "#0d0d1d"
         }
     },
     "particles": {
         "number": {
-            "value": 160,
+            "value": 120,
             "density": {
                 "enable": true,
-                "area": 1000
+                "area": 800
             }
         },
         "color": {
-            "value": ["#ffeb3b", "#ffc107", "#ff9800", "#ff5722", "#f44336"]
+            "value": ["#ffd700", "#ffa500", "#ff4500", "#ff6347", "#ff4040"]
         },
         "shape": {
             "type": "circle",
-            "options": {
-                "polygon": {
-                    "nb_sides": 6
-                },
-                "image": {
-                    "src": "sparkle.png",
-                    "width": 100,
-                    "height": 100
-                }
-            }
+            "options": {}
         },
         "opacity": {
             "value": {
                 "min": 0.1,
-                "max": 0.9
+                "max": 0.8
             },
             "animation": {
                 "enable": true,
-                "speed": 2,
+                "speed": 1.5,
                 "minimumValue": 0.1,
                 "sync": false
             }
@@ -43,19 +35,19 @@
         "size": {
             "value": {
                 "min": 2,
-                "max": 12
+                "max": 10
             },
             "animation": {
                 "enable": true,
-                "speed": 1,
-                "minimumValue": 3,
+                "speed": 1.2,
+                "minimumValue": 2,
                 "sync": false
             },
             "random": true
         },
         "move": {
             "enable": true,
-            "speed": 1.8,
+            "speed": 1.5,
             "direction": "none",
             "outModes": {
                 "default": "out"
@@ -64,33 +56,33 @@
             "straight": false,
             "attract": {
                 "enable": true,
-                "rotateX": 3000,
-                "rotateY": 3000
+                "rotateX": 2000,
+                "rotateY": 2000
             }
         },
         "twinkle": {
             "particles": {
                 "enable": true,
-                "frequency": 0.05,
-                "opacity": 0.8
+                "frequency": 0.1,
+                "opacity": 0.7
             },
             "lines": {
                 "enable": true,
-                "frequency": 0.02,
-                "opacity": 0.6
+                "frequency": 0.05,
+                "opacity": 0.5
             }
         },
         "stroke": {
             "width": 1,
             "color": {
-                "value": ["#fffacd", "#ffcc66", "#ffffff"]
+                "value": ["#ffddaa", "#ffeecc", "#ffffff"]
             }
         },
         "links": {
             "enable": true,
-            "distance": 150,
+            "distance": 120,
             "color": "#ffffff",
-            "opacity": 0.3,
+            "opacity": 0.4,
             "width": 1
         }
     },
@@ -102,41 +94,45 @@
             },
             "onClick": {
                 "enable": true,
-                "mode": ["push", "remove", "attract"]
+                "mode": ["push", "attract", "repulse"]
             }
         },
         "modes": {
             "bubble": {
                 "distance": 200,
-                "size": 18,
-                "duration": 4,
+                "size": 15,
+                "duration": 2,
                 "opacity": 0.8,
                 "color": {
-                    "value": "#ffd700"
+                    "value": "#ffb400"
                 }
             },
             "repulse": {
-                "distance": 220,
-                "duration": 0.8
+                "distance": 150,
+                "duration": 1
             },
             "attract": {
-                "distance": 140,
+                "distance": 100,
                 "duration": 1.5,
-                "factor": 3
+                "factor": 2
             },
             "grab": {
-                "distance": 160,
+                "distance": 140,
                 "links": {
-                    "opacity": 0.9
+                    "opacity": 0.8
                 }
             },
             "push": {
-                "quantity": 10
+                "quantity": 8
             },
             "remove": {
-                "quantity": 5
+                "quantity": 4
             }
         }
     },
-    "detectRetina": true
+    "detectRetina": true,
+    "fpsLimit": 60,
+    "pauseOnBlur": true,
+    "pauseOnOutsideViewport": true,
+    "zLayers": 1
 }

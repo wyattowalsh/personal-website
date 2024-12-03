@@ -346,6 +346,39 @@ $landing-title-gradient-dark: linear-gradient(
   --title-gradient-start: #ff0080;
   --title-gradient-end: #40e0d0;
   --title-shadow: rgba(0, 0, 0, 0.4);
+
+  // Enhanced text contrast
+  --foreground: hsl(222, 47%, 11%);
+  --background: hsl(0, 0%, 100%);
+  --muted-foreground: hsl(215.4, 16.3%, 36.9%);
+  
+  // Accent colors with better contrast
+  --accent: hsl(221, 83%, 53%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  
+  // Card and hover states
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222, 47%, 11%);
+  --card-hover: hsl(210, 40%, 98%);
+
+  // Add these new variables
+  --primary-light: rgb(147, 197, 253); // blue-300
+  --primary-rgb: 59, 130, 246; // blue-500
+  --text-primary: rgb(17, 24, 39); // gray-900
+  --text-secondary: rgb(55, 65, 81); // gray-700
+  --bg-card: rgb(255, 255, 255); // white
+  --bg-card-hover: rgb(249, 250, 251); // gray-50
+
+  // Add or update these specific variables
+  --primary-rgb: 59, 130, 246;
+  --text-primary: rgb(17, 24, 39); // Dark text for light mode
+  --text-hover: rgb(31, 41, 55); // Slightly lighter but still dark
+  --card-text: rgb(17, 24, 39); // Dark text for cards
+  --card-text-hover: rgb(31, 41, 55); // Dark text for card hover
+  --tag-text: rgb(31, 41, 55); // Darker text for better contrast
+  --tag-text-hover: rgb(17, 24, 39); // Even darker on hover
+  --tag-bg: rgb(255, 255, 255);
+  --tag-bg-hover: rgb(249, 250, 251);
 }
 
 // Dark Theme Variables
@@ -533,4 +566,37 @@ $landing-title-gradient-dark: linear-gradient(
   --title-gradient-start-dark: #8a2be2;
   --title-gradient-end-dark: #ff0080;
   --title-shadow: rgba(255, 255, 255, 0.4);
+
+  // Enhanced text contrast
+  --foreground: hsl(210, 40%, 98%);
+  --background: hsl(222, 47%, 11%);
+  --muted-foreground: hsl(215, 20.2%, 65.1%);
+  
+  // Accent colors with better contrast
+  --accent: hsl(217, 91%, 60%);
+  --accent-foreground: hsl(210, 40%, 98%);
+  
+  // Card and hover states
+  --card: hsl(222, 47%, 11%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --card-hover: hsl(222, 47%, 13%);
+
+  // Add these new variables
+  --primary-light: rgb(191, 219, 254); // blue-200
+  --primary-rgb: 96, 165, 250; // blue-400
+  --text-primary: rgb(243, 244, 246); // gray-100
+  --text-secondary: rgb(209, 213, 219); // gray-300
+  --bg-card: rgb(31, 41, 55); // gray-800
+  --bg-card-hover: rgb(55, 65, 81); // gray-700
+
+  // Add or update these specific variables
+  --primary-rgb: 59, 130, 246;
+  --text-primary: rgb(243, 244, 246); // Light text for dark mode
+  --text-hover: rgb(229, 231, 235); // Slightly lighter but still light
+  --card-text: rgb(243, 244, 246); // Light text for cards
+  --card-text-hover: rgb(229, 231, 235); // Light text for card hover
+  --tag-text: rgb(229, 231, 235); // Light text for dark mode
+  --tag-text-hover: rgb(243, 244, 246); // Lighter on hover
+  --tag-bg: rgb(31, 41, 55);
+  --tag-bg-hover: rgb(55, 65, 81);
 }

@@ -1,4 +1,5 @@
 {
+    "autoPlay": true,
     "background": {
         "color": {
             "value": "#fafafa"
@@ -6,48 +7,52 @@
     },
     "particles": {
         "number": {
-            "value": 80,
+            "value": 100,
             "density": {
                 "enable": true,
                 "area": 800
             }
         },
         "color": {
-            "value": ["#6a9fb5", "#4db6ac", "#00796b", "#ade8f4"]
+            "value": ["#6a9fb5", "#4db6ac", "#00796b", "#ade8f4", "#b2dfdb"]
         },
         "shape": {
             "type": "polygon",
             "polygon": {
                 "sides": 6
+            },
+            "stroke": {
+                "width": 1,
+                "color": "#b2ebf2"
             }
         },
         "opacity": {
             "value": {
-                "min": 0.3,
-                "max": 0.8
+                "min": 0.4,
+                "max": 0.9
             },
             "animation": {
                 "enable": true,
-                "speed": 1,
-                "minimumValue": 0.3,
+                "speed": 1.5,
+                "minimumValue": 0.4,
                 "sync": false
             }
         },
         "size": {
             "value": {
                 "min": 8,
-                "max": 12
+                "max": 14
             },
             "animation": {
                 "enable": true,
-                "speed": 2,
+                "speed": 3,
                 "minimumValue": 6,
                 "sync": false
             }
         },
         "move": {
             "enable": true,
-            "speed": 2,
+            "speed": 2.5,
             "direction": "none",
             "outModes": {
                 "default": "bounce"
@@ -55,10 +60,10 @@
         },
         "links": {
             "enable": true,
-            "distance": 150,
+            "distance": 120,
             "color": "#4db6ac",
-            "opacity": 0.4,
-            "width": 1
+            "opacity": 0.5,
+            "width": 1.5
         }
     },
     "interactivity": {
@@ -74,13 +79,13 @@
         },
         "modes": {
             "bubble": {
-                "distance": 200,
-                "size": 20,
-                "duration": 2,
-                "opacity": 0.8
+                "distance": 150,
+                "size": 18,
+                "duration": 1.8,
+                "opacity": 0.7
             },
             "push": {
-                "quantity": 4
+                "quantity": 5
             }
         }
     },
@@ -88,5 +93,13 @@
         "enable": false
     },
     "detectRetina": true,
-    "fpsLimit": 60
+    "fpsLimit": 60,
+    "themes": [
+        {
+            "name": "light-mode",
+            "default": {
+                "value": true
+            }
+        }
+    ]
 }

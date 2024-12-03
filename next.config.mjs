@@ -67,6 +67,32 @@ const nextConfig = {
       {
         source: '/rss.xml',
         destination: '/feed.xml',
+      },
+      {
+        source: '/feed.atom',
+        destination: '/feed.atom',
+        has: [{
+          type: 'header',
+          key: 'Accept',
+          value: 'application/atom\\+xml',
+        }],
+      },
+      {
+        source: '/atom',
+        destination: '/feed.atom',
+      },
+      {
+        source: '/feed.json',
+        destination: '/feed.json',
+        has: [{
+          type: 'header',
+          key: 'Accept',
+          value: 'application/json',
+        }],
+      },
+      {
+        source: '/json',
+        destination: '/feed.json',
       }
     ]
   },

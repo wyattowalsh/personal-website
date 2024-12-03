@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { schemas } from '@/lib/api/middleware';
-import { backend } from '@/lib/services/backend';
+import { BackendService } from '@/lib/server';
 import { ApiError } from '@/lib/api';
 
 export async function GET(req: NextRequest) {

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { backend } from '@/lib/services/backend';
+import { backend } from '@/lib/server'
 import { ApiError } from '@/lib/api';
 
 export async function GET(request: NextRequest) {

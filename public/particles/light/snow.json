@@ -1,7 +1,38 @@
 {
+    "autoPlay": true,
     "background": {
         "color": {
             "value": "#f4f8ff"
+        }
+    },
+    "detectRetina": true,
+    "duration": 0,
+    "fpsLimit": 60,
+    "fullScreen": {
+        "enable": false
+    },
+    "interactivity": {
+        "events": {
+            "onHover": {
+                "enable": true,
+                "mode": "bubble"
+            },
+            "onClick": {
+                "enable": true,
+                "mode": "repulse"
+            }
+        },
+        "modes": {
+            "bubble": {
+                "distance": 200,
+                "size": 8,
+                "duration": 2,
+                "opacity": 0.7
+            },
+            "repulse": {
+                "distance": 150,
+                "duration": 0.4
+            }
         }
     },
     "particles": {
@@ -21,7 +52,7 @@
         "opacity": {
             "value": {
                 "min": 0.3,
-                "max": 0.8
+                "max": 0.7
             },
             "animation": {
                 "enable": true,
@@ -47,47 +78,16 @@
             "speed": 1.5,
             "direction": "bottom",
             "outModes": {
-                "default": "out",
-                "bottom": "out",
-                "top": "out"
+                "default": "out"
             },
             "straight": false,
             "trail": {
-                "enable": true,
-                "length": 4,
-                "fill": {
-                    "color": "#f4f8ff"
-                }
+                "enable": false
             }
         }
     },
-    "interactivity": {
-        "events": {
-            "onHover": {
-                "enable": true,
-                "mode": "bubble"
-            },
-            "onClick": {
-                "enable": true,
-                "mode": "repulse"
-            }
-        },
-        "modes": {
-            "bubble": {
-                "distance": 200,
-                "size": 12,
-                "duration": 2,
-                "opacity": 0.8
-            },
-            "repulse": {
-                "distance": 200,
-                "duration": 0.4
-            }
-        }
-    },
-    "fullScreen": {
-        "enable": false
-    },
-    "detectRetina": true,
-    "fpsLimit": 60
+    "pauseOnBlur": true,
+    "pauseOnOutsideViewport": true,
+    "responsive": [],
+    "themes": []
 }

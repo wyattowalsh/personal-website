@@ -82,12 +82,13 @@ export default function NotFoundContent() {
         >
           <Link href={backLink} className="no-underline">
             <span className="flex items-center gap-2">
-              {isBlogPage ? <BookOpen className="w-4 h-4" /> : <Home className="w-4 h-4" />}
-              <span>{isBlogPage ? "Back to blog" : "Go back home"}</span>
-              <ArrowLeft className={cn(
+            <ArrowLeft className={cn(
                 "w-4 h-4 transition-transform duration-300",
                 "group-hover/button:-translate-x-1"
               )} />
+              <span>{isBlogPage ? "Back to blog" : "Go back home"}</span>
+              
+              {isBlogPage ? <BookOpen className="w-4 h-4" /> : <Home className="w-4 h-4" />}
             </span>
           </Link>
         </Button>

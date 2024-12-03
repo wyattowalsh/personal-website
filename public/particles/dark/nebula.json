@@ -2,70 +2,71 @@
   "autoPlay": true,
   "background": {
     "color": {
-      "value": "#020202"
+      "value": "#000010"
     },
     "opacity": 1
   },
   "fullScreen": {
-    "enable": false
+    "enable": true,
+    "zIndex": -1
   },
   "detectRetina": true,
-  "fpsLimit": 120,
+  "fpsLimit": 90,
   "particles": {
     "number": {
-      "value": 250,
+      "value": 200,
       "density": {
         "enable": true,
-        "area": 800
+        "area": 1000
       }
     },
     "color": {
-      "value": ["#ff0080", "#00ff80", "#8000ff", "#ffbf00", "#ffffff"]
+      "value": ["#ff007f", "#39ff14", "#7f00ff", "#ffcc00", "#00e5ff"]
     },
     "shape": {
-      "type": ["circle", "star", "polygon", "triangle"],
+      "type": ["circle", "star", "triangle", "polygon"],
       "options": {
         "polygon": {
-          "sides": 6
+          "sides": 5
         }
       }
     },
     "opacity": {
       "value": {
-        "min": 0.1,
-        "max": 1
+        "min": 0.2,
+        "max": 0.9
       },
       "animation": {
         "enable": true,
-        "speed": 1.2,
-        "minimumValue": 0.1,
+        "speed": 1,
+        "minimumValue": 0.2,
         "sync": false
       }
     },
     "size": {
       "value": {
-        "min": 1,
-        "max": 10
+        "min": 2,
+        "max": 8
       },
       "animation": {
         "enable": true,
-        "speed": 5,
-        "minimumValue": 1,
+        "speed": 3,
+        "minimumValue": 2,
         "sync": false
       }
     },
     "links": {
       "enable": true,
-      "distance": 150,
+      "distance": 120,
       "color": {
         "value": "#ffffff"
       },
-      "opacity": 0.4,
-      "width": 2
+      "opacity": 0.3,
+      "width": 1
     },
     "move": {
       "enable": true,
-      "speed": 1,
+      "speed": 1.5,
       "direction": "none",
       "outModes": {
         "default": "out"
@@ -73,9 +74,9 @@
       "straight": false,
       "trail": {
         "enable": true,
-        "length": 20,
+        "length": 15,
         "fill": {
-          "color": "#020202"
+          "color": "#000010"
         }
       }
     },
@@ -84,43 +85,64 @@
         "min": 0,
         "max": 100
       },
-      "opacityRate": 0.5
+      "opacityRate": 0.6
     }
   },
   "interactivity": {
     "events": {
       "onHover": {
         "enable": true,
-        "mode": ["bubble", "connect"]
+        "mode": ["bubble", "grab"]
       },
       "onClick": {
         "enable": true,
-        "mode": ["remove", "repulse"]
+        "mode": ["push", "repulse"]
       },
       "resize": true
     },
     "modes": {
       "bubble": {
-        "distance": 250,
-        "size": 15,
-        "duration": 2,
+        "distance": 200,
+        "size": 12,
+        "duration": 1.5,
         "opacity": 0.8
       },
-      "connect": {
-        "distance": 120,
+      "grab": {
+        "distance": 140,
         "links": {
           "opacity": 0.5
         }
       },
       "repulse": {
-        "distance": 200,
+        "distance": 150,
         "duration": 1
       },
-      "remove": {
-        "quantity": 2
+      "push": {
+        "quantity": 4
       }
     }
   },
   "pauseOnBlur": true,
-  "pauseOnOutsideViewport": true
+  "pauseOnOutsideViewport": false,
+  "themes": [
+    {
+      "name": "dark-nebula",
+      "default": {
+        "value": true,
+        "mode": "dark"
+      },
+      "options": {
+        "background": {
+          "color": {
+            "value": "#000010"
+          }
+        },
+        "particles": {
+          "color": {
+            "value": ["#ff007f", "#39ff14", "#7f00ff", "#ffcc00", "#00e5ff"]
+          }
+        }
+      }
+    }
+  ]
 }

@@ -4,7 +4,7 @@
     "color": {
       "value": "#0d1117"
     },
-    "opacity": 0.95
+    "opacity": 1
   },
   "fullScreen": {
     "enable": false
@@ -13,14 +13,14 @@
   "fpsLimit": 60,
   "particles": {
     "number": {
-      "value": 300,
+      "value": 250,
       "density": {
         "enable": true,
-        "area": 1000
+        "area": 800
       }
     },
     "color": {
-      "value": ["#00ff00", "#00cc00", "#007700", "#33ff33", "#66ff66"]
+      "value": ["#00ff00", "#00cc00", "#009900", "#33ff33", "#66ff66"]
     },
     "shape": {
       "type": "char",
@@ -35,24 +35,24 @@
     "opacity": {
       "value": {
         "min": 0.3,
-        "max": 0.8
+        "max": 0.7
       },
       "animation": {
         "enable": true,
-        "speed": 1.5,
+        "speed": 1.2,
         "minimumValue": 0.2,
         "sync": false
       }
     },
     "size": {
       "value": {
-        "min": 5,
-        "max": 10
+        "min": 6,
+        "max": 12
       },
       "animation": {
         "enable": true,
-        "speed": 2,
-        "minimumValue": 3,
+        "speed": 1.8,
+        "minimumValue": 4,
         "sync": false
       }
     },
@@ -65,11 +65,11 @@
       },
       "gravity": {
         "enable": true,
-        "acceleration": 5
+        "acceleration": 3
       },
       "trail": {
         "enable": true,
-        "length": 5,
+        "length": 6,
         "fill": {
           "color": "#0d1117"
         }
@@ -97,13 +97,13 @@
     },
     "modes": {
       "trail": {
-        "delay": 0.01,
-        "quantity": 3
+        "delay": 0.05,
+        "quantity": 5
       },
       "grab": {
-        "distance": 150,
+        "distance": 200,
         "links": {
-          "opacity": 0.5
+          "opacity": 0.6
         }
       },
       "push": {

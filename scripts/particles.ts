@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { logger } from '../../lib/utils/logger';
+import { logger } from '../lib/core';
 import { z } from 'zod';
 
 // Define a schema for numbers or objects with min and max
@@ -397,7 +397,11 @@ async function validateParticleConfig(filePath: string): Promise<void> {
 }
 
 export async function generateParticleConfigs(): Promise<string> {
+  const startTime = Date.now();
+  
   try {
+    logger.group('Generating particle configurations');
+    
     const publicDir = path.join(process.cwd(), 'public');
     const particlesDir = path.join(publicDir, 'particles');
     const outputDir = path.join(process.cwd(), 'components', 'particles');
@@ -411,27 +415,36 @@ export async function generateParticleConfigs(): Promise<string> {
     };
 
     for (const theme of themes) {
+      logger.step(`Processing ${theme} theme`);
       const themeDir = path.join(particlesDir, theme);
+      
       try {
         const files = await fs.readdir(themeDir);
         const jsonFiles = files.filter((file) => file.endsWith('.json'));
+        
+        logger.debug(`Found ${jsonFiles.length} configs for ${theme} theme`);
 
-        for (const file of jsonFiles) {
-          const filePath = path.join(themeDir, file);
-
+        for (const [index, file] of jsonFiles.entries()) {
           try {
-            await validateParticleConfig(filePath);
-            const stats = await fs.stat(filePath);
-            const hash = await calculateFileHash(filePath);
+            logger.step(`Validating ${file}`, index + 1, jsonFiles.length);
+            const filePath = path.join(themeDir, file);
 
-            configs[theme].push({
-              url: `/particles/${theme}/${file}`,
-              hash,
-              lastModified: stats.mtime.toISOString(),
-              theme,
-            });
+            try {
+              await validateParticleConfig(filePath);
+              const stats = await fs.stat(filePath);
+              const hash = await calculateFileHash(filePath);
 
-            logger.success(`Validated particle config: ${file}`);
+              configs[theme].push({
+                url: `/particles/${theme}/${file}`,
+                hash,
+                lastModified: stats.mtime.toISOString(),
+                theme,
+              });
+
+              logger.success(`Validated particle config: ${file}`);
+            } catch (error) {
+              logger.error(`Validation failed for ${file}:`, error as Error);
+            }
           } catch (error) {
             logger.error(`Validation failed for ${file}:`, error as Error);
           }
@@ -472,9 +485,18 @@ export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = $
     await fs.writeFile(outputPath, code, 'utf-8');
     logger.success(`Generated particle configs at ${outputPath}`);
 
+    const duration = Date.now() - startTime;
+    logger.timing('Particle config generation', duration);
+    logger.success('Generated particle configurations', {
+      light: configs.light.length,
+      dark: configs.dark.length
+    });
+    logger.groupEnd();
+
     return outputPath;
   } catch (error) {
     logger.error('Failed to generate particle configs:', error as Error);
+    logger.groupEnd();
     throw error;
   }
 }

@@ -1,11 +1,17 @@
-import { links } from '@/components/Links';
-import { Post } from '@/lib/services/backend';
+import { Post, getConfig } from './core';
 import { cache } from 'react';
-import { getConfig } from './config';
 
-interface BreadcrumbItem {
+export interface BreadcrumbItem {
   name: string;
   item: string;
+}
+
+export interface SchemaOptions {
+  baseUrl?: string;
+  images?: string[];
+  tags?: string[];
+  datePublished?: string;
+  dateModified?: string;
 }
 
 export function generateArticleStructuredData(post: Post, siteUrl: string) {
@@ -72,15 +78,16 @@ export const generateWebSiteSchema = cache((url = 'https://w4w.dev') => {
   };
 });
 
-export function generateArticleSchema(post: any) {
+export function generateArticleSchema(post: Post, options?: SchemaOptions) {
   const config = getConfig();
+  const baseUrl = options?.baseUrl || config.site.url;
   
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.summary,
-    image: post.image ? [`${config.site.url}${post.image}`] : [],
+    image: post.image ? [`${baseUrl}${post.image}`] : options?.images || [],
     datePublished: post.created,
     dateModified: post.updated || post.created,
     author: {
@@ -93,9 +100,12 @@ export function generateArticleSchema(post: any) {
       name: config.site.author.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${config.site.url}/logo.webp`
+        url: `${baseUrl}/logo.webp`
       }
-    }
+    },
+    keywords: post.tags,
+    isAccessibleForFree: true,
+    license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
   };
 }
 

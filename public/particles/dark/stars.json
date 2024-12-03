@@ -2,7 +2,7 @@
   "autoPlay": true,
   "background": {
     "color": {
-      "value": "#000000"
+      "value": "#0d0d1f"
     },
     "position": "50% 50%",
     "repeat": "no-repeat",
@@ -10,63 +10,64 @@
     "opacity": 1
   },
   "fullScreen": {
-    "enable": false
+    "enable": true,
+    "zIndex": -1
   },
   "detectRetina": true,
-  "fpsLimit": 120,
+  "fpsLimit": 60,
   "particles": {
     "number": {
-      "value": 300,
+      "value": 200,
       "density": {
         "enable": true,
-        "area": 1200
+        "area": 1000
       }
     },
     "color": {
-      "value": ["#ffffff", "#ffd700", "#ff4500", "#87ceeb", "#f0e68c"]
+      "value": ["#ffffff", "#ffd700", "#ffa07a", "#87cefa", "#fffacd"]
     },
     "shape": {
       "type": "star"
     },
     "opacity": {
       "value": {
-        "min": 0.1,
-        "max": 1
+        "min": 0.2,
+        "max": 0.8
       },
       "animation": {
         "enable": true,
-        "speed": 0.5,
-        "minimumValue": 0.1,
+        "speed": 0.8,
+        "minimumValue": 0.2,
         "sync": false
       }
     },
     "size": {
       "value": {
-        "min": 1,
-        "max": 6
+        "min": 2,
+        "max": 5
       },
       "animation": {
         "enable": true,
-        "speed": 5,
-        "minimumValue": 1,
+        "speed": 4,
+        "minimumValue": 1.5,
         "sync": false
       }
     },
     "rotate": {
       "value": 0,
       "random": true,
-      "direction": "clockwise",
+      "direction": "random",
       "animation": {
         "enable": true,
-        "speed": 6,
+        "speed": 3,
         "sync": false
       }
     },
     "move": {
       "enable": true,
       "speed": {
-        "min": 0.2,
-        "max": 0.5
+        "min": 0.3,
+        "max": 0.6
       },
       "direction": "none",
       "outModes": {
@@ -74,68 +75,69 @@
       },
       "trail": {
         "enable": true,
-        "length": 15,
+        "length": 12,
         "fill": {
-          "color": "#000000"
+          "color": "#0d0d1f"
         }
       }
     },
     "life": {
       "count": 0,
       "duration": {
-        "value": 6,
+        "value": 8,
         "random": {
           "enable": true,
-          "minimumValue": 2
+          "minimumValue": 3
         }
       },
       "delay": {
-        "value": 1,
+        "value": 0.5,
         "random": {
           "enable": true,
-          "minimumValue": 0.5
+          "minimumValue": 0.3
         }
       }
     },
     "twinkle": {
       "particles": {
         "enable": true,
-        "frequency": 0.01,
-        "opacity": 1
+        "frequency": 0.02,
+        "opacity": 0.9
       }
     },
     "zIndex": {
       "value": {
         "min": 0,
-        "max": 200
-      },
-      "opacityRate": 0.5
+        "max": 150
+      }
     }
   },
   "interactivity": {
     "events": {
       "onHover": {
         "enable": true,
-        "mode": "attract"
+        "mode": "bubble"
       },
       "onClick": {
         "enable": true,
-        "mode": "repulse"
+        "mode": ["repulse", "bubble"]
       },
       "resize": true
     },
     "modes": {
       "repulse": {
-        "distance": 350,
-        "duration": 0.5,
-        "factor": 150,
-        "speed": 2,
-        "maxSpeed": 70,
-        "easing": "ease-in-out-quad"
-      },
-      "attract": {
         "distance": 250,
-        "duration": 0.4
+        "duration": 0.8,
+        "speed": 3,
+        "maxSpeed": 50,
+        "easing": "ease-out-quad"
+      },
+      "bubble": {
+        "distance": 300,
+        "size": 8,
+        "duration": 2,
+        "opacity": 0.9,
+        "mix": false
       }
     }
   }

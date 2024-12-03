@@ -7,10 +7,10 @@
     },
     "particles": {
         "number": {
-            "value": 80,
+            "value": 60,
             "density": {
                 "enable": true,
-                "area": 800
+                "area": 1000
             }
         },
         "color": {
@@ -19,38 +19,38 @@
         "shape": {
             "type": "image",
             "image": {
-                "src": "butterfly.webp",
+                "src": "../../butterfly.webp",
                 "width": 32,
                 "height": 32
             }
         },
         "opacity": {
             "value": {
-                "min": 0.3,
+                "min": 0.4,
                 "max": 0.8
             },
             "animation": {
                 "enable": true,
-                "speed": 1,
-                "minimumValue": 0.3,
+                "speed": 0.8,
+                "minimumValue": 0.4,
                 "sync": false
             }
         },
         "size": {
             "value": {
-                "min": 8,
-                "max": 16
+                "min": 10,
+                "max": 20
             },
             "animation": {
                 "enable": true,
-                "speed": 2,
-                "minimumValue": 8,
+                "speed": 1.5,
+                "minimumValue": 10,
                 "sync": false
             }
         },
         "move": {
             "enable": true,
-            "speed": 2,
+            "speed": 1.8,
             "direction": "none",
             "outModes": {
                 "default": "out"
@@ -59,7 +59,7 @@
             "random": true,
             "trail": {
                 "enable": true,
-                "length": 3,
+                "length": 5,
                 "fill": {
                     "color": "#f9f9f9"
                 }
@@ -67,9 +67,9 @@
         },
         "links": {
             "enable": true,
-            "distance": 120,
+            "distance": 140,
             "color": "#ffa500",
-            "opacity": 0.5,
+            "opacity": 0.6,
             "width": 1
         }
     },
@@ -89,21 +89,21 @@
             "grab": {
                 "distance": 250,
                 "links": {
-                    "opacity": 0.7
+                    "opacity": 0.8
                 }
             },
             "bubble": {
                 "distance": 200,
-                "size": 24,
+                "size": 28,
                 "duration": 2,
-                "opacity": 0.8
+                "opacity": 0.85
             },
             "repulse": {
-                "distance": 200,
-                "duration": 0.4
+                "distance": 220,
+                "duration": 0.5
             },
             "push": {
-                "quantity": 8
+                "quantity": 6
             },
             "remove": {
                 "quantity": 4
@@ -124,6 +124,11 @@
             "options": {
                 "background": {
                     "color": "#f9f9f9"
+                },
+                "particles": {
+                    "color": {
+                        "value": ["#ff8c00", "#ffa500", "#ffd700", "#f0e68c"]
+                    }
                 }
             }
         },
@@ -131,12 +136,15 @@
             "name": "dark",
             "options": {
                 "background": {
-                    "color": "#000000"
+                    "color": "#1e1e1e"
                 },
                 "particles": {
                     "color": {
-                        "value": ["#ffffff", "#aaaaaa"]
+                        "value": ["#ffffff", "#d3d3d3", "#c0c0c0", "#808080"]
                     }
+                },
+                "links": {
+                    "color": "#d3d3d3"
                 }
             }
         }

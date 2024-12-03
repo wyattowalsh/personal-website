@@ -1,6 +1,6 @@
 // app/api/blog/posts/metadata/[slug]/route.ts
 import { NextRequest } from 'next/server';
-import { backend } from '@/lib/services/backend';
+import { BackendService } from '@/lib/server';
 import { ApiError } from '@/lib/errors';
 
 export async function GET(

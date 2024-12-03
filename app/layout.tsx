@@ -12,7 +12,7 @@ import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
 import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import { cn } from "@/lib/utils";
-import { getDefaultMetadata } from '@/lib/metadata';
+import { getDefaultMetadata } from '@/lib/core';
 import { generateWebSiteSchema } from '@/lib/schema';
 
 config.autoAddCss = false;

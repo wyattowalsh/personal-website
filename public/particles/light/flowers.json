@@ -1,7 +1,8 @@
 {
+    "autoPlay": true,
     "background": {
         "color": {
-            "value": "#f7f9fc"
+            "value": "#f9f5ff"
         },
         "image": "",
         "position": "50% 50%",
@@ -10,55 +11,55 @@
     },
     "particles": {
         "number": {
-            "value": 160,
+            "value": 120,
             "density": {
                 "enable": true,
-                "area": 1000
+                "area": 800
             }
         },
         "color": {
-            "value": ["#ff69b4", "#ff1493", "#ff00ff", "#ffc0cb", "#f500a0", "#e0e0f8", "#d5d9ff", "#8a2be2"]
+            "value": ["#ff69b4", "#ff1493", "#ff00ff", "#ffc0cb", "#f500a0", "#e0e0f8", "#d5d9ff", "#8a2be2", "#ffd700", "#ff4500"]
         },
         "shape": {
             "type": ["circle", "image", "polygon"],
             "image": {
-                "src": "/flower.webp",
+                "src": "../../flower.webp",
                 "width": 60,
                 "height": 60
             },
             "polygon": {
-                "nb_sides": 5
+                "nb_sides": 6
             }
         },
         "opacity": {
             "value": {
-                "min": 0.3,
+                "min": 0.4,
                 "max": 0.9
             },
             "random": true,
             "animation": {
                 "enable": true,
-                "speed": 1,
-                "minimumValue": 0.3,
+                "speed": 0.8,
+                "minimumValue": 0.4,
                 "sync": false
             }
         },
         "size": {
             "value": {
-                "min": 6,
-                "max": 14
+                "min": 8,
+                "max": 16
             },
             "random": true,
             "animation": {
                 "enable": true,
-                "speed": 5,
-                "minimumValue": 6,
+                "speed": 4,
+                "minimumValue": 8,
                 "sync": false
             }
         },
         "move": {
             "enable": true,
-            "speed": 2.5,
+            "speed": 2,
             "direction": "bottom",
             "random": false,
             "straight": false,
@@ -67,27 +68,27 @@
             },
             "attract": {
                 "enable": false,
-                "rotateX": 600,
-                "rotateY": 1200
+                "rotateX": 800,
+                "rotateY": 1600
             }
         },
         "links": {
             "enable": true,
-            "distance": 150,
+            "distance": 120,
             "color": "#ff69b4",
-            "opacity": 0.6,
-            "width": 1.2
+            "opacity": 0.5,
+            "width": 1
         }
     },
     "interactivity": {
         "events": {
             "onHover": {
                 "enable": true,
-                "mode": "bubble",
+                "mode": ["bubble", "grab"],
                 "parallax": {
                     "enable": true,
-                    "force": 60,
-                    "smooth": 10
+                    "force": 50,
+                    "smooth": 8
                 }
             },
             "onClick": {
@@ -98,24 +99,24 @@
         },
         "modes": {
             "grab": {
-                "distance": 200,
+                "distance": 180,
                 "links": {
-                    "opacity": 0.7
+                    "opacity": 0.8
                 }
             },
             "bubble": {
-                "distance": 200,
-                "size": 10,
+                "distance": 180,
+                "size": 12,
                 "duration": 2,
-                "opacity": 0.8,
+                "opacity": 0.7,
                 "mix": false
             },
             "repulse": {
-                "distance": 100,
-                "duration": 0.4
+                "distance": 120,
+                "duration": 0.6
             },
             "push": {
-                "quantity": 4
+                "quantity": 3
             },
             "remove": {
                 "quantity": 2
@@ -132,10 +133,29 @@
             "options": {
                 "particles": {
                     "number": {
-                        "value": 80
+                        "value": 60
                     },
                     "move": {
-                        "speed": 1.5
+                        "speed": 1.2
+                    },
+                    "size": {
+                        "value": {
+                            "min": 5,
+                            "max": 12
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "maxWidth": 480,
+            "options": {
+                "particles": {
+                    "number": {
+                        "value": 40
+                    },
+                    "move": {
+                        "speed": 1
                     },
                     "size": {
                         "value": {
@@ -146,5 +166,6 @@
                 }
             }
         }
-    ]
+    ],
+    "zLayers": 3
 }
