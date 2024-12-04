@@ -2,6 +2,7 @@
 import React from "react";
 import BlogTitle from "@/components/BlogTitle";
 import BlogFooter from "@/components/BlogFooter";
+import ScrollReset from "@/components/ScrollReset";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
     title: "onelonedatum Blog"
   }
 };
+
 export default function BlogRootLayout({
   children,
 }: {
@@ -25,6 +27,7 @@ export default function BlogRootLayout({
 }) {
   return (
     <div className="flex flex-col">
+      <ScrollReset />
       <main className="container mx-auto flex-grow">
         <BlogTitle />
         <hr className="border-border my-4" />
