@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 import path from 'path';
 import { BackendService } from '../lib/server';
-import { logger, PreprocessStats, LogLevel } from '../lib/core';
+import { logger, LogLevel } from '../lib/core';
+import type { PreprocessStats } from '../lib/types';  // Update this import
 import { generateParticleConfigs } from './particles';
 
 // Main preprocessing function
@@ -40,10 +41,12 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
     logger.memory();
     logger.groupEnd();
 
-    return {
+    const result: PreprocessStats = {
       ...stats,
       particleConfigPath
     };
+
+    return result;
   } catch (error) {
     logger.error(`Build failed for ${isDev ? 'development' : 'production'}`, error as Error);
     logger.memory();

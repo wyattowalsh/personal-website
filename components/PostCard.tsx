@@ -54,10 +54,18 @@ const PostCard = ({ post, className }: PostCardProps) => {
 		readingTime = "A few minutes",
 	} = post;
 
-	// Add navigation handler
+	// Option 1: Use template literal type assertion
 	const handleCardClick = () => {
-		router.push(`/blog/posts/${slug}`);
+		router.push(`/blog/posts/${slug}` as Route);
 	};
+
+	// Alternative Option 2: Use pathname + params object
+	// const handleCardClick = () => {
+	//     router.push({
+	//         pathname: '/blog/posts/[slug]',
+	//         params: { slug }
+	//     } as Route);
+	// };
 
 	return (
 		<div className="block h-full">

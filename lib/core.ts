@@ -94,6 +94,20 @@ export const schemas = {
   })
 };
 
+// API validation schemas
+export const apiSchemas = {
+  post: z.object({
+    slug: z.string().min(1),
+  }),
+  search: z.object({
+    query: z.string().min(1),
+  }),
+  pagination: z.object({
+    page: z.number().optional().default(1),
+    limit: z.number().optional().default(10),
+  }),
+} as const;
+
 // Log levels
 export enum LogLevel {
   DEBUG = 0,
@@ -269,6 +283,12 @@ export const logger = {
   formatters
 };
 
+// Add middleware types
+export interface ApiMiddleware {
+  validateRequest: <T>(req: Request, schema: z.Schema<T>) => Promise<T>;
+  withErrorHandler: (handler: Function) => Function;
+}
+
 // Enhanced API response types
 export interface ApiResponseMeta {
   timestamp: string;
@@ -400,3 +420,34 @@ class ConfigManager {
 
 export const getConfig = () => ConfigManager.getInstance().getConfig();
 export const config = getConfig();
+
+// API middleware exports
+export const api = {
+  middleware: {
+    validateRequest: async <T>(req: Request, schema: z.Schema<T>): Promise<T> => {
+      try {
+        const data = req.method === 'GET' 
+          ? Object.fromEntries(new URL(req.url).searchParams)
+          : await req.json();
+        return schema.parse(data);
+      } catch (error) {
+        if (error instanceof z.ZodError) {
+          throw new ApiError(400, 'Invalid request data', { errors: error.errors });
+        }
+        throw error;
+      }
+    },
+    
+    withErrorHandler: (handler: Function) => async (...args: any[]) => {
+      try {
+        return await handler(...args);
+      } catch (error) {
+        if (error instanceof ApiError) {
+          return error.toResponse();
+        }
+        console.error('Unhandled error:', error);
+        return new ApiError(500, 'Internal server error').toResponse();
+      }
+    }
+  }
+};

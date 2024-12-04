@@ -10,12 +10,13 @@ export function TagsList({ tags }: { tags: string[] }) {
   return (
     <div className="flex flex-wrap gap-3 justify-center mb-8 max-w-4xl mx-auto p-4">
       {tags.map((tag) => {
-        const isActive = pathname === `/blog/tags/${tag}`;
+        const encodedTag = encodeURIComponent(tag);
+        const isActive = pathname === `/blog/tags/${encodedTag}`;
         
         return (
           <Link
             key={tag}
-            href={`/blog/tags/${tag}`}
+            href={`/blog/tags/${encodedTag}`}
             className={cn(
               "px-3 py-1.5 rounded-lg text-sm font-medium",
               "transition-all duration-300",

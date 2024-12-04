@@ -1,7 +1,6 @@
 import { ISourceOptions } from "@tsparticles/engine";
 import { configUrls } from "./configUrls";
-
-type Theme = 'light' | 'dark';
+import { ParticleConfig, Theme } from "./types";
 
 export const baseConfig: ISourceOptions = {
   fullScreen: false,
@@ -28,8 +27,7 @@ export const baseConfig: ISourceOptions = {
     },
     number: {
       density: {
-        enable: true,
-        area: 800,
+        enable: true,      
       },
       value: 80,
     },
@@ -50,7 +48,6 @@ export const baseConfig: ISourceOptions = {
         enable: true,
         mode: "grab"
       },
-      resize: true
     },
     modes: {
       grab: {

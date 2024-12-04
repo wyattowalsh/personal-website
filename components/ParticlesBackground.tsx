@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, type FC } from "react";
 import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,7 +9,11 @@ import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import ParticleControls from "./ParticleControls";
 
-export default function ParticlesBackground() {
+interface ParticlesBackgroundProps {
+  className?: string;
+}
+
+const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) => {
   const [init, setInit] = useState(false);
   const { resolvedTheme } = useTheme();
   const [isPaused, setIsPaused] = useState(false);
@@ -106,7 +110,7 @@ export default function ParticlesBackground() {
   if (error) return <div className="text-destructive">{error}</div>;
 
   return (
-    <>
+    <div className={className}>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -150,6 +154,8 @@ export default function ParticlesBackground() {
         theme={currentTheme}
         currentConfigUrl={currentConfigUrl}
       />
-    </>
+    </div>
   );
-}
+};
+
+export default ParticlesBackground;

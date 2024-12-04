@@ -28,7 +28,11 @@ export function PostLayout({ children }: PostLayoutProps) {
 					"sm:px-0"
 				)}
 			>
-				<ErrorBoundary>
+				<ErrorBoundary fallback={
+					<div className="text-destructive text-center p-4">
+						Failed to load post header
+					</div>
+				}>
 					<Suspense
 						fallback={
 							<div className="w-full h-48 flex items-center justify-center">
@@ -73,7 +77,11 @@ export function PostLayout({ children }: PostLayoutProps) {
 					"max-w-5xl mx-auto" // Match PostHeader width
 				)} />
 
-				<ErrorBoundary>
+				<ErrorBoundary fallback={
+					<div className="text-destructive text-center p-4">
+						Failed to load post navigation
+					</div>
+				}>
 					<Suspense
 						fallback={
 							<div className="w-full h-24 flex items-center justify-center">

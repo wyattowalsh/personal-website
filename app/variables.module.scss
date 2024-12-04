@@ -19,6 +19,10 @@ $landing-title-gradient-dark: linear-gradient(
   #38bdf8 100%   // Back to Sky-400
 );
 
+// Add near the top with other gradients
+$gradient-heading-light: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
+$gradient-heading-dark: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
+
 // Base Colors
 $color-hue: 198;
 $color-saturation: 33.6%;
@@ -187,6 +191,7 @@ $landing-title-gradient-dark: linear-gradient(
 
   --gradient-background: #{$gradient-background-light};
   --gradient-text: #{$gradient-text-light};
+  --gradient-heading: #{$gradient-heading-light};
   --gradient-heading: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
   --gradient-separator: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
   --gradient-border: #{$gradient-border-light};
@@ -413,6 +418,7 @@ $landing-title-gradient-dark: linear-gradient(
 
   --gradient-background: #{$gradient-background-dark};
   --gradient-text: #{$gradient-text-dark};
+  --gradient-heading: #{$gradient-heading-dark};
   --gradient-heading: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
   --gradient-separator: linear-gradient(90deg, #0fd850 0%, #f9f047 100%);
   --gradient-border: #{$gradient-border-dark};

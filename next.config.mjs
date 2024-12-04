@@ -104,7 +104,33 @@ const nextConfig = {
         headers: [
           {
             key: 'Content-Type',
-            value: 'application/xml',
+            value: 'application/rss+xml; charset=utf-8',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        source: '/feed.atom',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/atom+xml; charset=utf-8',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      {
+        source: '/feed.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/feed+json; charset=utf-8',
           },
           {
             key: 'Cache-Control',
@@ -177,7 +203,16 @@ const nextConfig = {
     },
     typedRoutes: true,
     optimizeCss: true,
-    // esmExternals: 'loose',
+  },
+
+  async redirects() {
+    return [
+      {
+        source: '/blog/tag/:tag',
+        destination: '/blog/tags/:tag',
+        permanent: true,
+      },
+    ];
   }
 }
 

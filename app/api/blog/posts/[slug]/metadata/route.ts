@@ -13,7 +13,11 @@ export async function GET(
 ) {
   const { slug } = await props.params;
   await BackendService.ensurePreprocessed();
-  const result = await BackendService.getInstance().getAdjacentPosts(slug);
+  const post = await BackendService.getInstance().getPost(slug);
   
-  return NextResponse.json({ data: result });
+  if (!post) {
+    return NextResponse.json(null, { status: 404 });
+  }
+
+  return NextResponse.json({ data: post });
 }

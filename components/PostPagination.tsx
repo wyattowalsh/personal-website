@@ -28,21 +28,28 @@ export default function PostPagination() {
 		const loadAdjacentPosts = async () => {
 			try {
 				setState((prev) => ({ ...prev, isLoading: true, error: null }));
-				const slug = pathname.split("/blog/posts/")[1];
-				if (!slug) return;
-
-				// Update the fetch URL to use the correct API route
-				const response = await fetch(`/api/blog/posts/${slug}/adjacent`);
-				if (!response.ok) {
-					throw new Error("Failed to fetch adjacent posts");
+				
+				// Extract slug from pathname
+				const matches = pathname.match(/^\/blog(?:\/posts)?\/([^\/]+)/);
+				const slug = matches?.[1];
+				
+				if (!slug) {
+					console.warn('Could not extract slug from pathname:', pathname);
+					return;
 				}
 
-				const data = await response.json();
+				const response = await fetch(`/api/blog/posts/${slug}/adjacent`);
+				
+				if (!response.ok) {
+					throw new Error(`Failed to fetch adjacent posts (${response.status})`);
+				}
+
+				const { data } = await response.json();
 				setState((prev) => ({
 					...prev,
 					data: {
-						prevPost: data.prevPost,
-						nextPost: data.nextPost,
+						prevPost: data?.prev || null,
+						nextPost: data?.next || null,
 					},
 					isLoading: false,
 				}));
@@ -57,7 +64,7 @@ export default function PostPagination() {
 			}
 		};
 
-		loadAdjacentPosts();
+		if (pathname) loadAdjacentPosts();
 	}, [pathname]);
 
 	if (state.isLoading) {
@@ -94,7 +101,7 @@ export default function PostPagination() {
 				{/* Left column wrapper */}
 				{nextPost && ( // Show older post (back) on left
 					<Link
-						href={`/blog/posts/${nextPost.slug}` as Route}
+						href={`/blog/posts/${nextPost.slug}` as Route} // Always use /blog/[slug] format
 						className="group"
 					>
 						<motion.div
@@ -159,7 +166,7 @@ export default function PostPagination() {
 				{/* Right column wrapper */}
 				{prevPost && ( // Show newer post (forward) on right
 					<Link
-						href={`/blog/${prevPost.slug}` as Route} // Remove "posts/" from the path
+						href={`/blog/posts/${prevPost.slug}` as Route} // Always use /blog/[slug] format
 						className="group"
 					>
 						<motion.div

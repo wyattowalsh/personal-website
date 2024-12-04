@@ -1,5 +1,7 @@
 "use client";
 
+import { type LinkProps } from 'next/link';
+import { type Route } from 'next';
 import SocialLink from "./SocialLink";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -12,6 +14,17 @@ import {
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
 import { faBook, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+
+// Update Href type to handle both internal and external URLs
+export type Href = Route | URL | string;
+
+// Update Link interface
+interface Link {
+  name: string;
+  url: string;  // Keep as string since we're handling URLs
+  icon: any;
+  color?: string;
+}
 
 export const links = [
   {
@@ -65,7 +78,8 @@ export const links = [
   color: link.color || "#6a9fb5",
 }));
 
-export default function Links() {
+// Explicitly type the component as React.FC
+const Links: React.FC = () => {
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -146,4 +160,7 @@ export default function Links() {
       ))}
     </motion.div>
   );
-}
+};
+
+// Keep default export
+export default Links;

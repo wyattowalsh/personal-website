@@ -2,12 +2,12 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { cva, VariantProps } from "class-variance-authority";
 
-// Omit color from HTMLAttributes to avoid conflict
-type BaseSpinnerProps = Omit<React.HTMLAttributes<HTMLDivElement>, 'color'>;
+// Update the base props type to use HTMLMotionProps
+type BaseSpinnerProps = Omit<HTMLMotionProps<"div">, 'color'>;
 
 interface LoadingSpinnerProps
   extends BaseSpinnerProps,
@@ -52,7 +52,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   color,
   message = "Loading",
   className,
-  ...props
+  ...motionProps // Renamed from props to motionProps for clarity
 }) => {
   return (
     <AnimatePresence>
@@ -70,7 +70,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           "shadow-xl shadow-primary/5 dark:shadow-primary/10",
           className
         )}
-        {...props}
+        {...motionProps}
       >
         <Spinner variant={variant} size={size} color={color} message={message} />
         {message && (

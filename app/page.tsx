@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
-import Links from "@/components/Links";
+import Links from "@/components/Links";  // Remove .tsx extension
 import { Separator } from "@/components/ui/separator";
 import LandingTitle from "@/components/LandingTitle";
 import ParticlesBackground from "@/components/ParticlesBackground";

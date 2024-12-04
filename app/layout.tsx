@@ -8,12 +8,12 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import ScrollIndicator from "@/components/ScrollIndicator";
 import Header from "@/components/Header";
 import KaTeXLoader from "@/components/KaTeXLoader";
-import CustomScrollbars from "@/components/Scroll";
 import { StrictMode } from 'react';
 import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import { cn } from "@/lib/utils";
 import { getDefaultMetadata } from '@/lib/core';
 import { generateWebSiteSchema } from '@/lib/schema';
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 config.autoAddCss = false;
 
@@ -80,12 +80,14 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="relative flex min-h-screen flex-col">
-              <Header />
-              <main className="flex-1 flex flex-col">
-                <CustomScrollbars>{children}</CustomScrollbars>
-              </main>
-            </div>
+            <TooltipProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <Header />
+                <main className="flex-1 flex flex-col">
+                  {children}
+                </main>
+              </div>
+            </TooltipProvider>
           </ThemeProvider>
           <ScrollIndicator />
           <KaTeXLoader />

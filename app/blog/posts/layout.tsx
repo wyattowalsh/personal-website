@@ -5,6 +5,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PostLayout } from "@/components/PostLayout";
 import { MathProvider } from "@/components/MathContext";
 import { cn } from "@/lib/utils";
+import CustomScrollbars from "@/components/Scroll";
 
 
 type Props = {
@@ -32,9 +33,11 @@ export default function PostsLayout({ children }: Props) {
 			)}>
 				<MathProvider>
 					<Suspense fallback={<LoadingSpinner />}>
+					<CustomScrollbars>
 						<PostLayout>
 							<PostContent>{children}</PostContent>
 						</PostLayout>
+						</CustomScrollbars>
 					</Suspense>
 				</MathProvider>
 			</div>

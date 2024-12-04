@@ -156,22 +156,20 @@ const useSafePost = (pathname: string) => {
 
     const fetchPost = async () => {
       try {
+        console.log('Fetching post for pathname:', pathname);
         if (mounted) {
           setState(prev => ({ ...prev, isLoading: true, error: null }));
         }
         
-        const slug = pathname.split("/posts/")[1]?.split("/")[0];
+        // Fix the slug extraction - now handles both /blog/[slug] and /blog/posts/[slug]
+        const slug = pathname.split('/').filter(segment => segment && segment !== 'blog' && segment !== 'posts').pop();
         
         if (!slug) {
           throw new Error('Invalid URL format');
         }
 
-        const response = await fetch(`/api/blog/posts/metadata/${slug}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal
-        });
-
+        // Update API endpoint path
+        const response = await fetch(`/api/blog/posts/${slug}/metadata`);
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error('Post not found');
@@ -179,7 +177,7 @@ const useSafePost = (pathname: string) => {
           throw new Error(`Failed to load post (${response.status})`);
         }
 
-        const data = await response.json();
+        const { data } = await response.json();
         if (!mounted) return;
 
         setState(prev => ({ 
@@ -192,11 +190,12 @@ const useSafePost = (pathname: string) => {
             updated: data.updated || data.created || data.date,
             tags: data.tags || [],
             image: data.image || "/logo.webp",
-            caption: data.caption || null, // Change this to null instead of empty string
+            caption: data.caption || null,
           },
           isLoading: false 
         }));
       } catch (error) {
+        console.error('Error in useSafePost:', error);
         if (!mounted) return;
         console.error("Error loading post:", error);
         setState(prev => ({

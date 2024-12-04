@@ -4,16 +4,9 @@ import typography from '@tailwindcss/typography';
 import { ThemeConfig } from 'tailwindcss/types/config';
 import { PluginAPI } from 'tailwindcss/types/config';
 
-// Update the function definition to match Tailwind's expected types
-function withOpacityValue(variable: string) {
-  return ({ opacityValue }: { opacityValue: number | undefined }) => {
-    if (opacityValue === undefined) {
-      return `rgb(var(${variable}))`;
-    }
-    return `rgb(var(${variable}) / ${opacityValue})`;
-  };
-}
-
+// Helper function to create color values with opacity
+// Remove or modify the withOpacityValue function as we'll use the new syntax
+// const theme section update
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
@@ -30,7 +23,7 @@ function addVariablesForColors({ addBase, theme }: any) {
   });
 }
 
-const config: Config = {
+const config = {
   darkMode: ['class'],
   content: [
     './app/**/*.{html,js,jsx,ts,tsx,md,mdx,css,scss}',
@@ -43,39 +36,45 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: withOpacityValue('--background'),
-        foreground: withOpacityValue('--foreground'),
+        background: `rgb(var(--background) / <alpha-value>)`,
+        foreground: `rgb(var(--foreground) / <alpha-value>)`,
         primary: {
-          DEFAULT: withOpacityValue('--primary'),
-          light: withOpacityValue('--primary-light'),
-          foreground: withOpacityValue('--primary-foreground'),
+          DEFAULT: `rgb(var(--primary) / <alpha-value>)`,
+          light: `rgb(var(--primary-light) / <alpha-value>)`,
+          foreground: `rgb(var(--primary-foreground) / <alpha-value>)`,
           20: 'rgb(var(--primary-rgb) / 0.2)',
           30: 'rgb(var(--primary-rgb) / 0.3)',
         },
-        'primary-foreground': withOpacityValue('--primary-foreground'),
-        secondary: withOpacityValue('--secondary'),
-        'secondary-foreground': withOpacityValue('--secondary-foreground'),
+        'primary-foreground': `rgb(var(--primary-foreground) / <alpha-value>)`,
+        secondary: {
+          DEFAULT: `rgb(var(--secondary) / <alpha-value>)`,
+          foreground: `rgb(var(--secondary-foreground) / <alpha-value>)`,
+        },
+        'secondary-foreground': `rgb(var(--secondary-foreground) / <alpha-value>)`,
         accent: {
-          DEFAULT: withOpacityValue('--accent'),
-          foreground: withOpacityValue('--accent-foreground'),
+          DEFAULT: `rgb(var(--accent) / <alpha-value>)`,
+          foreground: `rgb(var(--accent-foreground) / <alpha-value>)`,
           '10': 'rgb(var(--accent-rgb) / 0.1)',
           '20': 'rgb(var(--accent-rgb) / 0.2)',
           '30': 'rgb(var(--accent-rgb) / 0.3)',
           '40': 'rgb(var(--accent-rgb) / 0.4)',
           '50': 'rgb(var(--accent-rgb) / 0.5)',
         },
-        'accent-foreground': withOpacityValue('--accent-foreground'),
-        destructive: withOpacityValue('--destructive'),
-        'destructive-foreground': withOpacityValue('--destructive-foreground'),
-        muted: withOpacityValue('--muted'),
-        'muted-foreground': withOpacityValue('--muted-foreground'),
-        card: withOpacityValue('--card'),
-        'card-foreground': withOpacityValue('--card-foreground'),
-        popover: withOpacityValue('--popover'),
-        'popover-foreground': withOpacityValue('--popover-foreground'),
-        border: withOpacityValue('--border'),
-        input: withOpacityValue('--input'),
-        ring: withOpacityValue('--ring'),
+        'accent-foreground': `rgb(var(--accent-foreground) / <alpha-value>)`,
+        destructive: `rgb(var(--destructive) / <alpha-value>)`,
+        'destructive-foreground': `rgb(var(--destructive-foreground) / <alpha-value>)`,
+        muted: {
+          DEFAULT: `rgb(var(--muted) / <alpha-value>)`,
+          foreground: `rgb(var(--muted-foreground) / <alpha-value>)`,
+        },
+        'muted-foreground': `rgb(var(--muted-foreground) / <alpha-value>)`,
+        card: `rgb(var(--card) / <alpha-value>)`,
+        'card-foreground': `rgb(var(--card-foreground) / <alpha-value>)`,
+        popover: `rgb(var(--popover) / <alpha-value>)`,
+        'popover-foreground': `rgb(var(--popover-foreground) / <alpha-value>)`,
+        border: `rgb(var(--border) / <alpha-value>)`,
+        input: `rgb(var(--input) / <alpha-value>)`,
+        ring: `rgb(var(--ring) / <alpha-value>)`,
         'border-muted': 'var(--border-muted)',
         'math-bg': 'rgb(var(--math-bg) / <alpha-value>)',
         'math-bg-transparent': 'rgb(var(--math-bg-transparent) / <alpha-value>)',
@@ -173,7 +172,7 @@ const config: Config = {
         'card-hover': 'card-hover 0.3s ease-in-out forwards',
         'card-float': 'card-float 3s ease-in-out infinite',
         'fade-in': 'fadeIn 0.5s ease-out forwards',
-        'title-glow': 'title-glow 2s ease-in-out infinite alternate',
+        'title-glow': 'titleGlow 2s ease-in-out infinite alternate',
         'float-smooth': 'float-smooth 6s ease-in-out infinite',
         'gradient-x': 'gradient-x 15s ease infinite',
         'gradient-y': 'gradient-y 15s ease infinite',
@@ -197,7 +196,6 @@ const config: Config = {
         'spinner-glitch': 'glitch 750ms infinite',
         'spinner-shift': 'glitch-shift 4s infinite linear alternate',
         'title-float': 'titleFloat 6s ease-in-out infinite',
-        'title-glow': 'titleGlow 2s ease-in-out infinite',
         'title-shimmer': 'titleShimmer 3s ease-in-out infinite',
         gradientAnimation: 'gradientAnimation 8s ease infinite',
         'text-gradient': 'textGradient 5s ease infinite',
@@ -268,29 +266,40 @@ const config: Config = {
         },
         'glitch': {
           '0%': { 
-            textShadow: 'var(--glitch-shadow-1)'
+            textShadow: 'var(--glitch-shadow-1)',
+            transform: 'translate(0)'
           },
           '2%': { 
-            textShadow: 'var(--glitch-shadow-2)'
+            textShadow: 'var(--glitch-shadow-2)',
           },
           '4%': {
-            textShadow: 'var(--glitch-shadow-3)'
+            textShadow: 'var(--glitch-shadow-3)',
           },
           '6%': {
-            textShadow: 'var(--glitch-shadow-1)'
+            textShadow: 'var(--glitch-shadow-1)',
           },
           '8%': { 
-            textShadow: 'var(--glitch-shadow-2)'
+            textShadow: 'var(--glitch-shadow-2)',
           },
-          '10%, 100%': {
+          '10%': {
             textShadow: 'none'
           },
-          '0%': { transform: 'translate(0)' },
-          '20%': { transform: 'translate(-2px, 2px)' },
-          '40%': { transform: 'translate(-2px, -2px)' },
-          '60%': { transform: 'translate(2px, 2px)' },
-          '80%': { transform: 'translate(2px, -2px)' },
-          '100%': { transform: 'translate(0)' },
+          '20%': { 
+            transform: 'translate(-2px, 2px)' 
+          },
+          '40%': { 
+            transform: 'translate(-2px, -2px)' 
+          },
+          '60%': { 
+            transform: 'translate(2px, 2px)' 
+          },
+          '80%': { 
+            transform: 'translate(2px, -2px)' 
+          },
+          '100%': { 
+            textShadow: 'none',
+            transform: 'translate(0)' 
+          },
         },
         'glitch-skew': {
           '0%': { transform: 'skew(0deg)' },
@@ -684,6 +693,9 @@ const config: Config = {
       transform: {
         '3d': 'perspective(600px) rotateY(10deg)',
       },
+      dropShadow: {
+        'sm': '0 1px 1px rgba(0,0,0,0.05)',
+      },
     },
   },
   future: {
@@ -766,6 +778,6 @@ const config: Config = {
       });
     },
   ],
-};
+} satisfies Config;
 
 export default config;

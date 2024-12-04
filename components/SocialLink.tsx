@@ -7,6 +7,7 @@ import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { cn } from "@/lib/utils";
 import React from "react";
 import { useTheme } from "next-themes";
+import type { Route } from 'next';
 
 interface SocialLinkProps {
   link: {
@@ -268,7 +269,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
 
   if (isInternalLink) {
     return (
-      <Link href={link.url} className="block w-full h-full rounded-2xl no-underline">
+      <Link href={link.url as Route} className="block w-full h-full rounded-2xl no-underline">
         {linkContent}
       </Link>
     );

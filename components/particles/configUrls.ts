@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Last generated: 2024-12-03T02:45:37.039Z
+// Last generated: 2024-12-04T01:06:28.472Z
 
 import { type ISourceOptions } from "@tsparticles/engine";
 

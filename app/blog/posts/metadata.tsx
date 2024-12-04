@@ -15,15 +15,22 @@ export async function generateMetadata(
 	{ params, searchParams }: any,
 	parent: ResolvingMetadata
 ): Promise<Metadata> {
-	const previousMetadata = (await parent) || {};
+	const previousMetadata = await parent;
+	const parentTitle = previousMetadata?.title?.absolute || previousMetadata?.title;
 
 	return {
-		...previousMetadata,
-		...metadata,
 		title: {
-			absolute: `${
-				previousMetadata.title?.absolute || previousMetadata.title
-			} | onelonedatum by Wyatt Walsh`,
+			absolute: `${parentTitle} | onelonedatum by Wyatt Walsh`,
 		},
+		description: metadata.description,
+		openGraph: metadata.openGraph,
+		robots: {
+			index: true,
+			follow: true,
+			googleBot: {
+				index: true,
+				follow: true,
+			}
+		}
 	};
 }

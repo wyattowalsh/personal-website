@@ -797,6 +797,16 @@
       @apply text-base sm:text-lg;
     }
   }
+
+  .bg-gradient-heading {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-heading);
+    background-size: 200% auto;
+  }
+
+  .drop-shadow-custom {
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.1));
+  }
 }
 
 @keyframes grid-flow {

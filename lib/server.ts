@@ -6,6 +6,8 @@ import matter from 'gray-matter';
 import path from 'path';
 import fs from 'fs/promises';
 import { logger, Post, formatters } from './core';
+import { PreprocessStats } from './types'; // Add this import
+import { cacheControl } from '@/lib/core';
 
 // Custom glob-like function
 async function findFiles(dir: string, pattern: RegExp): Promise<string[]> {
@@ -36,7 +38,8 @@ async function getFileData(filePath: string) {
       lastModified: stats.mtime.toISOString()
     };
   } catch (error) {
-    logger.error('Error getting file data:', error);
+    const errorMessage = error instanceof Error ? error : new Error('Unknown error occurred');
+    logger.error('Error getting file data:', errorMessage);
     return {
       firstModified: null,
       lastModified: null
@@ -54,7 +57,7 @@ const INDICES = {
 } as const;
 
 // API error handling
-export class ApiError extends Error {
+class ApiError extends Error {
   constructor(
     public statusCode: number,
     message: string,
@@ -73,7 +76,7 @@ export class ApiError extends Error {
 }
 
 // Backend service implementation
-export class BackendService {
+class BackendService {
   private static instance: BackendService;
   private preprocessPromise: Promise<any> | null = null;
   private cache: LRUCache<string, any>;
@@ -133,6 +136,15 @@ export class BackendService {
     }
   }
 
+  async getPostMetadata(slug: string) {
+    const post = await this.getPost(slug);
+    if (!post) return null;
+    
+    // Return only metadata fields
+    const { content, ...metadata } = post;
+    return metadata;
+  }
+
   async search(query: string) {
     try {
       const cached = this.cache.get(`search:${query}`);
@@ -183,7 +195,7 @@ export class BackendService {
     };
   }
 
-  async preprocess(isDev: boolean) {
+  async preprocess(isDev: boolean): Promise<Omit<PreprocessStats, 'particleConfigPath'>> {
     const startTime = Date.now();
     const errors: Error[] = [];
     
@@ -215,10 +227,20 @@ export class BackendService {
           
           const fileData = await getFileData(filePath);
           
+          // Calculate word count
+          const wordCount = markdown.trim().split(/\s+/).length;
+          
+          // Ensure title exists
+          if (!data.title) {
+            throw new Error(`Missing title in frontmatter for post: ${filePath}`);
+          }
+
           const post: Post = {
             slug,
             ...data,
+            title: data.title, // explicitly include title
             content: markdown,
+            wordCount, // add word count
             created: data.created || fileData.firstModified || new Date().toISOString(),
             updated: data.updated || fileData.lastModified || new Date().toISOString(),
             tags: data.tags || [],
@@ -247,7 +269,7 @@ export class BackendService {
       // Log final stats
       const duration = Date.now() - startTime;
       const stats = {
-        duration: formatters.duration(duration),
+        duration, // Return raw duration number instead of formatted string
         postsProcessed: this.posts.size,
         searchIndexSize: Array.from(this.posts.values()).length, // Fix: use posts length instead of searchIndex.size()
         cacheSize: this.cache.size,
@@ -255,7 +277,12 @@ export class BackendService {
         memory: formatters.fileSize(process.memoryUsage().heapUsed)
       };
 
-      logger.table([stats]);
+      // Use formatters.duration() only for logging
+      logger.table([{
+        ...stats,
+        duration: formatters.duration(duration)
+      }]);
+
       logger.memory(); // Log final memory usage
       logger.timing('Total preprocessing time', duration);
 
@@ -292,15 +319,10 @@ export class BackendService {
   }
 }
 
-// Create singleton instance
-export const backend = BackendService.getInstance();
-
 // Enhanced request handler with better type safety and error handling
-export async function handleRequest<T, P = Record<string, unknown>>(
-  req: Request,
+async function handleRequest<T>(
   options: {
-    schema?: z.ZodSchema<P>;
-    handler: (params: P) => Promise<T>;
+    handler: () => Promise<T>;
     cache?: boolean | number;
     transform?: (data: T) => unknown;
   }
@@ -308,20 +330,9 @@ export async function handleRequest<T, P = Record<string, unknown>>(
   const startTime = performance.now();
 
   try {
-    // Parse URL and params
-    const url = new URL(req.url);
-    const rawParams = Object.fromEntries(url.searchParams);
-    
-    // Validate params
-    const params = options.schema 
-      ? await options.schema.parseAsync(rawParams)
-      : rawParams as P;
-
-    // Execute handler
-    const result = await options.handler(params);
+    // Execute handler without URL parsing since we're using route handlers
+    const result = await options.handler();
     const data = options.transform ? options.transform(result) : result;
-
-    // Calculate duration
     const duration = performance.now() - startTime;
 
     // Determine cache control
@@ -349,28 +360,93 @@ export async function handleRequest<T, P = Record<string, unknown>>(
         'X-Response-Time': `${duration}ms`
       }
     });
-  } catch (error) {
-    logger.error('Request handler error:', error as Error);
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    logger.error('Request handler error:', error);
     
     if (error instanceof ApiError) {
       return error.toResponse();
     }
 
     return new ApiError(500, 'Internal Server Error', {
-      message: error instanceof Error ? error.message : 'Unknown error',
-      stack: process.env.NODE_ENV === 'development' ? error?.stack : undefined
+      message: error.message || 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
     }).toResponse();
   }
 }
 
-// Export common server-side functions
-export const serverUtils = {
-  getPost: async (slug: string) => backend.getPost(slug),
-  searchPosts: async (query: string) => backend.search(query),
-  getPostsByTag: async (tag: string) => backend.getPostsByTag(tag),
-  getAllPosts: async () => backend.getAllPosts(),
-  getAllTags: async () => backend.getAllTags(),
-  getAdjacentPosts: async (slug: string) => backend.getAdjacentPosts(slug),
-  preprocess: async (isDev: boolean) => backend.preprocess(isDev),
+// API route handlers
+async function getPostHandler(slug: string) {
+  await BackendService.ensurePreprocessed();
+  return handleRequest({
+    handler: async () => {
+      const post = await BackendService.getInstance().getPost(slug);
+      if (!post) throw new ApiError(404, 'Post not found');
+      return post;
+    },
+    cache: 3600
+  });
+}
+
+async function getPostsHandler() {
+  await BackendService.ensurePreprocessed();
+  return handleRequest({
+    handler: async () => {
+      return BackendService.getInstance().getAllPosts();
+    },
+    cache: 3600
+  });
+}
+
+async function searchPostsHandler(query: string) {
+  await BackendService.ensurePreprocessed();
+  return handleRequest({
+    handler: async () => {
+      return BackendService.getInstance().search(query);
+    },
+    cache: 1800
+  });
+}
+
+// API exports
+const api = {
+  handlers: {
+    getPost: getPostHandler,
+    getPosts: getPostsHandler,
+    searchPosts: searchPostsHandler
+  },
+  utils: {
+    handleRequest
+  }
+};
+
+// Create the serverUtils const first
+const serverUtils = {
+  getPost: async (slug: string) => BackendService.getInstance().getPost(slug),
+  searchPosts: async (query: string) => BackendService.getInstance().search(query),
+  getPostsByTag: async (tag: string) => BackendService.getInstance().getPostsByTag(tag),
+  getAllPosts: async () => BackendService.getInstance().getAllPosts(),
+  getAllTags: async () => BackendService.getInstance().getAllTags(),
+  getAdjacentPosts: async (slug: string) => BackendService.getInstance().getAdjacentPosts(slug),
+  preprocess: async (isDev: boolean) => BackendService.getInstance().preprocess(isDev),
   handleRequest,
+};
+
+// Create backend object using serverUtils functionality
+const backend = {
+  ...serverUtils,
+  api
+};
+
+// Single consolidated export statement at the end of the file
+export {
+  ApiError,
+  BackendService,
+  handleRequest,
+  getPostHandler,
+  getPostsHandler,
+  searchPostsHandler,
+  api,
+  serverUtils,
+  backend // Add backend export
 };

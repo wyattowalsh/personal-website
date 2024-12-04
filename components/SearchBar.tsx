@@ -26,7 +26,7 @@ import { motion } from "framer-motion";
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { backend } from "@/lib/services/backend";
+import { backend } from "@/lib/server"; // Update this line
 import type { PostMetadata } from "@/lib/types";
 import type { Route } from "next";
 
@@ -49,6 +49,16 @@ interface SearchBarProps {
 	posts: PostMetadata[];
 	tags: string[];
 }
+
+// Add this helper function at the top of the file
+const getPostDate = (post: PostMetadata): number => {
+  return post.created ? new Date(post.created).getTime() : 0;
+};
+
+// Add this helper function at the top
+const getPostTags = (post: PostMetadata): string[] => {
+  return post.tags || [];
+};
 
 const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 	// Filter out invalid posts
@@ -81,9 +91,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 			return;
 		}
 
-		const sortedPosts = [...posts].sort(
-			(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()
-		);
+		const sortedPosts = [...posts].sort((a, b) => getPostDate(b) - getPostDate(a));
 		setResults(sortedPosts);
 		setMounted(true);
 	}, [posts]);
@@ -121,7 +129,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 
 		if (selectedTags.length > 0) {
 			searchResults = searchResults.filter((post) =>
-				selectedTags.every((tag) => post.tags.includes(tag))
+				selectedTags.every((tag) => getPostTags(post).includes(tag))
 			);
 		}
 
@@ -132,10 +140,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 				return a.title.localeCompare(b.title) * modifier;
 			}
 			// Default to date sorting
-			return (
-				(new Date(b.created).getTime() - new Date(a.created).getTime()) *
-				modifier
-			);
+			return (getPostDate(b) - getPostDate(a)) * modifier;
 		});
 
 		setResults(searchResults);

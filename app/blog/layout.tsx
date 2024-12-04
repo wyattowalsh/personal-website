@@ -24,13 +24,13 @@ export default function BlogRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <BlogTitle />
-      <hr className="border-border my-4" />
+    <div className="flex flex-col">
       <main className="container mx-auto flex-grow">
-        {children}
+        <BlogTitle />
+        <hr className="border-border my-4" />
+          {children}
+        <BlogFooter />
       </main>
-      <BlogFooter />
     </div>
   );
 }

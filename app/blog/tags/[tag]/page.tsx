@@ -1,4 +1,4 @@
-import { backend } from "@/lib/server";
+import { BackendService } from "@/lib/server";
 import PostCard from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
@@ -8,9 +8,10 @@ interface TagPageProps {
 }
 
 export async function generateStaticParams() {
-    const tags = await backend.getAllTags();
+    await BackendService.ensurePreprocessed();
+    const tags = await BackendService.getInstance().getAllTags();
     return tags.map((tag) => ({
-        tag: tag,
+        tag: encodeURIComponent(tag),
     }));
 }
 
@@ -25,10 +26,18 @@ export async function generateMetadata({
     };
 }
 
-export default async function TagPage({ params }: { params: Promise<{ tag: string }> }) {
+type Props = {
+    params: Promise<{
+        tag: string;
+    }>;
+};
+
+export default async function TagPage({ params }: Props) {
     const { tag } = await params;
     const decodedTag = decodeURIComponent(tag);
     
+    await BackendService.ensurePreprocessed();
+    const backend = BackendService.getInstance();
     const [posts, tags] = await Promise.all([
         backend.getAllPosts(),
         backend.getAllTags()
