@@ -4,6 +4,7 @@ import BlogTitle from "@/components/BlogTitle";
 import BlogFooter from "@/components/BlogFooter";
 import ScrollReset from "@/components/ScrollReset";
 import { Metadata } from "next";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: {
@@ -28,7 +29,10 @@ export default function BlogRootLayout({
   return (
     <div className="flex flex-col">
       <ScrollReset />
-      <main className="container mx-auto flex-grow">
+      <main className={cn(
+        "container mx-auto flex-grow",
+        "pt-8 sm:pt-12 md:pt-16"
+      )}>
         <BlogTitle />
         <hr className="border-border my-4" />
           {children}
