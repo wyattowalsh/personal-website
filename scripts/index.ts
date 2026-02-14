@@ -55,8 +55,12 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
   }
 }
 
-// Main execution
-if (require.main === module) {
+// Main execution - ESM compatible check
+const isMainModule = import.meta.url === `file://${process.argv[1]}` ||
+  process.argv[1]?.endsWith('scripts/index.ts') ||
+  process.argv[1]?.endsWith('scripts/index.js');
+
+if (isMainModule) {
   const isDev = process.env.NODE_ENV === 'development';
   
   // Handle unhandled rejections

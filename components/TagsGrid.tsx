@@ -1,6 +1,7 @@
 'use client';
 
-import { motion, useMotionTemplate, useMotionValue } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -15,22 +16,22 @@ const containerVariants = {
     transition: {
       staggerChildren: 0.12,
       delayChildren: 0.1,
-      type: 'spring',
+      type: 'spring' as const,
       stiffness: 100
     }
   }
 };
 
 const itemVariants = {
-  hidden: { 
-    y: 20, 
+  hidden: {
+    y: 20,
     scale: 0.9,
   },
-  show: { 
-    y: 0, 
+  show: {
+    y: 0,
     scale: 1,
     transition: {
-      type: "spring",
+      type: "spring" as const,
       stiffness: 200,
       damping: 20,
       mass: 0.8
@@ -82,10 +83,12 @@ interface TagCardProps {
 }
 
 function TagCard({ tag, count, index }: TagCardProps) {
+  const prefersReducedMotion = useReducedMotion();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
   const handleMouseMove = ({ currentTarget, clientX, clientY }: React.MouseEvent) => {
+    if (prefersReducedMotion) return;
     const { left, top } = currentTarget.getBoundingClientRect();
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);

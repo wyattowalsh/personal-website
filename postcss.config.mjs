@@ -2,8 +2,10 @@
 const config = {
   plugins: {
     'postcss-import': {},
-    'tailwindcss/nesting': {},
-    tailwindcss: {},
+    '@tailwindcss/postcss': {
+      // Tailwind v4: specify config path since @config in SCSS may be stripped by preprocessor
+      configPath: './tailwind.config.js',
+    },
     autoprefixer: {},
   },
 };

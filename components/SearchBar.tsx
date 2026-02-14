@@ -22,7 +22,8 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
@@ -61,6 +62,8 @@ const getPostTags = (post: PostMetadata): string[] => {
 };
 
 const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
+	const prefersReducedMotion = useReducedMotion();
+
 	// Filter out invalid posts
 	const validPosts = useMemo(
 		() => posts.filter((post) => post.title && post.created && post.tags),
@@ -69,7 +72,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 
 	// Sort tags case-insensitively but preserve original case for display
 	const tags = useMemo(
-		() => [...unsortedTags].sort((a, b) => 
+		() => [...unsortedTags].sort((a, b) =>
 			a.toLowerCase().localeCompare(b.toLowerCase())
 		),
 		[unsortedTags]
@@ -221,8 +224,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
             <motion.button
               key={tag}
               onClick={() => toggleTag(tag)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+              whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
               className={cn(
                 "inline-flex items-center",
                 "px-2 py-1 sm:px-2.5 sm:py-1 md:px-3 md:py-1.5", // Responsive padding
@@ -231,6 +234,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
                 "font-medium",
                 "border-2 transition-all duration-200 ease-out",
                 "hover:shadow-md dark:hover:shadow-primary/20",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
                 selectedTags.includes(tag)
                   ? [
                       "bg-primary/10 dark:bg-primary/20",
@@ -264,6 +268,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
               "font-medium",
               "border-2 transition-all duration-200 ease-out",
               "hover:shadow-md dark:hover:shadow-primary/20",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               "bg-background dark:bg-gray-900",
               "text-muted-foreground dark:text-gray-300",
               "border-border dark:border-gray-700",
@@ -408,7 +413,8 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 							className={cn(
 								"hover:text-primary",
 								"transition-all duration-200",
-								"hover:scale-105 active:scale-95"
+								"hover:scale-105 active:scale-95",
+								"focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
 							)}
 						>
 							Clear filters

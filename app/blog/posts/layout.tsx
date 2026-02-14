@@ -9,7 +9,6 @@ import CustomScrollbars from "@/components/Scroll";
 
 
 type Props = {
-	params: { slug: string };
 	children: React.ReactNode;
 };
 

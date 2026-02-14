@@ -1,5 +1,5 @@
 import { Feed } from 'feed';
-import { BackendService, handleRequest } from '@/lib/server';
+import { BackendService } from '@/lib/server';
 import { getConfig } from '@/lib/core';
 
 const generateJsonFeed = async () => {
@@ -31,7 +31,7 @@ const generateJsonFeed = async () => {
   });
 
   for (const post of posts) {
-    const url = `${site.url}/blog/${post.slug}`;
+    const url = `${site.url}/blog/posts/${post.slug}`;
     feed.addItem({
       title: post.title,
       id: url,
@@ -49,15 +49,16 @@ const generateJsonFeed = async () => {
 };
 
 export async function GET() {
-  return handleRequest({
-    handler: async () => {
-      const feed = await generateJsonFeed();
-      return new Response(feed, {
-        headers: {
-          'Content-Type': 'application/feed+json; charset=utf-8',
-        },
-      });
-    },
-    cache: 3600,
-  });
+  try {
+    const feed = await generateJsonFeed();
+    return new Response(feed, {
+      headers: {
+        'Content-Type': 'application/feed+json; charset=utf-8',
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+      },
+    });
+  } catch (error) {
+    console.error('Error generating JSON feed:', error);
+    return new Response('Error generating feed', { status: 500 });
+  }
 }

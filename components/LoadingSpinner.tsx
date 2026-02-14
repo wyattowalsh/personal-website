@@ -2,7 +2,7 @@
 
 import React from "react";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence, HTMLMotionProps } from "framer-motion";
+import { motion, AnimatePresence, HTMLMotionProps } from "motion/react";
 import { Loader2 } from "lucide-react";
 import { cva, VariantProps } from "class-variance-authority";
 

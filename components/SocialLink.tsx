@@ -1,9 +1,8 @@
 "use client";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import Link from "next/link";
-import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
+import { motion, useMotionValue, useMotionTemplate } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import React from "react";
 import { useTheme } from "next-themes";
@@ -13,7 +12,7 @@ interface SocialLinkProps {
   link: {
     name: string;
     url: string;
-    icon: IconProp;
+    icon: React.ComponentType<{ className?: string }>;
     color?: string;
   };
 }
@@ -130,7 +129,8 @@ function adjustColorForMode(color: string, isDark: boolean) {
   return isDark ? darkModeAdjustment : lightModeAdjustment;
 }
 
-export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
+export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
+  const prefersReducedMotion = useReducedMotion();
   const isInternalLink = link.url.startsWith("/");
 
   // Motion values for interactive effects
@@ -138,6 +138,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
   const mouseY = useMotionValue(0);
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (prefersReducedMotion) return;
     const rect = event.currentTarget.getBoundingClientRect();
     mouseX.set(event.clientX - rect.left);
     mouseY.set(event.clientY - rect.top);
@@ -211,7 +212,7 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
       style={{
         '--hover-color': colors.bgHoverStyle,
       } as any}
-      whileHover={{
+      whileHover={prefersReducedMotion ? undefined : {
         scale: 1.05,
         rotateX: 2,
         rotateY: 2,
@@ -221,24 +222,27 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
       <motion.div
         className={iconContainerClassName}
         style={{
-          color: colors.iconColor,
           backgroundColor: colors.iconBgColor,
         }}
       >
-        <FontAwesomeIcon
-          icon={link.icon}
+        <div
           className={cn(
             "relative z-10",
-            "text-3xl md:text-4xl lg:text-5xl",
             "transition-all duration-500",
-            // Enhanced visibility
-            "drop-shadow-md dark:drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]",
             // Hover effects
             "group-hover:scale-110 group-hover:rotate-3",
-            "group-hover:drop-shadow-lg"
           )}
           style={{ color: colors.iconColor }}
-        />
+        >
+          <link.icon
+            className={cn(
+              "w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12",
+              // Enhanced visibility
+              "drop-shadow-md dark:drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]",
+              "group-hover:drop-shadow-lg"
+            )}
+          />
+        </div>
       </motion.div>
 
       {/* Label */}
@@ -269,7 +273,13 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
 
   if (isInternalLink) {
     return (
-      <Link href={link.url as Route} className="block w-full h-full rounded-2xl no-underline">
+      <Link
+        href={link.url as Route}
+        className={cn(
+          "block w-full h-full rounded-2xl no-underline",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        )}
+      >
         {linkContent}
       </Link>
     );
@@ -280,7 +290,10 @@ export default function SocialLink({ link }: SocialLinkProps): JSX.Element {
       href={link.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="block w-full h-full rounded-2xl no-underline"
+      className={cn(
+        "block w-full h-full rounded-2xl no-underline",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      )}
     >
       {linkContent}
     </a>

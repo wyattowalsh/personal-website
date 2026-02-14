@@ -5,12 +5,30 @@ import NotFoundContent from "@/components/NotFoundContent";
 import { cn } from "@/lib/utils";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
+interface FloatingParticle {
+  left: string;
+  top: string;
+  animationDelay: string;
+  animationDuration: string;
+}
+
 export default function NotFound() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
+  const [floatingParticles, setFloatingParticles] = useState<FloatingParticle[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Generate floating particles only on client to avoid hydration mismatch
+    setFloatingParticles(
+      Array.from({ length: 20 }).map(() => ({
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 100}%`,
+        animationDelay: `${Math.random() * 3}s`,
+        animationDuration: `${3 + Math.random() * 2}s`,
+      }))
+    );
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
 
@@ -78,7 +96,7 @@ export default function NotFound() {
 
       {/* Floating particles effect */}
       <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {floatingParticles.map((particle, i) => (
           <div
             key={i}
             className={cn(
@@ -86,12 +104,7 @@ export default function NotFound() {
               "bg-primary/30",
               "animate-float",
             )}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${3 + Math.random() * 2}s`,
-            }}
+            style={particle}
           />
         ))}
       </div>

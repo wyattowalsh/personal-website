@@ -1,10 +1,10 @@
 // app/blog/layout.tsx
 import React from "react";
-import BlogTitle from "@/components/BlogTitle";
 import BlogFooter from "@/components/BlogFooter";
 import ScrollReset from "@/components/ScrollReset";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
+import { BlogLayoutContent } from "@/components/BlogLayoutContent";
 
 export const metadata: Metadata = {
   title: {
@@ -33,9 +33,9 @@ export default function BlogRootLayout({
         "container mx-auto flex-grow",
         "pt-8 sm:pt-12 md:pt-16"
       )}>
-        <BlogTitle />
-        <hr className="border-border my-4" />
+        <BlogLayoutContent>
           {children}
+        </BlogLayoutContent>
         <BlogFooter />
       </main>
     </div>

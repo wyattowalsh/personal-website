@@ -2,6 +2,46 @@
 title: "Personal Web App v6"
 image: "/old.webp"
 caption: "onelonedatum"
-summary: ""
+summary: "A deep dive into building my personal website v6 with Next.js 15, featuring MDX blog posts, theme-aware components, and modern web development practices."
 tags: ["Project", "Typescript", "node.js", "next.js"]
+created: "2024-12-01"
+updated: "2024-12-01"
 ---
+
+import { ArticleJsonLd } from '@/components/PostSchema';
+
+export const metadata = {
+  title: "Personal Web App v6",
+  description: "A deep dive into building my personal website v6 with Next.js 15, featuring MDX blog posts, theme-aware components, and modern web development practices.",
+  alternates: {
+    canonical: "https://w4w.dev/blog/posts/w4w-v6",
+  },
+  openGraph: {
+    type: "article",
+    title: "Personal Web App v6",
+    description: "A deep dive into building my personal website v6 with Next.js 15, featuring MDX blog posts, theme-aware components, and modern web development practices.",
+    url: "https://w4w.dev/blog/posts/w4w-v6",
+    images: [{ url: "https://w4w.dev/old.webp", width: 1200, height: 630, alt: "Personal Web App v6" }],
+    publishedTime: "2024-12-01",
+    authors: ["Wyatt Walsh"],
+    tags: ["Project", "Typescript", "node.js", "next.js"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Personal Web App v6",
+    description: "A deep dive into building my personal website v6 with Next.js 15, featuring MDX blog posts, theme-aware components, and modern web development practices.",
+    images: ["https://w4w.dev/old.webp"],
+    creator: "@wyattowalsh",
+  },
+};
+
+<ArticleJsonLd
+  title="Personal Web App v6"
+  description="A deep dive into building my personal website v6 with Next.js 15, featuring MDX blog posts, theme-aware components, and modern web development practices."
+  image="/old.webp"
+  datePublished="2024-12-01"
+  slug="w4w-v6"
+  tags={["Project", "Typescript", "node.js", "next.js"]}
+/>
+
+Coming soon...

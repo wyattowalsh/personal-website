@@ -4,11 +4,11 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { type Route } from 'next';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import { links, type Href } from './Links';  // Single import for links and Href
 import { RssIcon, FileJson, AtomIcon, HomeIcon, BookOpenIcon, TagIcon } from 'lucide-react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -172,10 +172,11 @@ const FeedFormatButton = ({ href, icon: Icon, format, description }: {
 };
 
 const BlogFooter = () => {
+  const prefersReducedMotion = useReducedMotion();
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className={cn("w-full py-4", "bg-gradient-to-b from-background to-muted/30", "border-t border-border/50")}>
+    <footer role="contentinfo" aria-label="Blog footer" className={cn("w-full py-4", "bg-gradient-to-b from-background to-muted/30", "border-t border-border/50")}>
       {/* Add subscription section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -238,13 +239,13 @@ const BlogFooter = () => {
             "justify-center", // Center vertically
             "space-y-3" // Reduced spacing
           )}>
-            <motion.div 
+            <motion.div
               className={cn(
                 "relative w-12 h-12", // Smaller logo
                 "transform-gpu hover:scale-110",
                 "transition-transform duration-300"
               )}
-              whileHover={{ 
+              whileHover={prefersReducedMotion ? undefined : {
                 rotate: [0, -5, 5, -5, 0],
                 transition: { duration: 0.5 }
               }}
@@ -316,11 +317,10 @@ const BlogFooter = () => {
               {links
                 .filter((link) => ['GitHub', 'X'].includes(link.name))
                 .map((link) => (
-                  <FooterLink 
-                    key={link.name} 
+                  <FooterLink
+                    key={link.name}
                     href={link.url}
-                    // Use the icon from the links array
-                    icon={() => <FontAwesomeIcon icon={link.icon} className="w-4 h-4" />}
+                    icon={link.icon}
                   >
                     {link.name}
                   </FooterLink>

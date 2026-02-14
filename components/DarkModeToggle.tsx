@@ -39,6 +39,7 @@ export default function DarkModeToggle() {
         variant="ghost"
         size="icon"
         onClick={toggleTheme}
+        aria-label={`Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} theme`}
         className={cn(
           "h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14",
           "group relative",

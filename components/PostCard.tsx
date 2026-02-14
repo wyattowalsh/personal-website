@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { useRouter } from "next/navigation"; // Add this import
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
@@ -14,6 +14,8 @@ import TagLink from "@/components/TagLink";
 import { cn } from "@/lib/utils";
 import { Calendar, Clock } from "lucide-react";
 import type { Route } from "next";
+import ThemeAwareHero, { getHeroConfig } from "@/components/heroes/ThemeAwareHero";
+import RisoHero from "@/components/heroes/RisoHero";
 
 // Add the same helper function
 function isDifferentDate(
@@ -53,6 +55,8 @@ const PostCard = ({ post, className }: PostCardProps) => {
 		image = "/logo.webp",
 		readingTime = "A few minutes",
 	} = post;
+	const isSvg = image.endsWith(".svg");
+	const heroConfig = getHeroConfig(image);
 
 	// Option 1: Use template literal type assertion
 	const handleCardClick = () => {
@@ -74,15 +78,32 @@ const PostCard = ({ post, className }: PostCardProps) => {
 				className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col"
 			>
 				<div className="relative aspect-video w-full">
-					<Image
-						src={image}
-						alt={title}
-						fill
-						sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-						className="object-cover transition-transform duration-500 hover:scale-105"
-						placeholder="blur"
-						blurDataURL="/logo.webp"
+					{image === "/riso-hero.svg" ? (
+						<RisoHero
+							className="absolute inset-0 w-full h-full transition-transform duration-500 hover:scale-105"
 						/>
+					) : heroConfig ? (
+						<ThemeAwareHero
+							config={heroConfig}
+							className="absolute inset-0 w-full h-full transition-transform duration-500 hover:scale-105"
+						/>
+					) : isSvg ? (
+						<img
+							src={image}
+							alt={title}
+							className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+						/>
+					) : (
+						<Image
+							src={image}
+							alt={title}
+							fill
+							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+							className="object-cover transition-transform duration-500 hover:scale-105"
+							placeholder="blur"
+							blurDataURL="/logo.webp"
+						/>
+					)}
 					{/* Updated gradient overlay */}
 					<div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/90"></div>
 

@@ -1,9 +1,10 @@
-import React, { useState, Suspense } from "react";
+import React, { Suspense } from "react";
 import type { MDXComponents } from "mdx/types";
 import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { Copy, Check, ExternalLink, Info, AlertCircle, Terminal } from "lucide-react";
+import { ExternalLink, Info, AlertCircle, Terminal as TerminalIcon } from "lucide-react";
+import { CodeBlock } from "@/components/CodeBlock";
 
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,39 @@ import GistWrapper from "@/components/GistWrapper";
 import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
 import Math, { MathProps } from "@/components/Math";
+import Mermaid from "@/components/Mermaid";
+import { RisoModuleMatrix, RisoSaaSStack, RisoSampleVariants } from "@/components/RisoMatrix";
+
+// MDX Components
+import {
+  Chart,
+  Timeline,
+  Comparison,
+  ComparisonCard,
+  ImageGallery,
+  VideoEmbed,
+  Terminal,
+  Diff,
+  APIReference,
+  PropTable,
+  FileTree,
+  PackageInstall,
+  Quiz,
+  Spoiler,
+  InlineSpoiler,
+  Bookmark,
+  BookmarkGrid,
+  Newsletter,
+  Columns,
+  Column,
+  Split,
+  Aside,
+  InlineAside,
+  Figure,
+  FigureGroup,
+  Steps,
+  Step,
+} from "@/components/mdx";
 import type { UrlObject } from 'url';
 import { Route as NextRoute } from 'next';
 
@@ -140,54 +174,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </p>
         ),
 
-        pre: ({ children }) => (
-            <div className={cn(
-                "relative my-8 rounded-xl overflow-hidden group",
-                "bg-muted-30 dark:bg-card-50",
-                "border border-border-50 dark:border-border-30",
-                "transition-all duration-300",
-                "hover:shadow-lg dark:hover:shadow-primary-10",
-                "before:content-[''] before:absolute before:inset-0",
-                "before:bg-gradient-to-r before:from-primary/5 before:to-transparent",
-                "before:opacity-0 hover:before:opacity-100",
-                "before:transition-opacity before:duration-300"
-            )}>
-                <div className="absolute top-3 right-3 z-10">
-                    <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => {
-                            navigator.clipboard.writeText(children?.toString() || '');
-                        }}
-                        className={cn(
-                            "opacity-0 group-hover:opacity-100",
-                            "transition-all duration-300",
-                            "bg-background-80 dark:bg-background-50",
-                            "hover:bg-background dark:hover:bg-background-70",
-                            "backdrop-blur-sm",
-                            "shadow-sm hover:shadow-md",
-                            "transform hover:scale-105",
-                            "border border-border-50"
-                        )}
-                    >
-                        <span className="flex items-center gap-2">
-                            <Copy className="h-4 w-4" />
-                            <span className="hidden sm:inline">Copy</span>
-                        </span>
-                    </Button>
-                </div>
-                <pre className={cn(
-                    "p-4 overflow-x-auto",
-                    "bg-card-50 dark:bg-card-30",
-                    "text-foreground dark:text-primary-foreground",
-                    "rounded-xl",
-                    "scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent",
-                    "hover:scrollbar-thumb-primary-50"
-                )}>
-                    {children}
-                </pre>
-            </div>
-        ),
+        pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
 
         table: ({ children }) => (
             <div className={cn(
@@ -393,7 +380,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             const icons = {
                 info: Info,
                 warning: AlertCircle,
-                terminal: Terminal,
+                terminal: TerminalIcon,
             };
             const Icon = icons[type as keyof typeof icons];
             
@@ -632,7 +619,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </details>
         ),
 
-        Math: ({ children, ...props }: JSX.IntrinsicAttributes & MathProps) => {
+        Math: ({ children, ...props }: React.JSX.IntrinsicAttributes & MathProps) => {
             return (
                 <Suspense fallback={<div className="animate-pulse h-8 bg-muted rounded" />}>
                     <Math {...props}>{children}</Math>
@@ -715,6 +702,49 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         'math': ({ children }) => (
             <Math display={false}>{children}</Math>
         ),
+
+        // Mermaid diagrams
+        Mermaid,
+
+        // Riso template matrix components
+        RisoModuleMatrix,
+        RisoSaaSStack,
+        RisoSampleVariants,
+
+        // Phase 1: Interactive/Visual Components
+        Chart,
+        Timeline,
+        Comparison,
+        ComparisonCard,
+        ImageGallery,
+        VideoEmbed,
+        Terminal,
+        Diff,
+
+        // Phase 2: Data/Code Components
+        APIReference,
+        PropTable,
+        FileTree,
+        PackageInstall,
+
+        // Phase 3: Engagement Components
+        Quiz,
+        Spoiler,
+        InlineSpoiler,
+        Bookmark,
+        BookmarkGrid,
+        Newsletter,
+
+        // Phase 4: Layout Components
+        Columns,
+        Column,
+        Split,
+        Aside,
+        InlineAside,
+        Figure,
+        FigureGroup,
+        Steps,
+        Step,
         
         ...components,
     };

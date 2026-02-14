@@ -70,9 +70,15 @@ export default function Math({ children = '', display = false, options = {}, lab
   };
 
   const renderedKatex = useMemo(() => {
-    // Remove need to clean math content since remark-math handles it
+    // Ensure children is a string (remark-math may pass React children)
+    const mathString = typeof children === 'string'
+      ? children
+      : String(children ?? '');
+
+    if (!mathString) return '';
+
     try {
-      return katex.renderToString(children, {
+      return katex.renderToString(mathString, {
         displayMode: display,
         throwOnError: true,
         globalGroup: true,
@@ -83,7 +89,7 @@ export default function Math({ children = '', display = false, options = {}, lab
       });
     } catch (error) {
       console.error('KaTeX error:', error);
-      return katex.renderToString(children, {
+      return katex.renderToString(mathString, {
         displayMode: display,
         throwOnError: false,
         strict: 'ignore',

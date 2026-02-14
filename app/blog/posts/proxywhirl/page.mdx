@@ -1,0 +1,657 @@
+---
+title: "ProxyWhirl"
+image: "/proxywhirl-hero.svg"
+caption: "Intelligent proxy rotation that heals itself"
+summary: "Production-ready Python proxy rotation with auto-fetching from 114+ sources, 9 selection strategies, self-healing circuit breakers, and five interfaces."
+tags: ["Project", "Python", "Open Source", "Networking", "Web Scraping"]
+created: "2026-02-13"
+updated: "2026-02-13"
+---
+
+import { ArticleJsonLd } from '@/components/PostSchema';
+
+export const metadata = {
+  title: "ProxyWhirl",
+  description: "Production-ready Python proxy rotation with auto-fetching from 114+ sources, 9 selection strategies, self-healing circuit breakers, and five interfaces.",
+  alternates: {
+    canonical: "https://w4w.dev/blog/posts/proxywhirl",
+  },
+  openGraph: {
+    type: "article",
+    title: "ProxyWhirl",
+    description: "Production-ready Python proxy rotation with auto-fetching from 114+ sources, 9 selection strategies, self-healing circuit breakers, and five interfaces.",
+    url: "https://w4w.dev/blog/posts/proxywhirl",
+    images: [{ url: "https://w4w.dev/proxywhirl-hero.svg", width: 1200, height: 630, alt: "ProxyWhirl" }],
+    publishedTime: "2026-02-13",
+    modifiedTime: "2026-02-13",
+    authors: ["Wyatt Walsh"],
+    tags: ["Project", "Python", "Open Source", "Networking", "Web Scraping"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ProxyWhirl",
+    description: "Production-ready Python proxy rotation with auto-fetching from 114+ sources, 9 selection strategies, self-healing circuit breakers, and five interfaces.",
+    images: ["https://w4w.dev/proxywhirl-hero.svg"],
+    creator: "@wyattowalsh",
+  },
+};
+
+<ArticleJsonLd
+  title="ProxyWhirl"
+  description="Production-ready Python proxy rotation with auto-fetching from 114+ sources, 9 selection strategies, self-healing circuit breakers, and five interfaces."
+  image="/proxywhirl-hero.svg"
+  datePublished="2026-02-13"
+  dateModified="2026-02-13"
+  slug="proxywhirl"
+  tags={["Project", "Python", "Open Source", "Networking", "Web Scraping"]}
+/>
+
+Proxies die. Lists go stale. Rotation is manual. I built ProxyWhirl so I'd never write that logic again.
+
+<div className="flex flex-wrap gap-2 my-4">
+  <Badge variant="default">Python 3.9+</Badge>
+  <Badge variant="secondary">114+ Sources</Badge>
+  <Badge variant="outline">9 Strategies</Badge>
+  <Badge variant="secondary">5 Interfaces</Badge>
+  <Badge variant="outline">3,197 Tests</Badge>
+  <Badge variant="default">Async-First</Badge>
+</div>
+
+- **Homepage**: [proxywhirl.com](https://proxywhirl.com)
+- **GitHub**: [github.com/wyattowalsh/proxywhirl](https://github.com/wyattowalsh/proxywhirl)
+- **PyPI**: [pypi.org/project/proxywhirl](https://pypi.org/project/proxywhirl/)
+
+---
+
+## The Problem
+
+<Callout type="warning">
+Free proxy lists are everywhere. GeoNode, TheSpeedX, monosans, proxifly, komutan — dozens of GitHub repos and API endpoints serving thousands of proxies. Using them reliably is an entirely different challenge.
+</Callout>
+
+Proxies get blocked. Speeds fluctuate by orders of magnitude. Sources disappear overnight. You end up writing the same brittle rotation logic for every project: fetch a list, test each proxy, track which ones work, replace the dead ones, repeat forever.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Manual["The Old Way"]
+        direction TB
+        P1[Find proxy lists] --> P2[Copy into code]
+        P2 --> P3[Proxy dies mid-request]
+        P3 --> P4[Manually remove dead proxy]
+        P4 --> P5[Find replacement]
+        P5 --> P1
+    end
+
+    style Manual fill:#fee2e2,stroke:#ef4444
+`} />
+
+I got tired of solving this problem in every scraping project I touched. The logic was always the same — fetch, validate, rotate, heal — but the implementation was always ad-hoc. So I extracted it into a library.
+
+---
+
+## What ProxyWhirl Does
+
+<Callout type="success">
+ProxyWhirl aggregates proxies from **114 active sources** across HTTP, SOCKS4, and SOCKS5 protocols. It validates them concurrently, rotates through them using one of 9 strategies, ejects failures via circuit breakers, and persists everything to SQLite so your validated pool survives restarts.
+</Callout>
+
+```python
+from proxywhirl import ProxyRotator, ProxyFetcher
+
+fetcher = ProxyFetcher()
+proxies = await fetcher.fetch_all(validate=True)
+
+rotator = ProxyRotator(proxies=proxies, strategy="performance-based")
+response = rotator.get("https://api.example.com/data")
+# Dead proxies auto-ejected | Slow ones deprioritized | Pool persists to SQLite
+```
+
+Five lines. Fetched, validated, rotated, with self-healing built in.
+
+---
+
+## Architecture
+
+At a high level, ProxyWhirl is a pipeline. Sources feed a fetcher, the fetcher feeds a pool, and the pool feeds a rotator that your application talks to.
+
+<Mermaid chart={`
+flowchart LR
+    subgraph Sources["114 Proxy Sources"]
+        S1[GeoNode API]
+        S2[GitHub repos]
+        S3[Web endpoints]
+    end
+
+    subgraph Fetch["ProxyFetcher"]
+        F1[Parse] --> F2[Validate] --> F3[Dedupe]
+    end
+
+    subgraph Pool["ProxyPool"]
+        P1[(SQLite)]
+        P2[Health Monitor]
+        P3[Circuit Breakers]
+    end
+
+    subgraph Rotate["ProxyRotator"]
+        R1{9 Strategies}
+    end
+
+    App[Your App]
+
+    Sources --> Fetch --> Pool --> Rotate --> App
+`} />
+
+Every component is replaceable. Swap strategies at runtime. Plug in custom parsers. Replace SQLite with file-based storage. The pipeline stays the same.
+
+---
+
+## Source Curation
+
+ProxyWhirl ships with 114 active proxy sources out of 120 defined. Six were disabled after automated health checks flagged them as stale or unreachable.
+
+The sources break down by protocol:
+
+| Protocol | Active Sources |
+|:---------|:--------------|
+| HTTP | 50 |
+| SOCKS4 | 33 |
+| SOCKS5 | 31 |
+
+These come from three places: **API endpoints** (GeoNode), **GitHub repositories** (90+ repos serving raw text proxy lists), and **web endpoints** (proxyspace.pro, openproxylist.xyz, and others). Some sources render their lists with JavaScript — Playwright handles those automatically.
+
+Each source carries metadata: URL, parser type, protocol, trust level, and update frequency. Sources that go stale get flagged and disabled.
+
+<Details summary="View source collections">
+
+```python
+from proxywhirl import (
+    ALL_SOURCES,           # All 114 active sources
+    RECOMMENDED_SOURCES,   # 5 battle-tested defaults
+    ALL_HTTP_SOURCES,      # 50 HTTP sources
+    ALL_SOCKS4_SOURCES,    # 33 SOCKS4 sources
+    ALL_SOCKS5_SOURCES,    # 31 SOCKS5 sources
+    API_SOURCES,           # 3 GeoNode API sources
+)
+```
+
+**Recommended sources** (highest reliability):
+- GeoNode HTTP
+- monosans HTTP and SOCKS5
+- proxifly HTTP
+- komutan HTTP
+
+The full source list includes repositories from TheSpeedX, hookzof, roosterkid, MuRongPIG, ErcinDedeworken, sunny9577, and many others.
+
+</Details>
+
+I don't maintain the source list by hand. A GitHub Action runs periodic health checks — HTTP status codes, parseable proxy data, response times — and disables anything stale. The source list stays clean without manual intervention.
+
+---
+
+## Nine Rotation Strategies
+
+Every proxy pool needs a selection algorithm. ProxyWhirl ships nine, each optimized for a different access pattern.
+
+| Strategy | Algorithm | Best For |
+|:---------|:----------|:---------|
+| `round-robin` | Sequential with wraparound | Even distribution |
+| `random` | Uniform random selection | Unpredictable patterns |
+| `weighted` | Success-rate weighted random | Favoring reliable proxies |
+| `least-used` | Min-heap by request count | Load balancing |
+| `performance-based` | EMA response time with exploration | Lowest latency |
+| `session-persistence` | LRU cache with TTL | Sticky sessions |
+| `geo-targeted` | Country/region filtering + fallback | Regional routing |
+| `cost-aware` | Inverse cost weighting | Budget optimization |
+| `composite` | Filter pipeline + selector | Custom combinations |
+
+Strategies swap at runtime with a single call:
+
+```python
+rotator = ProxyRotator(proxies=proxies, strategy="round-robin")
+
+# Traffic patterns changed — switch to performance-based
+rotator.set_strategy("performance-based")
+
+# Need US-only proxies for this batch
+rotator.set_strategy("geo-targeted")
+```
+
+The `composite` strategy deserves a special mention. It chains filters with a final selector, letting you build pipelines like "filter to US proxies, then select by lowest latency." Each filter narrows the pool, and the selector picks from what remains.
+
+<Details summary="Strategy implementation details">
+
+**Least-used** uses a min-heap (`heapq`) keyed by `requests_started`, giving O(log n) selection with lazy heap rebuilds only when pool composition changes.
+
+**Performance-based** tracks response times using an exponential moving average (EMA) with configurable alpha (default 0.2). New proxies get exploration trials (default 5 requests) before the algorithm has enough data to rank them. After that, selection is weighted by inverse EMA — faster proxies get picked more often.
+
+**Session-persistence** maps session IDs to proxies via an `OrderedDict` with LRU eviction. TTL defaults to one hour. Max sessions cap at 10,000. A cleanup pass runs every 100 operations. If the assigned proxy fails, it falls back to round-robin.
+
+**Geo-targeted** filters by ISO 3166-1 alpha-2 country codes or custom region names. Country takes precedence over region. When filtering produces no results and fallback is enabled (the default), it delegates to a secondary strategy — round-robin by default.
+
+</Details>
+
+---
+
+## Self-Healing and Resilience
+
+Proxies fail. The question is how your system responds. ProxyWhirl stacks four resilience layers between your application and proxy failures.
+
+### Circuit Breakers
+
+Every proxy gets its own circuit breaker. When failures hit the threshold, the breaker opens and the proxy drops out of rotation. After a cooldown period, it transitions to half-open and allows limited test traffic. If the tests pass, the proxy rejoins the pool.
+
+<Mermaid chart={`
+stateDiagram-v2
+    [*] --> Closed: Proxy healthy
+    Closed --> Open: failures >= threshold
+    Open --> HalfOpen: after cooldown
+    HalfOpen --> Closed: test requests pass
+    HalfOpen --> Open: test requests fail
+
+    note right of Closed: Requests flow normally
+    note right of Open: Proxy ejected from pool
+    note right of HalfOpen: Limited test traffic
+`} />
+
+```python
+from proxywhirl import CircuitBreakerConfig
+
+config = CircuitBreakerConfig(
+    failure_threshold=5,       # Open after 5 failures in window
+    window_duration=60.0,      # Rolling failure window (seconds)
+    timeout_duration=30.0,     # How long circuit stays open before retesting
+)
+```
+
+### Retry with Backoff
+
+Failed requests retry automatically with configurable backoff strategies: exponential (default), linear, constant, or jitter. Each retry uses a different proxy from the pool. The `RetryPolicy` controls max attempts, timeout, and which exceptions are retryable.
+
+```python
+from proxywhirl import RetryPolicy
+
+policy = RetryPolicy(
+    max_attempts=3,
+    backoff_strategy="exponential",
+    base_delay=1.0,
+    max_backoff_delay=30.0,
+)
+```
+
+### Rate Limiting
+
+A token bucket rate limiter prevents overwhelming targets or burning through proxy quotas. Each proxy can have independent rate limits.
+
+### Multi-Tier Caching
+
+Two cache tiers reduce redundant work:
+
+- **L1**: In-memory LRU cache for hot data. Microsecond access.
+- **L2**: Encrypted disk cache (Fernet/AES-256) for persistence across restarts. TTL-based expiration.
+
+Cache corruption detection and automatic recovery prevent stale or damaged cache entries from propagating.
+
+<Mermaid chart={`
+flowchart TB
+    Request[Incoming Request]
+    L1[L1: In-Memory LRU]
+    L2[L2: Encrypted Disk]
+    Origin[Origin Fetch]
+    CB[Circuit Breaker]
+    Retry[Retry with Backoff]
+    RL[Rate Limiter]
+
+    Request --> L1
+    L1 -->|miss| L2
+    L2 -->|miss| RL
+    RL --> CB
+    CB --> Origin
+    Origin -->|failure| Retry
+    Retry -->|new proxy| CB
+`} />
+
+---
+
+## Security
+
+ProxyWhirl handles untrusted network data by default. The security model is designed around that assumption.
+
+**SSRF protection** blocks requests to private IP ranges (RFC 1918), localhost, link-local addresses, and internal domains (`.local`, `.internal`, `.lan`, `.corp`). Only `http://` and `https://` schemes are allowed. An explicit `--allow-private` flag exists for local testing.
+
+**ReDoS-safe regex** wraps all regular expression operations in timeout-enforced helpers (`safe_match`, `safe_search`, `safe_findall`). A complexity analyzer detects potential backtracking before execution. User-provided patterns never hit the regex engine directly.
+
+**Credential encryption** uses AES-256-GCM via the `cryptography` library's Fernet implementation. Proxy credentials are encrypted at rest, with keys sourced from environment variables — never hardcoded.
+
+**Strict validation** runs through Pydantic v2 with `ConfigDict(frozen=True, extra="forbid")`. Typos in configuration fields raise errors immediately rather than silently passing.
+
+---
+
+## Five Interfaces
+
+ProxyWhirl exposes the same core functionality through five interfaces. Pick the one that fits your workflow.
+
+<Tabs defaultValue="python">
+  <TabsList>
+    <TabsTrigger value="python">Python API</TabsTrigger>
+    <TabsTrigger value="cli">CLI</TabsTrigger>
+    <TabsTrigger value="rest">REST API</TabsTrigger>
+    <TabsTrigger value="mcp">MCP Server</TabsTrigger>
+    <TabsTrigger value="tui">TUI Dashboard</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="python">
+    Two rotator classes: `ProxyRotator` for synchronous code and `AsyncProxyRotator` for async workflows. Both support context managers, all HTTP methods, automatic failover, and runtime strategy swapping.
+
+    ```python
+    from proxywhirl import ProxyRotator, AsyncProxyRotator
+
+    # Synchronous
+    with ProxyRotator(proxies=proxies, strategy="weighted") as rotator:
+        response = rotator.get("https://httpbin.org/ip")
+        response = rotator.post("https://httpbin.org/post", json={"key": "value"})
+
+    # Asynchronous
+    async with AsyncProxyRotator(proxies=proxies, strategy="performance-based") as rotator:
+        response = await rotator.get("https://httpbin.org/ip")
+    ```
+
+    Context-aware selection lets you pass session IDs, target countries, and failed proxy IDs to influence proxy selection per-request:
+
+    ```python
+    from proxywhirl import SelectionContext
+
+    ctx = SelectionContext(session_id="user-123", target_country="US")
+    proxy = rotator.select_proxy(context=ctx)
+    ```
+  </TabsContent>
+
+  <TabsContent value="cli">
+    The CLI gives you everything from the terminal — fetching, pool management, health checks, exports, and the TUI dashboard:
+
+    ```bash
+    proxywhirl fetch                          # Fetch from all 114 sources
+    proxywhirl fetch --validate               # Fetch and validate concurrently
+    proxywhirl fetch --sources GEONODE_HTTP    # Fetch from specific sources
+
+    proxywhirl pool list                      # List all proxies in pool
+    proxywhirl pool stats                     # Pool health statistics
+    proxywhirl pool export proxies.json       # Export pool to JSON/CSV/TXT
+
+    proxywhirl test https://httpbin.org/ip    # Test proxies against a URL
+    proxywhirl health --check                 # Run health checks on all proxies
+
+    proxywhirl config show                    # Show current configuration
+    proxywhirl tui                            # Launch interactive dashboard
+    ```
+  </TabsContent>
+
+  <TabsContent value="rest">
+    The REST API wraps ProxyWhirl in a FastAPI service — useful for sharing a proxy pool across multiple apps or languages.
+
+    ```bash
+    # Start the server
+    uvicorn proxywhirl.api:app --host 0.0.0.0 --port 8000
+
+    # Pool management
+    curl http://localhost:8000/api/v1/pool
+    curl http://localhost:8000/api/v1/pool/stats
+    curl -X POST http://localhost:8000/api/v1/pool/fetch
+
+    # Make proxied requests
+    curl -X POST http://localhost:8000/api/v1/proxy/request \
+      -H "Content-Type: application/json" \
+      -d '{"url": "https://httpbin.org/ip", "method": "GET"}'
+
+    # Health and metrics
+    curl http://localhost:8000/health          # Liveness probe
+    curl http://localhost:8000/ready           # Readiness probe
+    curl http://localhost:8000/metrics         # Prometheus scrape target
+    ```
+
+    Circuit breaker state and retry policies are also exposed as API endpoints for runtime tuning.
+  </TabsContent>
+
+  <TabsContent value="mcp">
+    The MCP (Model Context Protocol) server lets AI assistants like Claude interact with ProxyWhirl directly. Requires Python 3.10+.
+
+    ```bash
+    pip install proxywhirl[mcp]
+    proxywhirl-mcp
+    ```
+
+    The server exposes a single unified `proxywhirl` tool with an `action` parameter:
+
+    | Action | Description |
+    |:-------|:------------|
+    | `list` | List all proxies in pool |
+    | `rotate` | Select next proxy via current strategy |
+    | `status` | Get status for a specific proxy |
+    | `recommend` | Recommend a proxy by region/performance |
+    | `health` | Pool health statistics |
+    | `fetch` | Fetch proxies from sources |
+    | `validate` | Validate proxies in pool |
+    | `add` / `remove` | Manage individual proxies |
+    | `set_strategy` | Change rotation strategy at runtime |
+    | `reset_cb` | Reset a proxy's circuit breaker |
+
+    Authentication via `PROXYWHIRL_MCP_API_KEY`. The MCP server uses a separate database (`PROXYWHIRL_MCP_DB`) to avoid contention with other interfaces.
+  </TabsContent>
+
+  <TabsContent value="tui">
+    The TUI dashboard (built on Textual) provides a full interactive interface across six tabs:
+
+    | Tab | Contents |
+    |:----|:---------|
+    | **Overview** | Live metrics panel, proxy table with health-colored rows |
+    | **Fetch & Validate** | Source selection, batch fetching, progress bars |
+    | **Export** | CSV, JSON, YAML, plain text export |
+    | **Test** | HTTP request tester (all methods, custom headers/body) |
+    | **Analytics** | Statistics by protocol, country, source |
+    | **Health** | Circuit breaker status, batch health checks with progress |
+
+    ```bash
+    proxywhirl tui
+    ```
+
+    **Keyboard shortcuts:** Ctrl+R (refresh), Ctrl+F (fetch tab), Ctrl+E (export tab), Ctrl+T (test tab), Delete (remove proxy), Enter (proxy details), F1 (help).
+  </TabsContent>
+</Tabs>
+
+---
+
+## Observability
+
+ProxyWhirl exposes three observability layers.
+
+**Prometheus metrics** via the `prometheus_client` library:
+
+| Metric | Type | Description |
+|:-------|:-----|:------------|
+| `proxywhirl_requests_total` | Counter | Total proxied requests |
+| `proxywhirl_request_duration_seconds` | Histogram | Request latency distribution |
+| `proxywhirl_active_proxies` | Gauge | Current pool size |
+| `proxywhirl_healthy_proxies` | Gauge | Healthy proxy count |
+| `proxywhirl_circuit_breaker_state` | Gauge | Per-proxy breaker state |
+
+**Structured logging** via Loguru with JSON output, size-based rotation (10 MB), time-based rotation (daily), and sensitive data masking for proxy credentials.
+
+**Health probes** for orchestration: `/health` (liveness — always 200 if running), `/ready` (readiness — 200 only if the pool has healthy proxies), and `/api/v1/health` (detailed pool statistics).
+
+---
+
+## Testing
+
+The test suite has 3,197 tests across 136 files, organized into five categories:
+
+| Category | Purpose |
+|:---------|:--------|
+| **Unit** | Individual component behavior in isolation |
+| **Integration** | Component interaction, database round-trips |
+| **Property** | Hypothesis-based generative testing for edge cases |
+| **Benchmarks** | Performance regression detection |
+| **Contract** | Strategy selection guarantees (e.g., session-persistence returns same proxy 99.9% of the time) |
+
+Coverage baseline is 70%, with 90% enforced in strict mode. Tests run on Python 3.9 through 3.13 via GitHub Actions matrix.
+
+---
+
+## Tech Stack
+
+<Mermaid chart={`
+graph TB
+    subgraph Core["Core"]
+        httpx[httpx + httpx-socks]
+        pydantic[Pydantic v2]
+        sqlmodel[SQLModel + aiosqlite]
+        loguru[Loguru]
+    end
+
+    subgraph Resilience["Resilience"]
+        tenacity[Tenacity]
+        pyrate[pyrate-limiter]
+        crypto[cryptography]
+    end
+
+    subgraph Interfaces["Interfaces"]
+        fastapi[FastAPI + uvicorn]
+        typer[Typer + Rich]
+        textual[Textual]
+        fastmcp[FastMCP]
+    end
+
+    subgraph Optional["Optional"]
+        playwright[Playwright]
+        geoip[GeoIP2]
+        prometheus[prometheus-client]
+    end
+
+    Core --> Resilience
+    Core --> Interfaces
+    Resilience --> Optional
+
+    style Core fill:#0096c7,color:#fff
+    style Resilience fill:#ef233c,color:#fff
+    style Interfaces fill:#06d6a0,color:#fff
+    style Optional fill:#6c757d,color:#fff
+`} />
+
+Install only what you need with optional extras:
+
+| Extra | Adds |
+|:------|:-----|
+| `storage` | SQLModel persistence |
+| `security` | Credential encryption |
+| `js` | Playwright for JS-rendered sources |
+| `analytics` | pandas, numpy, sklearn |
+| `mcp` | MCP server for AI assistants |
+| `all` | Everything above |
+
+---
+
+## Get Started
+
+<Tabs defaultValue="quick">
+  <TabsList>
+    <TabsTrigger value="quick">Quick Start</TabsTrigger>
+    <TabsTrigger value="extras">With Extras</TabsTrigger>
+    <TabsTrigger value="docker">Docker</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="quick">
+    ```bash
+    pip install proxywhirl
+    ```
+
+    ```python
+    from proxywhirl import ProxyRotator, ProxyFetcher
+
+    fetcher = ProxyFetcher()
+    proxies = await fetcher.fetch_all(validate=True)
+    rotator = ProxyRotator(proxies=proxies, strategy="performance-based")
+    response = rotator.get("https://httpbin.org/ip")
+    ```
+  </TabsContent>
+
+  <TabsContent value="extras">
+    ```bash
+    # Everything
+    pip install proxywhirl[all]
+
+    # Or pick what you need
+    pip install proxywhirl[storage]     # SQLite persistence
+    pip install proxywhirl[security]    # Credential encryption
+    pip install proxywhirl[js]          # Playwright for JS sources
+    pip install proxywhirl[analytics]   # Data analysis tools
+    pip install proxywhirl[mcp]         # MCP server (Python 3.10+)
+    ```
+  </TabsContent>
+
+  <TabsContent value="docker">
+    ```bash
+    git clone https://github.com/wyattowalsh/proxywhirl
+    cd proxywhirl
+
+    # Start the REST API
+    docker-compose up -d
+
+    # Fetch proxies and check pool stats
+    curl -X POST http://localhost:8000/api/v1/pool/fetch
+    curl http://localhost:8000/api/v1/pool/stats
+    ```
+  </TabsContent>
+</Tabs>
+
+---
+
+## Links
+
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 my-6">
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="flex items-center gap-3">
+      <div>
+        <div className="font-semibold">Homepage</div>
+        <a href="https://proxywhirl.com" className="text-sm text-muted-foreground hover:text-primary">proxywhirl.com</a>
+      </div>
+    </div>
+  </Card>
+
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="flex items-center gap-3">
+      <div>
+        <div className="font-semibold">PyPI</div>
+        <a href="https://pypi.org/project/proxywhirl/" className="text-sm text-muted-foreground hover:text-primary">pypi.org/project/proxywhirl</a>
+      </div>
+    </div>
+  </Card>
+
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="flex items-center gap-3">
+      <div>
+        <div className="font-semibold">GitHub</div>
+        <a href="https://github.com/wyattowalsh/proxywhirl" className="text-sm text-muted-foreground hover:text-primary">github.com/wyattowalsh/proxywhirl</a>
+      </div>
+    </div>
+  </Card>
+
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="flex items-center gap-3">
+      <div>
+        <div className="font-semibold">Documentation</div>
+        <a href="https://proxywhirl.com/docs" className="text-sm text-muted-foreground hover:text-primary">proxywhirl.com/docs</a>
+      </div>
+    </div>
+  </Card>
+
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="flex items-center gap-3">
+      <div>
+        <div className="font-semibold">Examples</div>
+        <a href="https://github.com/wyattowalsh/proxywhirl/tree/main/examples" className="text-sm text-muted-foreground hover:text-primary">View on GitHub</a>
+      </div>
+    </div>
+  </Card>
+</div>
+
+<Callout type="info">
+**Feedback welcome.** Open an issue or start a discussion on [GitHub](https://github.com/wyattowalsh/proxywhirl). Contributions are always appreciated.
+</Callout>

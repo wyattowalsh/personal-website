@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import React from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
 export const BackgroundGradient = ({
 	children,
@@ -13,6 +14,7 @@ export const BackgroundGradient = ({
 	containerClassName?: string;
 	animate?: boolean;
 }) => {
+	const prefersReducedMotion = useReducedMotion();
 	const variants = {
 		initial: {
 			backgroundPosition: "0 50%",
@@ -21,14 +23,16 @@ export const BackgroundGradient = ({
 			backgroundPosition: ["0, 50%", "100% 50%", "0 50%"],
 		},
 	};
+	const shouldAnimate = animate && !prefersReducedMotion;
+
 	return (
 		<div className={cn("relative p-[4px] group", containerClassName)}>
 			<motion.div
-				variants={animate ? variants : undefined}
-				initial={animate ? "initial" : undefined}
-				animate={animate ? "animate" : undefined}
+				variants={shouldAnimate ? variants : undefined}
+				initial={shouldAnimate ? "initial" : undefined}
+				animate={shouldAnimate ? "animate" : undefined}
 				transition={
-					animate
+					shouldAnimate
 						? {
 								duration: 5,
 								repeat: Infinity,
@@ -37,7 +41,7 @@ export const BackgroundGradient = ({
 						: undefined
 				}
 				style={{
-					backgroundSize: animate ? "400% 400%" : undefined,
+					backgroundSize: shouldAnimate ? "400% 400%" : undefined,
 				}}
 				className={cn(
 					"absolute inset-0 rounded-3xl z-[1] opacity-60 group-hover:opacity-100 blur-xl  transition duration-500 will-change-transform",
@@ -45,11 +49,11 @@ export const BackgroundGradient = ({
 				)}
 			/>
 			<motion.div
-				variants={animate ? variants : undefined}
-				initial={animate ? "initial" : undefined}
-				animate={animate ? "animate" : undefined}
+				variants={shouldAnimate ? variants : undefined}
+				initial={shouldAnimate ? "initial" : undefined}
+				animate={shouldAnimate ? "animate" : undefined}
 				transition={
-					animate
+					shouldAnimate
 						? {
 								duration: 5,
 								repeat: Infinity,
@@ -58,7 +62,7 @@ export const BackgroundGradient = ({
 						: undefined
 				}
 				style={{
-					backgroundSize: animate ? "400% 400%" : undefined,
+					backgroundSize: shouldAnimate ? "400% 400%" : undefined,
 				}}
 				className={cn(
 					"absolute inset-0 rounded-3xl z-[1] will-change-transform",

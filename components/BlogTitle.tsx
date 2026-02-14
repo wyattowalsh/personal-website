@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
-import { motion, useMotionValue, useAnimationFrame } from "framer-motion";
+import { motion, useMotionValue, useAnimationFrame } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { useTheme } from "next-themes";
 import {
 	Code,
@@ -144,29 +145,56 @@ const GlitchText = ({ children }: { children: React.ReactNode }) => (
 );
 
 const BackgroundParticles = () => {
-	const particles = Array.from({ length: 100 });
+	const [mounted, setMounted] = useState(false);
+	const [particles, setParticles] = useState<Array<{
+		width: number;
+		height: number;
+		top: number;
+		left: number;
+		xOffset: number;
+		duration: number;
+		delay: number;
+	}>>([]);
+
+	useEffect(() => {
+		// Generate random values only on client
+		setParticles(
+			Array.from({ length: 100 }, () => ({
+				width: Math.random() * 4 + 2,
+				height: Math.random() * 4 + 2,
+				top: Math.random() * 100,
+				left: Math.random() * 100,
+				xOffset: 20 * (Math.random() - 0.5),
+				duration: 5 + Math.random() * 5,
+				delay: Math.random() * 5,
+			}))
+		);
+		setMounted(true);
+	}, []);
+
+	if (!mounted) return null;
 
 	return (
 		<>
-			{particles.map((_, index) => (
+			{particles.map((particle, index) => (
 				<motion.div
 					key={index}
 					className="absolute rounded-full bg-cyan-500/20 dark:bg-cyan-400/20 blur-md"
 					style={{
-						width: `${Math.random() * 4 + 2}px`,
-						height: `${Math.random() * 4 + 2}px`,
-						top: `${Math.random() * 100}%`,
-						left: `${Math.random() * 100}%`,
+						width: `${particle.width}px`,
+						height: `${particle.height}px`,
+						top: `${particle.top}%`,
+						left: `${particle.left}%`,
 					}}
 					animate={{
 						opacity: [0, 1, 0],
 						y: [0, -50, 0],
-						x: [0, 20 * (Math.random() - 0.5), 0],
+						x: [0, particle.xOffset, 0],
 					}}
 					transition={{
-						duration: 5 + Math.random() * 5,
+						duration: particle.duration,
 						repeat: Infinity,
-						delay: Math.random() * 5,
+						delay: particle.delay,
 						ease: "easeInOut",
 					}}
 				/>
@@ -196,6 +224,7 @@ const AnimatedBackground = () => (
 );
 
 const BlogTitle = () => {
+	const prefersReducedMotion = useReducedMotion();
 	const { theme } = useTheme();
 	const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 
@@ -238,7 +267,7 @@ const BlogTitle = () => {
 						<BackgroundParticles />
 						<div className={styles.scanlines} />
 
-						{containerSize.width > 0 &&
+						{!prefersReducedMotion && containerSize.width > 0 &&
 							icons.map((Icon, index) => (
 								<FloatingIcon
 									key={index}

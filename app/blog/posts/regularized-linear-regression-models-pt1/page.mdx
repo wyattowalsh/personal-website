@@ -7,6 +7,42 @@ tags: ["ML", "TDS", "Python", "Optimization"]
 created: "2021-01-13"
 ---
 
+import { ArticleJsonLd } from '@/components/PostSchema';
+
+export const metadata = {
+  title: "Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)",
+  description: "Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy",
+  alternates: {
+    canonical: "https://w4w.dev/blog/posts/regularized-linear-regression-models-pt1",
+  },
+  openGraph: {
+    type: "article",
+    title: "Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)",
+    description: "Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy",
+    url: "https://w4w.dev/blog/posts/regularized-linear-regression-models-pt1",
+    images: [{ url: "https://w4w.dev/lasso.webp", width: 1200, height: 630, alt: "Linear Regression Modeling" }],
+    publishedTime: "2021-01-13",
+    authors: ["Wyatt Walsh"],
+    tags: ["ML", "TDS", "Python", "Optimization"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)",
+    description: "Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy",
+    images: ["https://w4w.dev/lasso.webp"],
+    creator: "@wyattowalsh",
+  },
+};
+
+<ArticleJsonLd
+  title="Basics of Linear Regression Modeling and Ordinary Least Squares (OLS)"
+  description="Context of Linear Regression, Optimization to Obtain the OLS Model Estimator, and an Implementation in Python Using Numpy"
+  image="/lasso.webp"
+  datePublished="2021-01-13"
+  slug="regularized-linear-regression-models-pt1"
+  tags={["ML", "TDS", "Python", "Optimization"]}
+/>
+
 Hey 👋
 
 Welcome to part one of a three-part deep-dive on **regularized linear regression modeling** — some of the most popular algorithms for supervised learning tasks.

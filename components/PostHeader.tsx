@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
@@ -13,6 +13,8 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
 import { useRouter } from "next/navigation"; // Update import
 import { Separator } from "@/components/ui/separator";
+import ThemeAwareHero, { getHeroConfig, isThemedHero } from "@/components/heroes/ThemeAwareHero";
+import RisoHero from "@/components/heroes/RisoHero";
 
 // Remove the local PostMetadata interface since we're importing it
 
@@ -294,41 +296,54 @@ export default function PostHeader() {
 
   console.log('Post data:', postData.post); // Add this debug line
 
+  const imageSrc = postData.post.image || "/logo.webp";
+  const isSvg = imageSrc.endsWith(".svg");
+  const heroConfig = getHeroConfig(imageSrc);
+  const isRisoHero = imageSrc === "/riso-hero.svg";
+  console.log('Hero debug:', { imageSrc, isRisoHero, hasHeroConfig: !!heroConfig });
+  const altText = postData.post.image
+    ? `Header image for ${postData.post.title}`
+    : "Default post header image";
+
+  // Extract slug from pathname
+  const slug = pathname.split('/').filter(segment => segment && segment !== 'blog' && segment !== 'posts').pop() || '';
+
   return (
-    <motion.header
-      className={cn(
-        // Remove any margin/padding at the top
-        "relative overflow-hidden",
-        "rounded-xl md:rounded-2xl lg:rounded-3xl",
-        "max-w-5xl mx-auto",
-        "border border-post-header-border",
-        "mt-0 pt-0",
-        
-        // Gradients and backgrounds
-        "bg-gradient-to-br from-post-header-gradient-from via-post-header-gradient-via to-post-header-gradient-to",
-        "backdrop-blur-sm backdrop-saturate-150",
-        
-        // Shadows and effects
-        "shadow-post-header",
-        "transition-all duration-500 ease-out",
-        "hover:shadow-post-header-hover hover:scale-[1.01]",
-        
-        // Dark mode adjustments
-        "dark:from-post-header-gradient-from/90",
-        "dark:via-post-header-gradient-via/90",
-        "dark:to-post-header-gradient-to/90",
-        "dark:border-post-header-border/50",
-        
-        // Ensure no padding or margin at the top
-        "pt-0 mt-0"
-      )}
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      role="banner"
-      aria-label="Post header"
-    >
-      {/* Image container - Ensure it's flush with the top */}
+    <>
+      <motion.header
+        className={cn(
+          // Remove any margin/padding at the top
+          "relative overflow-hidden",
+          "rounded-xl md:rounded-2xl lg:rounded-3xl",
+          "max-w-5xl mx-auto",
+          "border border-post-header-border",
+          "mt-0 pt-0",
+          
+          // Gradients and backgrounds
+          "bg-gradient-to-br from-post-header-gradient-from via-post-header-gradient-via to-post-header-gradient-to",
+          "backdrop-blur-sm backdrop-saturate-150",
+          
+          // Shadows and effects
+          "shadow-post-header",
+          "transition-all duration-500 ease-out",
+          "hover:shadow-post-header-hover hover:scale-[1.01]",
+          
+          // Dark mode adjustments
+          "dark:from-post-header-gradient-from/90",
+          "dark:via-post-header-gradient-via/90",
+          "dark:to-post-header-gradient-to/90",
+          "dark:border-post-header-border/50",
+          
+          // Ensure no padding or margin at the top
+          "pt-0 mt-0"
+        )}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+        role="banner"
+        aria-label="Post header"
+      >
+        {/* Image container - Ensure it's flush with the top */}
       <div className={cn(
         "relative w-full",
         "aspect-[21/9] sm:aspect-[2/1] md:aspect-[21/9]",
@@ -336,22 +351,61 @@ export default function PostHeader() {
         "rounded-t-xl md:rounded-t-2xl lg:rounded-t-3xl", // Match parent's top border radius
         "pt-0 mt-0" // Ensure no padding or margin at the top
       )}>
-        <Image
-          src={postData.post.image || "/logo.webp"}
-          alt={postData.post.image ? `Header image for ${postData.post.title}` : "Default post header image"}
-          fill
-          priority
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
-          className={cn(
-            "object-cover w-full h-full", // Change h-auto to h-full
-            "transform transition-all duration-700",
-            !imageLoaded && "blur-sm scale-105",
-            imageLoaded && "blur-0 scale-100",
-            "hover:scale-105 transition-transform duration-700",
-            "mt-0 pt-0" // Remove any top margin/padding
-          )}
-          onLoad={handleImageLoad}
-        />
+        {imageSrc === "/riso-hero.svg" ? (
+          <RisoHero
+            className={cn(
+              "absolute inset-0 w-full h-full",
+              "transform transition-all duration-700",
+              !imageLoaded && "blur-sm scale-105",
+              imageLoaded && "blur-0 scale-100",
+              "hover:scale-105 transition-transform duration-700"
+            )}
+            onLoad={handleImageLoad}
+          />
+        ) : heroConfig ? (
+          <ThemeAwareHero
+            config={heroConfig}
+            className={cn(
+              "absolute inset-0 w-full h-full",
+              "transform transition-all duration-700",
+              !imageLoaded && "blur-sm scale-105",
+              imageLoaded && "blur-0 scale-100",
+              "hover:scale-105 transition-transform duration-700"
+            )}
+            onLoad={handleImageLoad}
+          />
+        ) : isSvg ? (
+          <img
+            src={imageSrc}
+            alt={altText}
+            className={cn(
+              "absolute inset-0 w-full h-full object-cover",
+              "transform transition-all duration-700",
+              !imageLoaded && "blur-sm scale-105",
+              imageLoaded && "blur-0 scale-100",
+              "hover:scale-105 transition-transform duration-700",
+              "mt-0 pt-0"
+            )}
+            onLoad={handleImageLoad}
+          />
+        ) : (
+          <Image
+            src={imageSrc}
+            alt={altText}
+            fill
+            priority
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+            className={cn(
+              "object-cover w-full h-full", // Change h-auto to h-full
+              "transform transition-all duration-700",
+              !imageLoaded && "blur-sm scale-105",
+              imageLoaded && "blur-0 scale-100",
+              "hover:scale-105 transition-transform duration-700",
+              "mt-0 pt-0" // Remove any top margin/padding
+            )}
+            onLoad={handleImageLoad}
+          />
+        )}
         
         {/* Image Overlay */}
         <div className={cn(
@@ -495,5 +549,6 @@ export default function PostHeader() {
         </div>
       </div>
     </motion.header>
+    </>
   );
 }

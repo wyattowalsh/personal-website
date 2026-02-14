@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import styles from '../app/page.module.scss';
 
@@ -55,9 +56,10 @@ const WORDS = [
 const ANIMATION_INTERVAL = 3000;
 
 export default function LandingTitle() {
+  const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [wordIndex, setWordIndex] = useState(0);
-  
+
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
@@ -66,14 +68,15 @@ export default function LandingTitle() {
   // Scroll-based animations
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8]);
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.98, 1, 0.98]);
-  
-  // Word rotation effect
+
+  // Word rotation effect - disabled when reduced motion is preferred
   useEffect(() => {
+    if (prefersReducedMotion) return;
     const timer = setInterval(() => {
       setWordIndex(prev => (prev + 1) % WORDS.length);
     }, ANIMATION_INTERVAL);
     return () => clearInterval(timer);
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <motion.div
@@ -124,31 +127,49 @@ export default function LandingTitle() {
         Wyatt Walsh
       </h1>
 
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={wordIndex}
-          // Reduced gap between title and subtitle
-          className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2"
-        >
-          <motion.p
+      {prefersReducedMotion ? (
+        <div className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2">
+          <p
             className={cn(
-              // Reduced top margin
               "mt-2 sm:mt-3",
-              // Rest of text styles
               "text-lg sm:text-xl md:text-2xl lg:text-3xl",
               "font-light text-center leading-relaxed tracking-wide",
-              // Enhanced gradient
               "bg-gradient-to-r bg-clip-text text-transparent",
               "from-blue-500/90 via-purple-500/90 to-pink-500/90",
               "dark:from-blue-300/90 dark:via-purple-300/90 dark:to-pink-300/90",
               "transition-all duration-300 ease-out"
             )}
-            data-text={WORDS[wordIndex]}
           >
-            {WORDS[wordIndex]}
-          </motion.p>
-        </motion.div>
-      </AnimatePresence>
+            {WORDS[0]}
+          </p>
+        </div>
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={wordIndex}
+            // Reduced gap between title and subtitle
+            className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2"
+          >
+            <motion.p
+              className={cn(
+                // Reduced top margin
+                "mt-2 sm:mt-3",
+                // Rest of text styles
+                "text-lg sm:text-xl md:text-2xl lg:text-3xl",
+                "font-light text-center leading-relaxed tracking-wide",
+                // Enhanced gradient
+                "bg-gradient-to-r bg-clip-text text-transparent",
+                "from-blue-500/90 via-purple-500/90 to-pink-500/90",
+                "dark:from-blue-300/90 dark:via-purple-300/90 dark:to-pink-300/90",
+                "transition-all duration-300 ease-out"
+              )}
+              data-text={WORDS[wordIndex]}
+            >
+              {WORDS[wordIndex]}
+            </motion.p>
+          </motion.div>
+        </AnimatePresence>
+      )}
 
       {/* Theme-aware decorative elements */}
       <div className={cn(

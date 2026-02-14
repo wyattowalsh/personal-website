@@ -1,30 +1,69 @@
-@use 'sass:math';
-@use 'variables.module.scss' as variables;
-
-@use "tailwindcss/base";
-@use "tailwindcss/components";
-@use "tailwindcss/utilities";
-
-@function random-percentage() {
-  @return math.random(100) + 0%;
-}
-
-@function random-translate() {
-  @return math.random(10) - 5 + px;
-}
+/* Tailwind is imported from layout.tsx via tailwind.css */
+/* @reference makes Tailwind theme available for use in this SCSS file */
+@reference "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
-    @include variables.light;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-light: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+    --selection-bg: 222.2 47.4% 11.2%;
+    --selection-text: 210 40% 98%;
+    --selection-heading-bg: 210 40% 96.1%;
+    --selection-heading-text: 222.2 47.4% 11.2%;
+    --gradient-heading: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
   }
 
-  html.dark {
-    @include variables.dark;
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-light: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+    --selection-bg: 210 40% 98%;
+    --selection-text: 222.2 47.4% 11.2%;
+    --selection-heading-bg: 217.2 32.6% 17.5%;
+    --selection-heading-text: 210 40% 98%;
+    --gradient-heading: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    @apply bg-background text-foreground;
+    font-family: 'Montserrat', sans-serif;
   }
 
   a:not(.no-underline) {
@@ -67,7 +106,7 @@
   code {
     @apply bg-muted text-accent-foreground px-1.5 py-0.5 rounded;
     
-    // Add specific styles for inline code
+/* Add specific styles for inline code */
     &:not(pre code) {
       font-family: var(--font-code);
       font-weight: 500;
@@ -115,7 +154,7 @@
   }
 
   .math-inline {
-    @apply inline-flex items-center rounded border border-opacity-30 border-border bg-muted bg-opacity-30 px-2 py-1 dark:bg-opacity-10 dark:bg-muted;
+    @apply inline-flex items-center rounded border border-border/30 bg-muted/30 px-2 py-1 dark:bg-muted/10;
   }
 
   .math {
@@ -148,7 +187,7 @@
     color: var(--math-index-color);
   }
 
-  // Add styles for anchor links on headings
+/* Add styles for anchor links on headings */
   h1, h2, h3, h4, h5, h6 {
     scroll-margin-top: 100px;
     position: relative;
@@ -175,7 +214,7 @@
     }
   }
 
-  // Enhanced equation styles
+/* Enhanced equation styles */
   .math-display {
     .equation-number-container {
       @apply absolute right-4 bottom-4;
@@ -185,13 +224,13 @@
     }
 
     .equation-number {
-      @apply text-math-display-number text-sm;
+      @apply text-muted-foreground text-sm;
       @apply transition-all duration-300;
-      @apply hover:text-math-display-number-hover;
+      @apply hover:text-foreground;
       @apply cursor-pointer;
       @apply select-none;
       @apply flex items-center gap-1;
-      
+
       &:hover {
         @apply scale-105;
       }
@@ -203,12 +242,10 @@
       animation: highlight 2s ease-out;
     }
 
-    // Ensure math content is properly positioned
+/* Ensure math content is properly positioned */
     .math-content {
       @apply relative py-2;
       @apply overflow-x-auto overflow-y-hidden;
-      @apply scrollbar-thin scrollbar-track-transparent;
-      @apply scrollbar-thumb-math; // Use new custom utility
     }
   }
 
@@ -238,26 +275,26 @@
     }
   }
 
-  // Enhanced header styles with autolink
+/* Enhanced header styles with autolink */
   h1, h2, h3, h4, h5, h6 {
     @apply scroll-mt-20 relative;
     
-    // Anchor link container
+/* Anchor link container */
     .anchor {
       @apply absolute -left-8 top-1/2 -translate-y-1/2;
       @apply opacity-0 invisible;
-      @apply p-2 -m-2; // Larger touch target
+      @apply p-2 -m-2; /* Larger touch target */
       @apply rounded-lg;
       @apply transition-all duration-300 ease-out;
       @apply hover:bg-primary/5 dark:hover:bg-primary/10;
       @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
-      @apply sm:visible; // Only show on larger screens
+      @apply sm:visible; /* Only show on larger screens */
       
-      // Responsive positioning
+/* Responsive positioning */
       @apply md:-left-10;
       @apply lg:-left-12;
       
-      // Icon styling
+/* Icon styling */
       .anchor-icon {
         @apply block;
         @apply text-muted-foreground opacity-50;
@@ -267,25 +304,25 @@
         @apply hover:scale-100 hover:text-primary hover:opacity-100;
         @apply dark:hover:text-primary dark:hover:opacity-100;
         
-        // Responsive icon sizing
+/* Responsive icon sizing */
         @apply w-4 h-4;
         @apply sm:w-5 sm:h-5;
         @apply md:w-6 md:h-6;
         
-        // Add subtle glow on hover
+/* Add subtle glow on hover */
         @apply hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)];
         @apply dark:hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)];
       }
     }
 
-    // Show anchor on header hover
+/* Show anchor on header hover */
     &:hover .anchor {
       @apply opacity-100;
       @apply visible;
       @apply translate-x-0;
     }
 
-    // Mobile-friendly touch target
+/* Mobile-friendly touch target */
     @media (hover: none) {
       .anchor {
         @apply opacity-50 visible;
@@ -297,13 +334,13 @@
       }
     }
 
-    // Active state styles
+/* Active state styles */
     .anchor:active {
       @apply scale-95;
       @apply bg-primary/10 dark:bg-primary/15;
     }
 
-    // When header is targeted by URL hash
+/* When header is targeted by URL hash */
     &:target {
       @apply relative;
       
@@ -321,24 +358,27 @@
     }
   }
 
-  // Default text selection
+/* Default text selection */
   ::selection {
-    @apply bg-selection-bg text-selection-text;
+    background-color: hsl(var(--selection-bg));
+    color: hsl(var(--selection-text));
   }
 
-  // Heading-specific text selection
+/* Heading-specific text selection */
   h1, h2, h3, h4, h5, h6 {
     &::selection {
-      @apply bg-selection-heading-bg text-selection-heading-text;
+      background-color: hsl(var(--selection-heading-bg));
+      color: hsl(var(--selection-heading-text));
     }
 
-    // Also style selection within headings (e.g., for nested elements)
+/* Also style selection within headings (e.g., for nested elements) */
     & *::selection {
-      @apply bg-selection-heading-bg text-selection-heading-text;
+      background-color: hsl(var(--selection-heading-bg));
+      color: hsl(var(--selection-heading-text));
     }
   }
 
-  // Enhanced responsive heading styles
+/* Enhanced responsive heading styles */
   h1 {
     @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
     @apply leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight;
@@ -365,11 +405,11 @@
     @apply mt-4 sm:mt-6 md:mt-8 mb-2 sm:mb-3;
   }
 
-  // Enhanced heading hover and focus states
+/* Enhanced heading hover and focus states */
   h1, h2, h3, h4, h5, h6 {
     @apply relative overflow-visible;
     
-    // Progressive reveal effect on hover
+/* Progressive reveal effect on hover */
     &::after {
       @apply content-[''] absolute bottom-0 left-0 w-full;
       @apply h-[2px] bg-primary/30 dark:bg-primary/20;
@@ -381,13 +421,13 @@
       @apply scale-x-100;
     }
 
-    // Enhanced focus styles
+/* Enhanced focus styles */
     &:focus-visible {
       @apply outline-none ring-2 ring-primary/50 dark:ring-primary/40;
       @apply rounded-lg;
     }
 
-    // Improved anchor link visibility
+/* Improved anchor link visibility */
     .anchor {
       @apply opacity-0 transform -translate-x-2;
       @apply transition-all duration-300 ease-out;
@@ -406,7 +446,7 @@
     }
   }
 
-  // Enhanced mobile experience
+/* Enhanced mobile experience */
   @media (hover: none) {
     h1, h2, h3, h4, h5, h6 {
       .anchor {
@@ -416,13 +456,56 @@
   }
 }
 
+@layer base {
+  * {
+    @apply border-border;
+  }
+}
+
 @keyframes glitch-anim {
-  $steps: 20;
-  @for $i from 0 through $steps {
-    #{math.percentage(math.div($i, 2 * $steps))} {
-      clip-path: inset(random-percentage() 0 random-percentage() 0);
-      transform: translate(random-translate(), random-translate());
-    }
+  0%, 100% {
+    clip-path: inset(10% 0 85% 0);
+    transform: translate(-2px, 1px);
+  }
+  5% {
+    clip-path: inset(45% 0 40% 0);
+    transform: translate(1px, -1px);
+  }
+  10% {
+    clip-path: inset(20% 0 60% 0);
+    transform: translate(-1px, 2px);
+  }
+  15% {
+    clip-path: inset(70% 0 15% 0);
+    transform: translate(2px, -2px);
+  }
+  20% {
+    clip-path: inset(5% 0 80% 0);
+    transform: translate(-2px, -1px);
+  }
+  25% {
+    clip-path: inset(55% 0 30% 0);
+    transform: translate(1px, 2px);
+  }
+  30% {
+    clip-path: inset(35% 0 50% 0);
+    transform: translate(-1px, -2px);
+  }
+  35% {
+    clip-path: inset(80% 0 5% 0);
+    transform: translate(2px, 1px);
+  }
+  40% {
+    clip-path: inset(25% 0 60% 0);
+    transform: translate(-2px, 2px);
+  }
+  45% {
+    clip-path: inset(60% 0 25% 0);
+    transform: translate(1px, -1px);
+  }
+  50% {
+    clip-path: inset(15% 0 70% 0);
+    transform: translate(-1px, 1px);
   }
 }
 
@@ -496,74 +579,66 @@
 
   .math-display {
     @apply relative my-8 px-8 py-6;
-    @apply rounded-xl border border-math-border;
-    @apply bg-math-bg/95 dark:bg-math-bg/80;
-    @apply shadow-math hover:shadow-math-hover;
+    @apply rounded-xl border border-border;
+    @apply bg-muted/95 dark:bg-muted/80;
+    @apply shadow-md hover:shadow-lg;
     @apply transition-all duration-300;
-    // Replace @apply group with direct class
-    &:not(.no-group) {
-      isolation: isolate;
-      /* Add the group class via composition */
-      composes: group from global;
-    }
 
-    // Enhanced controls container
+/* Enhanced controls container */
     .equation-controls {
-      @apply absolute top-2 right-2; // Move to top-right
+      @apply absolute top-2 right-2;
       @apply flex items-center gap-2;
-      @apply opacity-0 group-hover:opacity-100;
+      @apply opacity-0 hover:opacity-100;
       @apply transition-opacity duration-200;
       @apply z-20;
     }
 
-    // Copy button styles
+/* Copy button styles */
     .copy-button {
       @apply p-1.5 rounded-md;
-      @apply text-math-controls-text hover:text-math-controls-text-hover;
-      @apply bg-transparent hover:bg-math-controls-bg;
+      @apply text-muted-foreground hover:text-foreground;
+      @apply bg-transparent hover:bg-muted/50;
       @apply transition-all duration-200;
       @apply transform hover:scale-110;
     }
 
-    // Link button styles 
+/* Link button styles  */
     .link-button {
       @apply p-1.5 rounded-md ml-1;
-      @apply text-math-controls-text hover:text-math-controls-text-hover;
-      @apply bg-transparent hover:bg-math-controls-bg;
+      @apply text-muted-foreground hover:text-foreground;
+      @apply bg-transparent hover:bg-muted/50;
       @apply transition-all duration-200;
       @apply transform hover:scale-110;
     }
 
-    // Update equation number styles
+/* Update equation number styles */
     .equation-number {
-      @apply absolute right-3 bottom-2; // Move to bottom-right
+      @apply absolute right-3 bottom-2;
       @apply text-sm font-medium px-2 py-1 rounded-md;
-      @apply text-math-controls-text hover:text-math-controls-text-hover;
-      @apply bg-transparent hover:bg-math-controls-bg;
+      @apply text-muted-foreground hover:text-foreground;
+      @apply bg-transparent hover:bg-muted/50;
       @apply transition-all duration-200;
       @apply cursor-pointer select-none;
-      @apply z-10; // Keep below controls
+      @apply z-10;
     }
 
-    // Add hover state
+/* Add hover state */
     &:hover {
       @apply border-primary/30;
-      
+
       .equation-controls,
       .equation-number {
         @apply opacity-100;
       }
     }
 
-    // Ensure math content is properly positioned
+/* Ensure math content is properly positioned */
     .math-content {
-      @apply relative py-2; // Add padding to avoid overlap
+      @apply relative py-2;
       @apply overflow-x-auto overflow-y-hidden;
-      @apply scrollbar-thin scrollbar-track-transparent;
-      @apply scrollbar-thumb-math; // Use our new custom utility
     }
 
-    // Target state highlight
+/* Target state highlight */
     &:target {
       @apply ring-2 ring-primary/50;
       @apply bg-primary/5;
@@ -574,11 +649,11 @@
   .math-inline {
     @apply relative inline-flex items-center justify-center;
     @apply px-2 py-1 rounded-md;
-    @apply bg-math-bg/40 dark:bg-math-bg/20;
-    @apply border border-math-border/30;
+    @apply bg-muted/40 dark:bg-muted/20;
+    @apply border border-border/30;
     @apply transition-all duration-300;
-    @apply hover:bg-math-bg/60 dark:hover:bg-math-bg/40;
-    @apply hover:border-math-border/50;
+    @apply hover:bg-muted/60 dark:hover:bg-muted/40;
+    @apply hover:border-border/50;
     @apply hover:shadow-sm dark:hover:shadow-primary/5;
   }
 
@@ -602,7 +677,7 @@
     }
   }
 
-  // Add search-related components
+/* Add search-related components */
   .search-input {
     @apply rounded-xl shadow-md;
     @apply bg-white dark:bg-gray-800;
@@ -622,7 +697,7 @@
     }
   }
 
-  // Spinner components
+/* Spinner components */
   .spinner {
     --spinner-primary: var(--primary);
     --spinner-secondary: var(--secondary);
@@ -729,7 +804,7 @@
     @apply relative;
     &::after {
       @apply content-[''] absolute inset-0 z-[-1];
-      @apply bg-gradient-glow;
+      @apply bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20;
       @apply blur-xl opacity-0 transition-opacity duration-300;
     }
     &:hover::after {
@@ -743,27 +818,27 @@
     @apply mx-auto;
   }
 
-  // Enhance text readability on different screen sizes
+/* Enhance text readability on different screen sizes */
   .text-adaptive {
     @apply text-sm sm:text-base md:text-lg lg:text-xl;
     @apply leading-relaxed sm:leading-relaxed md:leading-relaxed;
     @apply tracking-wide sm:tracking-normal md:tracking-normal;
   }
 
-  // Update prose utility to match PostHeader width
+/* Update prose utility to match PostHeader width */
   .prose {
     @apply w-full max-w-5xl mx-auto;
     
-    // Add responsive padding for smaller screens
+/* Add responsive padding for smaller screens */
     @apply px-4 sm:px-6 lg:px-8;
     
-    // Ensure content remains readable on larger screens
+/* Ensure content remains readable on larger screens */
     @screen xl {
       font-size: calc(14px + 0.2vw);
       line-height: 1.75;
     }
 
-    // Enhance table responsiveness
+/* Enhance table responsiveness */
     table {
       @apply w-full my-8 overflow-x-auto block md:table;
       
@@ -773,7 +848,7 @@
       }
     }
 
-    // Adjust image responsiveness
+/* Adjust image responsiveness */
     img {
       @apply w-full rounded-lg;
       @apply my-8;
@@ -782,7 +857,7 @@
       @apply h-auto;
     }
 
-    // Enhance code block responsiveness
+/* Enhance code block responsiveness */
     pre {
       @apply my-8;
       @apply p-4 sm:p-6;
@@ -790,7 +865,7 @@
       @apply overflow-x-auto;
     }
 
-    // Adjust blockquote responsiveness
+/* Adjust blockquote responsiveness */
     blockquote {
       @apply my-8;
       @apply pl-4 sm:pl-6;
@@ -849,20 +924,20 @@
 }
 
 @keyframes equation-highlight {
-  0% { @apply bg-primary/20; }
-  100% { @apply bg-primary/5; }
+  0% { background-color: hsl(var(--primary) / 0.2); }
+  100% { background-color: hsl(var(--primary) / 0.05); }
 }
 
 @keyframes highlight {
   from {
-    @apply bg-primary/20 dark:bg-primary/25;
+    background-color: hsl(var(--primary) / 0.2);
   }
   to {
-    @apply bg-primary/5 dark:bg-primary/10;
+    background-color: hsl(var(--primary) / 0.05);
   }
 }
 
-// Add spinner animations
+/* Add spinner animations */
 @keyframes rotateCube {
   from {
     transform: rotateX(0) rotateY(0) rotateZ(0);
@@ -884,5 +959,16 @@
 @keyframes glitch-shift {
   0% { transform: translateX(-2px); }
   100% { transform: translateX(2px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

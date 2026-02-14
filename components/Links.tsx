@@ -3,17 +3,12 @@
 import { type LinkProps } from 'next/link';
 import { type Route } from 'next';
 import SocialLink from "./SocialLink";
-import { motion } from "framer-motion";
+import { motion, Variants } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
-import {
-  faCodepen,
-  faGithub,
-  faKaggle,
-  faLinkedin,
-  faReddit,
-  faXTwitter,
-} from "@fortawesome/free-brands-svg-icons";
-import { faBook, faEnvelope } from "@fortawesome/free-solid-svg-icons";
+import { Github, Linkedin, Twitter, Codepen, BookOpen, Mail } from 'lucide-react';
+import { Reddit } from './icons/Reddit';
+import { Kaggle } from './icons/Kaggle';
 
 // Update Href type to handle both internal and external URLs
 export type Href = Route | URL | string;
@@ -22,7 +17,7 @@ export type Href = Route | URL | string;
 interface Link {
   name: string;
   url: string;  // Keep as string since we're handling URLs
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   color?: string;
 }
 
@@ -30,48 +25,48 @@ export const links = [
   {
     name: "GitHub",
     url: "https://www.github.com/wyattowalsh",
-    icon: faGithub,
+    icon: Github,
     color: "#181717",
   },
   {
     name: "LinkedIn",
     url: "https://www.linkedin.com/in/wyattowalsh",
-    icon: faLinkedin,
+    icon: Linkedin,
     color: "#0A66C2",
   },
   {
     name: "X",
     url: "https://www.x.com/wyattowalsh",
-    icon: faXTwitter,
+    icon: Twitter,
     color: "#000000",
   },
   {
     name: "Reddit",
     url: "https://www.reddit.com/user/onelonedatum",
-    icon: faReddit,
+    icon: Reddit,
     color: "#FF4500",
   },
   {
     name: "Blog",
     url: "/blog",
-    icon: faBook,
+    icon: BookOpen,
   },
   {
     name: "Kaggle",
     url: "https://www.kaggle.com/wyattowalsh",
-    icon: faKaggle,
+    icon: Kaggle,
     color: "#20BEFF",
   },
   {
     name: "CodePen",
     url: "https://codepen.io/wyattowalsh",
-    icon: faCodepen,
+    icon: Codepen,
     color: "#000000",
   },
   {
     name: "Email",
     url: "mailto:mail@w4wdev.com",
-    icon: faEnvelope,
+    icon: Mail,
   },
 ].map((link) => ({
   ...link,
@@ -80,19 +75,21 @@ export const links = [
 
 // Explicitly type the component as React.FC
 const Links: React.FC = () => {
-  const containerVariants = {
+  const prefersReducedMotion = useReducedMotion();
+
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.3,
+        staggerChildren: prefersReducedMotion ? 0 : 0.1,
+        delayChildren: prefersReducedMotion ? 0 : 0.3,
       }
     }
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
     visible: {
       opacity: 1,
       y: 0,

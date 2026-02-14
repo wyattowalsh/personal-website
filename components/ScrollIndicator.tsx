@@ -1,9 +1,11 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring } from "motion/react";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { usePathname } from "next/navigation";
 
 export default function ScrollIndicator() {
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 70,
@@ -11,10 +13,10 @@ export default function ScrollIndicator() {
     restDelta: 0.0001,
     mass: 0.5
   });
-  
+
   const pathname = usePathname();
-  
-  if (!pathname.startsWith('/blog/posts/')) {
+
+  if (!pathname.startsWith('/blog/posts/') || prefersReducedMotion) {
     return null;
   }
 

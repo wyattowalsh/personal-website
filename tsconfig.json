@@ -15,7 +15,7 @@
     "moduleResolution": "Bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "baseUrl": ".",
     "paths": {
@@ -36,7 +36,9 @@
   },
   "ts-node": {
     "transpileOnly": true,
-    "require": ["tsconfig-paths/register"],
+    "require": [
+      "tsconfig-paths/register"
+    ],
     "compilerOptions": {
       "module": "CommonJS",
       "moduleResolution": "Node"
@@ -48,9 +50,11 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "scripts/**/*.ts",
-    "@types/**/*.d.ts"
+    "@types/**/*.d.ts",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "docs"
   ]
 }

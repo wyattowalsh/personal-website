@@ -3,11 +3,13 @@
 import { useEffect, useState, useCallback, useRef, type FC } from "react";
 import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 import { type Container, type Engine } from "@tsparticles/engine";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import ParticleControls from "./ParticleControls";
+import ParticleControls, { type DensityLevel } from "./ParticleControls";
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
 interface ParticlesBackgroundProps {
   className?: string;
@@ -21,9 +23,38 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
   const [mounted, setMounted] = useState(false);
   const [currentConfigUrl, setCurrentConfigUrl] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
+
+  // Density state (localStorage persistence disabled temporarily)
+  const [density, setDensity] = useState<DensityLevel>('full');
 
   // Initialize theme
   const currentTheme = resolvedTheme as "light" | "dark" || "light";
+
+  // Density change handler
+  const handleDensityChange = useCallback((newDensity: DensityLevel) => {
+    setDensity(newDensity);
+    // Refresh particles when density changes
+    if (newDensity !== 'off') {
+      const newConfigUrl = getRandomConfigUrl(currentTheme);
+      setCurrentConfigUrl(newConfigUrl);
+      setIsPaused(false);
+    }
+  }, [currentTheme]);
+
+  // Calculate density multiplier
+  const getDensityMultiplier = (level: DensityLevel): number => {
+    switch (level) {
+      case 'full':
+        return 1.0;
+      case 'reduced':
+        return 0.4;
+      case 'off':
+        return 0;
+      default:
+        return 1.0;
+    }
+  };
 
   // Handle mounting
   useEffect(() => {
@@ -109,6 +140,26 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
   if (!mounted || !init) return null;
   if (error) return <div className="text-destructive">{error}</div>;
 
+  // Show static gradient for users who prefer reduced motion or density is off
+  if (prefersReducedMotion || density === 'off') {
+    return (
+      <>
+        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20" />
+        <ParticleControls
+          onConfigChange={handleConfigChange}
+          onPause={handlePause}
+          onResume={handleResume}
+          onRefresh={handleRefresh}
+          isPaused={isPaused}
+          theme={currentTheme}
+          currentConfigUrl={currentConfigUrl}
+          density={density}
+          onDensityChange={handleDensityChange}
+        />
+      </>
+    );
+  }
+
   return (
     <div className={className}>
       <motion.div
@@ -120,8 +171,8 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
         <AnimatePresence mode="wait">
           {currentConfigUrl && (
             <Particles
-              key={currentConfigUrl}
-              id={`tsparticles-${currentConfigUrl}`}
+              key={`${currentConfigUrl}-${density}`}
+              id={`tsparticles-${currentConfigUrl}-${density}`}
               className="absolute inset-0"
               url={currentConfigUrl}
               particlesLoaded={particlesLoaded}
@@ -129,12 +180,22 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
                 fps_limit: 60,
                 pauseOnBlur: true,
                 pauseOnOutsideViewport: true,
+                particles: {
+                  number: {
+                    value: Math.round(80 * getDensityMultiplier(density)),
+                    density: {
+                      enable: true,
+                    }
+                  }
+                },
                 responsive: [
                   {
                     maxWidth: 768,
                     options: {
                       particles: {
-                        number: { value: 30 }
+                        number: {
+                          value: Math.round(30 * getDensityMultiplier(density))
+                        }
                       }
                     }
                   }
@@ -153,6 +214,8 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
         isPaused={isPaused}
         theme={currentTheme}
         currentConfigUrl={currentConfigUrl}
+        density={density}
+        onDensityChange={handleDensityChange}
       />
     </div>
   );

@@ -227,8 +227,18 @@ class BackendService {
           
           const fileData = await getFileData(filePath);
           
-          // Calculate word count
-          const wordCount = markdown.trim().split(/\s+/).length;
+          // Strip out JS/JSX that shouldn't appear in feeds:
+          // - import statements
+          // - metadata export block
+          // - ArticleJsonLd component
+          const cleanContent = markdown
+            .replace(/^import\s+\{[^}]+\}\s+from\s+['"][^'"]+['"];\s*/gm, '')
+            .replace(/^export const metadata = \{[\s\S]*?\};\s*/m, '')
+            .replace(/<ArticleJsonLd[\s\S]*?\/>\s*/g, '')
+            .trim();
+          
+          // Calculate word count from clean content
+          const wordCount = cleanContent.trim().split(/\s+/).length;
           
           // Ensure title exists
           if (!data.title) {
@@ -239,7 +249,7 @@ class BackendService {
             slug,
             ...data,
             title: data.title, // explicitly include title
-            content: markdown,
+            content: cleanContent,
             wordCount, // add word count
             created: data.created || fileData.firstModified || new Date().toISOString(),
             updated: data.updated || fileData.lastModified || new Date().toISOString(),

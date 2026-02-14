@@ -7,6 +7,42 @@ tags: ["ML", "TDS", "Python", "Optimization"]
 created: "2021-01-14"
 ---
 
+import { ArticleJsonLd } from '@/components/PostSchema';
+
+export const metadata = {
+  title: "Using Ridge Regression to Overcome Drawbacks of Ordinary Least Squares (OLS)",
+  description: "Weaknesses of OLS, Optimization to Obtain the Ridge Model Estimator, and an Implementation in Python Using Numpy",
+  alternates: {
+    canonical: "https://w4w.dev/blog/posts/regularized-linear-regression-models-pt2",
+  },
+  openGraph: {
+    type: "article",
+    title: "Using Ridge Regression to Overcome Drawbacks of Ordinary Least Squares (OLS)",
+    description: "Weaknesses of OLS, Optimization to Obtain the Ridge Model Estimator, and an Implementation in Python Using Numpy",
+    url: "https://w4w.dev/blog/posts/regularized-linear-regression-models-pt2",
+    images: [{ url: "https://w4w.dev/ridge.webp", width: 1200, height: 630, alt: "Ridge Regression" }],
+    publishedTime: "2021-01-14",
+    authors: ["Wyatt Walsh"],
+    tags: ["ML", "TDS", "Python", "Optimization"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Using Ridge Regression to Overcome Drawbacks of Ordinary Least Squares (OLS)",
+    description: "Weaknesses of OLS, Optimization to Obtain the Ridge Model Estimator, and an Implementation in Python Using Numpy",
+    images: ["https://w4w.dev/ridge.webp"],
+    creator: "@wyattowalsh",
+  },
+};
+
+<ArticleJsonLd
+  title="Using Ridge Regression to Overcome Drawbacks of Ordinary Least Squares (OLS)"
+  description="Weaknesses of OLS, Optimization to Obtain the Ridge Model Estimator, and an Implementation in Python Using Numpy"
+  image="/ridge.webp"
+  datePublished="2021-01-14"
+  slug="regularized-linear-regression-models-pt2"
+  tags={["ML", "TDS", "Python", "Optimization"]}
+/>
+
 Hello again and hopefully welcome back 👋
 
 In [the last part](./regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the ***Ordinary Least Squares*** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.

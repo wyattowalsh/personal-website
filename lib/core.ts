@@ -432,7 +432,7 @@ export const api = {
         return schema.parse(data);
       } catch (error) {
         if (error instanceof z.ZodError) {
-          throw new ApiError(400, 'Invalid request data', { errors: error.errors });
+          throw new ApiError(400, 'Invalid request data', { errors: error.issues });
         }
         throw error;
       }

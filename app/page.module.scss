@@ -1,4 +1,5 @@
 @use "variables.module.scss" as variables;
+@reference "./globals.scss";
 
 @keyframes backgroundAnimation {
   0%,
@@ -239,11 +240,11 @@
   
   text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   will-change: background-position, transform;
-}
 
-.enhanced-animated-text:hover {
+  &:hover {
   animation-play-state: paused;
   filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
+  }
 }
 
 @keyframes gradientBackground {
@@ -258,7 +259,7 @@
   }
 }
 
-html.dark .enhanced-animated-text {
+:global(html.dark) .enhanced-animated-text {
   background: var(--gradient-text);
 }
 
@@ -316,7 +317,7 @@ html.dark .enhanced-animated-text {
       opacity: 0.4;
     }
 
-    img {
+    :global(img) {
       transform: scale(1.05);
       filter: brightness(1.1);
     }
@@ -397,15 +398,14 @@ html.dark .enhanced-animated-text {
 
 .imageContainer {
   width: 100%;
+  margin: 0 auto;
+  perspective: 1000px;
   // Adjust max-width for different screen sizes
   max-width: 160px; // Default for mobile
   @screen sm { max-width: 180px; }
   @screen md { max-width: 200px; }
   @screen lg { max-width: 220px; }
   @screen xl { max-width: 240px; }
-  
-  margin: 0 auto;
-  perspective: 1000px;
   
   &::before {
     content: '';
@@ -490,8 +490,8 @@ html.dark .enhanced-animated-text {
 // Export variables using a local class
 .root {
   :global(:root) {
-    --landing-title-gradient-light: #{variables.$landing-title-gradient-light};
-    --landing-title-gradient-dark: #{variables.$landing-title-gradient-dark};
+    --landing-title-gradient-light: var(--landing-title-gradient-light-def);
+    --landing-title-gradient-dark: var(--landing-title-gradient-dark-def);
   }
 }
 

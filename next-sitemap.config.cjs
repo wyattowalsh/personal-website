@@ -12,8 +12,8 @@ const config = {
     "/tags/*",
     "/logo.png",
     "/logo.webp",
-    "opengraph.png",
-    "twitter-image.png",
+    "/opengraph.png",
+    "/twitter-image.png",
   ],
   generateIndexSitemap: true,
   robotsTxtOptions: {
@@ -22,6 +22,9 @@ const config = {
         userAgent: "*",
         allow: "/",
       },
+    ],
+    additionalSitemaps: [
+      "https://w4w.dev/sitemap.xml",
     ],
   },
 };

@@ -1,0 +1,3 @@
+/* Tailwind CSS v4 entry point - separate from SCSS to prevent directive conflicts */
+@import "tailwindcss";
+@config "../tailwind.config.js";

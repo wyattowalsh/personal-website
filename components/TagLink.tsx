@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
+import { cn } from "@/lib/utils";
 
 interface TagLinkProps {
   tag: string;
@@ -29,5 +30,14 @@ export default function TagLink({ tag, count, showCount = false, isNested = fals
     </motion.div>
   );
 
-  return isNested ? content : <Link href={`/blog/tags/${tag}`}>{content}</Link>;
+  return isNested ? content : (
+    <Link
+      href={`/blog/tags/${tag}`}
+      className={cn(
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
+      )}
+    >
+      {content}
+    </Link>
+  );
 }
