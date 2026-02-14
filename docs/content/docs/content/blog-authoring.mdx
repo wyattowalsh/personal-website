@@ -1,0 +1,464 @@
+---
+title: "Blog Authoring"
+description: "Complete guide to creating and publishing blog posts with MDX"
+---
+
+Blog posts are written in MDX (Markdown + JSX) and stored in `app/blog/posts/{slug}/page.mdx`. The site provides a CLI tool for creating new posts with proper structure, frontmatter, and metadata.
+
+## Quick Start
+
+Create a new blog post using the interactive CLI:
+
+```bash
+pnpm new-post
+```
+
+Or use flags for non-interactive creation:
+
+```bash
+pnpm new-post --title "My Post Title" --tags "React,TypeScript" --summary "Post description"
+```
+
+This generates:
+- Post directory: `app/blog/posts/{slug}/`
+- MDX file: `app/blog/posts/{slug}/page.mdx`
+- Frontmatter with current date
+- Starter template content
+
+## Frontmatter Reference
+
+Every blog post must include YAML frontmatter at the top of the MDX file:
+
+```yaml
+---
+title: "Post Title"
+image: "/post-hero.svg"
+caption: "Short tagline"
+summary: "SEO-optimized description (155 characters max recommended)"
+tags: ["Category", "Technology", "Topic"]
+created: "2024-12-01"
+updated: "2024-12-01"
+---
+```
+
+### Field Descriptions
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `title` | string | Yes | Post title (used in `<h1>`, metadata, feeds) |
+| `image` | string | Yes | Hero image path (relative to `public/`) |
+| `caption` | string | No | Short tagline (displayed below title) |
+| `summary` | string | Yes | SEO description (used in meta tags, OpenGraph, feeds) |
+| `tags` | array | Yes | Categories/topics (used for filtering, SEO keywords) |
+| `created` | string | Yes | Publication date (ISO 8601 format: `YYYY-MM-DD`) |
+| `updated` | string | No | Last update date (defaults to `created` if omitted) |
+
+### Best Practices
+
+- **Title**: 40-60 characters, clear and descriptive
+- **Summary**: 120-155 characters for optimal SEO
+- **Tags**: 2-5 tags, choose from existing tags when possible for consistency
+- **Image**: Use SVG for diagrams, WebP/AVIF for photos (1200x630px recommended)
+- **Dates**: Always use `YYYY-MM-DD` format
+
+## Three-Way Metadata Sync
+
+The site maintains **three synchronized sources** of post metadata to ensure consistency across SEO, social sharing, and structured data:
+
+### 1. YAML Frontmatter
+
+The source of truth, parsed by `remark-mdx-frontmatter`:
+
+```yaml
+---
+title: "Personal Web App v6"
+image: "/old.webp"
+summary: "A deep dive into building my personal website v6..."
+tags: ["Project", "TypeScript", "Next.js"]
+created: "2024-12-01"
+updated: "2024-12-01"
+---
+```
+
+### 2. Next.js Metadata Export
+
+The `metadata` export provides SEO tags, OpenGraph, and Twitter Card data:
+
+```tsx
+export const metadata = {
+  title: "Personal Web App v6",
+  description: "A deep dive into building my personal website v6...",
+  alternates: {
+    canonical: "https://w4w.dev/blog/posts/w4w-v6",
+  },
+  openGraph: {
+    type: "article",
+    title: "Personal Web App v6",
+    description: "A deep dive into building...",
+    url: "https://w4w.dev/blog/posts/w4w-v6",
+    images: [{ url: "https://w4w.dev/old.webp", width: 1200, height: 630 }],
+    publishedTime: "2024-12-01",
+    authors: ["Wyatt Walsh"],
+    tags: ["Project", "TypeScript", "Next.js"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Personal Web App v6",
+    description: "A deep dive into building...",
+    images: ["https://w4w.dev/old.webp"],
+    creator: "@wyattowalsh",
+  },
+};
+```
+
+### 3. ArticleJsonLd Component
+
+The `<ArticleJsonLd>` component generates JSON-LD structured data for search engines:
+
+```tsx
+import { ArticleJsonLd } from '@/components/PostSchema';
+
+<ArticleJsonLd
+  title="Personal Web App v6"
+  description="A deep dive into building my personal website v6..."
+  image="/old.webp"
+  datePublished="2024-12-01"
+  slug="w4w-v6"
+  tags={["Project", "TypeScript", "Next.js"]}
+/>
+```
+
+This generates:
+
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Personal Web App v6",
+  "description": "A deep dive into building...",
+  "image": "https://w4w.dev/old.webp",
+  "datePublished": "2024-12-01",
+  "author": {
+    "@type": "Person",
+    "name": "Wyatt Walsh"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "Wyatt Walsh",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://w4w.dev/logo.webp"
+    }
+  }
+}
+```
+
+### Why Three Sources?
+
+1. **Frontmatter** — Parsed at build time by MDX, accessible to services
+2. **Metadata export** — Required by Next.js for `<head>` tags
+3. **ArticleJsonLd** — Required for rich search results and SEO
+
+The `lib/metadata.ts` utility can generate both the metadata export and JSON-LD from frontmatter, but explicit duplication is currently used to ensure each is independently verifiable.
+
+## Hero Image Setup
+
+Hero images are displayed at the top of each post and used for social sharing previews.
+
+### Image Guidelines
+
+- **Location**: `public/` directory
+- **Reference**: Absolute path from root (e.g., `/hero.svg`)
+- **Dimensions**: 1200x630px (OpenGraph standard)
+- **Formats**: SVG (preferred for diagrams), WebP, or AVIF
+- **Size**: < 200KB recommended
+
+### Creating Hero Images
+
+**Option 1: SVG Diagram (Recommended)**
+
+Create a custom SVG diagram using:
+- Figma → Export as SVG
+- Excalidraw → Export as SVG
+- Inkscape → Save as Optimized SVG
+
+**Option 2: Photo/Screenshot**
+
+1. Capture or create image at 2400x1260px (2x for retina)
+2. Crop to 1200x630px
+3. Convert to WebP: `cwebp input.png -o output.webp -q 85`
+4. Place in `public/`
+
+**Option 3: Generated Hero**
+
+Use a service like:
+- [Hero Patterns](https://heropatterns.com/) for SVG backgrounds
+- [Coolors](https://coolors.co/) for gradients
+- [Haikei](https://haikei.app/) for generative designs
+
+### Example Hero Image Setup
+
+```yaml
+---
+title: "Building a Design System"
+image: "/design-system-hero.svg"
+---
+```
+
+The image is automatically:
+- Optimized by Next.js Image component
+- Used in OpenGraph meta tags
+- Included in RSS/Atom feeds
+- Displayed with blur placeholder
+
+## Post Template
+
+Here's a complete starter template for a new post:
+
+```mdx
+---
+title: "Your Post Title"
+image: "/your-post-hero.svg"
+caption: "A short tagline"
+summary: "A compelling description of your post for SEO and social sharing."
+tags: ["Category", "Technology"]
+created: "2024-12-01"
+updated: "2024-12-01"
+---
+
+import { ArticleJsonLd } from '@/components/PostSchema';
+
+export const metadata = {
+  title: "Your Post Title",
+  description: "A compelling description of your post for SEO and social sharing.",
+  alternates: {
+    canonical: "https://w4w.dev/blog/posts/your-post-slug",
+  },
+  openGraph: {
+    type: "article",
+    title: "Your Post Title",
+    description: "A compelling description...",
+    url: "https://w4w.dev/blog/posts/your-post-slug",
+    images: [{ url: "https://w4w.dev/your-post-hero.svg", width: 1200, height: 630 }],
+    publishedTime: "2024-12-01",
+    authors: ["Wyatt Walsh"],
+    tags: ["Category", "Technology"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Your Post Title",
+    description: "A compelling description...",
+    images: ["https://w4w.dev/your-post-hero.svg"],
+    creator: "@wyattowalsh",
+  },
+};
+
+<ArticleJsonLd
+  title="Your Post Title"
+  description="A compelling description of your post for SEO and social sharing."
+  image="/your-post-hero.svg"
+  datePublished="2024-12-01"
+  slug="your-post-slug"
+  tags={["Category", "Technology"]}
+/>
+
+## Introduction
+
+Start your post here...
+
+## Section One
+
+Content goes here...
+
+## Conclusion
+
+Wrap it up...
+```
+
+## Writing Tips
+
+### Use Components
+
+Take advantage of the [MDX components](/docs/content/mdx-components):
+
+```mdx
+<Note type="info">
+This is an informational callout.
+</Note>
+
+<Chart
+  type="line"
+  data={[...]}
+  dataKeys={['value']}
+/>
+
+<Math display>
+E = mc^2
+</Math>
+```
+
+### Code Blocks
+
+Use syntax highlighting with language specifiers:
+
+````mdx
+```typescript
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+```
+````
+
+### Images
+
+Place images in `public/` and reference them absolutely:
+
+```mdx
+![Diagram description](/diagram.svg)
+```
+
+### Internal Links
+
+Use relative paths for internal links:
+
+```mdx
+[See related post](/blog/posts/other-post)
+[Back to blog](/blog)
+```
+
+### External Links
+
+External links automatically get target="_blank" and rel="noopener noreferrer":
+
+```mdx
+[React documentation](https://react.dev)
+```
+
+## CLI Tool (`scripts/new-post.ts`)
+
+The post creation script (`pnpm new-post`) provides two modes:
+
+### Interactive Mode
+
+Run without arguments to be prompted for each field:
+
+```bash
+pnpm new-post
+
+📝 Create a new blog post
+
+Title: My New Post
+Slug (my-new-post):
+Summary:
+Tags (comma-separated): React,TypeScript
+Caption:
+
+✓ Created: app/blog/posts/my-new-post/page.mdx
+```
+
+### CLI Mode
+
+Pass arguments directly:
+
+```bash
+pnpm new-post \
+  --title "My New Post" \
+  --tags "React,TypeScript" \
+  --summary "Post description" \
+  --slug "custom-slug" \
+  --caption "Short tagline"
+```
+
+### Arguments
+
+| Flag | Description | Required |
+|------|-------------|----------|
+| `--title` | Post title | Yes |
+| `--slug` | URL slug (auto-generated from title if omitted) | No |
+| `--summary` | SEO description | No |
+| `--tags` | Comma-separated tags | No |
+| `--caption` | Short tagline | No |
+| `--image` | Hero image path (default: `/{slug}-hero.svg`) | No |
+
+### Slug Generation
+
+Slugs are auto-generated from titles using these rules:
+1. Convert to lowercase
+2. Replace non-alphanumeric characters with hyphens
+3. Remove leading/trailing hyphens
+
+Examples:
+- `"Hello World"` → `hello-world`
+- `"React 19: What's New?"` → `react-19-what-s-new`
+- `"Building a Design System (Part 1)"` → `building-a-design-system-part-1`
+
+## Publishing Workflow
+
+1. **Create post**: `pnpm new-post`
+2. **Add hero image**: Place image in `public/`
+3. **Write content**: Edit `app/blog/posts/{slug}/page.mdx`
+4. **Preview**: `pnpm dev` and visit `http://localhost:3000/blog/posts/{slug}`
+5. **Verify metadata**: Check OpenGraph preview with [OpenGraph.xyz](https://www.opengraph.xyz/)
+6. **Lint & typecheck**: `pnpm lint && pnpm typecheck`
+7. **Build**: `pnpm build` to verify production build
+8. **Commit**: Add, commit, and push to repository
+9. **Deploy**: Vercel auto-deploys on push to main branch
+
+## Post Discovery
+
+Posts are automatically discovered and indexed by `BackendService` (in `lib/server.ts`):
+
+1. Scans `app/blog/posts/` for directories
+2. Reads `page.mdx` from each directory
+3. Parses frontmatter and content
+4. Builds search index (title, summary, tags, content)
+5. Caches results in LRU cache
+
+No manual registration required — just create the directory and file.
+
+## SEO Optimization
+
+### Meta Tags
+
+Automatically generated from frontmatter:
+- `<title>` — Post title
+- `<meta name="description">` — Summary
+- `<link rel="canonical">` — Canonical URL
+- `<meta name="keywords">` — Tags
+- `<meta name="author">` — Author name
+
+### OpenGraph
+
+Social sharing preview:
+- `og:type` — "article"
+- `og:title` — Post title
+- `og:description` — Summary
+- `og:image` — Hero image (1200x630px)
+- `og:url` — Canonical URL
+- `article:published_time` — Created date
+- `article:modified_time` — Updated date
+- `article:author` — Author name
+- `article:tag` — Tags
+
+### Twitter Card
+
+Twitter-specific metadata:
+- `twitter:card` — "summary_large_image"
+- `twitter:title` — Post title
+- `twitter:description` — Summary
+- `twitter:image` — Hero image
+- `twitter:creator` — @wyattowalsh
+
+### JSON-LD
+
+Structured data for search engines:
+- BlogPosting schema with headline, image, dates, author
+- BreadcrumbList schema with navigation path
+- Publisher schema with logo
+
+## Related Documentation
+
+- [MDX Pipeline](/docs/content/mdx-pipeline) — How MDX is processed
+- [MDX Components](/docs/content/mdx-components) — Available components
+- [Feeds](/docs/content/feeds) — RSS/Atom/JSON feed generation
+- [SEO and Metadata](/docs/features/seo-and-metadata) — Metadata system

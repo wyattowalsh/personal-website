@@ -1,0 +1,65 @@
+{
+  "$schema": "https://fumadocs.vercel.app/schema.json",
+  "tabs": [
+    {
+      "type": "tab",
+      "title": "Architecture",
+      "icon": "lucide:cpu",
+      "items": [
+        "architecture/overview",
+        "architecture/backend",
+        "architecture/frontend",
+        "architecture/api-routes",
+        "architecture/build-process"
+      ]
+    },
+    {
+      "type": "tab",
+      "title": "Content",
+      "icon": "lucide:file-text",
+      "items": [
+        "content/mdx-pipeline",
+        "content/mdx-components",
+        "content/math-and-diagrams",
+        "content/blog-authoring",
+        "content/feeds"
+      ]
+    },
+    {
+      "type": "tab",
+      "title": "Features",
+      "icon": "lucide:dices",
+      "items": [
+        "features/styling-and-theming",
+        "features/hero-system",
+        "features/particle-system",
+        "features/search",
+        "features/seo-and-metadata",
+        "features/hooks"
+      ]
+    },
+    {
+      "type": "tab",
+      "title": "API Reference",
+      "icon": "lucide:book-open",
+      "items": [
+        "reference/lib-core",
+        "reference/lib-services",
+        "reference/lib-client",
+        "reference/lib-utils",
+        "reference/ui-primitives"
+      ]
+    },
+    {
+      "type": "tab",
+      "title": "Operations",
+      "icon": "lucide:settings",
+      "items": [
+        "operations/scripts-and-tooling",
+        "operations/deployment",
+        "operations/testing",
+        "operations/dev-docs"
+      ]
+    }
+  ]
+}

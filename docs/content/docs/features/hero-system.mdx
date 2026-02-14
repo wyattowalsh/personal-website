@@ -1,0 +1,335 @@
+---
+title: "Hero System"
+description: "Theme-aware dynamic SVG heroes for blog posts with configurable color schemes."
+---
+
+## Overview
+
+The hero system provides **theme-aware dynamic SVG heroes** for blog posts. Each hero automatically adapts to light/dark mode using configurable color palettes. Heroes are registered by image path and selected via post frontmatter.
+
+## Architecture
+
+### Core Files
+
+| File | Purpose |
+|------|---------|
+| `components/heroes/ThemeAwareHero.tsx` | Main hero component and registration system |
+| `components/heroes/RisoHero.tsx` | Standalone Riso hero implementation |
+| `components/RisoMatrix.tsx` | Riso-specific interactive tables (unrelated to hero system) |
+
+## ThemeAwareHero Component
+
+The `ThemeAwareHero` component renders theme-responsive SVG graphics with full color customization.
+
+### HeroConfig Interface
+
+```typescript
+export interface ThemeColors {
+  // Background gradients
+  bgStart: string;
+  bgMid: string;
+  bgEnd: string;
+
+  // Radial glows
+  glowA: string;
+  glowB: string;
+  glowAOpacity?: number;
+  glowBOpacity?: number;
+
+  // Ring gradients
+  ringStart: string;
+  ringMid: string;
+  ringEnd: string;
+  ring2Start: string;
+  ring2End: string;
+
+  // Elements
+  trail: string;
+  grid: string;
+  gridOpacity?: number;
+
+  // Node colors
+  node1: string;
+  node2: string;
+  node3: string;
+  node4: string;
+  nodeCenter: string;
+
+  // UI elements
+  clientBg: string;
+  clientBorder: string;
+  clientBar: string;
+  arrow: string;
+}
+
+export interface HeroConfig {
+  dark: ThemeColors;
+  light: ThemeColors;
+}
+```
+
+### Built-in Configurations
+
+#### ProxyWhirl Hero
+
+**Path:** `/proxywhirl-hero.svg`
+
+Dark mode color scheme (cyberpunk blues/purples):
+
+```typescript
+dark: {
+  bgStart: "#05070f",
+  bgMid: "#0b1226",
+  bgEnd: "#0a0f1f",
+  glowA: "#22d3ee",      // Cyan glow
+  glowB: "#a78bfa",      // Purple glow
+  ringStart: "#38bdf8",  // Sky blue
+  ringMid: "#818cf8",    // Indigo
+  ringEnd: "#22d3ee",    // Cyan
+  node1: "#22d3ee",
+  node2: "#a78bfa",
+  node3: "#60a5fa",
+  node4: "#38bdf8",
+  // ... full config in ThemeAwareHero.tsx
+}
+```
+
+Light mode color scheme (softer blues/purples):
+
+```typescript
+light: {
+  bgStart: "#f8fafc",
+  bgMid: "#f1f5f9",
+  bgEnd: "#e2e8f0",
+  glowA: "#0891b2",
+  glowB: "#7c3aed",
+  // ... full config in ThemeAwareHero.tsx
+}
+```
+
+#### Riso Hero
+
+**Path:** `/riso-hero.svg`
+
+Retro print aesthetic with warm/cool contrast:
+
+```typescript
+dark: {
+  glowA: "#f97316",      // Orange (riso ink)
+  glowB: "#06b6d4",      // Cyan (riso ink)
+  ringStart: "#f97316",  // Orange
+  ringMid: "#ec4899",    // Pink
+  ringEnd: "#06b6d4",    // Cyan
+  ring2Start: "#84cc16", // Lime
+  node1: "#f97316",
+  node2: "#ec4899",
+  node3: "#06b6d4",
+  node4: "#84cc16",
+  // ... full config in ThemeAwareHero.tsx
+}
+```
+
+Light mode uses warm cream backgrounds to mimic riso paper:
+
+```typescript
+light: {
+  bgStart: "#fefce8",    // Warm cream
+  bgMid: "#fef9c3",
+  bgEnd: "#fef3c7",
+  grid: "#fde047",       // Yellow grid
+  // ... full config in ThemeAwareHero.tsx
+}
+```
+
+### Hero Registry
+
+Heroes are registered in a simple object map:
+
+```typescript
+const heroConfigs: Record<string, HeroConfig> = {
+  "/proxywhirl-hero.svg": proxyWhirlConfig,
+  "/riso-hero.svg": risoConfig,
+};
+
+export function getHeroConfig(imagePath: string): HeroConfig | null {
+  return heroConfigs[imagePath] || null;
+}
+
+export function isThemedHero(imagePath: string): boolean {
+  return imagePath in heroConfigs;
+}
+```
+
+### Component Usage
+
+```tsx
+import ThemeAwareHero, { getHeroConfig } from '@/components/heroes/ThemeAwareHero'
+
+const config = getHeroConfig('/proxywhirl-hero.svg')
+
+if (config) {
+  return <ThemeAwareHero config={config} className="w-full" />
+}
+```
+
+**Props:**
+
+- `config: HeroConfig` — Theme color configuration
+- `className?: string` — Additional CSS classes
+- `onLoad?: () => void` — Callback when hero SVG loads
+
+### Implementation Details
+
+1. **Hydration-safe rendering** — Returns placeholder during SSR to prevent mismatches:
+
+```tsx
+if (!mounted) {
+  return (
+    <div
+      className={cn("w-full h-full", className)}
+      style={{ aspectRatio: "1200/630", background: config.dark.bgMid }}
+    />
+  );
+}
+```
+
+2. **Unique gradient IDs** — Uses random UIDs to support multiple heroes on one page:
+
+```tsx
+const uid = useMemo(() => Math.random().toString(36).slice(2, 8), []);
+
+<linearGradient id={`bg-${uid}`}>...</linearGradient>
+<rect fill={`url(#bg-${uid})`} />
+```
+
+3. **Theme detection** — Consumes `next-themes` to switch color schemes:
+
+```tsx
+const { resolvedTheme } = useTheme();
+const colors = resolvedTheme === "dark" ? config.dark : config.light;
+```
+
+4. **Responsive aspect ratio** — Fixed 1200×630 viewBox scales to container:
+
+```tsx
+<svg
+  width="1200"
+  height="630"
+  viewBox="0 0 1200 630"
+  preserveAspectRatio="xMidYMid slice"
+>
+```
+
+## RisoHero Component
+
+Standalone hero for the Riso template post. Similar to ThemeAwareHero but with a bespoke SVG illustration featuring:
+
+- Detailed riso duplicator machine
+- Halftone patterns
+- Animated LCD screen with blinking cursor
+- Layered paper output with misregistration effect
+- Floating sample prints
+
+**Key differences from ThemeAwareHero:**
+
+- Not part of the registry (hardcoded for one post)
+- More complex SVG structure (450+ lines)
+- Uses filters (halftone, noise, glow, scanlines)
+- Includes text and icons beyond geometric shapes
+
+**Usage:**
+
+```tsx
+import RisoHero from '@/components/heroes/RisoHero'
+
+<RisoHero className="w-full" onLoad={handleLoad} />
+```
+
+## Adding a New Hero
+
+### Step 1: Define Color Scheme
+
+Add a new `HeroConfig` in `ThemeAwareHero.tsx`:
+
+```typescript
+export const myHeroConfig: HeroConfig = {
+  dark: {
+    bgStart: "#...",
+    bgMid: "#...",
+    // ... all required ThemeColors properties
+  },
+  light: {
+    bgStart: "#...",
+    bgMid: "#...",
+    // ... all required ThemeColors properties
+  },
+};
+```
+
+### Step 2: Register Hero
+
+Add to the `heroConfigs` map:
+
+```typescript
+const heroConfigs: Record<string, HeroConfig> = {
+  "/proxywhirl-hero.svg": proxyWhirlConfig,
+  "/riso-hero.svg": risoConfig,
+  "/my-hero.svg": myHeroConfig, // <-- new entry
+};
+```
+
+### Step 3: Use in Post Frontmatter
+
+Reference the hero in your MDX post:
+
+```yaml
+---
+title: "My Post"
+image: "/my-hero.svg"
+---
+```
+
+The post rendering logic (in `PostHeader.tsx` or similar) will detect the hero config and render `ThemeAwareHero` instead of a static `<img>`.
+
+## Integration with Blog Posts
+
+Heroes are selected via the `image` field in post frontmatter. The rendering component checks if the image is registered:
+
+```tsx
+import { isThemedHero, getHeroConfig } from '@/components/heroes/ThemeAwareHero'
+
+const isHero = isThemedHero(post.image)
+
+if (isHero) {
+  const config = getHeroConfig(post.image)!
+  return <ThemeAwareHero config={config} />
+} else {
+  return <img src={post.image} alt={post.title} />
+}
+```
+
+## Design Considerations
+
+1. **Color slot naming** — Use semantic names (e.g., `glowA`, `node1`) not color names (e.g., `blueDark`) to allow theme variation
+2. **Opacity defaults** — Provide sensible defaults for optional opacity values
+3. **SVG structure** — Keep complex shapes in reusable `<defs>` blocks
+4. **Filters and effects** — Use sparingly; can impact performance on low-end devices
+5. **Accessibility** — Ensure sufficient contrast in both themes
+
+## Troubleshooting
+
+**Problem:** Hero doesn't update on theme change
+
+- **Solution:** Ensure `resolvedTheme` is used, not `theme` (which can be "system")
+
+**Problem:** Multiple heroes show wrong colors
+
+- **Solution:** Check that unique `uid` is generated per component instance
+
+**Problem:** Hydration mismatch errors
+
+- **Solution:** Verify `mounted` state is checked before rendering theme-dependent content
+
+**Problem:** Hero looks pixelated
+
+- **Solution:** Ensure `viewBox` and dimensions match 1200×630 and `preserveAspectRatio` is set

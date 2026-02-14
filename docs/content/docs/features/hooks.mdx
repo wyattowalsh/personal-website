@@ -1,0 +1,692 @@
+---
+title: "Custom Hooks"
+description: "Client-side React hooks for reduced motion detection, window sizing, mouse tracking, and toast notifications."
+---
+
+## Overview
+
+The site provides **four custom React hooks** for common client-side interactions:
+
+- `useReducedMotion` — Detect user motion preferences
+- `useWindowSize` — Track viewport dimensions
+- `useMousePosition` — Track cursor coordinates
+- `useToast` — Display toast notifications (shadcn/ui wrapper)
+
+All hooks are **client-only** and must be imported from `@/components/hooks/`.
+
+## useReducedMotion
+
+Detects the user's `prefers-reduced-motion` system setting and updates reactively.
+
+### Implementation
+
+**File:** `components/hooks/useReducedMotion.ts`
+
+```typescript
+import { useEffect, useState } from 'react';
+
+export function useReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mq.matches);
+
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener('change', handler);
+
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  return prefersReducedMotion;
+}
+```
+
+### Usage
+
+```tsx
+'use client'
+
+import { useReducedMotion } from '@/components/hooks/useReducedMotion'
+import { motion } from 'motion/react'
+
+export function AnimatedComponent() {
+  const prefersReducedMotion = useReducedMotion()
+
+  return (
+    <motion.div
+      animate={{ opacity: 1 }}
+      transition={{
+        duration: prefersReducedMotion ? 0.01 : 0.5
+      }}
+    >
+      Content
+    </motion.div>
+  )
+}
+```
+
+### Return Value
+
+| Type | Description |
+|------|-------------|
+| `boolean` | `true` if user prefers reduced motion, `false` otherwise |
+
+### Behavior
+
+1. **Initial state:** `false` (default)
+2. **On mount:** Reads `prefers-reduced-motion` media query
+3. **Reactive:** Listens for changes to system preference
+4. **Cleanup:** Removes event listener on unmount
+
+### Accessibility
+
+Use this hook to **respect user preferences** by:
+
+- Disabling or minimizing animations when `true`
+- Reducing transition durations to near-instant (`0.01s`)
+- Skipping parallax/scroll-based effects
+
+**Example:**
+
+```tsx
+<motion.button
+  whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
+  whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+>
+  Click me
+</motion.button>
+```
+
+## useWindowSize
+
+Tracks the browser window dimensions and updates on resize.
+
+### Implementation
+
+**File:** `components/hooks/useWindowSize.ts`
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export const useWindowSize = () => {
+  const [size, setSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return size;
+};
+```
+
+### Usage
+
+```tsx
+'use client'
+
+import { useWindowSize } from '@/components/hooks/useWindowSize'
+
+export function ResponsiveComponent() {
+  const { width, height } = useWindowSize()
+
+  return (
+    <div>
+      <p>Window: {width}px × {height}px</p>
+      {width < 768 && <MobileView />}
+      {width >= 768 && <DesktopView />}
+    </div>
+  )
+}
+```
+
+### Return Value
+
+```typescript
+{
+  width: number;   // window.innerWidth in pixels
+  height: number;  // window.innerHeight in pixels
+}
+```
+
+### Use Cases
+
+- **Responsive rendering:** Show/hide components based on viewport
+- **Canvas sizing:** Adjust canvas element dimensions
+- **Layout calculations:** Position floating elements
+- **Breakpoint detection:** Trigger JS logic at specific widths
+
+### Performance Considerations
+
+**Throttling:** For high-frequency updates, consider throttling the resize handler:
+
+```typescript
+import { throttle } from 'lodash'
+
+const handleResize = throttle(() => {
+  setSize({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+}, 200); // Update max every 200ms
+```
+
+**Alternative:** Use CSS media queries or Tailwind breakpoints instead of JS for simple responsive layouts.
+
+## useMousePosition
+
+Tracks the current mouse cursor coordinates relative to the viewport.
+
+### Implementation
+
+**File:** `components/hooks/useMousePosition.ts`
+
+```typescript
+import { useState, useEffect } from 'react';
+
+export const useMousePosition = () => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (event: MouseEvent) => {
+      setPosition({ x: event.clientX, y: event.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  return position;
+};
+```
+
+### Usage
+
+```tsx
+'use client'
+
+import { useMousePosition } from '@/components/hooks/useMousePosition'
+
+export function FollowCursor() {
+  const { x, y } = useMousePosition()
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        left: x,
+        top: y,
+        transform: 'translate(-50%, -50%)',
+        pointerEvents: 'none',
+      }}
+      className="w-4 h-4 bg-primary rounded-full"
+    />
+  )
+}
+```
+
+### Return Value
+
+```typescript
+{
+  x: number;  // Mouse X position in pixels (from left edge)
+  y: number;  // Mouse Y position in pixels (from top edge)
+}
+```
+
+### Use Cases
+
+- **Custom cursors:** Render custom cursor graphics that follow the mouse
+- **Parallax effects:** Move background elements based on mouse position
+- **Hover effects:** Calculate distance to elements for proximity-based animations
+- **Interactive canvas:** Track mouse for drawing/painting apps
+
+### Example: Proximity-Based Glow
+
+```tsx
+'use client'
+
+import { useMousePosition } from '@/components/hooks/useMousePosition'
+import { useRef } from 'react'
+
+export function GlowCard() {
+  const { x, y } = useMousePosition()
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  // Calculate distance from mouse to card center
+  const rect = cardRef.current?.getBoundingClientRect()
+  const cardCenterX = (rect?.left || 0) + (rect?.width || 0) / 2
+  const cardCenterY = (rect?.top || 0) + (rect?.height || 0) / 2
+  const distance = Math.sqrt(
+    Math.pow(x - cardCenterX, 2) + Math.pow(y - cardCenterY, 2)
+  )
+
+  const glowIntensity = Math.max(0, 1 - distance / 500)
+
+  return (
+    <div
+      ref={cardRef}
+      style={{
+        boxShadow: `0 0 ${glowIntensity * 50}px rgba(59, 130, 246, ${glowIntensity})`,
+      }}
+    >
+      Card content
+    </div>
+  )
+}
+```
+
+### Performance Considerations
+
+**Throttling:** Mouse move events fire very frequently. For non-critical use cases, throttle updates:
+
+```typescript
+import { throttle } from 'lodash'
+
+const handleMouseMove = throttle((event: MouseEvent) => {
+  setPosition({ x: event.clientX, y: event.clientY });
+}, 16); // ~60fps
+```
+
+**Mobile:** Mouse position is meaningless on touch devices. Consider combining with touch events or feature detection:
+
+```typescript
+const isTouchDevice = 'ontouchstart' in window
+
+if (!isTouchDevice) {
+  window.addEventListener('mousemove', handleMouseMove)
+}
+```
+
+## useToast
+
+Displays toast notifications using shadcn/ui's Toast component. This is a **wrapper around shadcn/ui's built-in toast system**, not a custom implementation.
+
+### Implementation
+
+**File:** `components/hooks/use-toast.ts`
+
+The hook manages global toast state using a reducer pattern:
+
+```typescript
+type ToasterToast = ToastProps & {
+  id: string
+  title?: React.ReactNode
+  description?: React.ReactNode
+  action?: ToastActionElement
+}
+
+export function useToast() {
+  const [state, setState] = React.useState<State>(memoryState)
+
+  React.useEffect(() => {
+    listeners.push(setState)
+    return () => {
+      const index = listeners.indexOf(setState)
+      if (index > -1) {
+        listeners.splice(index, 1)
+      }
+    }
+  }, [state])
+
+  return {
+    ...state,
+    toast,
+    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
+  }
+}
+
+export function toast({ ...props }: Toast) {
+  const id = genId()
+
+  const update = (props: ToasterToast) =>
+    dispatch({
+      type: "UPDATE_TOAST",
+      toast: { ...props, id },
+    })
+
+  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
+
+  dispatch({
+    type: "ADD_TOAST",
+    toast: {
+      ...props,
+      id,
+      open: true,
+      onOpenChange: (open) => {
+        if (!open) dismiss()
+      },
+    },
+  })
+
+  return { id, dismiss, update }
+}
+```
+
+### Usage
+
+```tsx
+'use client'
+
+import { useToast } from '@/components/hooks/use-toast'
+import { Button } from '@/components/ui/button'
+
+export function ToastExample() {
+  const { toast } = useToast()
+
+  return (
+    <Button
+      onClick={() => {
+        toast({
+          title: "Success!",
+          description: "Your changes have been saved.",
+        })
+      }}
+    >
+      Show Toast
+    </Button>
+  )
+}
+```
+
+### Toast Options
+
+```typescript
+toast({
+  title: "Notification Title",
+  description: "Optional description text",
+  variant: "default" | "destructive",
+  action: <ToastAction altText="Undo" onClick={handleUndo}>Undo</ToastAction>,
+  duration: 5000, // Auto-dismiss after 5s (default)
+})
+```
+
+### Return Value
+
+```typescript
+{
+  toasts: ToasterToast[];  // Current active toasts
+  toast: (props: Toast) => { id: string; dismiss: () => void; update: (props) => void };
+  dismiss: (toastId?: string) => void;
+}
+```
+
+### Methods
+
+#### `toast(props)`
+
+Display a new toast notification.
+
+**Returns:**
+
+```typescript
+{
+  id: string;           // Unique toast ID
+  dismiss: () => void;  // Dismiss this toast
+  update: (props: ToasterToast) => void;  // Update toast content
+}
+```
+
+**Example:**
+
+```tsx
+const { id, dismiss, update } = toast({
+  title: "Uploading...",
+  description: "Please wait",
+})
+
+// Later: update progress
+update({
+  title: "Upload complete!",
+  description: "File uploaded successfully",
+})
+
+// Or dismiss programmatically
+dismiss()
+```
+
+#### `dismiss(toastId?)`
+
+Dismiss a specific toast by ID, or all toasts if no ID provided.
+
+```tsx
+const { toast, dismiss } = useToast()
+
+// Show toast
+const { id } = toast({ title: "Hello" })
+
+// Dismiss specific toast
+dismiss(id)
+
+// Dismiss all toasts
+dismiss()
+```
+
+### Configuration
+
+**Toast limit:** Only 1 toast shown at a time (configurable in `use-toast.ts`):
+
+```typescript
+const TOAST_LIMIT = 1
+```
+
+**Auto-dismiss delay:**
+
+```typescript
+const TOAST_REMOVE_DELAY = 1000000 // 1000s (effectively permanent without explicit dismiss)
+```
+
+### Toast Variants
+
+#### Default
+
+```tsx
+toast({
+  title: "Notification",
+  description: "This is a default toast",
+})
+```
+
+#### Destructive (Error)
+
+```tsx
+toast({
+  variant: "destructive",
+  title: "Error",
+  description: "Something went wrong",
+})
+```
+
+#### With Action
+
+```tsx
+toast({
+  title: "Event scheduled",
+  description: "Your event has been created.",
+  action: (
+    <ToastAction altText="View event" onClick={() => router.push('/events')}>
+      View
+    </ToastAction>
+  ),
+})
+```
+
+### Global Toaster Component
+
+Render once in root layout to enable toasts app-wide:
+
+```tsx
+// app/layout.tsx
+import { Toaster } from '@/components/ui/toaster'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  )
+}
+```
+
+## Hook Import Patterns
+
+### Individual Imports
+
+```typescript
+import { useReducedMotion } from '@/components/hooks/useReducedMotion'
+import { useWindowSize } from '@/components/hooks/useWindowSize'
+import { useMousePosition } from '@/components/hooks/useMousePosition'
+import { useToast } from '@/components/hooks/use-toast'
+```
+
+### Barrel Exports (if added)
+
+Create `components/hooks/index.ts`:
+
+```typescript
+export { useReducedMotion } from './useReducedMotion'
+export { useWindowSize } from './useWindowSize'
+export { useMousePosition } from './useMousePosition'
+export { useToast, toast } from './use-toast'
+```
+
+Then import:
+
+```typescript
+import { useReducedMotion, useWindowSize, useMousePosition, useToast } from '@/components/hooks'
+```
+
+## Common Patterns
+
+### Combining Hooks
+
+```tsx
+'use client'
+
+import { useReducedMotion } from '@/components/hooks/useReducedMotion'
+import { useWindowSize } from '@/components/hooks/useWindowSize'
+import { useMousePosition } from '@/components/hooks/useMousePosition'
+
+export function InteractiveBackground() {
+  const prefersReducedMotion = useReducedMotion()
+  const { width, height } = useWindowSize()
+  const { x, y } = useMousePosition()
+
+  // Skip animations if reduced motion
+  if (prefersReducedMotion) {
+    return <StaticBackground />
+  }
+
+  // Calculate parallax offset based on mouse position
+  const offsetX = (x / width - 0.5) * 50
+  const offsetY = (y / height - 0.5) * 50
+
+  return (
+    <div
+      style={{
+        transform: `translate(${offsetX}px, ${offsetY}px)`,
+        transition: 'transform 0.2s ease-out',
+      }}
+    >
+      Background content
+    </div>
+  )
+}
+```
+
+### Conditional Rendering
+
+```tsx
+'use client'
+
+import { useWindowSize } from '@/components/hooks/useWindowSize'
+
+export function AdaptiveLayout() {
+  const { width } = useWindowSize()
+
+  // Custom breakpoint logic
+  if (width < 640) return <MobileLayout />
+  if (width < 1024) return <TabletLayout />
+  return <DesktopLayout />
+}
+```
+
+### Toast with Async Actions
+
+```tsx
+'use client'
+
+import { useToast } from '@/components/hooks/use-toast'
+
+export function AsyncButton() {
+  const { toast } = useToast()
+
+  const handleClick = async () => {
+    const { id, update } = toast({
+      title: "Saving...",
+      description: "Please wait",
+    })
+
+    try {
+      await saveData()
+      update({
+        title: "Success!",
+        description: "Data saved successfully",
+      })
+    } catch (error) {
+      update({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to save data",
+      })
+    }
+  }
+
+  return <Button onClick={handleClick}>Save</Button>
+}
+```
+
+## Best Practices
+
+1. **Always use `'use client'` directive** — These hooks access browser APIs (`window`, `document`)
+2. **Respect reduced motion** — Never ignore `useReducedMotion()` when adding animations
+3. **Throttle high-frequency events** — Use throttle/debounce for `resize` and `mousemove` handlers
+4. **Cleanup listeners** — Return cleanup functions from `useEffect` to prevent memory leaks
+5. **Provide fallbacks** — Handle initial state before hooks return actual values
+6. **Check browser support** — Feature-detect before using mouse position on touch devices
+
+## Troubleshooting
+
+**Problem:** Hook causes hydration mismatch
+
+- **Solution:** Ensure hook is only used in client components (`'use client'`)
+
+**Problem:** `useWindowSize` returns stale values
+
+- **Solution:** Verify `resize` event listener is properly attached and not throttled too aggressively
+
+**Problem:** `useMousePosition` causes performance issues
+
+- **Solution:** Throttle updates to ~60fps (`16ms` delay) or higher for less critical use cases
+
+**Problem:** Toasts not appearing
+
+- **Solution:** Ensure `<Toaster />` component is rendered in root layout
+
+**Problem:** `useReducedMotion` always returns `false`
+
+- **Solution:** Test by enabling reduced motion in OS settings (macOS: System Preferences → Accessibility → Display → Reduce motion)

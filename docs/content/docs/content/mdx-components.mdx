@@ -1,0 +1,627 @@
+---
+title: "MDX Components"
+description: "Complete reference for all MDX components available in blog posts"
+---
+
+All MDX components are auto-registered via `mdx-components.tsx` and available globally in blog posts without imports. The component system is organized into four categories: built-in HTML element overrides, utility components, interactive components, and layout components.
+
+## Built-In Element Overrides
+
+These components replace standard HTML elements with enhanced, styled versions.
+
+### Headings (h1, h2, h3)
+
+Headings are automatically enhanced with:
+- Gradient hover effects
+- Responsive font sizing
+- Anchor link support (via rehype-slug)
+- Flexbox layout for proper alignment
+
+```mdx
+## This is an H2 heading
+### This is an H3 heading
+```
+
+### Paragraphs (p)
+
+Styled paragraphs with:
+- Subtle hover underline animation
+- Responsive text sizing
+- Proper vertical spacing
+
+### Code Blocks (pre, code)
+
+Code blocks use the `CodeBlock` component with:
+- Syntax highlighting via rehype-prism-plus
+- Copy-to-clipboard button
+- Language badge
+- Line numbers (optional)
+- Theme-aware colors
+
+Inline code is styled with rounded background and monospace font.
+
+````mdx
+```typescript
+const greeting = "Hello, world!";
+```
+
+Inline `code` also works.
+````
+
+### Images (img)
+
+Images are enhanced with:
+- Next.js Image optimization (AVIF/WebP)
+- Rounded corners and shadows
+- Hover zoom effect
+- Optional caption overlay from alt text
+- Blur placeholder
+
+```mdx
+![Alt text describing image](/image.png)
+```
+
+### Links (a)
+
+Automatic link enhancement:
+- Internal links use Next.js `<Link>` for client-side navigation
+- External links open in new tab with security attributes
+- Anchor links for same-page navigation
+- External link icon indicator
+- Animated underline on hover
+
+```mdx
+[Internal link](/blog/posts/example)
+[External link](https://example.com)
+[Anchor link](#section-id)
+```
+
+### Tables (table)
+
+Tables receive comprehensive styling:
+- Rounded borders and shadows
+- Hover row highlighting
+- Horizontal scroll for overflow
+- Sticky headers (optional)
+- Alternating row colors
+
+```mdx
+| Column 1 | Column 2 |
+|----------|----------|
+| Data     | Data     |
+```
+
+## Utility Components
+
+### Note
+
+Callout boxes for info, warnings, or terminal output.
+
+**Props:**
+- `type` — `"info"` | `"warning"` | `"terminal"` (default: `"info"`)
+- `children` — Content
+
+```mdx
+<Note type="info">
+This is an informational note.
+</Note>
+
+<Note type="warning">
+⚠️ This is a warning.
+</Note>
+```
+
+### Callout
+
+Enhanced callout with custom icons and types.
+
+**Props:**
+- `type` — `"default"` | `"info"` | `"warning"` | `"error"` | `"success"`
+- `icon` — Lucide icon component (optional)
+- `children` — Content
+
+```mdx
+<Callout type="success">
+✅ Operation completed successfully!
+</Callout>
+```
+
+### Details
+
+Collapsible accordion-style details/summary.
+
+**Props:**
+- `summary` — Summary text (required)
+- `children` — Hidden content
+
+```mdx
+<Details summary="Click to expand">
+Hidden content goes here.
+</Details>
+```
+
+### CodeFilename
+
+Displays a filename header above code blocks.
+
+````mdx
+<CodeFilename>src/components/Example.tsx</CodeFilename>
+```typescript
+export function Example() {
+  return <div>Hello</div>;
+}
+```
+````
+
+### ScrollableCode
+
+Wraps code in a scrollable container with max height.
+
+**Props:**
+- `maxHeight` — CSS height value (default: `"400px"`)
+- `children` — Code content
+
+````mdx
+<ScrollableCode maxHeight="300px">
+```javascript
+// Long code that needs scrolling...
+```
+</ScrollableCode>
+````
+
+### ExternalLink
+
+Explicit external link with icon.
+
+```mdx
+<ExternalLink href="https://example.com">
+Visit Example
+</ExternalLink>
+```
+
+## Interactive Components
+
+### Chart
+
+Data visualization using Recharts.
+
+**Props:**
+- `type` — `"line"` | `"bar"` | `"pie"` | `"area"` | `"radar"`
+- `data` — Array of data objects
+- `dataKeys` — Array of keys to plot
+- `xAxisKey` — Key for x-axis (default: `"name"`)
+- `title` — Chart title
+- `height` — Height in pixels (default: `300`)
+- `colors` — Array of color strings
+- `showGrid` — Show grid lines (default: `true`)
+- `showLegend` — Show legend (default: `true`)
+- `showTooltip` — Show tooltip on hover (default: `true`)
+- `stacked` — Stack bars/areas (default: `false`)
+
+```mdx
+<Chart
+  type="line"
+  data={[
+    { name: 'Jan', value: 100 },
+    { name: 'Feb', value: 120 },
+  ]}
+  dataKeys={['value']}
+  title="Monthly Growth"
+/>
+```
+
+### Timeline
+
+Vertical timeline with status indicators.
+
+**Props:**
+- `items` — Array of timeline items
+  - `date` — Date string
+  - `title` — Event title
+  - `description` — Event description (optional)
+  - `status` — `"completed"` | `"current"` | `"upcoming"`
+  - `icon` — Icon name (optional)
+  - `tags` — Array of tag strings (optional)
+- `title` — Timeline title
+- `className` — Additional CSS classes
+
+```mdx
+<Timeline
+  items={[
+    {
+      date: '2024-01',
+      title: 'Project Launch',
+      status: 'completed',
+      icon: 'rocket'
+    },
+    {
+      date: '2024-02',
+      title: 'Feature Development',
+      status: 'current'
+    }
+  ]}
+/>
+```
+
+### Comparison & ComparisonCard
+
+Side-by-side comparisons.
+
+**Comparison Props:**
+- `leftTitle` — Left column title
+- `rightTitle` — Right column title
+- `items` — Array of `{ label, left, right }`
+  - Values can be boolean (renders ✓/✗), string, or ReactNode
+- `leftHighlight` — Highlight left column (default: `false`)
+- `rightHighlight` — Highlight right column (default: `false`)
+
+**ComparisonCard Props:**
+- `title` — Card title
+- `price` — Price string (optional)
+- `features` — Array of feature strings
+- `pros` — Array of pro strings
+- `cons` — Array of con strings
+- `highlighted` — Apply highlighted styling
+- `badge` — Badge text (optional)
+
+```mdx
+<Comparison
+  leftTitle="Option A"
+  rightTitle="Option B"
+  items={[
+    { label: 'Speed', left: true, right: false },
+    { label: 'Cost', left: '$10', right: '$5' }
+  ]}
+  rightHighlight
+/>
+```
+
+### VideoEmbed
+
+Embedded YouTube or Vimeo videos with lazy loading.
+
+**Props:**
+- `url` — YouTube or Vimeo URL
+- `title` — Video title
+- `poster` — Custom poster image URL (optional)
+- `aspectRatio` — `"16:9"` | `"4:3"` | `"1:1"` | `"9:16"` (default: `"16:9"`)
+- `autoplay` — Auto-play video (default: `false`)
+- `muted` — Mute video (default: `false`)
+- `loop` — Loop video (default: `false`)
+
+```mdx
+<VideoEmbed
+  url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+  title="Example Video"
+  aspectRatio="16:9"
+/>
+```
+
+### Terminal
+
+Animated terminal with typing effects.
+
+**Props:**
+- `lines` — Array of line objects:
+  - `text` — Line text
+  - `type` — `"command"` | `"output"` | `"error"` | `"success"` | `"comment"`
+  - `delay` — Delay before line (ms)
+  - `typing` — Enable typing animation (default: `true` for commands)
+- `title` — Terminal title (default: `"Terminal"`)
+- `prompt` — Prompt character (default: `"$"`)
+- `typingSpeed` — Typing speed in ms/char (default: `30`)
+- `autoPlay` — Auto-start animation (default: `true`)
+- `loop` — Loop animation (default: `false`)
+
+```mdx
+<Terminal
+  lines={[
+    { text: 'npm install', type: 'command' },
+    { text: 'Installing dependencies...', type: 'output' },
+    { text: '✓ Done!', type: 'success' }
+  ]}
+/>
+```
+
+### Diff
+
+Side-by-side code diff viewer.
+
+**Props:**
+- `oldCode` — Code before changes
+- `newCode` — Code after changes
+- `language` — Syntax highlighting language
+- `filename` — Diff filename (optional)
+- `showLineNumbers` — Show line numbers (default: `true`)
+- `className` — Additional CSS classes (optional)
+
+### Math
+
+LaTeX math rendering with KaTeX. See [Math and Diagrams](/docs/content/math-and-diagrams) for details.
+
+**Props:**
+- `display` — Display mode (block) vs inline (default: `false`)
+- `label` — Equation label/anchor
+- `number` — Equation number (auto-generated if not provided)
+- `options` — KaTeX options object (optional)
+
+```mdx
+<Math display>
+\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+</Math>
+```
+
+### Mermaid
+
+Interactive diagram rendering. See [Math and Diagrams](/docs/content/math-and-diagrams) for details.
+
+**Props:**
+- `chart` — Mermaid diagram definition
+- `title` — Diagram title
+- `className` — Additional CSS classes
+
+```mdx
+<Mermaid chart={`
+  graph LR
+    A --> B
+    B --> C
+`} />
+```
+
+## Data & Code Components
+
+### APIReference
+
+API endpoint documentation.
+
+**Props:**
+- `method` — HTTP method (`"GET"`, `"POST"`, etc.)
+- `endpoint` — API endpoint path
+- `title` — Endpoint title
+- `description` — Endpoint description
+- `parameters` — Array of `{ name, type, required, description, default }`
+- `headers` — Array of header objects
+- `requestBody` — `{ type, example }` object
+- `response` — `{ status, description, example }` object
+- `authentication` — Auth type string
+
+```mdx
+<APIReference
+  method="POST"
+  endpoint="/api/posts"
+  title="Create Post"
+  parameters={[
+    { name: 'title', type: 'string', required: true }
+  ]}
+/>
+```
+
+### PropTable
+
+Component prop documentation table.
+
+**Props:**
+- `props` — Array of `{ name, type, required, default, description }`
+
+### FileTree
+
+Visual file tree representation.
+
+**Props:**
+- `files` — Array of file path strings
+- `expanded` — Array of expanded directory paths
+
+### PackageInstall
+
+Package installation commands for multiple package managers.
+
+**Props:**
+- `package` — Package name(s)
+- `dev` — Install as dev dependency (default: `false`)
+
+```mdx
+<PackageInstall package="react react-dom" />
+```
+
+## Engagement Components
+
+### Quiz
+
+Interactive quiz with multiple choice questions.
+
+**Props:**
+- `questions` — Array of question objects:
+  - `question` — Question text
+  - `options` — Array of option strings
+  - `correct` — Index of correct answer
+  - `explanation` — Explanation text (optional)
+
+### Spoiler & InlineSpoiler
+
+Hidden content that reveals on click.
+
+```mdx
+<Spoiler title="Click to reveal">
+Hidden spoiler content
+</Spoiler>
+
+This is <InlineSpoiler>hidden inline text</InlineSpoiler>.
+```
+
+### Bookmark & BookmarkGrid
+
+External link bookmarks with previews.
+
+**Bookmark Props:**
+- `url` — Bookmark URL
+- `title` — Link title
+- `description` — Description text
+- `image` — Preview image URL
+- `tags` — Array of tag strings
+
+**BookmarkGrid:**
+- `children` — Bookmark components
+
+```mdx
+<BookmarkGrid>
+  <Bookmark
+    url="https://example.com"
+    title="Example Site"
+    description="A great resource"
+  />
+</BookmarkGrid>
+```
+
+### Newsletter
+
+Newsletter signup form.
+
+**Props:**
+- `title` — Form title
+- `description` — Form description
+- `buttonText` — Submit button text
+
+## Layout Components
+
+### Columns & Column
+
+Multi-column layouts.
+
+**Columns Props:**
+- `count` — Number of columns: `2` | `3` | `4` (default: `2`)
+- `gap` — Gap size: `"sm"` | `"md"` | `"lg"` (default: `"md"`)
+- `align` — Vertical alignment: `"start"` | `"center"` | `"end"` | `"stretch"`
+- `divider` — Show vertical dividers (default: `false`)
+
+**Column Props:**
+- `sticky` — Enable sticky positioning (default: `false`)
+
+```mdx
+<Columns count={3} gap="lg">
+  <Column>First column</Column>
+  <Column sticky>Sticky second column</Column>
+  <Column>Third column</Column>
+</Columns>
+```
+
+### Split
+
+50/50 split layout.
+
+**Props:**
+- `reverse` — Reverse column order on mobile (default: `false`)
+- `gap` — Gap size (default: `"md"`)
+- `align` — Vertical alignment (default: `"center"`)
+
+```mdx
+<Split>
+  <div>Left content</div>
+  <div>Right content</div>
+</Split>
+```
+
+### Aside & InlineAside
+
+Sidebar content.
+
+**Aside Props:**
+- `title` — Aside title
+- `position` — `"left"` | `"right"` (default: `"right"`)
+- `sticky` — Enable sticky positioning
+
+```mdx
+<Aside title="Related Info" position="right">
+Additional context here.
+</Aside>
+```
+
+### Figure & FigureGroup
+
+Captioned figures.
+
+**Figure Props:**
+- `caption` — Figure caption
+- `alt` — Alt text
+- `src` — Image source
+
+**FigureGroup Props:**
+- `caption` — Group caption
+- `columns` — Number of columns
+
+```mdx
+<Figure
+  src="/diagram.png"
+  alt="Architecture diagram"
+  caption="System architecture overview"
+/>
+
+<FigureGroup caption="Comparison" columns={2}>
+  <Figure src="/before.png" alt="Before" />
+  <Figure src="/after.png" alt="After" />
+</FigureGroup>
+```
+
+### Steps & Step
+
+Step-by-step instructions.
+
+**Steps Props:**
+- `steps` — Array of step objects (or use `<Step>` children)
+- `variant` — `"numbered"` | `"check"` | `"arrow"` (default: `"numbered"`)
+
+**Step Props:**
+- `title` — Step title
+- `number` — Step number (optional)
+- `completed` — Completion status (default: `false`)
+
+```mdx
+<Steps>
+  <Step number={1} title="Install dependencies">
+    Run `pnpm install` to install all dependencies.
+  </Step>
+  <Step number={2} title="Start dev server">
+    Run `pnpm dev` to start the development server.
+  </Step>
+</Steps>
+```
+
+## UI Primitives
+
+shadcn/ui components are also available:
+
+- `<Alert>` — Alert boxes
+- `<Badge>` — Status badges
+- `<Button>` — Buttons
+- `<Card>` — Cards
+- `<Separator>` — Horizontal dividers
+- `<Tooltip>` — Tooltips
+- `<Accordion>`, `<AccordionItem>`, `<AccordionTrigger>`, `<AccordionContent>` — Accordions
+- `<Tabs>`, `<TabsList>`, `<TabsTrigger>`, `<TabsContent>` — Tabs
+- `<ScrollArea>` — Scrollable containers
+
+See [UI Primitives](/docs/reference/ui-primitives) for full documentation.
+
+## Component Registry Implementation
+
+The `mdx-components.tsx` file exports a `useMDXComponents` function that returns a mapping of component names to React components. This is the mechanism that makes all these components available without imports:
+
+```typescript
+export function useMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    // Element overrides
+    h1: ({ children }) => <h1 ...>{children}</h1>,
+    code: ({ children }) => <code ...>{children}</code>,
+
+    // Custom components
+    Math,
+    Mermaid,
+    Chart,
+    Timeline,
+    // ... all other components
+
+    ...components,
+  };
+}
+```
+
+This function is automatically called by the MDX runtime when rendering MDX pages.

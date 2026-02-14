@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+:root {
+  --primary-hue: 203;
+  --primary-saturation: 27%;
+  
+  --primary-light: hsl(var(--primary-hue), var(--primary-saturation), 53%);
+  --primary-dark: hsl(var(--primary-hue), var(--primary-saturation), 65%);
+
+  --fd-primary-50: hsl(var(--primary-hue), var(--primary-saturation), 95%);
+  --fd-primary-100: hsl(var(--primary-hue), var(--primary-saturation), 90%);
+  --fd-primary-200: hsl(var(--primary-hue), var(--primary-saturation), 80%);
+  --fd-primary-300: hsl(var(--primary-hue), var(--primary-saturation), 70%);
+  --fd-primary-400: hsl(var(--primary-hue), var(--primary-saturation), 60%);
+  --fd-primary-500: var(--primary-light);
+  --fd-primary-600: hsl(var(--primary-hue), var(--primary-saturation), 45%);
+  --fd-primary-700: hsl(var(--primary-hue), var(--primary-saturation), 40%);
+  --fd-primary-800: hsl(var(--primary-hue), var(--primary-saturation), 35%);
+  --fd-primary-900: hsl(var(--primary-hue), var(--primary-saturation), 30%);
+  --fd-primary-950: hsl(var(--primary-hue), var(--primary-saturation), 25%);
+
+  --fd-foreground: hsl(222.2, 84%, 4.9%);
+  --fd-background: hsl(0, 0%, 100%);
+  --fd-muted-foreground: hsl(215.4, 16.3%, 46.9%);
+  --fd-border: hsl(214.3, 31.8%, 91.4%);
+}
+
+.dark {
+  --fd-primary-500: var(--primary-dark);
+
+  --fd-foreground: hsl(210, 40%, 98%);
+  --fd-background: hsl(222.2, 84%, 4.9%);
+  --fd-muted-foreground: hsl(217.2, 32.6%, 17.5%);
+  --fd-border: hsl(217.2, 32.6%, 17.5%);
+}
+
+body {
+  background-color: var(--fd-background);
+  color: var(--fd-foreground);
+}

@@ -1,0 +1,595 @@
+---
+title: "SEO & Metadata"
+description: "Comprehensive SEO system with metadata generation, JSON-LD structured data, and three-way metadata sync rules."
+---
+
+## Overview
+
+The site implements a **comprehensive SEO system** that generates:
+
+- HTML meta tags (title, description, keywords)
+- OpenGraph metadata for social sharing
+- Twitter Card metadata
+- JSON-LD structured data (BlogPosting, BreadcrumbList, WebSite)
+- Sitemap generation via `next-sitemap`
+- Canonical URLs for all pages
+
+All metadata is generated server-side for optimal SEO.
+
+## Architecture
+
+### Core Files
+
+| File | Purpose |
+|------|---------|
+| `lib/metadata.ts` | Metadata generation functions |
+| `lib/schema.ts` | JSON-LD structured data generators |
+| `components/PostSchema.tsx` | Client-safe JSON-LD component |
+| `next-sitemap.config.cjs` | Sitemap configuration |
+| `public/sitemap.xml` | **Auto-generated** sitemap |
+
+## Metadata Generation (`lib/metadata.ts`)
+
+### generatePostMetadata()
+
+Creates complete Next.js metadata object for blog posts:
+
+```typescript
+export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metadata {
+  const config = getConfig();
+  const postUrl = `${siteUrl}/blog/posts/${slug}`;
+  const ogImage = post.image
+    ? (post.image.startsWith('http') ? post.image : `${siteUrl}${post.image}`)
+    : `${siteUrl}/opengraph.png`;
+
+  return {
+    title: post.title,
+    description: post.summary || config.site.description,
+    authors: [{ name: config.site.author.name }],
+    creator: config.site.author.name,
+    publisher: config.site.author.name,
+
+    // Canonical URL
+    alternates: {
+      canonical: postUrl,
+    },
+
+    // OpenGraph metadata
+    openGraph: {
+      type: 'article',
+      title: post.title,
+      description: post.summary || config.site.description,
+      url: postUrl,
+      siteName: config.site.title,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      publishedTime: post.created,
+      modifiedTime: post.updated || post.created,
+      authors: [config.site.author.name],
+      tags: post.tags,
+    },
+
+    // Twitter card metadata
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.summary || config.site.description,
+      images: [ogImage],
+      creator: `@${config.site.author.twitter}`,
+    },
+
+    // Robots directives
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    // Keywords from tags
+    keywords: post.tags,
+  };
+}
+```
+
+**Usage in post pages:**
+
+```typescript
+// app/blog/posts/[slug]/page.tsx
+import { generatePostMetadata } from '@/lib/metadata'
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const post = await getPost(params.slug);
+  return generatePostMetadata({ post, slug: params.slug });
+}
+```
+
+### OpenGraph Images
+
+Image URL resolution:
+
+1. **External image:** `http://example.com/image.png` → use as-is
+2. **Local image:** `/post-hero.svg` → prepend `${siteUrl}`
+3. **Fallback:** No image → use `/opengraph.png`
+
+Standard OG image dimensions: **1200×630** (Facebook/Twitter recommended)
+
+### Twitter Cards
+
+Uses `summary_large_image` card type for prominent image display:
+
+```typescript
+twitter: {
+  card: 'summary_large_image',
+  title: post.title,
+  description: post.summary,
+  images: [ogImage],
+  creator: `@${config.site.author.twitter}`,
+}
+```
+
+Preview tool: [Twitter Card Validator](https://cards-dev.twitter.com/validator)
+
+## JSON-LD Structured Data (`lib/schema.ts`)
+
+### generateArticleSchema()
+
+Creates BlogPosting schema for search engines:
+
+```typescript
+export function generateArticleSchema(post: Post, options?: SchemaOptions) {
+  const config = getConfig();
+  const baseUrl = options?.baseUrl || config.site.url;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: post.title,
+    description: post.summary,
+    image: post.image ? [`${baseUrl}${post.image}`] : options?.images || [],
+    datePublished: post.created,
+    dateModified: post.updated || post.created,
+    author: {
+      '@type': 'Person',
+      name: config.site.author.name,
+      url: config.site.url
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: config.site.author.name,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${baseUrl}/logo.webp`
+      }
+    },
+    keywords: post.tags,
+    isAccessibleForFree: true,
+    license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
+  };
+}
+```
+
+### generateBreadcrumbSchema()
+
+Creates BreadcrumbList for navigation hierarchy:
+
+```typescript
+export const generateBreadcrumbSchema = cache(
+  (items: BreadcrumbItem[], baseUrl = 'https://w4w.dev') => {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: items.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: `${baseUrl}${item.item}`
+      }))
+    }
+  }
+);
+```
+
+**Usage:**
+
+```typescript
+const breadcrumbs = generateBreadcrumbSchema([
+  { name: 'Home', item: '/' },
+  { name: 'Blog', item: '/blog' },
+  { name: post.title, item: `/blog/posts/${slug}` },
+], siteUrl);
+```
+
+### generateWebSiteSchema()
+
+Root site schema for homepage:
+
+```typescript
+export const generateWebSiteSchema = cache((url = 'https://w4w.dev') => {
+  const config = getConfig();
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: config.site.title,
+    alternateName: ['w4w', 'wyattowalsh'],
+    url: config.site.url,
+    description: config.site.description,
+    author: {
+      '@type': 'Person',
+      name: config.site.author.name,
+      url: config.site.url,
+      email: config.site.author.email,
+      sameAs: [
+        `https://github.com/${config.site.author.github}`,
+        `https://twitter.com/${config.site.author.twitter}`,
+        `https://linkedin.com/in/${config.site.author.linkedin}`
+      ]
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: config.site.author.name,
+      logo: {
+        '@type': 'ImageObject',
+        url: `${config.site.url}/logo.webp`
+      }
+    },
+    copyrightYear: new Date().getFullYear(),
+    copyrightHolder: {
+      '@type': 'Person',
+      name: config.site.author.name
+    },
+    inLanguage: 'en-US',
+    license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
+    keywords: ['Software Engineering', 'Web Development', 'Technology', 'Blog']
+  };
+});
+```
+
+## PostSchema Component (`components/PostSchema.tsx`)
+
+Server component for rendering JSON-LD in `<head>`:
+
+### ArticleJsonLd
+
+```typescript
+export function ArticleJsonLd({
+  title,
+  description,
+  image,
+  datePublished,
+  dateModified,
+  slug,
+  tags = [],
+}: ArticleSchemaProps) {
+  const articleSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: title,
+    description: description,
+    image: image.startsWith('http') ? image : `${siteUrl}${image}`,
+    datePublished: datePublished,
+    dateModified: dateModified || datePublished,
+    author: {
+      '@type': 'Person',
+      name: 'Wyatt Walsh',
+      url: siteUrl,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Wyatt Walsh',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.webp`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/blog/posts/${slug}`,
+    },
+    keywords: tags.join(', '),
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Blog',
+        item: `${siteUrl}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: title,
+        item: `${siteUrl}/blog/posts/${slug}`,
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify([articleSchema, breadcrumbSchema]).replace(/</g, '\\u003c'),
+      }}
+    />
+  );
+}
+```
+
+**XSS protection:** `.replace(/</g, '\\u003c')` escapes `<` to prevent script injection.
+
+**Usage in MDX:**
+
+```tsx
+import { ArticleJsonLd } from '@/components/PostSchema'
+
+<ArticleJsonLd
+  title={frontmatter.title}
+  description={frontmatter.summary}
+  image={frontmatter.image}
+  datePublished={frontmatter.created}
+  dateModified={frontmatter.updated}
+  slug="my-post"
+  tags={frontmatter.tags}
+/>
+```
+
+### WebSiteJsonLd
+
+Renders site-level schema for root layout:
+
+```typescript
+export function WebSiteJsonLd() {
+  const schema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'onelonedatum',
+    alternateName: ['w4w', 'wyattowalsh'],
+    url: siteUrl,
+    description: 'Articles about software engineering, data science, and technology',
+    author: {
+      '@type': 'Person',
+      name: 'Wyatt Walsh',
+      url: siteUrl,
+      sameAs: [
+        'https://github.com/wyattowalsh',
+        'https://twitter.com/wyattowalsh',
+        'https://linkedin.com/in/wyattowalsh',
+      ],
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Wyatt Walsh',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/logo.webp`,
+      },
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
+    />
+  );
+}
+```
+
+## Sitemap Generation
+
+### next-sitemap Configuration
+
+`next-sitemap.config.cjs`:
+
+```javascript
+module.exports = {
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev',
+  generateRobotsTxt: true,
+  exclude: ['/api/*', '/admin/*'],
+  robotsTxtOptions: {
+    policies: [
+      { userAgent: '*', allow: '/' },
+      { userAgent: '*', disallow: '/api/' },
+    ],
+  },
+};
+```
+
+**Generated files:**
+
+- `public/sitemap.xml` — Main sitemap
+- `public/sitemap-0.xml` — Sitemap index (if multiple sitemaps)
+- `public/robots.txt` — Robots directives
+
+**Build command:**
+
+```bash
+pnpm build  # Automatically runs next-sitemap postbuild
+```
+
+### Sitemap Structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://w4w.dev/</loc>
+    <lastmod>2026-02-13</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://w4w.dev/blog</loc>
+    <lastmod>2026-02-13</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://w4w.dev/blog/posts/my-post</loc>
+    <lastmod>2026-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>
+```
+
+## Three-Way Metadata Sync Rules
+
+Metadata exists in three places and must stay consistent:
+
+### 1. MDX Frontmatter
+
+```yaml
+---
+title: "Post Title"
+summary: "Post description"
+image: "/post-hero.svg"
+created: "2026-01-15"
+updated: "2026-01-20"
+tags: ["React", "TypeScript"]
+---
+```
+
+**Source of truth** for post content.
+
+### 2. Next.js Metadata API
+
+```typescript
+export const metadata: Metadata = {
+  title: frontmatter.title,
+  description: frontmatter.summary,
+  // ... generated via generatePostMetadata()
+};
+```
+
+**Consumed by Next.js** to render `<head>` tags.
+
+### 3. JSON-LD Structured Data
+
+```tsx
+<ArticleJsonLd
+  title={frontmatter.title}
+  description={frontmatter.summary}
+  datePublished={frontmatter.created}
+  // ... schema.org format
+/>
+```
+
+**Read by search engines** for rich snippets.
+
+### Sync Rules
+
+| Field | Frontmatter | Metadata API | JSON-LD |
+|-------|-------------|--------------|---------|
+| Title | `title` | `metadata.title` | `headline` |
+| Description | `summary` | `metadata.description` | `description` |
+| Image | `image` | `metadata.openGraph.images[0].url` | `image` |
+| Published | `created` | `metadata.openGraph.publishedTime` | `datePublished` |
+| Modified | `updated` | `metadata.openGraph.modifiedTime` | `dateModified` |
+| Tags | `tags` | `metadata.keywords` | `keywords` |
+
+**Critical:** All three must have identical values for:
+
+- Title
+- Description
+- Image URL
+- Dates
+- Tags
+
+### Validation
+
+Run these checks before publishing:
+
+1. **Frontmatter → Metadata:** `generatePostMetadata()` correctly maps all fields
+2. **Frontmatter → JSON-LD:** `ArticleJsonLd` props match frontmatter
+3. **Image URLs:** Absolute URLs in OG and JSON-LD (use `${siteUrl}` prefix)
+4. **Date formats:** ISO 8601 strings (`YYYY-MM-DD` or `YYYY-MM-DDTHH:mm:ss.sssZ`)
+
+## SEO Best Practices
+
+### Title Length
+
+- **Ideal:** 50-60 characters
+- **Max:** 70 characters (Google truncates beyond this)
+
+### Description Length
+
+- **Ideal:** 150-160 characters
+- **Max:** 200 characters
+
+### Keywords
+
+- Use 5-10 tags per post
+- Mix broad and specific terms
+- Avoid keyword stuffing
+
+### Image Optimization
+
+- **Format:** WebP or modern formats
+- **Dimensions:** 1200×630 for OG images
+- **Size:** < 1MB compressed
+- **Alt text:** Descriptive, not keyword-stuffed
+
+### Canonical URLs
+
+Always set canonical to prevent duplicate content penalties:
+
+```typescript
+alternates: {
+  canonical: postUrl,
+}
+```
+
+## Troubleshooting
+
+**Problem:** OG image not showing on social platforms
+
+- **Solution:** Verify image is absolute URL, not relative. Test with [OpenGraph Debugger](https://www.opengraph.xyz/).
+
+**Problem:** Google not indexing pages
+
+- **Solution:** Check `robots.txt` allows crawling. Submit sitemap in Google Search Console.
+
+**Problem:** Rich snippets not appearing
+
+- **Solution:** Validate JSON-LD with [Google Rich Results Test](https://search.google.com/test/rich-results). Ensure all required fields are present.
+
+**Problem:** Metadata mismatch between frontmatter and rendered HTML
+
+- **Solution:** Check `generatePostMetadata()` correctly extracts all frontmatter fields. Use browser DevTools to inspect `<head>` tags.
+
+**Problem:** Sitemap missing pages
+
+- **Solution:** Ensure pages are not in `exclude` list in `next-sitemap.config.cjs`. Re-run `pnpm build`.
+
+## Testing Tools
+
+- **Google Rich Results Test:** https://search.google.com/test/rich-results
+- **OpenGraph Debugger:** https://www.opengraph.xyz/
+- **Twitter Card Validator:** https://cards-dev.twitter.com/validator
+- **Schema Markup Validator:** https://validator.schema.org/
+- **Lighthouse SEO Audit:** Chrome DevTools → Lighthouse → SEO

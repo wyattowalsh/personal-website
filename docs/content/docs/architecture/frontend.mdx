@@ -1,0 +1,127 @@
+---
+title: Frontend & Component Model
+description: An analysis of the frontend architecture, focusing on resilience, composition, and key components.
+---
+
+The frontend architecture is defined by **resilience, composition, and a commitment to a unique, highly interactive user experience.**
+
+### Component Philosophy: Composition & Resilience
+
+- **Composition over Inheritance**: The UI is built from small, reusable components. `shadcn/ui` provides the base, which is then extended with custom application-specific components. This promotes reusability and maintainability.
+
+- **Resilience by Default**: The application makes extensive and expert use of React's core resilience features. This is a hallmark of a production-ready application.
+  - **`Suspense`**: Data-fetching components (`PostHeader`, `Comments`, `PostPagination`) are wrapped in `<Suspense>`, showing an elegant `LoadingSpinner` fallback. This prevents UI jank and blank screens during data loading.
+  - **`ErrorBoundary`**: The application uses error boundaries at multiple levels (page and component) to prevent a single component failure from crashing the entire application.
+
+### Key Layouts & Page Structures
+
+**Source:** `app/blog/`, `app/layout.tsx`
+
+The Next.js App Router is used to its full potential, creating a clear hierarchy of layouts with progressive enhancement:
+
+#### Root Layout (`app/layout.tsx`)
+The outermost layout establishes the foundation for the entire application:
+
+- **Font Loading**: Configures Google Fonts (Fira Code for code, Montserrat for display) with CSS variables
+- **Theme Provider**: Wraps the app in `next-themes` for dark/light mode support with system detection
+- **Tooltip Provider**: Establishes global tooltip context from Radix UI
+- **Metadata**: Sets base OpenGraph and Twitter Card metadata
+- **Viewport**: Configures responsive viewport with theme color support
+- **Analytics**: Integrates Google Tag Manager and Google Analytics
+- **Structured Data**: Includes WebSite JSON-LD schema for SEO
+- **Global Components**: Renders Header and ScrollIndicator at root level
+
+#### Blog Root Layout (`app/blog/layout.tsx`)
+Provides consistent structure for all blog-related pages (if present).
+
+#### Blog Posts Layout (`app/blog/posts/layout.tsx`)
+A specialized client component layout for individual post pages:
+
+- **MathProvider**: Wraps posts in equation numbering context for LaTeX math
+- **Suspense**: Provides loading fallback with LoadingSpinner
+- **CustomScrollbars**: Enhances scrollbar styling for the post content
+- **PostLayout**: Manages the overall post structure
+- **Responsive Padding**: Uses max-width container with responsive horizontal padding
+  ```typescript
+  className={cn(
+    "max-w-5xl mx-auto",
+    "px-4 sm:px-6 lg:px-8",
+    "pb-8",
+    "relative z-10"
+  )}
+  ```
+
+### MDX Component Registry (`mdx-components.tsx`)
+
+**Source:** `mdx-components.tsx`
+
+The project uses a **central MDX component registry** via the `useMDXComponents` function. This is the single source of truth for all components available in MDX files.
+
+The registry provides 50+ components organized into categories:
+
+#### Base HTML Overrides
+- `h1`, `h2`, `h3`: Enhanced headings with hover effects, gradients, and anchor link support
+- `p`: Paragraphs with subtle hover animations
+- `pre`, `code`: Syntax-highlighted code blocks via `CodeBlock` component
+- `table`: Styled tables with hover effects and scrollable containers
+- `img`: Optimized images with Next.js Image, blur placeholders, and zoom effects
+- `a`: Smart links that detect external URLs and add icons
+- `strong`, `em`: Default HTML elements (no custom styling)
+
+#### UI Primitives (shadcn/ui)
+- `Alert`, `Badge`, `Button`, `Card`, `Tooltip`, `Separator`
+- `Accordion`, `AccordionItem`, `AccordionTrigger`, `AccordionContent`
+- `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`
+- `ScrollArea`
+
+#### Custom Content Components
+- `Note`: Info/warning/terminal callouts with icons
+- `Callout`: Enhanced callouts with type-based styling (warning, error, info, success)
+- `Details`: Collapsible sections with animated expansion
+- `CodeFilename`: File name headers for code blocks
+- `ScrollableCode`: Code blocks with max-height and custom scrollbars
+- `ExternalLink`: Links with external link icon
+- `ClientSideLink`, `TagLink`: Navigation components
+- `Gist`: GitHub Gist embeds
+- `Math`, `math-display`, `math-inline`: KaTeX math rendering with equation numbering
+- `Mermaid`: Diagram rendering
+
+#### MDX Component Library (50+ components)
+See [MDX Components](/docs/content/mdx-components) for the full library including:
+- Interactive components: `Chart`, `Timeline`, `Comparison`, `ImageGallery`, `VideoEmbed`, `Terminal`, `Diff`
+- Data components: `APIReference`, `PropTable`, `FileTree`, `PackageInstall`
+- Engagement components: `Quiz`, `Spoiler`, `Bookmark`, `Newsletter`
+- Layout components: `Columns`, `Split`, `Aside`, `Figure`, `Steps`
+
+#### Specialized Components
+- `RisoModuleMatrix`, `RisoSaaSStack`, `RisoSampleVariants`: Custom components for the Riso template showcase
+
+### UI Primitives & `shadcn/ui`
+
+The project leverages `shadcn/ui` for its base set of UI primitives. These components are located in `components/ui/`:
+
+**Available Primitives:**
+- `accordion.tsx` — Collapsible content sections
+- `alert.tsx` — Alert notifications
+- `badge.tsx` — Status badges and labels
+- `button.tsx` — Interactive buttons
+- `card.tsx` — Content containers
+- `checkbox.tsx` — Form checkboxes
+- `dropdown-menu.tsx` — Dropdown menus
+- `input.tsx` — Form inputs
+- `scroll-area.tsx` — Custom scrollbars
+- `select.tsx` — Select dropdowns
+- `separator.tsx` — Visual separators
+- `tabs.tsx` — Tabbed interfaces
+- `toast.tsx` + `toaster.tsx` — Toast notifications
+- `tooltip.tsx` — Tooltips
+- `background-gradient.tsx` — Gradient backgrounds
+
+These provide a solid foundation of accessible, unstyled components that are then customized to fit the project's unique aesthetic. For detailed component documentation, see the [Features: Hero System](/docs/features/hero-system) page.
+
+### Analysis of High-Impact Components
+
+- **`PostCard.tsx`**: An effective preview card for blog posts, combining an optimized Next.js `Image` with a gradient overlay for text readability and interactive, clickable tags.
+- **`NotFoundContent.tsx`**: A best-in-class 404 page that turns an error state into a positive, on-brand experience with contextual messaging and signature glitch animations.
+- **`BlogBackLink.tsx`**: A masterclass in responsive design, intelligently adapting from a fixed, thumb-friendly icon on mobile to a static button on desktop, all while being context-aware of its navigation target.
+- **`use-toast.ts`**: A surprisingly sophisticated, self-contained state management system for toast notifications. It implements a Redux-like pattern (global state, reducer, dispatch, listeners) completely from scratch, demonstrating a deep understanding of React state management principles. 

@@ -1,0 +1,603 @@
+---
+title: "Particle System"
+description: "TSParticles-powered background animations with config generation pipeline, Zod validation, and theme-aware controls."
+---
+
+## Overview
+
+The particle system provides dynamic background animations using **TSParticles** (v3). The system includes:
+
+- Automated config generation and validation pipeline
+- Theme-aware JSON config loading (light/dark)
+- User controls for style switching, pause/resume, and density adjustment
+- Performance optimization for mobile and reduced-motion preferences
+
+## Architecture
+
+### Core Files
+
+| File | Purpose |
+|------|---------|
+| `components/ParticlesBackground.tsx` | Main particle component with lifecycle management |
+| `components/ParticleControls.tsx` | UI controls for config selection, pause, density |
+| `scripts/particles.ts` | Build-time config generation and Zod validation |
+| `components/particles/configUrls.ts` | **Auto-generated** — maps theme → config URLs |
+| `public/particles/{light,dark}/` | JSON config files for TSParticles |
+
+## Config Generation Pipeline
+
+The `scripts/particles.ts` script runs during `pnpm preprocess` to validate and index all particle configs.
+
+### Zod Schema
+
+Comprehensive validation schema matching TSParticles `IOptions`:
+
+```typescript
+const TsParticlesConfigSchema = z.object({
+  autoPlay: z.boolean().optional(),
+  background: BackgroundSchema.optional(),
+  detectRetina: z.boolean().optional(),
+  fpsLimit: z.number().optional(),
+  fullScreen: FullScreenSchema.optional(),
+  interactivity: InteractivitySchema.optional(),
+  particles: ParticlesSchema.optional(),
+  pauseOnBlur: z.boolean().optional(),
+  responsive: z.array(...).optional(),
+  themes: z.array(ThemeSchema).optional(),
+}).passthrough();
+```
+
+**Note:** Uses `.passthrough()` for forward compatibility with TSParticles schema changes.
+
+### Particles Schema
+
+```typescript
+const ParticlesSchema = z.object({
+  number: NumberSchema.optional(),
+  color: z.object({
+    value: ColorSchema, // string | string[] | { value: ... }
+  }).optional(),
+  shape: ShapeSchema.optional(),
+  opacity: OpacitySchema.optional(),
+  size: SizeSchema.optional(),
+  links: z.object({
+    enable: z.boolean().optional(),
+    distance: z.number().positive().optional(),
+    color: ColorSchema.optional(),
+    opacity: z.number().min(0).max(1).optional(),
+    width: z.number().positive().optional(),
+  }).optional(),
+  move: MoveSchema.optional(),
+  // ... life, rotate, twinkle, shadow, zIndex
+});
+```
+
+### Validation Function
+
+```typescript
+async function validateParticleConfig(filePath: string): Promise<void> {
+  const content = await fs.readFile(filePath, 'utf-8');
+  const json = JSON.parse(content);
+
+  // Check mandatory fields
+  const mandatoryFields = ['particles', 'background', 'interactivity'];
+  for (const field of mandatoryFields) {
+    if (!json[field]) {
+      throw new Error(`Missing mandatory field: ${field}`);
+    }
+  }
+
+  // Basic structure validation (simplified for Zod 4.x compatibility)
+  if (typeof json.particles !== 'object') {
+    throw new Error('particles must be an object');
+  }
+  // ... similar checks for background, interactivity
+
+  // Validate background image paths
+  if (json.background?.image) {
+    const imagePath = path.join(process.cwd(), 'public', json.background.image);
+    await fs.access(imagePath); // Throws if not found
+  }
+}
+```
+
+### Config Indexing
+
+```typescript
+export async function generateParticleConfigs(): Promise<string> {
+  const particlesDir = path.join(process.cwd(), 'public', 'particles');
+  const configs: Record<Theme, ParticleConfig[]> = {
+    light: [],
+    dark: [],
+  };
+
+  for (const theme of ['light', 'dark']) {
+    const themeDir = path.join(particlesDir, theme);
+    const files = await fs.readdir(themeDir);
+    const jsonFiles = files.filter(file => file.endsWith('.json'));
+
+    for (const file of jsonFiles) {
+      const filePath = path.join(themeDir, file);
+      await validateParticleConfig(filePath);
+
+      const stats = await fs.stat(filePath);
+      const hash = await calculateFileHash(filePath);
+
+      configs[theme].push({
+        url: `/particles/${theme}/${file}`,
+        hash,
+        lastModified: stats.mtime.toISOString(),
+        theme,
+      });
+    }
+  }
+
+  // Generate TypeScript file
+  const code = `// This file is auto-generated. Do not edit manually.
+export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = ${JSON.stringify(configs, null, 2)} as const;`;
+
+  await fs.writeFile('components/particles/configUrls.ts', code, 'utf-8');
+}
+```
+
+**Output file:** `components/particles/configUrls.ts`
+
+```typescript
+export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
+  "light": [
+    {
+      "url": "/particles/light/bubbles.json",
+      "hash": "a1b2c3d4",
+      "lastModified": "2026-01-15T10:30:00.000Z",
+      "theme": "light"
+    }
+  ],
+  "dark": [
+    {
+      "url": "/particles/dark/nyan-cat.json",
+      "hash": "e5f6g7h8",
+      "lastModified": "2026-01-15T10:30:00.000Z",
+      "theme": "dark"
+    }
+  ]
+} as const;
+```
+
+## ParticlesBackground Component
+
+Main orchestrator for particle rendering and lifecycle.
+
+### State Management
+
+```typescript
+const [init, setInit] = useState(false);              // Engine initialized?
+const [mounted, setMounted] = useState(false);        // Component mounted?
+const [isPaused, setIsPaused] = useState(false);      // Paused state
+const [currentConfigUrl, setCurrentConfigUrl] = useState<string>("");
+const [density, setDensity] = useState<DensityLevel>('full'); // 'full' | 'reduced' | 'off'
+const containerRef = useRef<Container | null>(null);
+```
+
+### Initialization
+
+```typescript
+useEffect(() => {
+  const initEngine = async () => {
+    await initParticlesEngine(async (engine) => {
+      await loadSlim(engine); // Load minimal TSParticles bundle
+    });
+
+    setInit(true);
+
+    // Set initial config
+    const initialConfig = getRandomConfigUrl(currentTheme);
+    setCurrentConfigUrl(initialConfig);
+  };
+
+  if (mounted) initEngine();
+}, [mounted, currentTheme]);
+```
+
+### Theme Updates
+
+```typescript
+useEffect(() => {
+  if (!mounted || !init || !resolvedTheme) return;
+
+  const theme = resolvedTheme as "light" | "dark";
+  const newConfigUrl = getRandomConfigUrl(theme);
+  setCurrentConfigUrl(newConfigUrl);
+}, [resolvedTheme, init, mounted]);
+```
+
+### Density Multiplier
+
+```typescript
+const getDensityMultiplier = (level: DensityLevel): number => {
+  switch (level) {
+    case 'full': return 1.0;
+    case 'reduced': return 0.4;
+    case 'off': return 0;
+    default: return 1.0;
+  }
+};
+```
+
+Applied to particle count:
+
+```tsx
+<Particles
+  options={{
+    particles: {
+      number: {
+        value: Math.round(80 * getDensityMultiplier(density)),
+        density: { enable: true }
+      }
+    },
+    responsive: [
+      {
+        maxWidth: 768,
+        options: {
+          particles: {
+            number: {
+              value: Math.round(30 * getDensityMultiplier(density))
+            }
+          }
+        }
+      }
+    ]
+  }}
+/>
+```
+
+### Reduced Motion Support
+
+```typescript
+const prefersReducedMotion = useReducedMotion();
+
+if (prefersReducedMotion || density === 'off') {
+  return (
+    <>
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20" />
+      <ParticleControls {...props} />
+    </>
+  );
+}
+```
+
+### Container Lifecycle
+
+```typescript
+const particlesLoaded = useCallback(async (container?: Container) => {
+  if (container) {
+    // Cleanup previous container if it exists
+    if (containerRef.current && containerRef.current !== container) {
+      containerRef.current.destroy();
+    }
+    containerRef.current = container;
+    setIsPaused(false);
+  }
+}, []);
+
+useEffect(() => {
+  return () => {
+    if (containerRef.current) {
+      containerRef.current.destroy();
+    }
+  };
+}, []);
+```
+
+## ParticleControls Component
+
+User-facing controls panel with config selection, pause/play, refresh, and density settings.
+
+### UI Structure
+
+```tsx
+<motion.div className="fixed bottom-4 right-4 z-50">
+  {/* Settings menu (expandable) */}
+  <motion.div className={isOpen ? "..." : "opacity-0 translate-y-full"}>
+    {/* Density controls */}
+    <div className="flex gap-1">
+      {['full', 'reduced', 'off'].map(level => (
+        <button onClick={() => onDensityChange(level)}>
+          {level}
+        </button>
+      ))}
+    </div>
+
+    {/* Config selection */}
+    <div>
+      {configs.map(config => (
+        <button onClick={() => onConfigChange(config.url)}>
+          {configName}
+        </button>
+      ))}
+    </div>
+  </motion.div>
+
+  {/* Control buttons */}
+  <div className="flex gap-2">
+    <button onClick={() => setIsOpen(!isOpen)}>
+      <Settings />
+    </button>
+    <button onClick={isPaused ? onResume : onPause}>
+      {isPaused ? <Play /> : <Pause />}
+    </button>
+    <button onClick={onRefresh}>
+      <RefreshCw />
+    </button>
+  </div>
+</motion.div>
+```
+
+### Density Levels
+
+| Level | Multiplier | Description |
+|-------|------------|-------------|
+| `full` | 1.0 | Default particle count (80 desktop, 30 mobile) |
+| `reduced` | 0.4 | 40% of default (32 desktop, 12 mobile) |
+| `off` | 0 | Static gradient background only |
+
+### Config Name Extraction
+
+```typescript
+const configName = config.url.split("/").pop()?.split(".")[0] || 'config';
+```
+
+Example: `/particles/dark/nyan-cat.json` → `nyan-cat`
+
+### Accessibility
+
+- Focus-visible ring styles on all buttons
+- ARIA labels: `"Switch to {configName} particles"`, `"Pause particles"`, etc.
+- Respects `useReducedMotion()` for button animations
+
+## Config Format
+
+### Minimal Example
+
+```json
+{
+  "background": {
+    "color": "#000000"
+  },
+  "particles": {
+    "number": {
+      "value": 80,
+      "density": {
+        "enable": true,
+        "area": 800
+      }
+    },
+    "color": {
+      "value": "#ffffff"
+    },
+    "shape": {
+      "type": "circle"
+    },
+    "opacity": {
+      "value": 0.5
+    },
+    "size": {
+      "value": 3
+    },
+    "move": {
+      "enable": true,
+      "speed": 2,
+      "direction": "none",
+      "outModes": "out"
+    }
+  },
+  "interactivity": {
+    "events": {
+      "onHover": {
+        "enable": true,
+        "mode": "repulse"
+      },
+      "onClick": {
+        "enable": true,
+        "mode": "push"
+      }
+    },
+    "modes": {
+      "repulse": {
+        "distance": 100
+      },
+      "push": {
+        "quantity": 4
+      }
+    }
+  }
+}
+```
+
+### Advanced Features
+
+**Links between particles:**
+
+```json
+"particles": {
+  "links": {
+    "enable": true,
+    "distance": 150,
+    "color": "#ffffff",
+    "opacity": 0.4,
+    "width": 1
+  }
+}
+```
+
+**Particle trails:**
+
+```json
+"particles": {
+  "move": {
+    "trail": {
+      "enable": true,
+      "length": 10,
+      "fillColor": "#000000"
+    }
+  }
+}
+```
+
+**Custom shapes (images):**
+
+```json
+"particles": {
+  "shape": {
+    "type": "image",
+    "image": {
+      "src": "/path/to/image.png",
+      "width": 100,
+      "height": 100
+    }
+  }
+}
+```
+
+**Character shapes (text):**
+
+```json
+"particles": {
+  "shape": {
+    "type": "character",
+    "character": {
+      "value": ["A", "B", "C"],
+      "font": "Verdana",
+      "style": "",
+      "weight": "400",
+      "fill": true
+    }
+  }
+}
+```
+
+## Adding a New Particle Config
+
+### Step 1: Create JSON File
+
+Add your config to `public/particles/{light|dark}/my-config.json`:
+
+```bash
+touch public/particles/dark/my-config.json
+```
+
+### Step 2: Write Config
+
+Ensure these mandatory fields are present:
+
+- `background`
+- `particles`
+- `interactivity`
+
+Example starter:
+
+```json
+{
+  "background": { "color": "#1a1a2e" },
+  "particles": {
+    "number": { "value": 50 },
+    "color": { "value": "#ff6b6b" },
+    "shape": { "type": "circle" },
+    "size": { "value": 3 },
+    "move": { "enable": true, "speed": 1.5 }
+  },
+  "interactivity": {
+    "events": {
+      "onHover": { "enable": true, "mode": "grab" }
+    }
+  }
+}
+```
+
+### Step 3: Validate and Generate
+
+Run the preprocessing script:
+
+```bash
+pnpm preprocess
+```
+
+This will:
+
+1. Validate your config against the Zod schema
+2. Check for missing fields
+3. Verify background image paths (if present)
+4. Generate updated `configUrls.ts` with your new config
+
+### Step 4: Verify
+
+Check `components/particles/configUrls.ts` — your new config should appear in the appropriate theme array.
+
+### Step 5: Test
+
+Start dev server and open particle controls:
+
+```bash
+pnpm dev
+```
+
+Click the settings icon (bottom-right) and select your new config from the dropdown.
+
+## Performance Optimization
+
+### Mobile Particle Count
+
+Responsive config reduces particles on small screens:
+
+```typescript
+responsive: [
+  {
+    maxWidth: 768,
+    options: {
+      particles: {
+        number: {
+          value: Math.round(30 * getDensityMultiplier(density))
+        }
+      }
+    }
+  }
+]
+```
+
+### FPS Limiting
+
+```typescript
+fpsLimit: 60 // Caps frame rate to save CPU
+```
+
+### Pause on Blur
+
+```typescript
+pauseOnBlur: true  // Auto-pause when tab is inactive
+pauseOnOutsideViewport: true
+```
+
+### Slim Bundle
+
+Uses `@tsparticles/slim` instead of full bundle (loads only essential features).
+
+## Troubleshooting
+
+**Problem:** Particles don't update when theme changes
+
+- **Solution:** Ensure `resolvedTheme` is used (not `theme`) and `currentConfigUrl` dependency is in useEffect
+
+**Problem:** Validation fails with "Missing mandatory field"
+
+- **Solution:** Add `background`, `particles`, and `interactivity` to your config
+
+**Problem:** Config not appearing in controls
+
+- **Solution:** Run `pnpm preprocess` to regenerate `configUrls.ts`
+
+**Problem:** Hydration mismatch errors
+
+- **Solution:** Check that `mounted` state is true before rendering `<Particles>`
+
+**Problem:** Poor performance on mobile
+
+- **Solution:** Use lower particle counts in config or adjust responsive breakpoint thresholds

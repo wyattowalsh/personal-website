@@ -1,0 +1,463 @@
+---
+title: API Routes
+description: Comprehensive documentation of all API endpoints, request/response schemas, and middleware patterns.
+---
+
+The project implements a **secure, granular, type-safe API** using Next.js App Router route handlers. All routes are located in `app/api/` and follow a consistent middleware pattern.
+
+## API Architecture Principles
+
+### 1. Granular Endpoints
+Rather than a single monolithic endpoint, the API exposes focused, purpose-built endpoints for specific frontend needs. This improves performance by returning only the data required.
+
+### 2. Middleware Chain
+Each route handler is wrapped in a consistent middleware chain:
+
+```typescript
+export const GET = coreApi.middleware.withErrorHandler(
+  async (request: Request) => {
+    // Optional: Validate request with Zod schema
+    const { query } = await coreApi.middleware.validateRequest(request, apiSchemas.search);
+
+    // Call backend service
+    return api.handlers.searchPosts(query);
+  }
+);
+```
+
+**Middleware layers:**
+1. **`withErrorHandler`**: Catches unhandled exceptions and returns standardized JSON error responses
+2. **`validateRequest`**: Uses Zod schemas to validate request parameters, returning 400 errors for invalid data
+3. **Handler functions**: Clean business logic that calls BackendService methods
+
+### 3. Standardized Response Format
+
+All API responses follow a consistent structure:
+
+```typescript
+{
+  data: T,                    // The actual response data
+  meta: {
+    timestamp: string,        // ISO 8601 timestamp
+    duration: number,         // Response time in ms
+    cache: {
+      hit: boolean,           // Cache hit/miss
+      ttl: number            // Cache TTL in seconds
+    },
+    pagination?: {            // Optional pagination metadata
+      page: number,
+      limit: number,
+      total: number,
+      pages: number
+    }
+  }
+}
+```
+
+## API Endpoints
+
+### Blog Posts
+
+#### `GET /api/blog/posts`
+Fetches all blog posts, sorted by creation date (newest first).
+
+**Request:**
+- No parameters required
+
+**Response:**
+```typescript
+{
+  data: Post[],
+  meta: {
+    timestamp: "2026-02-13T12:00:00.000Z",
+    duration: 5.23,
+    cache: { hit: false, ttl: 3600 }
+  }
+}
+```
+
+**Cache:** Public, 1 hour TTL
+
+**Source:** `app/api/blog/posts/route.ts`
+
+---
+
+#### `GET /api/blog/posts/[slug]`
+Fetches a single post's full content by slug.
+
+**Request:**
+- **Path parameter:** `slug` (string) — Post identifier
+
+**Response:**
+```typescript
+{
+  data: Post | null,
+  meta: {
+    timestamp: "2026-02-13T12:00:00.000Z",
+    duration: 3.45,
+    cache: { hit: false, ttl: 3600 }
+  }
+}
+```
+
+**Error Responses:**
+- `404 Not Found` — Post with specified slug does not exist
+
+**Cache:** Public, 1 hour TTL
+
+**Source:** `app/api/blog/posts/[slug]/route.ts`
+
+---
+
+#### `GET /api/blog/posts/[slug]/metadata`
+Fetches only the metadata for a post (excludes content field). Used by `PostHeader` and other components that don't need the full post content.
+
+**Request:**
+- **Path parameter:** `slug` (string) — Post identifier
+
+**Response:**
+```typescript
+{
+  data: PostMetadata | null,  // Post without content field
+  meta: {
+    timestamp: "2026-02-13T12:00:00.000Z",
+    duration: 2.10,
+    cache: { hit: false, ttl: 3600 }
+  }
+}
+```
+
+**Error Responses:**
+- `404 Not Found` — Post with specified slug does not exist
+
+**Performance:** Significantly faster than full post endpoint since content field is excluded
+
+**Cache:** Public, 1 hour TTL
+
+**Source:** `app/api/blog/posts/[slug]/metadata/route.ts`
+
+---
+
+#### `GET /api/blog/posts/[slug]/adjacent`
+Fetches the previous and next post links for pagination. Used by `PostPagination` component.
+
+**Request:**
+- **Path parameter:** `slug` (string) — Current post identifier
+
+**Response:**
+```typescript
+{
+  data: {
+    prev: AdjacentPost | null,  // { slug: string, title: string }
+    next: AdjacentPost | null
+  }
+}
+```
+
+**Example:**
+```json
+{
+  "data": {
+    "prev": {
+      "slug": "regularized-linear-regression-models-pt2",
+      "title": "Regularized Linear Regression Models Pt. 2"
+    },
+    "next": {
+      "slug": "w4w-v6",
+      "title": "w4w.dev v6 Launch"
+    }
+  }
+}
+```
+
+**Performance:** Extremely lightweight — returns only slug and title for prev/next posts
+
+**Cache:** Public, 1 hour TTL
+
+**Source:** `app/api/blog/posts/[slug]/adjacent/route.ts`
+
+---
+
+### Search
+
+#### `GET /api/blog/search`
+Performs fuzzy search across posts using Fuse.js.
+
+**Request:**
+- **Query parameter:** `query` (string, required, min: 1, max: 100)
+
+**Validation Schema (Zod):**
+```typescript
+apiSchemas.search = z.object({
+  query: z.string().min(1),
+});
+```
+
+**Response:**
+```typescript
+{
+  data: SearchResult<Post>[],
+  meta: {
+    timestamp: "2026-02-13T12:00:00.000Z",
+    duration: 8.76,
+    cache: { hit: false, ttl: 1800 }
+  }
+}
+```
+
+**SearchResult Type:**
+```typescript
+interface SearchResult<T> {
+  item: T,              // The matched post
+  score: number,        // Relevance score (0-1, lower is better)
+  matches: Array<{      // Match locations for highlighting
+    key: string,        // Field that matched (title, summary, content, tags)
+    value: string,      // The matched text
+    indices: number[][] // Character indices of matches
+  }>
+}
+```
+
+**Example:**
+```json
+{
+  "data": [
+    {
+      "item": { /* Post object */ },
+      "score": 0.12,
+      "matches": [
+        {
+          "key": "title",
+          "value": "Linear Regression Models",
+          "indices": [[0, 5], [17, 23]]
+        }
+      ]
+    }
+  ]
+}
+```
+
+**Cache:** Public, 30 minutes TTL (shorter than other endpoints due to dynamic nature)
+
+**Source:** `app/api/blog/search/route.ts`
+
+---
+
+## Validation Schemas
+
+All request validation uses Zod schemas defined in `lib/core.ts`:
+
+```typescript
+export const apiSchemas = {
+  post: z.object({
+    slug: z.string().min(1),
+  }),
+  search: z.object({
+    query: z.string().min(1),
+  }),
+  pagination: z.object({
+    page: z.number().optional().default(1),
+    limit: z.number().optional().default(10),
+  }),
+} as const;
+```
+
+**Additional validation schemas available:**
+```typescript
+export const schemas = {
+  slug: z.object({ slug: z.string().min(1).max(200) }),
+  search: z.object({ query: z.string().min(1).max(100) }),
+  tag: z.object({ tag: z.string().min(1).max(50) }),
+  pagination: z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+    sort: z.enum(['asc', 'desc']).default('desc'),
+    orderBy: z.string().default('created')
+  }),
+  filter: z.object({
+    tags: z.array(z.string()).optional(),
+    before: z.string().datetime().optional(),
+    after: z.string().datetime().optional(),
+  })
+};
+```
+
+## Error Handling
+
+### ApiError Class
+
+All API errors use the `ApiError` class from `lib/core.ts`:
+
+```typescript
+export class ApiError extends Error {
+  constructor(
+    public statusCode: number,
+    message: string,
+    public details?: any,
+    public code?: string
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+
+  toResponse() {
+    return Response.json({
+      error: {
+        message: this.message,
+        code: this.code || `ERR_${this.statusCode}`,
+        details: this.details
+      }
+    }, {
+      status: this.statusCode,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
+}
+```
+
+### Error Response Format
+
+```json
+{
+  "error": {
+    "message": "Post not found",
+    "code": "ERR_404",
+    "details": {
+      "slug": "nonexistent-post"
+    }
+  }
+}
+```
+
+### Common Error Codes
+
+| Status Code | Error Code | Description |
+|-------------|------------|-------------|
+| 400 | `ERR_400` | Invalid request data (Zod validation failure) |
+| 404 | `ERR_404` | Resource not found |
+| 500 | `ERR_500` | Internal server error |
+
+### Validation Error Example
+
+```json
+{
+  "error": {
+    "message": "Invalid request data",
+    "code": "ERR_400",
+    "details": {
+      "errors": [
+        {
+          "code": "too_small",
+          "minimum": 1,
+          "type": "string",
+          "inclusive": true,
+          "exact": false,
+          "message": "String must contain at least 1 character(s)",
+          "path": ["query"]
+        }
+      ]
+    }
+  }
+}
+```
+
+## Middleware Implementation
+
+### `withErrorHandler`
+
+Wraps route handlers to catch all exceptions:
+
+```typescript
+withErrorHandler: (handler: Function) => async (...args: any[]) => {
+  try {
+    return await handler(...args);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return error.toResponse();
+    }
+    console.error('Unhandled error:', error);
+    return new ApiError(500, 'Internal server error').toResponse();
+  }
+}
+```
+
+### `validateRequest`
+
+Validates request data against Zod schemas:
+
+```typescript
+validateRequest: async <T>(req: Request, schema: z.Schema<T>): Promise<T> => {
+  try {
+    const data = req.method === 'GET'
+      ? Object.fromEntries(new URL(req.url).searchParams)
+      : await req.json();
+    return schema.parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      throw new ApiError(400, 'Invalid request data', { errors: error.issues });
+    }
+    throw error;
+  }
+}
+```
+
+## Cache Control Strategy
+
+Different endpoints use different caching strategies based on their data volatility:
+
+| Endpoint | Strategy | TTL | Header |
+|----------|----------|-----|--------|
+| `/api/blog/posts` | Public | 3600s | `public, s-maxage=3600, stale-while-revalidate=7200` |
+| `/api/blog/posts/[slug]` | Public | 3600s | `public, s-maxage=3600, stale-while-revalidate=7200` |
+| `/api/blog/posts/[slug]/metadata` | Public | 3600s | `public, s-maxage=3600, stale-while-revalidate=7200` |
+| `/api/blog/posts/[slug]/adjacent` | Public | 3600s | `public, s-maxage=3600, stale-while-revalidate=7200` |
+| `/api/blog/search` | Dynamic | 1800s | `public, s-maxage=1800, stale-while-revalidate=3600, stale-if-error=7200` |
+
+**Cache control utilities** are defined in `lib/core.ts`:
+
+```typescript
+export const cacheControl = {
+  public: (maxAge: number = 3600) =>
+    `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
+  private: (maxAge: number = 60) =>
+    `private, must-revalidate, max-age=${maxAge}`,
+  dynamic: (maxAge: number = 3600) =>
+    `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}, stale-if-error=${maxAge * 4}`,
+} as const;
+```
+
+## Response Time Headers
+
+All API responses include an `X-Response-Time` header with the actual processing duration in milliseconds:
+
+```
+X-Response-Time: 5.23ms
+```
+
+This is generated by the `handleRequest` utility in `lib/server.ts`.
+
+## Type Safety
+
+All API routes leverage TypeScript for end-to-end type safety:
+
+1. **Route params** are typed via Next.js route handler types
+2. **Request validation** uses Zod schemas that infer TypeScript types
+3. **Response data** is typed via `Post`, `PostMetadata`, `SearchResult<T>` interfaces
+4. **API client** (`lib/client.ts`) provides type-safe fetch wrappers
+
+Example of type flow:
+
+```typescript
+// 1. Request validation (Zod → TypeScript)
+const { query } = await coreApi.middleware.validateRequest(request, apiSchemas.search);
+// query is typed as { query: string }
+
+// 2. Backend service (TypeScript)
+const results: SearchResult<Post>[] = await BackendService.getInstance().search(query);
+
+// 3. Response (TypeScript → JSON)
+return Response.json({
+  data: results,  // Type: SearchResult<Post>[]
+  meta: { /* ... */ }
+});
+```

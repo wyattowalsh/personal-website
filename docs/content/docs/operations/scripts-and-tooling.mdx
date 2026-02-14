@@ -1,0 +1,277 @@
+---
+title: Scripts and Tooling
+description: Build scripts, automation pipelines, and developer tooling for preprocessing, content generation, and particle configuration.
+icon: fa/FaTools
+---
+
+## Overview
+
+The project includes several build scripts and tooling pipelines that run automatically during development and production builds. These scripts preprocess content, generate configurations, and maintain the search index.
+
+## pnpm Scripts
+
+The `package.json` defines the following npm scripts for common tasks:
+
+| Script | Command | Description |
+| :--- | :--- | :--- |
+| `dev` | `next dev` | Start development server with debug logging (port 3000) |
+| `build` | `next build` | Production build |
+| `start` | `next start` | Start production server |
+| `lint` | `eslint .` | Run ESLint on all files |
+| `typecheck` | `tsc --noEmit` | Run TypeScript type checking |
+| `preprocess` | `tsx scripts/index.ts` | Run preprocessing pipeline manually |
+| `predev` | `NODE_ENV=development npm run preprocess` | Auto-run before dev (development mode) |
+| `prebuild` | `NODE_ENV=production npm run preprocess` | Auto-run before build (production mode) |
+| `lclean` | `rimraf .next .cache node_modules/.cache` | Clean build artifacts and caches |
+| `clean` | `rimraf .next .cache node_modules/` | Full clean including node_modules |
+| `storybook` | `storybook dev -p 6006` | Start Storybook component explorer |
+| `build-storybook` | `storybook build` | Build Storybook for deployment |
+| `lighthouse` | `lhci autorun` | Run Lighthouse CI performance audit |
+| `new-post` | `tsx scripts/new-post.ts` | Create a new blog post (interactive or CLI) |
+
+### Environment-Specific Behavior
+
+The development server sets additional environment variables for enhanced debugging:
+
+```bash
+DEBUG=true LOG_LEVEL=debug next dev
+```
+
+This enables verbose logging in the `BackendService` and other core services.
+
+## Preprocessing Pipeline
+
+The preprocessing pipeline runs automatically before every build and dev server start. It's orchestrated by `scripts/index.ts`.
+
+### Pipeline Flow
+
+```
+predev/prebuild (npm lifecycle hook)
+  ↓
+scripts/index.ts (main orchestrator)
+  ├─→ scripts/particles.ts (generate particle configs)
+  └─→ BackendService.preprocess() (posts, search, cache)
+```
+
+### Main Orchestrator (`scripts/index.ts`)
+
+The main preprocessing script:
+
+1. **Detects environment** — checks `NODE_ENV` to determine development vs production mode
+2. **Generates particle configs** — calls `generateParticleConfigs()` from `scripts/particles.ts`
+3. **Runs backend preprocessing** — calls `BackendService.getInstance().preprocess(isDev)`
+4. **Logs performance metrics** — tracks timing, memory usage, and file counts
+5. **Returns preprocessing stats** — includes particle config path and content stats
+
+**Key features:**
+
+- Graceful error handling — particle config failures don't block the build
+- Performance logging — timing and memory stats for debugging
+- Environment-aware log levels — `DEBUG` in dev, `INFO` in production
+- Programmatic export — `export const preprocess = processFiles` for external usage
+
+**Output example:**
+
+```
+Build Process Started
+Environment: Development
+✓ Generating particle configurations
+✓ Generated particle configs at components/particles/configUrls.ts
+✓ Running preprocessing pipeline
+⏱ Total build time: 1234ms
+✓ Development preprocessing complete!
+```
+
+### Particle Config Generation (`scripts/particles.ts`)
+
+This script generates TypeScript configuration maps for TSParticles themes.
+
+**What it does:**
+
+1. **Scans particle directories** — reads all JSON configs from `public/particles/light/` and `public/particles/dark/`
+2. **Validates configs** — checks for required fields (`particles`, `background`, `interactivity`)
+3. **Computes file hashes** — MD5 hashes for cache invalidation
+4. **Generates TypeScript** — writes `components/particles/configUrls.ts` with typed config URLs
+
+**Output structure:**
+
+```typescript
+// components/particles/configUrls.ts
+type ParticleConfig = {
+  url: string;
+  hash: string;
+  lastModified: string;
+  theme: string;
+};
+
+export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
+  light: [
+    { url: '/particles/light/config1.json', hash: 'abc123', lastModified: '2026-01-15T...', theme: 'light' }
+  ],
+  dark: [
+    { url: '/particles/dark/config1.json', hash: 'def456', lastModified: '2026-01-15T...', theme: 'dark' }
+  ]
+};
+```
+
+**Validation:**
+
+The script performs basic validation on particle configs:
+
+- Checks for required top-level fields (`particles`, `background`, `interactivity`)
+- Validates that each field is an object
+- Verifies background image paths exist in `public/`
+- Skips invalid configs with error logging (build continues)
+
+**Note:** Full Zod schema validation was simplified due to Zod 4.x breaking changes. The current implementation uses basic structural validation instead of deep schema validation.
+
+### BackendService Preprocessing
+
+The `BackendService.preprocess()` method (from `lib/server.ts`) handles content-related preprocessing:
+
+- **Rebuilds post cache** — scans `app/blog/posts/`, parses frontmatter, computes reading time
+- **Regenerates search index** — builds Fuse.js search index for all posts
+- **Updates tag metadata** — aggregates tag usage counts and post associations
+- **Optimizes caches** — prunes old LRU cache entries
+
+See [Architecture > Backend](/docs/architecture/backend) for details on the BackendService.
+
+## Blog Post Creation (`scripts/new-post.ts`)
+
+The `new-post` script provides an interactive CLI for creating blog posts with frontmatter.
+
+### Interactive Mode
+
+Run without arguments for interactive prompts:
+
+```bash
+pnpm new-post
+```
+
+**Prompts:**
+
+1. **Title** — required, used to generate default slug
+2. **Slug** — optional, auto-generated from title via `slugify()`
+3. **Summary** — optional, for meta description
+4. **Tags** — comma-separated list (e.g., `React, TypeScript`)
+5. **Caption** — optional tagline
+
+**Output:**
+
+Creates `app/blog/posts/{slug}/page.mdx` with frontmatter:
+
+```yaml
+---
+title: "Post Title"
+image: "/{slug}-hero.svg"
+caption: ""
+summary: "Post summary"
+tags: ["React", "TypeScript"]
+created: "2026-02-13"
+updated: "2026-02-13"
+---
+
+# Post Title
+
+Start writing your post here...
+```
+
+### CLI Mode
+
+Pass arguments directly for scripting:
+
+```bash
+pnpm new-post --title "My Post" --tags "React,TypeScript" --summary "A post about React"
+```
+
+**Supported flags:**
+
+- `--title` — post title (required in CLI mode)
+- `--slug` — custom slug (defaults to slugified title)
+- `--tags` — comma-separated tag list
+- `--summary` — meta description
+- `--image` — custom hero image path (defaults to `/{slug}-hero.svg`)
+- `--caption` — tagline
+
+**Slugification rules:**
+
+- Lowercase conversion
+- Non-alphanumeric chars replaced with `-`
+- Leading/trailing dashes removed
+- Example: `"My Post! 2026"` → `"my-post-2026"`
+
+### Error Handling
+
+- **Missing title** — exits with error in both modes
+- **Duplicate slug** — throws error if `app/blog/posts/{slug}/` already exists
+- **Invalid arguments** — unrecognized flags are ignored
+
+## Pipeline Execution Order
+
+The full build pipeline runs in this order:
+
+```
+1. pnpm dev (or pnpm build)
+   ↓
+2. predev (or prebuild) lifecycle hook
+   ↓
+3. scripts/index.ts
+   ├─→ scripts/particles.ts
+   └─→ BackendService.preprocess()
+   ↓
+4. next dev (or next build)
+```
+
+**Why this matters:**
+
+- Particle configs must exist before `ParticlesBackground` component renders
+- Search index must be built before `/api/search` route is hit
+- Post cache must be warm before SSG pages are generated
+- All preprocessing completes *before* Next.js starts building pages
+
+## Debugging
+
+### Enable verbose logging
+
+Set environment variables for detailed logs:
+
+```bash
+DEBUG=true LOG_LEVEL=debug pnpm dev
+```
+
+### Check preprocessing output
+
+The `BackendService` logs detailed stats:
+
+```
+Build Process Started
+Environment: Development
+✓ Generating particle configurations
+  Found 5 configs for light theme
+  ✓ Validated config1.json
+  ✓ Validated config2.json
+  ...
+✓ Generated particle configs at components/particles/configUrls.ts
+✓ Running preprocessing pipeline
+  Processed 25 posts
+  Built search index with 25 entries
+  Cached 10 tags
+⏱ Total build time: 1234ms
+Memory: 125 MB
+```
+
+### Common issues
+
+| Issue | Cause | Solution |
+| :--- | :--- | :--- |
+| Particle configs not found | Missing `public/particles/light/` or `public/particles/dark/` | Ensure both theme directories exist with at least one `.json` file |
+| Build hangs on preprocessing | Large number of posts or images | Check memory usage, increase Node heap size if needed |
+| Post not appearing | Frontmatter validation failed | Check frontmatter syntax, ensure `title`, `created`, `updated` are present |
+| Search not working | Index not built | Run `pnpm preprocess` manually, check logs for errors |
+
+## Related
+
+- [Architecture > Build Process](/docs/architecture/build-process) — full build architecture
+- [Architecture > Backend](/docs/architecture/backend) — BackendService internals
+- [Features > Particle System](/docs/features/particle-system) — particle config schema
+- [Content > Blog Authoring](/docs/content/blog-authoring) — blog post creation workflow

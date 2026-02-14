@@ -1,0 +1,128 @@
+---
+title: Backend & Data Layer
+description: A deep dive into the server-side architecture, including the core service layer and API design.
+---
+
+The backend is masterfully architected around a central service layer, which powers a secure API and an efficient content preprocessing pipeline.
+
+### The `BackendService` Singleton: The Core Engine
+
+**Source:** `lib/server.ts`
+
+The heart of the entire application is the `BackendService` class, implemented as a **Singleton**. This ensures a single, consistent source of truth for all data operations, preventing redundant processing and data fragmentation.
+
+#### Key Features & Subsystems
+
+- **LRU Cache**: Integrates a high-performance `lru-cache` (500 items, 1-hour TTL) to memoize the results of expensive operations like file parsing and content processing. This is critical for API performance.
+  - Cache keys follow a schema: `post:{slug}`, `search:{query}`, `tag:{tagName}`
+  - Automatic TTL management with configurable expiration
+
+- **Content Preprocessing**: Contains the logic to find, parse (with `gray-matter`), and enrich all MDX blog posts. This includes:
+  - Word count calculation from cleaned content
+  - Reading time estimation
+  - Tag extraction and indexing
+  - Adjacent post determination (prev/next links)
+  - File metadata (created/updated dates)
+
+- **On-Demand Processing**: Employs an `ensurePreprocessed()` method, a smart strategy that performs the expensive preprocessing step only once when the service is first accessed, ensuring all subsequent data requests are served instantly from memory or cache.
+
+- **Fuse.js Search Engine**: Integrates `Fuse.js` for powerful, weighted, client-side fuzzy searching across post titles, summaries, and tags.
+  - **Search keys**: `['title', 'summary', 'content', 'tags']`
+  - **Threshold**: `0.3` (balance between fuzzy matching and precision)
+  - **Include matches**: `true` (returns match locations for highlighting)
+  - Backend prepares the complete, searchable data index
+
+- **Feed Generation**: Contains the logic to generate valid, spec-compliant RSS, Atom, and JSON feeds from the processed blog content.
+
+### API Architecture: Secure, Granular, Performant
+
+**Source:** `app/api/`
+
+The API design prioritizes security, performance, and maintainability. It exposes a set of granular, purpose-built endpoints rather than a single monolithic one.
+
+#### Robust Middleware Pattern
+
+Each API route is wrapped in a chain of middleware handlers. This is a standout feature of the architecture.
+
+1.  **`withErrorHandler`**: A high-level wrapper that catches any unhandled exceptions and returns a standardized JSON error response.
+2.  **`validateRequest`**: A powerful middleware that uses **Zod schemas** (defined in `lib/core.ts`) to validate incoming request parameters (params, query, body). This prevents invalid data from ever reaching the business logic.
+
+#### Service Layer Abstraction
+
+Route handlers are exceptionally clean and readable. Their only responsibility is to call the `BackendService` to retrieve data and return it. All business logic is completely abstracted away.
+
+#### Granular Endpoints
+
+The API exposes multiple focused endpoints for different frontend needs, which is highly performant.
+
+- `GET /api/blog/posts`: Fetches all posts.
+- `GET /api/blog/posts/[slug]`: Fetches a single post's full content.
+- `GET /api/blog/posts/[slug]/metadata`: **(Performance-oriented)** Fetches only the metadata for a post, used by components like `PostHeader` that don't need the full content.
+- `GET /api/blog/posts/[slug]/adjacent`: **(Performance-oriented)** Fetches only the next/previous post links, used by the `PostPagination` component.
+- `GET /api/blog/search`: Handles search queries, validated via a Zod schema.
+
+### Enhanced BackendService Methods
+
+The `BackendService` class provides several specialized methods beyond basic CRUD operations:
+
+#### `getPostMetadata(slug: string)`
+Returns only metadata fields (excluding content) for a post. This is a performance optimization for components that need post information but not the full content body.
+
+```typescript
+const metadata = await BackendService.getInstance().getPostMetadata(slug);
+// Returns: { slug, title, summary, created, updated, tags, image, caption, ... }
+// Excludes: content field
+```
+
+#### `getPostsWithPagination(page: number, limit: number)`
+Returns paginated posts with metadata about the pagination state:
+
+```typescript
+const result = await BackendService.getInstance().getPostsWithPagination(1, 10);
+// Returns:
+// {
+//   posts: Post[],
+//   pagination: {
+//     total: number,
+//     page: number,
+//     limit: number,
+//     pages: number
+//   }
+// }
+```
+
+#### `handleRequest()` Utility
+A sophisticated request wrapper that:
+- Executes the provided handler function
+- Applies optional data transformations
+- Generates cache control headers (public, private, or dynamic)
+- Measures and reports response time
+- Returns standardized JSON responses with metadata
+
+```typescript
+return handleRequest({
+  handler: async () => {
+    return BackendService.getInstance().getPost(slug);
+  },
+  cache: 3600,  // Cache for 1 hour
+  transform: (data) => ({ ...data, transformed: true })
+});
+```
+
+### Cache Control Utilities
+
+The backend leverages cache control utilities from `lib/core.ts`:
+
+```typescript
+// Public caching with stale-while-revalidate
+cacheControl.public(3600)
+// → "public, s-maxage=3600, stale-while-revalidate=7200"
+
+// Private caching for user-specific data
+cacheControl.private(60)
+// → "private, must-revalidate, max-age=60"
+
+// Dynamic caching with stale-if-error
+cacheControl.dynamic(3600)
+// → "public, s-maxage=3600, stale-while-revalidate=7200, stale-if-error=14400"
+``` 

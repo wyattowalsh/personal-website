@@ -1,0 +1,88 @@
+---
+title: Overview
+description: The high-level architectural philosophy and structure of the project.
+---
+
+## Architectural Philosophy
+
+The architecture is guided by principles of **modularity, separation of concerns, and resilience**. A clear distinction is maintained between the server-side business logic, the client-side rendering layer, and the content itself.
+
+This approach leads to a more maintainable, scalable, and robust application.
+
+## Monorepo Structure
+
+The project uses a **pnpm workspace** monorepo containing two packages:
+
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - '.'          # Main Next.js application
+  - 'docs'       # Fumadocs documentation site
+```
+
+This structure allows the documentation to live alongside the main application while maintaining separate dependencies and build processes.
+
+## High-Level Directory Structure
+
+The project follows a logical, feature-oriented structure that aligns with Next.js App Router conventions.
+
+```bash
+personal-website/
+├── app/                  # Next.js App Router: Routing, Layouts, Pages, API
+│   ├── api/              # Secure, granular API endpoints
+│   ├── blog/             # Blog pages and layouts
+│   │   └── posts/        # Individual blog posts (page.mdx files)
+│   └── (core)/           # Core pages (home), feeds, etc.
+├── components/           # Reusable React components (UI, features, hooks)
+│   ├── ui/               # Base UI components (from shadcn/ui)
+│   ├── mdx/              # Custom MDX components (40+ components)
+│   ├── heroes/           # Hero components for blog post headers
+│   ├── icons/            # Icon components
+│   ├── particles/        # Particle animation configurations
+│   └── hooks/            # Custom React hooks
+├── lib/                  # Core application logic (three-layer architecture)
+│   ├── core.ts           # Layer 1: Types, schemas (Zod), errors, logger
+│   ├── server.ts         # Layer 2: BackendService singleton, data access
+│   ├── services.ts       # Layer 3: Simplified API wrapper
+│   ├── client.ts         # Type-safe client-side API fetcher
+│   ├── metadata.ts       # SEO metadata generators
+│   └── utils.ts          # Utility functions (cn, formatDate, etc.)
+├── public/               # Static assets (images, fonts, particle configs)
+├── scripts/              # Node.js-based build & automation scripts
+└── docs/                 # Fumadocs documentation workspace
+    ├── content/docs/     # Documentation MDX files
+    └── package.json      # Separate dependencies for docs site
+```
+
+## Three-Layer Library Architecture
+
+The `lib/` directory implements a clean three-layer architecture:
+
+### Layer 1: Core (`lib/core.ts`)
+- **Type definitions**: `Post`, `PostMetadata`, `SearchResult`, `Config`
+- **Zod schemas**: API validation schemas for requests/responses
+- **Error handling**: `ApiError` class with status codes and details
+- **Logging**: Sophisticated logger with formatters and log levels
+- **Cache utilities**: `cacheControl` helpers for HTTP caching headers
+- **Constants**: Site configuration, default metadata
+
+### Layer 2: Server (`lib/server.ts`)
+- **BackendService singleton**: Central data access layer
+- **LRU cache**: 500-item cache with 1-hour TTL
+- **Fuse.js search**: Fuzzy search across posts with configurable thresholds
+- **Content preprocessing**: MDX parsing, metadata extraction, reading time calculation
+- **API handlers**: `getPost`, `getPosts`, `searchPosts`
+- **Utility functions**: `handleRequest` wrapper with error handling
+
+### Layer 3: Services (`lib/services.ts`)
+- **Simplified API**: Wrapper around BackendService for easy consumption
+- **`services.posts.*`**: `get()`, `getAll()`, `search()`, `getByTag()`, `getAdjacent()`
+- **`services.tags.*`**: `getAll()`
+- **Type-safe**: All methods return properly typed data
+- **Async/await**: Clean promise-based API
+
+This architecture ensures:
+- **Separation of concerns**: Each layer has a clear responsibility
+- **Testability**: Layers can be tested in isolation
+- **Maintainability**: Changes are localized to appropriate layers
+- **Type safety**: TypeScript types flow through all layers 

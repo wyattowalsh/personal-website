@@ -1,0 +1,43 @@
+---
+title: Introduction
+description: An overview of the w4w.dev project architecture and features.
+icon: fa/FaRocket
+---
+
+## **Introduction**
+
+This documentation provides a comprehensive architectural analysis of the `w4w.dev` personal website, a project that demonstrates an **enterprise-grade, production-ready** implementation of a modern web application.
+
+Far more than a simple portfolio, this project functions as a sophisticated showcase of advanced software architecture. It features a powerful MDX-based content pipeline with an extensive component system, a highly interactive and aesthetically unique frontend, a secure and performant API layer, and a robust build system.
+
+**Key Architectural Pillars:**
+- **Technology**: Next.js 16.1.1, React 19.2.3, TypeScript 5, Tailwind CSS 4.1.18, SCSS, Framer Motion, TSParticles, Zod 4.2.1.
+- **Build**: ESLint 9 flat config, Storybook 10.1.10, pnpm workspace monorepo (main app + docs).
+- **Backend**: A robust, singleton-based service layer with an integrated LRU cache, Fuse.js search, and a content preprocessing pipeline.
+- **API**: A secure, granular, and performant API leveraging Zod for validation and a robust middleware pattern.
+- **Content**: A sophisticated MDX pipeline with over 35 remark/rehype plugins, enabling rich, technical content with first-class support for LaTeX mathematics via KaTeX and Mermaid diagrams.
+- **Frontend**: A resilient component model using `Suspense` and `ErrorBoundary`, featuring a unique "cyberpunk" aesthetic driven by advanced animation and styling techniques.
+- **Components**: Extensive MDX component library (50+ custom components) and specialized hero system for post headers.
+- **Quality**: Meticulously organized, strongly typed, and demonstrative of modern best practices, with Storybook-driven component development.
+
+## **Documentation Structure**
+
+This documentation is organized into five comprehensive tabs:
+
+1. **[Architecture](/docs/architecture/overview)** — Core system design, backend services, frontend patterns, API routes, and build process.
+2. **[Content](/docs/content/mdx-pipeline)** — MDX pipeline, custom components, math rendering, blog authoring, and RSS feeds.
+3. **[Features](/docs/features/styling-and-theming)** — Theming system, hero components, particle backgrounds, search, SEO metadata, and custom hooks.
+4. **[API Reference](/docs/reference/lib-core)** — Detailed API documentation for lib utilities, services, UI primitives, and type definitions.
+5. **[Operations](/docs/operations/scripts-and-tooling)** — Build scripts, deployment, testing strategy, and developer documentation.
+
+## **Quick Links**
+
+- **Getting Started**: See [Build Process](/docs/architecture/build-process) for setup instructions
+- **Writing Content**: Check [Blog Authoring](/docs/content/blog-authoring) for post creation workflow
+- **Component Library**: Explore [MDX Components](/docs/content/mdx-components) for available components
+- **API Layer**: Review [API Routes](/docs/architecture/api-routes) for endpoint documentation
+- **Styling Guide**: Reference [Styling & Theming](/docs/features/styling-and-theming) for design system details
+
+Explore the following sections for a deep dive into the project's architecture and features.
+
+---

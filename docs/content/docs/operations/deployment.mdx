@@ -1,0 +1,327 @@
+---
+title: Deployment
+description: Deployment configuration, environment variables, analytics integration, and production optimizations.
+icon: fa/FaRocket
+---
+
+## Overview
+
+The site is designed for deployment on Vercel with automatic builds from the `master` branch. The project is structured as a pnpm monorepo with two deployable packages: the main site and the documentation site.
+
+## Monorepo Structure
+
+The project uses pnpm workspaces defined in `pnpm-workspace.yaml`:
+
+```yaml
+packages:
+  - '.'      # Main site (personal-website)
+  - 'docs'   # Documentation site
+```
+
+### Deployment Configuration
+
+Each workspace can be deployed independently:
+
+| Package | Directory | Build Command | Output Directory |
+| :--- | :--- | :--- | :--- |
+| Main site | `/` | `pnpm build` | `.next` |
+| Docs site | `docs/` | `pnpm --filter docs build` | `docs/.next` |
+
+**Vercel configuration:**
+
+The root `package.json` serves as the default build target. To deploy the docs separately, create a separate Vercel project pointing to the `docs/` subdirectory with build command `pnpm build`.
+
+## Environment Variables
+
+### Required
+
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_SITE_URL` | Full site URL for meta tags, sitemaps, feeds | `https://w4w.dev` |
+
+**Usage in code:**
+
+```typescript
+// app/layout.tsx:29
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+```
+
+This value is used for:
+
+- OpenGraph `og:url` tags
+- Twitter card URLs
+- RSS/Atom/JSON feed canonical URLs
+- Sitemap `<loc>` entries
+- JSON-LD structured data
+
+### Optional
+
+| Variable | Description | Default |
+| :--- | :--- | :--- |
+| `ANALYZE` | Enable webpack bundle analyzer | `false` |
+| `NODE_ENV` | Build environment | `production` |
+| `DEBUG` | Enable verbose logging | `false` |
+| `LOG_LEVEL` | Logging level (`debug`, `info`, `warn`, `error`) | `info` |
+
+**Bundle analysis:**
+
+To analyze bundle size, set `ANALYZE=true` and build:
+
+```bash
+ANALYZE=true pnpm build
+```
+
+This uses `@next/bundle-analyzer` configured in `next.config.mjs`:
+
+```javascript
+// next.config.mjs:57-59
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+```
+
+The analyzer generates interactive HTML reports in `.next/analyze/`.
+
+### Local Development
+
+No `.env.local` file is required for local development. All variables have sensible defaults:
+
+- `NEXT_PUBLIC_SITE_URL` defaults to `https://w4w.dev`
+- `NODE_ENV` is automatically set to `development` by Next.js
+- `DEBUG` and `LOG_LEVEL` are optional
+
+## Analytics Integration
+
+The site integrates Google Analytics and Google Tag Manager via `@next/third-parties/google`.
+
+### Configuration
+
+Analytics are loaded in the root layout (`app/layout.tsx:111-112`):
+
+```tsx
+<GoogleTagManager gtmId="GTM-P7VFKNK6" />
+<GoogleAnalytics gaId="G-17PRGFZN0C" />
+```
+
+**Why @next/third-parties?**
+
+- **Performance optimized** — lazy loads scripts, uses `next/script` strategy
+- **First-party integration** — official Next.js package
+- **Type-safe** — TypeScript definitions included
+- **No consent banner required** — follows best practices for GDPR compliance
+
+### Tracked Events
+
+The default integration tracks:
+
+- **Page views** — automatic on route change
+- **Core Web Vitals** — LCP, FID, CLS, TTFB, INP
+- **Scroll depth** — via GTM triggers
+- **Click events** — via GTM data layer
+
+Custom events can be added via `window.dataLayer` or the GTM interface.
+
+### Privacy Considerations
+
+- IP anonymization is enabled by default
+- No cookies are set without user consent (relies on browser settings)
+- Analytics scripts are loaded from Google's CDN (first-party context)
+
+## Security Headers
+
+The site configures security headers in `next.config.mjs:22-35`:
+
+```javascript
+async headers() {
+  return [
+    {
+      source: '/:path*',
+      headers: [
+        { key: 'X-DNS-Prefetch-Control', value: 'on' },
+        { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+        { key: 'X-Content-Type-Options', value: 'nosniff' },
+        { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+      ],
+    },
+  ]
+}
+```
+
+| Header | Value | Purpose |
+| :--- | :--- | :--- |
+| `X-DNS-Prefetch-Control` | `on` | Enables DNS prefetching for external resources |
+| `X-Frame-Options` | `SAMEORIGIN` | Prevents clickjacking attacks (disallows embedding in iframes) |
+| `X-Content-Type-Options` | `nosniff` | Prevents MIME type sniffing |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Controls referrer information sent to external sites |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=()` | Disables browser APIs that aren't used |
+
+**Note:** CSP (Content Security Policy) is not configured because it conflicts with inline styles from TSParticles and Framer Motion. If adding CSP, use `unsafe-inline` or nonces.
+
+## Build Optimizations
+
+### Image Optimization
+
+Next.js image optimization is configured in `next.config.mjs:8-13`:
+
+```javascript
+images: {
+  formats: ['image/avif', 'image/webp'],
+  remotePatterns: [],
+  deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+  imageSizes: [16, 32, 48, 64, 96, 128, 256],
+}
+```
+
+- **Modern formats** — serves AVIF/WebP with JPEG fallback
+- **Responsive images** — generates srcset for all device sizes
+- **No remote patterns** — all images are local (no external image domains allowed)
+
+### MDX Plugins
+
+The MDX pipeline includes 35+ remark/rehype plugins for performance:
+
+- **Code highlighting** — `rehype-prism-plus` for syntax highlighting at build time (no runtime JS)
+- **Math rendering** — `rehype-katex` for server-side LaTeX rendering
+- **Link validation** — `remark-validate-links` catches broken internal links at build time
+- **Reading time** — `rehype-infer-reading-time-meta` computes reading time during compilation
+
+See [Content > MDX Pipeline](/docs/content/mdx-pipeline) for the full plugin list.
+
+### Webpack Optimizations
+
+Custom webpack config in `next.config.mjs:14-21`:
+
+```javascript
+webpack: (config) => {
+  config.resolve.fallback = {
+    ...config.resolve.fallback,
+    fs: false,
+    path: false,
+  }
+  return config
+}
+```
+
+- **Disables Node.js modules** — `fs` and `path` are not bundled for client (reduces bundle size)
+- **Tree shaking** — Next.js automatically tree-shakes unused exports
+
+## Production Checklist
+
+Before deploying to production:
+
+### 1. Environment Variables
+
+Set `NEXT_PUBLIC_SITE_URL` in Vercel dashboard:
+
+```
+NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+```
+
+### 2. Analytics
+
+Update GTM and GA IDs in `app/layout.tsx`:
+
+```tsx
+<GoogleTagManager gtmId="YOUR-GTM-ID" />
+<GoogleAnalytics gaId="YOUR-GA-ID" />
+```
+
+### 3. Sitemap Configuration
+
+Update sitemap URLs in `next-sitemap.config.cjs`:
+
+```javascript
+module.exports = {
+  siteUrl: 'https://w4w.dev',
+  generateRobotsTxt: true,
+  // ... other config
+}
+```
+
+### 4. Build Verification
+
+Run a production build locally:
+
+```bash
+pnpm build
+pnpm start
+```
+
+Check:
+
+- ✅ No build errors or warnings
+- ✅ All pages render correctly
+- ✅ Images load with AVIF/WebP formats
+- ✅ Analytics fires on page load
+- ✅ Lighthouse score meets thresholds (see [Testing](/docs/operations/testing))
+
+### 5. DNS and SSL
+
+- Point DNS A/CNAME records to Vercel
+- Vercel automatically provisions SSL via Let's Encrypt
+- Enable "Automatically expose System Environment Variables" in Vercel settings
+
+### 6. Deploy
+
+Push to `master` branch — Vercel automatically builds and deploys.
+
+**Vercel build command:**
+
+```bash
+pnpm build
+```
+
+**Vercel output directory:**
+
+```
+.next
+```
+
+## Deployment Workflow
+
+```
+1. Push to master branch
+   ↓
+2. Vercel triggers build
+   ↓
+3. Install dependencies (pnpm install)
+   ↓
+4. Run prebuild hook (preprocessing)
+   ↓
+5. Run build (next build)
+   ↓
+6. Deploy to CDN
+   ↓
+7. Invalidate cache
+   ↓
+8. Update DNS
+```
+
+**Build time:** Typically 2-4 minutes depending on post count and image optimization.
+
+## Monitoring
+
+### Performance
+
+Use Vercel Analytics or Google Analytics to monitor:
+
+- **Core Web Vitals** — LCP, FID, CLS
+- **Page load times** — TTFB, FCP, TTI
+- **Bundle size** — track over time via `ANALYZE=true pnpm build`
+
+### Errors
+
+Vercel automatically captures:
+
+- **Build errors** — logged to Vercel dashboard
+- **Runtime errors** — logged to Vercel Functions logs (for API routes)
+- **Edge function errors** — logged to Vercel Edge logs
+
+For client-side error monitoring, consider integrating Sentry or similar.
+
+## Related
+
+- [Operations > Testing](/docs/operations/testing) — Lighthouse CI and performance thresholds
+- [Operations > Scripts and Tooling](/docs/operations/scripts-and-tooling) — build pipeline details
+- [Architecture > Build Process](/docs/architecture/build-process) — full build architecture

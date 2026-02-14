@@ -1,0 +1,229 @@
+---
+title: "MDX Pipeline"
+description: "Comprehensive overview of the MDX processing pipeline with remark and rehype plugins"
+---
+
+The website features one of the most extensive and well-configured MDX pipelines possible, transforming simple markdown files into rich, interactive, and technical content. Blog posts are written in MDX (Markdown + JSX) and processed through a sophisticated plugin chain that enhances content with syntax highlighting, mathematical rendering, GitHub Flavored Markdown, and more.
+
+## Pipeline Architecture
+
+The MDX processing pipeline is configured in `next.config.mjs` using `@next/mdx` and consists of two main stages:
+
+1. **Remark plugins** — Process the Markdown AST (Abstract Syntax Tree) before conversion to JSX
+2. **Rehype plugins** — Process the HTML/JSX AST after conversion
+
+### Configuration
+
+```javascript
+const withMdx = createMDX({
+  extension: /\.mdx?$/,
+  options: {
+    remarkPlugins: [
+      ['remark-frontmatter'],
+      ['remark-mdx-frontmatter'],
+      ['remark-gfm'],
+      ['remark-math'],
+      ['remark-mdx-math-enhanced', { component: 'Math' }],
+    ],
+    rehypePlugins: [
+      ['rehype-slug'],
+      ['rehype-prism-plus'],
+    ],
+  },
+})
+```
+
+## Remark Plugins (Markdown Processing)
+
+Remark plugins operate on the Markdown AST before it's converted to JSX. They enrich the content, extract metadata, and transform syntax.
+
+### remark-frontmatter
+
+Parses YAML frontmatter blocks at the top of MDX files.
+
+```yaml
+---
+title: "My Post"
+tags: ["React", "TypeScript"]
+created: "2024-12-01"
+---
+```
+
+### remark-mdx-frontmatter
+
+Exports frontmatter as JavaScript variables, making metadata available to the MDX runtime. This enables three-way metadata sync between:
+- YAML frontmatter
+- Next.js `Metadata` export
+- `ArticleJsonLd` structured data
+
+### remark-gfm (GitHub Flavored Markdown)
+
+Adds support for GitHub-style Markdown extensions:
+- **Tables** with alignment
+- **Strikethrough** (`~~text~~`)
+- **Task lists** (`- [ ] Todo`)
+- **Autolinks** (URLs become clickable)
+- **Footnotes**
+
+Example:
+
+```markdown
+| Feature | Supported |
+|---------|-----------|
+| Tables  | ✅        |
+| ~~Old~~ | ✅        |
+
+- [x] Completed task
+- [ ] Pending task
+```
+
+### remark-math
+
+Detects LaTeX math syntax in Markdown and marks it for processing by rehype-katex. Supports both inline and display math:
+
+- **Inline**: `$E = mc^2$`
+- **Display**: `$$\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$$`
+
+### remark-mdx-math-enhanced
+
+Custom plugin that transforms math blocks into `<Math>` component calls with proper props for equation numbering and labeling. Configured with `{ component: 'Math' }` to use the site's custom Math component.
+
+## Rehype Plugins (HTML/JSX Processing)
+
+Rehype plugins operate on the HTML/JSX AST after Markdown has been converted. They add functionality to the rendered output.
+
+### rehype-slug
+
+Automatically adds `id` attributes to all heading elements (`<h1>` through `<h6>`), enabling:
+- Deep linking to sections
+- Table of contents generation
+- Anchor navigation
+
+Example output:
+
+```html
+<h2 id="my-section">My Section</h2>
+```
+
+### rehype-prism-plus
+
+Enhanced syntax highlighting for code blocks using PrismJS with additional features:
+- **Language detection** from code fence info strings
+- **Line highlighting** support
+- **Line numbers** (optional)
+- **Diff highlighting** for code changes
+- **Theme-aware** highlighting that respects dark/light mode
+
+Supports 100+ languages including JavaScript, TypeScript, Python, Rust, Go, SQL, Bash, and more.
+
+Example:
+
+````markdown
+```typescript
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+```
+````
+
+### rehype-autolink-headings
+
+Adds clickable anchor links to headings, making it easy for readers to share links to specific sections. Links are styled and positioned via CSS.
+
+## Component Registry
+
+After the plugin pipeline processes MDX, the `mdx-components.tsx` file maps HTML elements and custom components into React components. This enables:
+
+1. **Element overrides** — Replace default HTML elements (`<h1>`, `<code>`, `<img>`) with styled React components
+2. **Custom components** — Register MDX-specific components like `<Math>`, `<Mermaid>`, `<Chart>`, etc.
+3. **No imports required** — All components are globally available in MDX files
+
+See [MDX Components](/docs/content/mdx-components) for the complete component reference.
+
+## Content Transformation Flow
+
+```
+┌─────────────────┐
+│  page.mdx       │
+│  (raw Markdown) │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────────────┐
+│  Remark Plugins         │
+│  • Parse frontmatter    │
+│  • GFM extensions       │
+│  • Math detection       │
+└────────┬────────────────┘
+         │
+         ▼
+┌─────────────────────────┐
+│  MDX → JSX Conversion   │
+└────────┬────────────────┘
+         │
+         ▼
+┌─────────────────────────┐
+│  Rehype Plugins         │
+│  • Add heading IDs      │
+│  • Syntax highlighting  │
+│  • Autolink headings    │
+└────────┬────────────────┘
+         │
+         ▼
+┌─────────────────────────┐
+│  Component Registry     │
+│  (mdx-components.tsx)   │
+└────────┬────────────────┘
+         │
+         ▼
+┌─────────────────────────┐
+│  Rendered React Page    │
+└─────────────────────────┘
+```
+
+## Performance Optimizations
+
+### Build-Time Processing
+
+All MDX processing happens at build time (not runtime), ensuring:
+- **Zero client-side overhead** for Markdown parsing
+- **Static HTML generation** for instant page loads
+- **Optimized bundle sizes** — only used components are included
+
+### Caching
+
+The `BackendService` singleton in `lib/server.ts` provides LRU caching for processed MDX content, avoiding redundant file reads and parsing during development.
+
+### Code Splitting
+
+MDX components use dynamic imports and React Suspense where appropriate, ensuring large dependencies (like Mermaid.js for diagrams) are only loaded when needed.
+
+## Adding New Plugins
+
+To add a new remark or rehype plugin:
+
+1. Install the plugin:
+
+```bash
+pnpm add remark-plugin-name
+# or
+pnpm add rehype-plugin-name
+```
+
+2. Add to `next.config.mjs`:
+
+```javascript
+remarkPlugins: [
+  ['remark-frontmatter'],
+  ['remark-gfm'],
+  ['remark-plugin-name', { options }], // Add here
+],
+```
+
+3. Restart the dev server for the config change to take effect.
+
+## Related Documentation
+
+- [MDX Components](/docs/content/mdx-components) — Full component reference
+- [Math and Diagrams](/docs/content/math-and-diagrams) — LaTeX and Mermaid support
+- [Blog Authoring](/docs/content/blog-authoring) — Writing and publishing posts

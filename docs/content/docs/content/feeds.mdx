@@ -1,0 +1,345 @@
+---
+title: "Feeds"
+description: "RSS, Atom, and JSON feed implementations for content syndication"
+---
+
+The website implements all three major feed standards — **RSS 2.0**, **Atom 1.0**, and **JSON Feed** — to maximize content reach and compatibility with feed readers, aggregators, and other syndication tools.
+
+## Feed Formats
+
+### RSS 2.0
+
+**URL**: `https://w4w.dev/feed.xml`
+
+RSS 2.0 is the most widely supported feed format, compatible with virtually all feed readers.
+
+**Implementation**: `app/feed.xml/route.ts`
+
+```typescript
+export async function GET() {
+  const feed = await generateRSSFeed();
+  return new Response(feed, {
+    headers: {
+      'Content-Type': 'application/rss+xml; charset=utf-8',
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+    },
+  });
+}
+```
+
+### Atom 1.0
+
+**URL**: `https://w4w.dev/feed.atom`
+
+Atom is a more modern, XML-based feed format with richer metadata support and stricter specifications than RSS.
+
+**Implementation**: `app/feed.atom/route.ts`
+
+```typescript
+export async function GET() {
+  const feed = await generateAtomFeed();
+  return new Response(feed, {
+    headers: {
+      'Content-Type': 'application/atom+xml; charset=utf-8',
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+    },
+  });
+}
+```
+
+### JSON Feed
+
+**URL**: `https://w4w.dev/feed.json`
+
+JSON Feed is a modern, developer-friendly format that uses JSON instead of XML, making it easier to parse and work with programmatically.
+
+**Implementation**: `app/feed.json/route.ts`
+
+```typescript
+export async function GET() {
+  const feed = await generateJsonFeed();
+  return new Response(feed, {
+    headers: {
+      'Content-Type': 'application/feed+json; charset=utf-8',
+      'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200',
+    },
+  });
+}
+```
+
+## Feed Library
+
+All three feed formats are generated using the [`feed`](https://github.com/jpmonette/feed) library, which provides:
+
+- Single unified API for all feed formats
+- Spec-compliant output
+- Automatic cross-linking between feed formats
+- Built-in validation
+
+### Feed Configuration
+
+```typescript
+import { Feed } from 'feed';
+
+const feed = new Feed({
+  title: site.title,
+  description: site.description,
+  id: site.url,
+  link: site.url,
+  language: "en",
+  favicon: `${site.url}/favicon.ico`,
+  copyright: `All rights reserved ${new Date().getFullYear()}, ${site.author.name}`,
+  updated: new Date(posts[0].created),
+  generator: "Next.js using Feed for Node.js",
+  feedLinks: {
+    rss2: `${site.url}/feed.xml`,
+    json: `${site.url}/feed.json`,
+    atom: `${site.url}/feed.atom`,
+  },
+  author: site.author
+});
+```
+
+### Adding Items
+
+Each post is added to the feed:
+
+```typescript
+for (const post of posts) {
+  const url = `${site.url}/blog/posts/${post.slug}`;
+  feed.addItem({
+    title: post.title,
+    id: url,
+    link: url,
+    description: post.summary,
+    content: post.content,
+    author: [site.author],
+    date: new Date(post.created),
+    image: post.image ? `${site.url}${post.image}` : undefined,
+    category: post.tags.map(tag => ({ name: tag })),
+  });
+}
+```
+
+### Generating Output
+
+```typescript
+// RSS 2.0
+return feed.rss2();
+
+// Atom 1.0
+return feed.atom1();
+
+// JSON Feed
+return feed.json1();
+```
+
+## Auto-Discovery
+
+Feed auto-discovery links are included in the site's `<head>` to help browsers and feed readers discover the available feeds:
+
+```html
+<link rel="alternate" type="application/rss+xml" title="RSS Feed" href="/feed.xml" />
+<link rel="alternate" type="application/atom+xml" title="Atom Feed" href="/feed.atom" />
+<link rel="alternate" type="application/feed+json" title="JSON Feed" href="/feed.json" />
+```
+
+This is configured in `app/layout.tsx`:
+
+```typescript
+export const metadata: Metadata = {
+  // ...
+  alternates: {
+    types: {
+      'application/rss+xml': '/feed.xml',
+      'application/atom+xml': '/feed.atom',
+      'application/feed+json': '/feed.json',
+    },
+  },
+};
+```
+
+## Caching Strategy
+
+Feeds are cached using Next.js Response headers to reduce server load and improve performance:
+
+```typescript
+'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=7200'
+```
+
+This means:
+- **`public`** — Can be cached by CDN and browsers
+- **`s-maxage=3600`** — Cache is fresh for 1 hour (3600 seconds)
+- **`stale-while-revalidate=7200`** — Can serve stale content for 2 hours while revalidating in background
+
+### Caching Flow
+
+```
+Request → Cache Hit (< 1 hour old) → Serve from cache
+       → Cache Hit (1-2 hours old)  → Serve from cache + revalidate in background
+       → Cache Miss / Stale         → Generate fresh feed
+```
+
+This ensures:
+- Fast response times (CDN edge cache)
+- Minimal server load (1-hour cache duration)
+- Fresh content (background revalidation)
+
+## Content Cleaning
+
+Feed content is pre-processed before inclusion to ensure compatibility with feed readers:
+
+### HTML Cleaning
+
+1. **Strip complex components** — Components like `<Math>`, `<Mermaid>` may not render in feed readers
+2. **Preserve basic formatting** — `<p>`, `<a>`, `<strong>`, `<em>`, `<code>`, `<pre>` are kept
+3. **Convert relative URLs** — Convert `/blog/posts/...` to `https://w4w.dev/blog/posts/...`
+4. **Sanitize HTML** — Remove potentially unsafe attributes and scripts
+
+### Content vs Summary
+
+Each feed item includes both:
+- **`description`** — The post summary (from frontmatter)
+- **`content`** — The full post content (cleaned HTML)
+
+Feed readers may show one or both depending on their settings and the feed format.
+
+## Feed Format Comparison
+
+| Feature | RSS 2.0 | Atom 1.0 | JSON Feed |
+|---------|---------|----------|-----------|
+| Format | XML | XML | JSON |
+| Compatibility | Excellent | Good | Growing |
+| Metadata richness | Moderate | Rich | Rich |
+| Extensibility | Limited | Good | Excellent |
+| Human readable | No | No | Yes |
+| Machine parseable | Yes | Yes | Yes |
+| Required fields | Title, link, description | Title, id, updated | Title, home_page_url, items |
+
+### When to Use Which Format
+
+- **RSS 2.0** — Maximum compatibility, works everywhere
+- **Atom 1.0** — Stricter spec, better metadata, modern feed readers
+- **JSON Feed** — API integrations, developer tools, modern platforms
+
+## Feed Validation
+
+Validate feeds using these tools:
+
+- **RSS 2.0**: [W3C Feed Validation Service](https://validator.w3.org/feed/)
+- **Atom 1.0**: [W3C Feed Validation Service](https://validator.w3.org/feed/)
+- **JSON Feed**: [JSON Feed Validator](https://validator.jsonfeed.org/)
+
+## Example Feed Items
+
+### RSS 2.0
+
+```xml
+<item>
+  <title>Personal Web App v6</title>
+  <link>https://w4w.dev/blog/posts/w4w-v6</link>
+  <guid>https://w4w.dev/blog/posts/w4w-v6</guid>
+  <description>A deep dive into building my personal website v6...</description>
+  <content:encoded><![CDATA[<p>Full post content here...</p>]]></content:encoded>
+  <pubDate>Sun, 01 Dec 2024 00:00:00 GMT</pubDate>
+  <author>wyatt@w4w.dev (Wyatt Walsh)</author>
+  <category>Project</category>
+  <category>TypeScript</category>
+  <enclosure url="https://w4w.dev/old.webp" type="image/webp" />
+</item>
+```
+
+### Atom 1.0
+
+```xml
+<entry>
+  <title>Personal Web App v6</title>
+  <link href="https://w4w.dev/blog/posts/w4w-v6"/>
+  <id>https://w4w.dev/blog/posts/w4w-v6</id>
+  <summary>A deep dive into building my personal website v6...</summary>
+  <content type="html"><![CDATA[<p>Full post content here...</p>]]></content>
+  <published>2024-12-01T00:00:00Z</published>
+  <updated>2024-12-01T00:00:00Z</updated>
+  <author>
+    <name>Wyatt Walsh</name>
+    <email>wyatt@w4w.dev</email>
+  </author>
+  <category term="Project"/>
+  <category term="TypeScript"/>
+</entry>
+```
+
+### JSON Feed
+
+```json
+{
+  "id": "https://w4w.dev/blog/posts/w4w-v6",
+  "url": "https://w4w.dev/blog/posts/w4w-v6",
+  "title": "Personal Web App v6",
+  "summary": "A deep dive into building my personal website v6...",
+  "content_html": "<p>Full post content here...</p>",
+  "date_published": "2024-12-01T00:00:00.000Z",
+  "authors": [
+    {
+      "name": "Wyatt Walsh",
+      "url": "https://w4w.dev"
+    }
+  ],
+  "tags": ["Project", "TypeScript"],
+  "image": "https://w4w.dev/old.webp"
+}
+```
+
+## Subscribing to Feeds
+
+Users can subscribe to feeds using:
+
+### Feed Readers
+
+- **Web**: Feedly, Inoreader, NewsBlur
+- **Desktop**: NetNewsWire (macOS), Thunderbird
+- **Mobile**: Reeder (iOS), FeedMe (Android)
+- **Browser**: Firefox Live Bookmarks, Chrome extensions
+
+### Subscribe Links
+
+Provide subscribe links on your blog:
+
+```html
+<a href="/feed.xml">RSS</a>
+<a href="/feed.atom">Atom</a>
+<a href="/feed.json">JSON</a>
+```
+
+Or use feed reader protocol links:
+
+```html
+<a href="feed://w4w.dev/feed.xml">Subscribe in your feed reader</a>
+```
+
+## Error Handling
+
+All feed routes include error handling:
+
+```typescript
+export async function GET() {
+  try {
+    const feed = await generateRSSFeed();
+    return new Response(feed, { ... });
+  } catch (error) {
+    console.error('Error generating RSS feed:', error);
+    return new Response('Error generating feed', { status: 500 });
+  }
+}
+```
+
+Common errors:
+- **No posts found** — Throws error if BackendService returns empty array
+- **Invalid post data** — Logs warning and skips post if required fields missing
+- **Feed generation failure** — Returns 500 error with message
+
+## Related Documentation
+
+- [Blog Authoring](/docs/content/blog-authoring) — Creating posts that appear in feeds
+- [Backend Service](/docs/architecture/backend) — Post fetching and caching
+- [SEO and Metadata](/docs/features/seo-and-metadata) — Metadata that feeds rely on

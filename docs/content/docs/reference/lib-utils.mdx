@@ -1,0 +1,701 @@
+---
+title: "lib/utils.ts"
+description: "Utility functions for className composition, date formatting, string manipulation, and type guards"
+---
+
+The `lib/utils.ts` module provides essential utility functions used throughout the application for common operations like className merging, date formatting, string manipulation, and type checking.
+
+## Class Name Utilities
+
+### cn
+
+Merge Tailwind CSS class names with intelligent conflict resolution.
+
+```typescript
+function cn(...inputs: ClassValue[]): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `...inputs` | `ClassValue[]` | Any number of class name inputs |
+
+**Returns:** `string` - Merged and deduplicated class names
+
+**How it works:**
+1. Uses `clsx` to combine class names
+2. Uses `tailwind-merge` to resolve Tailwind conflicts
+3. Returns a single optimized string
+
+**Usage:**
+
+```typescript
+import { cn } from '@/lib/utils';
+
+// Basic usage
+cn('px-4', 'py-2');
+// Result: "px-4 py-2"
+
+// Conditional classes
+cn('bg-blue-500', isActive && 'bg-green-500');
+// Result: "bg-green-500" (tailwind-merge resolves conflict)
+
+// Array syntax
+cn(['text-lg', 'font-bold'], 'text-center');
+// Result: "text-lg font-bold text-center"
+
+// Object syntax
+cn({ 'text-red-500': hasError, 'text-gray-500': !hasError });
+// Result: "text-red-500" or "text-gray-500"
+
+// Component usage
+export function Button({ className, ...props }) {
+  return (
+    <button
+      className={cn('px-4 py-2 rounded', className)}
+      {...props}
+    />
+  );
+}
+
+// Usage with variants
+const variants = {
+  primary: 'bg-blue-500 text-white',
+  secondary: 'bg-gray-200 text-gray-900'
+};
+
+<Button className={cn(variants.primary, 'shadow-lg')} />
+// Result: "bg-blue-500 text-white shadow-lg"
+```
+
+**Why use cn() instead of template strings?**
+
+❌ **Without cn():**
+```typescript
+// Tailwind conflicts not resolved
+className={`bg-blue-500 ${variant === 'red' ? 'bg-red-500' : ''}`}
+// Result: "bg-blue-500 bg-red-500" (both classes applied!)
+```
+
+✅ **With cn():**
+```typescript
+// Conflicts automatically resolved
+className={cn('bg-blue-500', variant === 'red' && 'bg-red-500')}
+// Result: "bg-red-500" (conflict resolved correctly)
+```
+
+---
+
+## Date Utilities
+
+### formatDate
+
+Format a date string or Date object for display.
+
+```typescript
+function formatDate(
+  date: string | Date,
+  options?: Intl.DateTimeFormatOptions
+): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `date` | `string \| Date` | Required | Date to format |
+| `options` | `Intl.DateTimeFormatOptions` | See below | Formatting options |
+
+**Default options:**
+```typescript
+{
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}
+```
+
+**Returns:** `string` - Formatted date or empty string on error
+
+**Usage:**
+
+```typescript
+import { formatDate } from '@/lib/utils';
+
+// Default format
+formatDate('2026-01-15');
+// Result: "January 15, 2026"
+
+formatDate(new Date('2026-01-15'));
+// Result: "January 15, 2026"
+
+// Custom format - short
+formatDate('2026-01-15', {
+  year: '2-digit',
+  month: 'short',
+  day: 'numeric'
+});
+// Result: "Jan 15, 26"
+
+// Custom format - full
+formatDate('2026-01-15', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+});
+// Result: "Wednesday, January 15, 2026"
+
+// Invalid date handling
+formatDate('invalid-date');
+// Result: "" (empty string, warning logged to console)
+```
+
+**Error handling:**
+- Invalid dates return `''`
+- Warning logged to console: `"Invalid date provided to formatDate:"`
+- Never throws
+
+---
+
+### toISODate
+
+Convert a date to ISO 8601 format.
+
+```typescript
+function toISODate(date: string | Date): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `date` | `string \| Date` | Date to convert |
+
+**Returns:** `string` - ISO date string or empty string on error
+
+**Usage:**
+
+```typescript
+import { toISODate } from '@/lib/utils';
+
+toISODate('2026-01-15');
+// Result: "2026-01-15T00:00:00.000Z"
+
+toISODate(new Date(2026, 0, 15, 14, 30));
+// Result: "2026-01-15T19:30:00.000Z"
+
+// Use in <time> element
+<time dateTime={toISODate(post.created)}>
+  {formatDate(post.created)}
+</time>
+```
+
+---
+
+### getRelativeTimeString
+
+Get a human-readable relative time string.
+
+```typescript
+function getRelativeTimeString(date: string | Date): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `date` | `string \| Date` | Past date to compare to now |
+
+**Returns:** `string` - Relative time description
+
+**Output examples:**
+
+| Time Difference | Output |
+|----------------|--------|
+| 0 days | `"Today"` |
+| 1 day | `"Yesterday"` |
+| 2-6 days | `"3 days ago"` |
+| 7-29 days | `"2 weeks ago"` |
+| 30-364 days | `"3 months ago"` |
+| 365+ days | `"2 years ago"` |
+
+**Usage:**
+
+```typescript
+import { getRelativeTimeString } from '@/lib/utils';
+
+// Post created today
+getRelativeTimeString(new Date());
+// Result: "Today"
+
+// Post created 5 days ago
+const fiveDaysAgo = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+getRelativeTimeString(fiveDaysAgo);
+// Result: "5 days ago"
+
+// Post created 3 months ago
+const threeMonthsAgo = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000);
+getRelativeTimeString(threeMonthsAgo);
+// Result: "3 months ago"
+
+// Component usage
+export function PostMeta({ created }) {
+  return (
+    <p className="text-sm text-gray-500">
+      Published {getRelativeTimeString(created)}
+    </p>
+  );
+}
+```
+
+---
+
+## String Utilities
+
+### slugify
+
+Convert text to a URL-safe slug.
+
+```typescript
+function slugify(text: string): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `text` | `string` | Text to slugify |
+
+**Returns:** `string` - URL-safe slug
+
+**Transformation rules:**
+1. Convert to lowercase
+2. Remove special characters (keep `\w`, whitespace, `-`)
+3. Replace spaces with hyphens
+4. Replace multiple hyphens with single hyphen
+5. Trim leading/trailing hyphens
+
+**Usage:**
+
+```typescript
+import { slugify } from '@/lib/utils';
+
+slugify('Hello World');
+// Result: "hello-world"
+
+slugify('TypeScript: The Good Parts');
+// Result: "typescript-the-good-parts"
+
+slugify('  Multiple   Spaces  ');
+// Result: "multiple-spaces"
+
+slugify('Special!@#$%Characters');
+// Result: "specialcharacters"
+
+slugify('Résumé & CV');
+// Result: "rsume-cv"
+
+// Generate post slugs
+const title = "My New Blog Post!";
+const slug = slugify(title);
+// Result: "my-new-blog-post"
+```
+
+---
+
+### truncate
+
+Truncate text to a maximum length.
+
+```typescript
+function truncate(text: string, length: number): string
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `text` | `string` | Text to truncate |
+| `length` | `number` | Maximum length (including ellipsis) |
+
+**Returns:** `string` - Truncated text with `...` suffix (if truncated)
+
+**Usage:**
+
+```typescript
+import { truncate } from '@/lib/utils';
+
+truncate('Short text', 100);
+// Result: "Short text" (no truncation)
+
+truncate('This is a very long sentence that needs truncation', 20);
+// Result: "This is a very long..." (20 chars total)
+
+truncate('Exactly 10', 10);
+// Result: "Exactly 10" (no truncation if exactly at length)
+
+// Component usage
+export function PostCard({ post }) {
+  return (
+    <div>
+      <h3>{post.title}</h3>
+      <p>{truncate(post.summary, 150)}</p>
+    </div>
+  );
+}
+
+// Handle empty strings
+truncate('', 10);
+// Result: ""
+
+truncate(null, 10);
+// Result: null (passed through)
+```
+
+---
+
+## Type Guards
+
+### isString
+
+Check if a value is a string.
+
+```typescript
+function isString(value: unknown): value is string
+```
+
+**Usage:**
+
+```typescript
+import { isString } from '@/lib/utils';
+
+isString('hello');    // true
+isString(123);        // false
+isString(null);       // false
+isString(undefined);  // false
+
+// Type narrowing
+function process(value: unknown) {
+  if (isString(value)) {
+    // TypeScript knows value is string here
+    return value.toUpperCase();
+  }
+}
+```
+
+---
+
+### isDate
+
+Check if a value is a valid Date object.
+
+```typescript
+function isDate(value: unknown): value is Date
+```
+
+**Usage:**
+
+```typescript
+import { isDate } from '@/lib/utils';
+
+isDate(new Date());              // true
+isDate(new Date('2026-01-15'));  // true
+isDate(new Date('invalid'));     // false (Invalid Date)
+isDate('2026-01-15');            // false (string, not Date)
+isDate(1234567890);              // false (number, not Date)
+
+// Type narrowing
+function formatIfDate(value: unknown) {
+  if (isDate(value)) {
+    // TypeScript knows value is Date here
+    return value.toISOString();
+  }
+  return 'Not a date';
+}
+```
+
+---
+
+### isValidDateString
+
+Check if a string can be parsed as a valid date.
+
+```typescript
+function isValidDateString(dateString: string): boolean
+```
+
+**Usage:**
+
+```typescript
+import { isValidDateString } from '@/lib/utils';
+
+isValidDateString('2026-01-15');           // true
+isValidDateString('January 15, 2026');     // true
+isValidDateString('2026-01-15T10:30:00Z'); // true
+isValidDateString('invalid-date');         // false
+isValidDateString('not a date');           // false
+
+// Validation before parsing
+if (isValidDateString(input)) {
+  const date = new Date(input);
+  // Safe to use
+}
+```
+
+---
+
+### isNonEmptyArray
+
+Check if a value is a non-empty array.
+
+```typescript
+function isNonEmptyArray<T>(arr: T[] | null | undefined): arr is T[]
+```
+
+**Usage:**
+
+```typescript
+import { isNonEmptyArray } from '@/lib/utils';
+
+isNonEmptyArray([1, 2, 3]);  // true
+isNonEmptyArray([]);         // false
+isNonEmptyArray(null);       // false
+isNonEmptyArray(undefined);  // false
+
+// Type narrowing with generics
+const tags: string[] | null = post.tags;
+
+if (isNonEmptyArray(tags)) {
+  // TypeScript knows tags is string[] here
+  tags.map(tag => <Tag key={tag} name={tag} />);
+}
+```
+
+---
+
+### isNonEmptyString
+
+Check if a value is a non-empty string (after trimming).
+
+```typescript
+function isNonEmptyString(str: unknown): str is string
+```
+
+**Usage:**
+
+```typescript
+import { isNonEmptyString } from '@/lib/utils';
+
+isNonEmptyString('hello');      // true
+isNonEmptyString('  hello  ');  // true (trimmed)
+isNonEmptyString('');           // false
+isNonEmptyString('   ');        // false (only whitespace)
+isNonEmptyString(null);         // false
+isNonEmptyString(undefined);    // false
+isNonEmptyString(123);          // false
+
+// Form validation
+if (isNonEmptyString(input.value)) {
+  // Safe to process
+  processInput(input.value);
+}
+```
+
+---
+
+## Error Handling
+
+### handleError
+
+Normalize unknown errors to Error objects.
+
+```typescript
+function handleError(error: unknown): Error
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `error` | `unknown` | Error of any type |
+
+**Returns:** `Error` - Normalized Error object
+
+**Usage:**
+
+```typescript
+import { handleError } from '@/lib/utils';
+
+try {
+  throw 'String error';
+} catch (err) {
+  const error = handleError(err);
+  console.error(error.message); // "String error"
+}
+
+try {
+  throw { custom: 'object' };
+} catch (err) {
+  const error = handleError(err);
+  console.error(error.message); // "An unknown error occurred"
+}
+
+try {
+  throw new Error('Real error');
+} catch (err) {
+  const error = handleError(err);
+  console.error(error.message); // "Real error"
+}
+
+// Usage in catch blocks
+catch (err) {
+  const error = handleError(err);
+  logger.error('Operation failed', error);
+}
+```
+
+---
+
+## Usage Patterns
+
+### Component Styling
+
+```typescript
+import { cn } from '@/lib/utils';
+
+interface ButtonProps {
+  variant: 'primary' | 'secondary';
+  size: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export function Button({ variant, size, className }: ButtonProps) {
+  return (
+    <button
+      className={cn(
+        'rounded font-medium transition',
+        variant === 'primary' && 'bg-blue-500 text-white',
+        variant === 'secondary' && 'bg-gray-200 text-gray-900',
+        size === 'sm' && 'px-3 py-1 text-sm',
+        size === 'md' && 'px-4 py-2',
+        size === 'lg' && 'px-6 py-3 text-lg',
+        className
+      )}
+    />
+  );
+}
+```
+
+### Date Display
+
+```typescript
+import { formatDate, getRelativeTimeString, toISODate } from '@/lib/utils';
+
+export function PostMeta({ post }) {
+  return (
+    <div>
+      <time dateTime={toISODate(post.created)}>
+        {formatDate(post.created)}
+      </time>
+      <span className="text-gray-500">
+        · {getRelativeTimeString(post.created)}
+      </span>
+    </div>
+  );
+}
+```
+
+### URL Generation
+
+```typescript
+import { slugify } from '@/lib/utils';
+
+export function generatePostUrl(title: string) {
+  return `/blog/posts/${slugify(title)}`;
+}
+
+// Usage
+generatePostUrl('My Awesome Post!');
+// Result: "/blog/posts/my-awesome-post"
+```
+
+### Safe Type Checking
+
+```typescript
+import { isNonEmptyArray, isNonEmptyString } from '@/lib/utils';
+
+export function renderTags(tags: string[] | null) {
+  if (!isNonEmptyArray(tags)) {
+    return null;
+  }
+
+  return tags.map(tag => {
+    if (isNonEmptyString(tag)) {
+      return <Tag key={tag} name={tag} />;
+    }
+  });
+}
+```
+
+---
+
+## Browser & Server Safe
+
+**✅ All utilities in `lib/utils.ts` are safe to use in both environments:**
+- Server components
+- Client components
+- API routes
+- Build scripts
+- Edge runtime
+
+**No environment-specific dependencies:**
+- ✅ No Node.js APIs
+- ✅ No browser-specific APIs
+- ✅ Pure JavaScript/TypeScript
+
+---
+
+## Type Safety
+
+All utilities are fully typed with TypeScript:
+
+```typescript
+import { cn, formatDate, slugify, isNonEmptyArray } from '@/lib/utils';
+
+// TypeScript infers correct return types
+const className: string = cn('px-4', 'py-2');
+const formattedDate: string = formatDate('2026-01-15');
+const slug: string = slugify('My Title');
+
+// Type guards narrow types
+function process(arr: string[] | null) {
+  if (isNonEmptyArray(arr)) {
+    // arr is string[] here, not string[] | null
+    arr.forEach(item => console.log(item));
+  }
+}
+```
+
+---
+
+## Summary
+
+`lib/utils.ts` provides **essential utilities** for:
+
+| Category | Functions |
+|----------|-----------|
+| **Class names** | `cn()` |
+| **Date formatting** | `formatDate()`, `toISODate()`, `getRelativeTimeString()` |
+| **String manipulation** | `slugify()`, `truncate()` |
+| **Type guards** | `isString()`, `isDate()`, `isValidDateString()`, `isNonEmptyArray()`, `isNonEmptyString()` |
+| **Error handling** | `handleError()` |
+
+**When to use:**
+- ✅ Anywhere in the application (universal)
+- ✅ Component styling (`cn()`)
+- ✅ Date display (`formatDate()`, `getRelativeTimeString()`)
+- ✅ URL generation (`slugify()`)
+- ✅ Input validation (type guards)
+- ✅ Error normalization (`handleError()`)

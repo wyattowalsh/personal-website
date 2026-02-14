@@ -1,0 +1,779 @@
+---
+title: "UI Primitives"
+description: "shadcn/ui components and custom icons available in the project"
+---
+
+The w4w.dev website uses **shadcn/ui** components as UI primitives. These are pre-built, accessible components based on Radix UI primitives, styled with Tailwind CSS and located in `components/ui/`.
+
+## Overview
+
+All UI components follow the shadcn/ui pattern:
+- ✅ Built on Radix UI headless primitives
+- ✅ Styled with Tailwind CSS
+- ✅ Fully accessible (ARIA compliant)
+- ✅ Customizable with `className` prop
+- ✅ Type-safe with TypeScript
+
+**Import pattern:**
+```typescript
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+```
+
+---
+
+## Form & Input Components
+
+### Button
+
+Versatile button component with multiple variants and sizes.
+
+**File:** `components/ui/button.tsx`
+
+**Variants:**
+- `default` — Primary blue button
+- `destructive` — Red destructive action
+- `outline` — Border with transparent background
+- `secondary` — Gray secondary button
+- `ghost` — Transparent with hover effect
+- `link` — Text link style
+
+**Sizes:**
+- `default` — Standard size (h-10)
+- `sm` — Small (h-9)
+- `lg` — Large (h-11)
+- `icon` — Square icon button (h-10 w-10)
+
+**Props:**
+
+```typescript
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link';
+  size?: 'default' | 'sm' | 'lg' | 'icon';
+  asChild?: boolean; // Render as child component (using Radix Slot)
+}
+```
+
+**Usage:**
+
+```typescript
+import { Button } from '@/components/ui/button';
+
+// Basic button
+<Button>Click me</Button>
+
+// Variants
+<Button variant="destructive">Delete</Button>
+<Button variant="outline">Cancel</Button>
+<Button variant="ghost">Dismiss</Button>
+
+// Sizes
+<Button size="sm">Small</Button>
+<Button size="lg">Large</Button>
+<Button size="icon"><Icon /></Button>
+
+// As Link (with asChild)
+<Button asChild>
+  <Link href="/blog">View Blog</Link>
+</Button>
+
+// With custom className
+<Button className="mt-4 shadow-lg">Custom Styled</Button>
+```
+
+**Radix primitive:** `@radix-ui/react-slot` (for `asChild` prop)
+
+---
+
+### Input
+
+Standard text input field.
+
+**File:** `components/ui/input.tsx`
+
+**Usage:**
+
+```typescript
+import { Input } from '@/components/ui/input';
+
+<Input
+  type="text"
+  placeholder="Enter your name"
+  value={value}
+  onChange={e => setValue(e.target.value)}
+/>
+
+<Input type="email" placeholder="email@example.com" />
+<Input type="password" placeholder="Password" />
+<Input type="search" placeholder="Search posts..." />
+```
+
+---
+
+### Checkbox
+
+Checkbox input with custom styling.
+
+**File:** `components/ui/checkbox.tsx`
+
+**Usage:**
+
+```typescript
+import { Checkbox } from '@/components/ui/checkbox';
+
+<Checkbox
+  checked={isChecked}
+  onCheckedChange={setIsChecked}
+/>
+
+<label className="flex items-center gap-2">
+  <Checkbox />
+  <span>Accept terms and conditions</span>
+</label>
+```
+
+**Radix primitive:** `@radix-ui/react-checkbox`
+
+---
+
+### Select
+
+Dropdown select component.
+
+**File:** `components/ui/select.tsx`
+
+**Usage:**
+
+```typescript
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select';
+
+<Select value={value} onValueChange={setValue}>
+  <SelectTrigger>
+    <SelectValue placeholder="Select an option" />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="option1">Option 1</SelectItem>
+    <SelectItem value="option2">Option 2</SelectItem>
+    <SelectItem value="option3">Option 3</SelectItem>
+  </SelectContent>
+</Select>
+```
+
+**Radix primitive:** `@radix-ui/react-select`
+
+---
+
+## Layout Components
+
+### Card
+
+Container component for grouping content.
+
+**File:** `components/ui/card.tsx`
+
+**Exports:**
+- `Card` — Main container
+- `CardHeader` — Header section
+- `CardTitle` — Title heading
+- `CardContent` — Content section
+
+**Usage:**
+
+```typescript
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+
+<Card>
+  <CardHeader>
+    <CardTitle>Post Title</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <p>Post content goes here...</p>
+  </CardContent>
+</Card>
+
+// Custom styling
+<Card className="shadow-lg hover:shadow-xl transition">
+  <CardContent className="p-6">
+    Content with custom padding
+  </CardContent>
+</Card>
+```
+
+**Styling:**
+- Default: Rounded corners, border, subtle shadow
+- Dark mode: Automatic border color adjustment
+
+---
+
+### Separator
+
+Horizontal or vertical divider line.
+
+**File:** `components/ui/separator.tsx`
+
+**Usage:**
+
+```typescript
+import { Separator } from '@/components/ui/separator';
+
+// Horizontal (default)
+<Separator />
+
+// Vertical
+<Separator orientation="vertical" />
+
+// With custom styling
+<Separator className="my-4" />
+```
+
+**Radix primitive:** `@radix-ui/react-separator`
+
+---
+
+### Scroll Area
+
+Custom scrollbar container.
+
+**File:** `components/ui/scroll-area.tsx`
+
+**Usage:**
+
+```typescript
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+<ScrollArea className="h-96">
+  <div className="p-4">
+    {/* Long content that needs scrolling */}
+  </div>
+</ScrollArea>
+```
+
+**Radix primitive:** `@radix-ui/react-scroll-area`
+
+---
+
+## Navigation Components
+
+### Tabs
+
+Tabbed interface component.
+
+**File:** `components/ui/tabs.tsx`
+
+**Exports:**
+- `Tabs` — Container
+- `TabsList` — Tab buttons container
+- `TabsTrigger` — Individual tab button
+- `TabsContent` — Tab panel content
+
+**Usage:**
+
+```typescript
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+
+<Tabs defaultValue="tab1">
+  <TabsList>
+    <TabsTrigger value="tab1">Tab 1</TabsTrigger>
+    <TabsTrigger value="tab2">Tab 2</TabsTrigger>
+    <TabsTrigger value="tab3">Tab 3</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="tab1">
+    Content for tab 1
+  </TabsContent>
+  <TabsContent value="tab2">
+    Content for tab 2
+  </TabsContent>
+  <TabsContent value="tab3">
+    Content for tab 3
+  </TabsContent>
+</Tabs>
+```
+
+**Radix primitive:** `@radix-ui/react-tabs`
+
+---
+
+### Accordion
+
+Collapsible content sections.
+
+**File:** `components/ui/accordion.tsx`
+
+**Exports:**
+- `Accordion` — Container
+- `AccordionItem` — Individual item
+- `AccordionTrigger` — Clickable header
+- `AccordionContent` — Collapsible content
+
+**Usage:**
+
+```typescript
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent
+} from '@/components/ui/accordion';
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item1">
+    <AccordionTrigger>Section 1</AccordionTrigger>
+    <AccordionContent>
+      Content for section 1
+    </AccordionContent>
+  </AccordionItem>
+
+  <AccordionItem value="item2">
+    <AccordionTrigger>Section 2</AccordionTrigger>
+    <AccordionContent>
+      Content for section 2
+    </AccordionContent>
+  </AccordionItem>
+</Accordion>
+
+// Multiple items open at once
+<Accordion type="multiple">
+  {/* ... */}
+</Accordion>
+```
+
+**Radix primitive:** `@radix-ui/react-accordion`
+
+---
+
+### Dropdown Menu
+
+Dropdown menu with nested items.
+
+**File:** `components/ui/dropdown-menu.tsx`
+
+**Exports:**
+- `DropdownMenu` — Container
+- `DropdownMenuTrigger` — Trigger button
+- `DropdownMenuContent` — Dropdown content
+- `DropdownMenuItem` — Menu item
+- `DropdownMenuSeparator` — Divider
+- (and more sub-components)
+
+**Usage:**
+
+```typescript
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button variant="outline">Open Menu</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem>Settings</DropdownMenuItem>
+    <DropdownMenuItem>Logout</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+**Radix primitive:** `@radix-ui/react-dropdown-menu`
+
+---
+
+## Feedback Components
+
+### Alert
+
+Alert message box with variants.
+
+**File:** `components/ui/alert.tsx`
+
+**Variants:**
+- `default` — Standard alert
+- `destructive` — Error/warning alert
+
+**Usage:**
+
+```typescript
+import { Alert } from '@/components/ui/alert';
+
+<Alert>
+  <p>This is an informational alert</p>
+</Alert>
+
+<Alert variant="destructive">
+  <p>Error: Something went wrong!</p>
+</Alert>
+```
+
+---
+
+### Badge
+
+Small label or tag component.
+
+**File:** `components/ui/badge.tsx`
+
+**Variants:**
+- `default` — Primary badge
+- `secondary` — Gray secondary badge
+- `destructive` — Red destructive badge
+- `outline` — Outlined badge
+
+**Usage:**
+
+```typescript
+import { Badge } from '@/components/ui/badge';
+
+<Badge>New</Badge>
+<Badge variant="secondary">Draft</Badge>
+<Badge variant="destructive">Error</Badge>
+<Badge variant="outline">TypeScript</Badge>
+
+// In post tags
+{post.tags.map(tag => (
+  <Badge key={tag} variant="outline">{tag}</Badge>
+))}
+```
+
+---
+
+### Toast
+
+Toast notification system.
+
+**Files:**
+- `components/ui/toast.tsx` — Toast component
+- `components/ui/toaster.tsx` — Toast container
+
+**Usage:**
+
+```typescript
+import { Toaster } from '@/components/ui/toaster';
+import { useToast } from '@/components/ui/use-toast';
+
+// Add <Toaster /> to root layout
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  );
+}
+
+// Trigger toast in component
+export function MyComponent() {
+  const { toast } = useToast();
+
+  return (
+    <Button onClick={() => {
+      toast({
+        title: "Success!",
+        description: "Post published successfully.",
+      });
+    }}>
+      Publish
+    </Button>
+  );
+}
+```
+
+**Radix primitive:** `@radix-ui/react-toast`
+
+---
+
+### Tooltip
+
+Hover tooltip component.
+
+**File:** `components/ui/tooltip.tsx`
+
+**Exports:**
+- `TooltipProvider` — Context provider
+- `Tooltip` — Container
+- `TooltipTrigger` — Hover target
+- `TooltipContent` — Tooltip content
+
+**Usage:**
+
+```typescript
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+
+<TooltipProvider>
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <Button variant="ghost" size="icon">
+        <InfoIcon />
+      </Button>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>Additional information here</p>
+    </TooltipContent>
+  </Tooltip>
+</TooltipProvider>
+```
+
+**Radix primitive:** `@radix-ui/react-tooltip`
+
+---
+
+## Special Components
+
+### Background Gradient
+
+Animated gradient background effect.
+
+**File:** `components/ui/background-gradient.tsx`
+
+**Usage:**
+
+```typescript
+import { BackgroundGradient } from '@/components/ui/background-gradient';
+
+<BackgroundGradient className="rounded-lg p-6">
+  <div>Content with animated gradient background</div>
+</BackgroundGradient>
+```
+
+**Note:** Custom component, not from shadcn/ui. Uses Framer Motion for animations.
+
+---
+
+## Custom Icons
+
+### Reddit
+
+Reddit logo icon.
+
+**File:** `components/icons/Reddit.tsx`
+
+**Usage:**
+
+```typescript
+import { Reddit } from '@/components/icons/Reddit';
+
+<Reddit className="w-6 h-6 text-orange-500" />
+
+// In social links
+<a href="https://reddit.com/u/username" target="_blank">
+  <Reddit className="hover:text-orange-600 transition" />
+</a>
+```
+
+**Props:**
+- `className?: string` — Tailwind classes for styling
+
+---
+
+### Kaggle
+
+Kaggle logo icon.
+
+**File:** `components/icons/Kaggle.tsx`
+
+**Usage:**
+
+```typescript
+import { Kaggle } from '@/components/icons/Kaggle';
+
+<Kaggle className="w-6 h-6 text-blue-400" />
+
+// In social links
+<a href="https://kaggle.com/username" target="_blank">
+  <Kaggle className="hover:text-blue-500 transition" />
+</a>
+```
+
+**Props:**
+- `className?: string` — Tailwind classes for styling
+
+---
+
+## Component Categories
+
+### Input Components
+| Component | File | Radix Primitive |
+|-----------|------|-----------------|
+| Button | `button.tsx` | `@radix-ui/react-slot` |
+| Input | `input.tsx` | Native HTML |
+| Checkbox | `checkbox.tsx` | `@radix-ui/react-checkbox` |
+| Select | `select.tsx` | `@radix-ui/react-select` |
+
+### Layout Components
+| Component | File | Radix Primitive |
+|-----------|------|-----------------|
+| Card | `card.tsx` | None |
+| Separator | `separator.tsx` | `@radix-ui/react-separator` |
+| Scroll Area | `scroll-area.tsx` | `@radix-ui/react-scroll-area` |
+
+### Navigation Components
+| Component | File | Radix Primitive |
+|-----------|------|-----------------|
+| Tabs | `tabs.tsx` | `@radix-ui/react-tabs` |
+| Accordion | `accordion.tsx` | `@radix-ui/react-accordion` |
+| Dropdown Menu | `dropdown-menu.tsx` | `@radix-ui/react-dropdown-menu` |
+
+### Feedback Components
+| Component | File | Radix Primitive |
+|-----------|------|-----------------|
+| Alert | `alert.tsx` | None |
+| Badge | `badge.tsx` | None |
+| Toast | `toast.tsx` / `toaster.tsx` | `@radix-ui/react-toast` |
+| Tooltip | `tooltip.tsx` | `@radix-ui/react-tooltip` |
+
+### Special Components
+| Component | File | Purpose |
+|-----------|------|---------|
+| Background Gradient | `background-gradient.tsx` | Animated gradient backgrounds |
+
+### Custom Icons
+| Icon | File | Purpose |
+|------|------|---------|
+| Reddit | `icons/Reddit.tsx` | Reddit social link |
+| Kaggle | `icons/Kaggle.tsx` | Kaggle profile link |
+
+---
+
+## Customization
+
+All components accept `className` prop for customization:
+
+```typescript
+// Extend default styles
+<Button className="shadow-lg hover:shadow-xl">
+  Enhanced Button
+</Button>
+
+// Override styles (Tailwind classes with higher specificity)
+<Card className="border-2 border-blue-500 rounded-xl">
+  Custom Card
+</Card>
+
+// Combine with cn() utility
+import { cn } from '@/lib/utils';
+
+<Badge className={cn(
+  'text-xs',
+  isActive && 'bg-green-500',
+  !isActive && 'bg-gray-400'
+)}>
+  Status
+</Badge>
+```
+
+---
+
+## Adding New Components
+
+To add a new shadcn/ui component:
+
+```bash
+# Using shadcn CLI (if installed)
+npx shadcn@latest add [component-name]
+
+# Example
+npx shadcn@latest add dialog
+npx shadcn@latest add popover
+```
+
+Components will be added to `components/ui/`.
+
+---
+
+## Accessibility
+
+All UI primitives are **fully accessible** by default:
+- ✅ Keyboard navigation
+- ✅ Screen reader support
+- ✅ ARIA attributes
+- ✅ Focus management
+
+**Example:**
+```typescript
+// Button has proper focus states
+<Button>Accessible Button</Button>
+// - Can be focused with Tab
+// - Activates with Enter/Space
+// - Has visible focus ring
+
+// Dropdown menu has full keyboard support
+<DropdownMenu>
+  {/* Navigate with arrow keys, Esc to close, etc. */}
+</DropdownMenu>
+```
+
+---
+
+## Server vs Client
+
+### Server-Safe Components
+Most layout components can be used in server components:
+- Card, CardHeader, CardTitle, CardContent
+- Badge
+- Separator
+- Alert
+
+### Client-Only Components
+Interactive components require `'use client'`:
+- Button (with click handlers)
+- Input (with state)
+- Checkbox (with state)
+- Select (with state)
+- Tabs (interactive)
+- Accordion (interactive)
+- Dropdown Menu (interactive)
+- Toast (interactive)
+- Tooltip (hover state)
+
+**Usage in server components:**
+```typescript
+// ✅ OK - no interactivity
+<Card>
+  <CardTitle>Static Content</CardTitle>
+</Card>
+
+// ❌ WRONG - requires client component
+<Button onClick={() => alert('clicked')}>
+  Click me
+</Button>
+
+// ✅ OK - wrap in client component
+// ClientButton.tsx
+'use client';
+export function ClientButton() {
+  return <Button onClick={() => alert('clicked')}>Click me</Button>;
+}
+```
+
+---
+
+## Summary
+
+The project includes **16 UI primitives** and **2 custom icons**:
+
+**Use these components for:**
+- ✅ Consistent design system
+- ✅ Accessibility out-of-the-box
+- ✅ Type safety
+- ✅ Dark mode support
+- ✅ Responsive design
+
+**Import from `@/components/ui/` or `@/components/icons/`**
+**Customize with Tailwind CSS classes**
+**All components use the `cn()` utility for className merging**

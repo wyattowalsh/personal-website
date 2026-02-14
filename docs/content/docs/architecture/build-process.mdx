@@ -1,0 +1,184 @@
+---
+title: Build Process & Configuration
+description: A look into the build system, webpack optimizations, and automation scripts.
+---
+
+The project is supported by a robust and automated build process that handles everything from content preprocessing to bundle optimization.
+
+### Central Configuration: `next.config.mjs`
+
+The `next.config.mjs` file is the central hub for the project's build. It configures:
+
+#### MDX Plugin Pipeline
+
+The project uses `@next/mdx` with a carefully curated set of remark and rehype plugins (string-based for Turbopack compatibility):
+
+**Remark Plugins (Markdown AST processing):**
+```javascript
+remarkPlugins: [
+  ['remark-frontmatter'],           // Parse YAML frontmatter
+  ['remark-mdx-frontmatter'],       // Export frontmatter as JS
+  ['remark-gfm'],                   // GitHub Flavored Markdown
+  ['remark-math'],                  // LaTeX math syntax
+  ['remark-mdx-math-enhanced', { component: 'Math' }],  // Enhanced math
+],
+```
+
+**Rehype Plugins (HTML AST processing):**
+```javascript
+rehypePlugins: [
+  ['rehype-slug'],                  // Generate heading IDs
+  ['rehype-prism-plus'],            // Syntax highlighting
+],
+```
+
+Note: While 35+ plugin packages are installed in `package.json` to support the full MDX ecosystem, `next.config.mjs` currently uses a minimal subset (7 active plugins) optimized for Turbopack compatibility. The remaining plugins are available but not all active in the current configuration. For the complete plugin architecture, see the [Content: MDX Pipeline](/docs/content/mdx-pipeline) documentation.
+
+#### Page Extensions
+```javascript
+pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx']
+```
+
+#### Image Optimization
+```javascript
+images: {
+  formats: ['image/avif', 'image/webp'],
+  deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+  imageSizes: [16, 32, 48, 64, 96, 128, 256],
+}
+```
+
+#### Webpack Fallbacks
+The configuration disables Node.js built-ins for browser bundles:
+
+```javascript
+webpack: (config) => {
+  config.resolve.fallback = {
+    ...config.resolve.fallback,
+    fs: false,
+    path: false,
+  }
+  return config
+}
+```
+
+#### Security Headers
+Implements comprehensive security headers for all routes:
+
+```javascript
+async headers() {
+  return [{
+    source: '/:path*',
+    headers: [
+      { key: 'X-DNS-Prefetch-Control', value: 'on' },
+      { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+      { key: 'X-Content-Type-Options', value: 'nosniff' },
+      { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+      { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+    ],
+  }]
+}
+```
+
+#### Bundle Analyzer
+Optional bundle size analysis via `@next/bundle-analyzer`:
+
+```javascript
+const bundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})
+```
+
+Run with: `ANALYZE=true pnpm build`
+
+#### Turbopack Compatibility
+All MDX plugins are specified as **string-based arrays** instead of imported functions to ensure compatibility with Next.js Turbopack bundler.
+
+### ESLint 9 Flat Config
+
+**Source:** `eslint.config.js`
+
+The project uses the modern **ESLint 9 flat config** format (replacing `.eslintrc.json`):
+
+```javascript
+/** @type {import("eslint").Linter.Config[]} */
+const config = [
+  {
+    ignores: ["*.stories.*", ".next/**", "node_modules/**", "out/**",
+              "public/**", "docs/**", ".storybook/**", "**/*.d.ts"],
+  },
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    plugins: {
+      "@next/next": nextPlugin,
+      "react": reactPlugin,
+      "react-hooks": reactHooksPlugin,
+      "@typescript-eslint": tsPlugin,
+    },
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: { ecmaFeatures: { jsx: true } },
+    },
+    rules: {
+      ...nextPlugin.configs.recommended.rules,
+      ...nextPlugin.configs["core-web-vitals"].rules,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["warn", {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }],
+    },
+  },
+];
+```
+
+**Key Features:**
+- Array-based configuration (flat config format)
+- Plugin imports as ESM modules
+- Explicit parser configuration (`@typescript-eslint/parser`)
+- Next.js recommended rules + Core Web Vitals
+- React Hooks validation
+- TypeScript strict mode warnings
+
+### Automation: Build Scripts & Preprocessing
+
+**Source:** `scripts/`
+
+The project contains TypeScript-based automation scripts that run before development and production builds:
+
+#### Build Lifecycle Hooks (`package.json`)
+
+```json
+{
+  "scripts": {
+    "preprocess": "tsx scripts/index.ts",
+    "predev": "NODE_ENV=development npm run preprocess",
+    "dev": "DEBUG=true LOG_LEVEL=debug next dev",
+    "prebuild": "NODE_ENV=production npm run preprocess",
+    "build": "next build"
+  }
+}
+```
+
+**Flow:**
+1. `pnpm dev` → triggers `predev` → runs `preprocess` script → starts Next.js dev server
+2. `pnpm build` → triggers `prebuild` → runs `preprocess` script → builds production bundle
+
+#### Preprocessing Scripts
+
+- **`scripts/index.ts`**: Main orchestrator that calls the backend preprocessing pipeline and logs detailed performance metrics (memory usage, execution time, posts processed, cache size).
+
+- **`scripts/particles.ts`**: Validates and processes JSON particle configurations from `public/particles/` using Zod schemas. Includes intelligent file hashing and caching to avoid reprocessing unchanged files.
+
+- **`scripts/new-post.ts`**: Interactive CLI for creating new blog posts with frontmatter templates and automatic slug generation.
+
+**Example output:**
+```
+ℹ [INFO] → Mode: Production
+↳ [PROGRESS] → ████████████████████ 100.0% | Processing /app/blog/posts/w4w-v6/page.mdx
+✓ [SUCCESS] → Preprocessing completed successfully
+⏱ [TIME] → Total preprocessing time: 1234.56ms
+📊 [MEMORY] → heapUsed: 45.2MB, external: 1.8MB
+``` 

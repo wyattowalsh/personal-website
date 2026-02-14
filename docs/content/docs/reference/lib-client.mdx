@@ -1,0 +1,677 @@
+---
+title: "lib/client.ts"
+description: "Client-side API for fetching blog data via fetch() in browser components"
+---
+
+The `lib/client.ts` module provides a **client-safe** API for fetching blog data in React client components. Unlike `lib/services.ts`, which directly accesses the file system, `lib/client.ts` uses `fetch()` to call API routes.
+
+## Overview
+
+**Key differences:**
+
+| Feature | `lib/client.ts` | `lib/services.ts` |
+|---------|-----------------|-------------------|
+| Environment | Client components | Server components |
+| Transport | HTTP (fetch) | Direct function calls |
+| Caching | In-memory cache | LRU cache in BackendService |
+| Error handling | Returns `null` | Returns `null` or throws |
+
+---
+
+## api Object
+
+The primary export is an `api` object with methods for posts and caching.
+
+```typescript
+const api = {
+  posts: { /* ... */ },
+  withCache: <T>(...) => Promise<T>
+};
+```
+
+---
+
+## api.posts
+
+Client-side post operations.
+
+### api.posts.get
+
+Fetch a single post by slug.
+
+```typescript
+async function get(slug: string): Promise<ApiResponse<Post> | null>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `slug` | `string` | Post slug (URL identifier) |
+
+**Returns:** `ApiResponse<Post> | null`
+- Returns API response wrapper with post data and metadata
+- Returns `null` on error or 404
+
+**Usage:**
+
+```typescript
+'use client';
+
+import { api } from '@/lib/client';
+import { useEffect, useState } from 'react';
+import type { Post } from '@/lib/core';
+
+export function PostViewer({ slug }: { slug: string }) {
+  const [post, setPost] = useState<Post | null>(null);
+
+  useEffect(() => {
+    api.posts.get(slug).then(response => {
+      if (response) {
+        setPost(response.data);
+      }
+    });
+  }, [slug]);
+
+  if (!post) return <div>Loading...</div>;
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+    </article>
+  );
+}
+```
+
+**API Endpoint:** `GET /api/blog/posts/${slug}`
+
+---
+
+### api.posts.getAll
+
+Fetch all posts with optional pagination and sorting.
+
+```typescript
+async function getAll(params?: {
+  page?: number;
+  limit?: number;
+  sort?: 'asc' | 'desc';
+}): Promise<ApiResponse<Post[]> | null>
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `params.page` | `number` | `1` | Page number (1-indexed) |
+| `params.limit` | `number` | `10` | Posts per page |
+| `params.sort` | `'asc' \| 'desc'` | `'desc'` | Sort order by date |
+
+**Returns:** `ApiResponse<Post[]> | null`
+
+**Usage:**
+
+```typescript
+'use client';
+
+import { api } from '@/lib/client';
+import { useEffect, useState } from 'react';
+
+export function PostList() {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    api.posts.getAll({ page: 1, limit: 20, sort: 'desc' })
+      .then(response => {
+        if (response) {
+          setPosts(response.data);
+          console.log('Total pages:', response.meta?.total);
+        }
+      });
+  }, []);
+
+  return (
+    <ul>
+      {posts.map(post => (
+        <li key={post.slug}>{post.title}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+**API Endpoint:** `GET /api/blog/posts?page=1&limit=10&sort=desc`
+
+---
+
+### api.posts.getByTag
+
+Fetch posts filtered by tag.
+
+```typescript
+async function getByTag(tag: string, params?: {
+  page?: number;
+  limit?: number;
+}): Promise<ApiResponse<Post[]> | null>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tag` | `string` | Tag name (case-sensitive) |
+| `params.page` | `number` | Page number |
+| `params.limit` | `number` | Posts per page |
+
+**Returns:** `ApiResponse<Post[]> | null`
+
+**Usage:**
+
+```typescript
+'use client';
+
+import { api } from '@/lib/client';
+
+export function TaggedPosts({ tag }: { tag: string }) {
+  const [posts, setPosts] = useState([]);
+
+  useEffect(() => {
+    api.posts.getByTag(tag, { limit: 50 })
+      .then(response => {
+        if (response) setPosts(response.data);
+      });
+  }, [tag]);
+
+  return <PostGrid posts={posts} />;
+}
+```
+
+**API Endpoint:** `GET /api/blog/tags/${tag}?page=1&limit=10`
+
+---
+
+### api.posts.search
+
+Full-text search across posts.
+
+```typescript
+async function search(query: string): Promise<ApiResponse<SearchResult<Post>[]> | null>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | `string` | Search query string |
+
+**Returns:** `ApiResponse<SearchResult<Post>[]> | null`
+
+**Usage:**
+
+```typescript
+'use client';
+
+import { api } from '@/lib/client';
+import type { SearchResult, Post } from '@/lib/core';
+
+export function SearchBox() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult<Post>[]>([]);
+
+  const handleSearch = async () => {
+    const response = await api.posts.search(query);
+    if (response) {
+      setResults(response.data);
+    }
+  };
+
+  return (
+    <div>
+      <input value={query} onChange={e => setQuery(e.target.value)} />
+      <button onClick={handleSearch}>Search</button>
+
+      {results.map(result => (
+        <SearchResultCard
+          key={result.item.slug}
+          post={result.item}
+          score={result.score}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+**API Endpoint:** `GET /api/blog/search?query=react`
+
+---
+
+## api.withCache
+
+Cache wrapper for expensive operations.
+
+```typescript
+function withCache<T>(
+  key: string,
+  fn: () => Promise<T>,
+  ttl?: number
+): Promise<T>
+```
+
+**Parameters:**
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `key` | `string` | Required | Unique cache key |
+| `fn` | `() => Promise<T>` | Required | Async function to cache |
+| `ttl` | `number` | `3600` | Cache TTL in seconds |
+
+**Returns:** Cached or fresh result of type `T`
+
+**Usage:**
+
+```typescript
+import { api } from '@/lib/client';
+
+// Cache expensive search results for 30 minutes
+const results = await api.withCache(
+  `search:${query}`,
+  () => api.posts.search(query),
+  1800 // 30 minutes
+);
+```
+
+**Cache behavior:**
+- First call: Executes `fn()` and caches result
+- Subsequent calls (within TTL): Returns cached result without executing `fn()`
+- After TTL expires: Re-executes `fn()` and updates cache
+
+**Cache storage:**
+- In-memory object (`cache.store`)
+- Cleared on page refresh
+- Not shared across tabs
+
+---
+
+## Legacy Functions
+
+The following functions are legacy exports. **Prefer using `api` object instead.**
+
+### fetchPost
+
+```typescript
+async function fetchPost(slug: string): Promise<Post | null>
+```
+
+**Usage:**
+```typescript
+const post = await fetchPost('my-slug');
+```
+
+**Equivalent to:**
+```typescript
+const response = await api.posts.get('my-slug');
+const post = response?.data || null;
+```
+
+---
+
+### fetchPosts
+
+```typescript
+async function fetchPosts(): Promise<Post[]>
+```
+
+**Usage:**
+```typescript
+const posts = await fetchPosts();
+```
+
+**Equivalent to:**
+```typescript
+const response = await api.posts.getAll();
+const posts = response?.data || [];
+```
+
+---
+
+### fetchPostsByTag
+
+```typescript
+async function fetchPostsByTag(tag: string): Promise<Post[]>
+```
+
+**Usage:**
+```typescript
+const posts = await fetchPostsByTag('TypeScript');
+```
+
+**Equivalent to:**
+```typescript
+const response = await api.posts.getByTag('TypeScript');
+const posts = response?.data || [];
+```
+
+---
+
+### searchPosts
+
+```typescript
+async function searchPosts(query: string): Promise<SearchResult<Post>[]>
+```
+
+**Usage:**
+```typescript
+const results = await searchPosts('hooks');
+```
+
+**Equivalent to:**
+```typescript
+const response = await api.posts.search('hooks');
+const results = response?.data || [];
+```
+
+---
+
+### fetchPostMetadata
+
+```typescript
+async function fetchPostMetadata(slug: string): Promise<PostMetadata | null>
+```
+
+**Usage:**
+```typescript
+const metadata = await fetchPostMetadata('my-slug');
+```
+
+**API Endpoint:** `GET /api/blog/posts/${slug}/metadata`
+
+---
+
+### getAdjacentPosts
+
+```typescript
+async function getAdjacentPosts(slug: string): Promise<{
+  prev: AdjacentPost | null;
+  next: AdjacentPost | null;
+}>
+```
+
+**Usage:**
+```typescript
+const { prev, next } = await getAdjacentPosts('my-slug');
+```
+
+**API Endpoint:** `GET /api/blog/posts/${slug}/adjacent`
+
+---
+
+### getPostMetadata
+
+```typescript
+async function getPostMetadata(slug: string): Promise<any>
+```
+
+**Usage:**
+```typescript
+const metadata = await getPostMetadata('my-slug');
+```
+
+**Note:** Duplicate of `fetchPostMetadata`. Use that instead.
+
+---
+
+## Internal Utilities
+
+### apiFetch
+
+Low-level fetch wrapper used by `api` object.
+
+```typescript
+async function apiFetch<T, P extends Record<string, unknown>>(
+  endpoint: string,
+  options?: {
+    params?: P;
+    init?: RequestInit;
+    transform?: (data: T) => unknown;
+  }
+): Promise<ApiResponse<T> | null>
+```
+
+**Features:**
+- Automatic query parameter encoding
+- JSON Accept header
+- Error handling
+- Optional response transformation
+
+**Usage:**
+```typescript
+const response = await apiFetch<Post[]>('/api/blog/posts', {
+  params: { page: 2, limit: 20 },
+  transform: (posts) => posts.slice(0, 10) // Only take first 10
+});
+```
+
+**Not typically used directly** — use `api.posts.*` methods instead.
+
+---
+
+## Type Definitions
+
+### ApiResponse
+
+```typescript
+interface ApiResponse<T> {
+  data: T;
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+  };
+}
+```
+
+### CacheStore
+
+```typescript
+interface CacheStore {
+  [key: string]: {
+    value: unknown;
+    timestamp: number;
+    ttl: number; // In seconds
+  };
+}
+```
+
+---
+
+## Error Handling
+
+All `api.posts.*` methods return `null` on error:
+
+```typescript
+const response = await api.posts.get('invalid-slug');
+
+if (!response) {
+  console.error('Failed to fetch post');
+  return <ErrorMessage />;
+}
+
+const post = response.data;
+```
+
+Errors are logged to the browser console:
+```
+API fetch error (/api/blog/posts/invalid): Post not found
+```
+
+---
+
+## Caching Strategy
+
+### Built-in Cache
+
+The `api.withCache()` method provides a simple TTL-based cache:
+
+```typescript
+// First call: fetch from API
+const posts1 = await api.withCache('all-posts', () => api.posts.getAll());
+
+// Second call (within TTL): return cached result
+const posts2 = await api.withCache('all-posts', () => api.posts.getAll());
+
+// After TTL expires: fetch from API again
+```
+
+**Cache invalidation:**
+```typescript
+// Manual invalidation not supported — use unique keys
+const key = `posts:${page}:${Date.now()}`;
+const posts = await api.withCache(key, () => api.posts.getAll({ page }));
+```
+
+### React Query Integration
+
+For more robust caching, use React Query:
+
+```typescript
+'use client';
+
+import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/client';
+
+export function PostList() {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['posts'],
+    queryFn: async () => {
+      const response = await api.posts.getAll();
+      return response?.data || [];
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  if (isLoading) return <Spinner />;
+  if (error) return <Error />;
+
+  return <PostGrid posts={data} />;
+}
+```
+
+---
+
+## Browser-Only
+
+**⚠️ Important:** `lib/client.ts` is **client-safe** but should only be used in browser environments.
+
+**Use in client components:**
+```typescript
+'use client'; // ✅ Correct
+
+import { api } from '@/lib/client';
+```
+
+**Do NOT use in server components:**
+```typescript
+// ❌ WRONG - use lib/services.ts instead
+
+import { api } from '@/lib/client';
+// Will work but inefficient (extra HTTP round-trip)
+```
+
+**For server components:**
+```typescript
+import { services } from '@/lib/services'; // ✅ Correct
+```
+
+---
+
+## Usage Patterns
+
+### Fetching in useEffect
+
+```typescript
+'use client';
+
+import { api } from '@/lib/client';
+import { useEffect, useState } from 'react';
+
+export function ClientPost({ slug }: { slug: string }) {
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.posts.get(slug)
+      .then(response => {
+        if (response) setPost(response.data);
+      })
+      .finally(() => setLoading(false));
+  }, [slug]);
+
+  if (loading) return <Spinner />;
+  if (!post) return <NotFound />;
+
+  return <Article post={post} />;
+}
+```
+
+### Parallel Fetching
+
+```typescript
+useEffect(() => {
+  Promise.all([
+    api.posts.get(slug),
+    api.posts.getAll({ limit: 5 }),
+  ]).then(([postResponse, postsResponse]) => {
+    if (postResponse) setPost(postResponse.data);
+    if (postsResponse) setRelatedPosts(postsResponse.data);
+  });
+}, [slug]);
+```
+
+### With Suspense
+
+```typescript
+'use client';
+
+import { use } from 'react';
+import { api } from '@/lib/client';
+
+export function SuspensePost({ slug }: { slug: string }) {
+  // Convert Promise to Suspense-compatible resource
+  const postPromise = api.posts.get(slug).then(r => r?.data);
+  const post = use(postPromise);
+
+  return <Article post={post} />;
+}
+
+// In parent component:
+<Suspense fallback={<Spinner />}>
+  <SuspensePost slug={slug} />
+</Suspense>
+```
+
+---
+
+## Summary
+
+`lib/client.ts` provides a **fetch-based, client-safe API** for blog data:
+
+| Method | Purpose | Returns |
+|--------|---------|---------|
+| `api.posts.get(slug)` | Fetch single post | `ApiResponse<Post> \| null` |
+| `api.posts.getAll(params)` | Fetch all posts | `ApiResponse<Post[]> \| null` |
+| `api.posts.getByTag(tag, params)` | Filter by tag | `ApiResponse<Post[]> \| null` |
+| `api.posts.search(query)` | Full-text search | `ApiResponse<SearchResult<Post>[]> \| null` |
+| `api.withCache(key, fn, ttl)` | Cache results | `Promise<T>` |
+
+**When to use:**
+- ✅ Client components (`'use client'`)
+- ✅ Browser-side interactions
+- ✅ Dynamic, user-triggered fetching
+
+**When NOT to use:**
+- ❌ Server components (use `lib/services.ts` instead)
+- ❌ Static generation (use `lib/services.ts` instead)
+
+**Legacy functions:** All legacy functions (`fetchPost`, `searchPosts`, etc.) are still exported for backward compatibility but **prefer the `api` object** for new code.

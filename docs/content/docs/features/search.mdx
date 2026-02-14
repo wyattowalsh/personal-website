@@ -1,0 +1,435 @@
+---
+title: "Search"
+description: "Client-side full-text search powered by Fuse.js with tag filtering, sorting, and animated results."
+---
+
+## Overview
+
+The search system provides **client-side full-text search** across all blog posts using **Fuse.js**. Features include:
+
+- Fuzzy search across title, summary, content, and tags
+- Tag-based filtering (multi-select)
+- Sort by date or title (ascending/descending)
+- Animated result grid with staggered entrance
+- Responsive design with mobile-optimized tag layout
+
+## Architecture
+
+### Core Files
+
+| File | Purpose |
+|------|---------|
+| `components/SearchBar.tsx` | Main search UI component with Fuse.js integration |
+| `lib/server.ts` | Backend search index building (if server-side search is added) |
+| `components/ui/input.tsx` | shadcn/ui Input primitive |
+| `components/ui/select.tsx` | shadcn/ui Select primitive for sort controls |
+
+## SearchBar Component
+
+The `SearchBar` component orchestrates search, filtering, and display logic.
+
+### Props
+
+```typescript
+interface SearchBarProps {
+  posts: PostMetadata[];  // All blog posts
+  tags: string[];         // All unique tags
+}
+```
+
+### State Management
+
+```typescript
+const [query, setQuery] = useState("");                        // Search query
+const [results, setResults] = useState<Post[]>([]);            // Filtered results
+const [selectedTags, setSelectedTags] = useState<string[]>([]); // Active tag filters
+const [sortMethod, setSortMethod] = useState<string>("date");  // "date" | "title"
+const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+const [mounted, setMounted] = useState(false);                 // Hydration guard
+```
+
+## Fuse.js Configuration
+
+### Search Index
+
+Fuse instance is memoized to prevent re-initialization on every render:
+
+```typescript
+const fuse = useMemo(
+  () => new Fuse(posts, {
+    keys: [
+      { name: "title", weight: 1.0 },       // Highest priority
+      { name: "summary", weight: 0.8 },
+      { name: "content", weight: 0.6 },
+      { name: "tags", weight: 0.9 },
+    ],
+    includeScore: true,
+    threshold: 0.3,              // Lower = stricter matching (0.0 = exact, 1.0 = any)
+    ignoreLocation: true,        // Search entire field, not just beginning
+    useExtendedSearch: true,
+    findAllMatches: true,        // Return all matches, not just first
+  }),
+  [posts]
+);
+```
+
+### Weighted Keys
+
+Fields are weighted to prioritize matches in important areas:
+
+| Field | Weight | Reasoning |
+|-------|--------|-----------|
+| `title` | 1.0 | Most relevant indicator of post content |
+| `tags` | 0.9 | High signal for topic relevance |
+| `summary` | 0.8 | Author-curated description |
+| `content` | 0.6 | Comprehensive but can be noisy |
+
+### Threshold
+
+`threshold: 0.3` provides a balance between:
+
+- **Strict matching** (catches typos like "reacct" → "react")
+- **Avoiding false positives** (doesn't match completely unrelated terms)
+
+Adjust higher (→ 0.6) for fuzzier matches, lower (→ 0.1) for stricter.
+
+## Search Logic
+
+### Combined Filtering
+
+The search effect applies three filters in sequence:
+
+```typescript
+useEffect(() => {
+  let searchResults = [...posts];
+
+  // 1. Text search
+  if (query.trim()) {
+    const fuseResults = fuse.search(query);
+    searchResults = fuseResults
+      .sort((a, b) => (a.score || 0) - (b.score || 0)) // Best score first
+      .map(({ item }) => item);
+  }
+
+  // 2. Tag filtering
+  if (selectedTags.length > 0) {
+    searchResults = searchResults.filter((post) =>
+      selectedTags.every((tag) => post.tags?.includes(tag))
+    );
+  }
+
+  // 3. Sorting
+  searchResults = searchResults.sort((a, b) => {
+    const modifier = sortDirection === "asc" ? -1 : 1;
+    if (sortMethod === "title") {
+      return a.title.localeCompare(b.title) * modifier;
+    }
+    return (getPostDate(b) - getPostDate(a)) * modifier;
+  });
+
+  setResults(searchResults);
+}, [query, selectedTags, sortMethod, sortDirection, posts, fuse]);
+```
+
+### Tag Intersection
+
+Multi-select tags use **AND logic** (intersection, not union):
+
+```typescript
+selectedTags.every((tag) => post.tags?.includes(tag))
+```
+
+Example: Selecting `["React", "TypeScript"]` shows only posts tagged with **both**.
+
+## UI Components
+
+### Search Input
+
+Enhanced input with gradient underline effect:
+
+```tsx
+<Input
+  type="text"
+  placeholder="Search posts by title, content, or tags..."
+  value={query}
+  onChange={handleSearch}
+  className={cn(
+    "w-full p-3 sm:p-4 text-base sm:text-lg",
+    "bg-background/95 dark:bg-gray-900/95",
+    "border-2 border-border hover:border-primary/50",
+    "transition-all duration-300",
+    "focus:ring-2 focus:ring-primary/20"
+  )}
+/>
+```
+
+### Tag Badges
+
+Clickable badges with active state:
+
+```tsx
+{tags.map((tag) => (
+  <motion.button
+    key={tag}
+    onClick={() => toggleTag(tag)}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+    className={cn(
+      "px-2 py-1 rounded-full text-xs sm:text-sm border-2",
+      selectedTags.includes(tag)
+        ? "bg-primary/10 text-primary border-primary/50"
+        : "bg-background text-muted-foreground border-border"
+    )}
+  >
+    #{tag}
+  </motion.button>
+))}
+```
+
+**Tag sorting:** Case-insensitive alphabetical:
+
+```typescript
+const tags = useMemo(
+  () => [...unsortedTags].sort((a, b) =>
+    a.toLowerCase().localeCompare(b.toLowerCase())
+  ),
+  [unsortedTags]
+);
+```
+
+### Sort Controls
+
+Select dropdown and direction toggle:
+
+```tsx
+<Select value={sortMethod} onValueChange={setSortMethod}>
+  <SelectTrigger className="w-full sm:w-[180px]">
+    <SelectValue placeholder="Sort by..." />
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="date">Sort by Date</SelectItem>
+    <SelectItem value="title">Sort by Title</SelectItem>
+  </SelectContent>
+</Select>
+
+<Button
+  variant="outline"
+  size="icon"
+  onClick={() => setSortDirection(d => d === "asc" ? "desc" : "asc")}
+>
+  {sortDirection === "asc" ? <ChevronUp /> : <ChevronDown />}
+</Button>
+```
+
+### Results Grid
+
+Responsive grid with animated entries:
+
+```tsx
+<div className="grid gap-4 sm:gap-6 lg:gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+  {results.length > 0 ? (
+    results.map((post, idx) => (
+      <motion.div
+        key={`${post.slug}-${idx}`}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          type: "spring",
+          stiffness: 100,
+          damping: 15,
+          delay: Math.min(idx * 0.1, 0.8), // Max 0.8s delay
+        }}
+      >
+        <PostCard post={post} className="h-full" />
+      </motion.div>
+    ))
+  ) : (
+    <motion.div className="col-span-full text-center py-12">
+      <p className="text-lg text-muted-foreground">No matching posts found.</p>
+      <Button onClick={clearFilters}>Clear filters</Button>
+    </motion.div>
+  )}
+</div>
+```
+
+**Single result centering:**
+
+```tsx
+{results.length === 1 ? (
+  <div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
+    <PostCard post={results[0]} className="h-full" />
+  </div>
+) : (
+  /* ... multiple results */
+)}
+```
+
+## Accessibility
+
+### Focus Management
+
+All interactive elements have focus-visible styles:
+
+```scss
+.focus-visible:outline-none
+.focus-visible:ring-2
+.focus-visible:ring-ring
+.focus-visible:ring-offset-2
+```
+
+### ARIA Labels
+
+- Tag buttons: `aria-label` implicit from visible text
+- Sort direction button: Tooltip shows "Ascending" / "Descending"
+- Clear filters button: Self-explanatory text
+
+### Keyboard Navigation
+
+- `Tab` to navigate between input, tags, sort controls
+- `Enter` to activate buttons
+- `Space` to toggle selected tags
+
+## Hydration Safety
+
+Prevents server/client mismatch:
+
+```typescript
+const [mounted, setMounted] = useState(false);
+
+useEffect(() => {
+  if (!posts?.length) {
+    console.warn("No posts provided to SearchBar");
+    setResults([]);
+    return;
+  }
+
+  const sortedPosts = [...posts].sort((a, b) => getPostDate(b) - getPostDate(a));
+  setResults(sortedPosts);
+  setMounted(true);
+}, [posts]);
+
+if (!mounted) {
+  return null; // Don't render until client-side
+}
+```
+
+## Performance Optimizations
+
+### Memoization
+
+- Fuse instance: `useMemo(() => new Fuse(...), [posts])`
+- Sorted tags: `useMemo(() => [...tags].sort(...), [tags])`
+- Valid posts filter: `useMemo(() => posts.filter(...), [posts])`
+
+### Debouncing (Not Implemented)
+
+For extremely large post counts (100+), consider debouncing the search input:
+
+```typescript
+import { useDebouncedCallback } from 'use-debounce';
+
+const debouncedSearch = useDebouncedCallback(
+  (value: string) => setQuery(value),
+  300 // 300ms delay
+);
+
+<Input onChange={(e) => debouncedSearch(e.target.value)} />
+```
+
+### Stagger Limit
+
+Animation delay caps at 0.8s to prevent excessive delay on large result sets:
+
+```typescript
+delay: Math.min(idx * 0.1, 0.8)
+```
+
+## Customization
+
+### Adjusting Search Strictness
+
+**More lenient** (catch more typos, risk false positives):
+
+```typescript
+threshold: 0.5 // Up from 0.3
+```
+
+**Stricter** (exact matches only):
+
+```typescript
+threshold: 0.1 // Down from 0.3
+```
+
+### Changing Field Weights
+
+Prioritize tags over title:
+
+```typescript
+keys: [
+  { name: "tags", weight: 1.0 },
+  { name: "title", weight: 0.9 },
+  // ...
+]
+```
+
+### Switching to OR Tag Logic
+
+Change from intersection (AND) to union (OR):
+
+```typescript
+// Old: every tag must match
+selectedTags.every((tag) => post.tags?.includes(tag))
+
+// New: any tag matches
+selectedTags.some((tag) => post.tags?.includes(tag))
+```
+
+### Adding Excerpt Highlighting
+
+Fuse.js supports match highlighting via `includeMatches`:
+
+```typescript
+new Fuse(posts, {
+  // ... existing config
+  includeMatches: true
+});
+
+// In results:
+fuseResults.map(({ item, matches }) => {
+  // matches contains { indices: [[start, end]], value: "..." }
+  // Wrap indices in <mark> tags
+});
+```
+
+## Troubleshooting
+
+**Problem:** Search finds nothing
+
+- **Solution:** Check `threshold` isn't too strict. Verify posts have `title`, `summary`, `content`, `tags` fields.
+
+**Problem:** Hydration mismatch
+
+- **Solution:** Ensure `mounted` state is checked before rendering
+
+**Problem:** Tags not filtering correctly
+
+- **Solution:** Verify `post.tags` is an array of strings (not comma-separated string)
+
+**Problem:** Results appear in wrong order
+
+- **Solution:** Check `sortDirection` modifier logic: `asc` should use `-1`, `desc` should use `1`
+
+**Problem:** Animation stutters
+
+- **Solution:** Reduce stagger delay or use `prefersReducedMotion` hook to disable animations
+
+## Future Enhancements
+
+Potential additions not yet implemented:
+
+- **Server-side search** — Pre-build search index in `lib/server.ts`, fetch via API route
+- **Search history** — Store recent queries in localStorage
+- **Query suggestions** — Show autocomplete dropdown
+- **Advanced filters** — Filter by date range, reading time, etc.
+- **Highlighted excerpts** — Show matching snippets in results
+- **URL sync** — Persist search state in query params for shareable URLs

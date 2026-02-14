@@ -1,0 +1,416 @@
+---
+title: "Math and Diagrams"
+description: "LaTeX math rendering with KaTeX and interactive Mermaid diagrams"
+---
+
+The website has first-class support for academic and technical content through its **KaTeX integration** for mathematical equations and **Mermaid** for interactive diagrams. Both systems are fully theme-aware and provide rich interactive features.
+
+## Math Component (KaTeX)
+
+The `Math` component (`components/Math.tsx`) enhances KaTeX-rendered mathematical equations with automatic numbering, anchor links, and copy functionality.
+
+### Features
+
+- **LaTeX rendering** — Full KaTeX support for mathematical notation
+- **Display and inline modes** — Block equations and inline math
+- **Automatic equation numbering** — Sequential numbering via React Context
+- **Permalink anchors** — Each equation gets a unique, copyable anchor link
+- **Copy functionality** — Copy raw LaTeX source or direct equation link
+- **Theme-aware styling** — Automatically adapts to light/dark mode
+
+### Usage
+
+#### Inline Math
+
+Use single dollar signs for inline math:
+
+```mdx
+The equation $E = mc^2$ represents mass-energy equivalence.
+```
+
+Or use the component explicitly:
+
+```mdx
+<Math>E = mc^2</Math>
+```
+
+#### Display Math (Block Equations)
+
+Use double dollar signs for display math:
+
+```mdx
+$$
+\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+$$
+```
+
+Or use the component with `display` prop:
+
+```mdx
+<Math display>
+\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}
+</Math>
+```
+
+#### Custom Labels and Numbers
+
+You can specify custom labels or equation numbers:
+
+```mdx
+<Math display label="energy-mass">
+E = mc^2
+</Math>
+
+<Math display number={42}>
+F = ma
+</Math>
+```
+
+### MathContext for Numbering
+
+The `MathContext` (defined in `components/MathContext.tsx`) provides equation numbering state:
+
+```typescript
+interface MathContextType {
+  getNextNumber: () => number;
+}
+```
+
+The context is provided in the blog layout via `MathProvider`, ensuring equation numbers are sequential within a post but reset between posts.
+
+### Equation Anchors
+
+Each display equation automatically receives an anchor ID in the format `eq-{number}` or `eq-{label}`. This enables:
+
+1. **Direct linking** — Click the equation number to update the URL hash
+2. **Copy link** — Copy button to grab the full URL with anchor
+3. **Deep linking** — Share links to specific equations
+
+Example URL: `https://w4w.dev/blog/posts/example#eq-3`
+
+### Interactive Controls
+
+Display equations include a control panel with two buttons:
+
+1. **Copy equation** — Copies the raw LaTeX source to clipboard
+2. **Copy link** — Copies the permalink URL to clipboard
+
+Both buttons show a green checkmark for 2 seconds after successful copy.
+
+### Implementation Details
+
+The `Math` component uses several optimizations:
+
+- **Memoized rendering** — KaTeX rendering is memoized to avoid re-renders
+- **Error handling** — Falls back to non-strict mode if rendering fails
+- **Auto-scroll** — Scrolls to equation if URL hash matches on mount
+- **Number stability** — Equation numbers are stored in a ref to prevent re-numbering on re-renders
+
+### Props Interface
+
+```typescript
+interface MathProps {
+  children?: string;        // LaTeX source
+  display?: boolean;        // Display mode (block) vs inline
+  options?: any;            // KaTeX options object
+  label?: string;           // Custom label (instead of number)
+  number?: number;          // Custom number (instead of auto)
+}
+```
+
+### KaTeX Configuration
+
+The component uses these KaTeX options:
+
+```typescript
+{
+  displayMode: display,
+  throwOnError: true,      // Strict mode (fallback to false on error)
+  globalGroup: true,       // Share macros across equations
+  trust: true,             // Allow \url, \href
+  strict: false,           // Relaxed parsing
+  fleqn: false,           // Left-align equations (false = center)
+}
+```
+
+## Mermaid Component
+
+The `Mermaid` component (`components/Mermaid.tsx`) renders interactive diagrams with pan, zoom, and fullscreen capabilities.
+
+### Features
+
+- **Interactive pan/zoom** — Mouse wheel zoom, click-and-drag pan
+- **Fullscreen mode** — Expand diagram to fill the screen
+- **Theme-aware rendering** — Automatically switches between light/dark Mermaid themes
+- **Download SVG** — Export diagrams as SVG files
+- **Keyboard shortcuts** — Quick access to zoom and pan controls
+- **Touch support** — Pan and zoom work on mobile devices
+
+### Usage
+
+```mdx
+<Mermaid chart={`
+  graph TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
+    D --> E
+`} />
+```
+
+With title:
+
+```mdx
+<Mermaid
+  title="System Architecture"
+  chart={`
+    graph LR
+      Client --> API
+      API --> Database
+      API --> Cache
+  `}
+/>
+```
+
+### Supported Diagram Types
+
+Mermaid supports many diagram types:
+
+#### Flowchart
+
+```
+graph TD
+  A --> B
+  B --> C
+```
+
+#### Sequence Diagram
+
+```
+sequenceDiagram
+  Alice->>Bob: Hello Bob
+  Bob-->>Alice: Hi Alice
+```
+
+#### Class Diagram
+
+```
+classDiagram
+  Animal <|-- Dog
+  Animal : +name
+  Animal : +makeSound()
+```
+
+#### State Diagram
+
+```
+stateDiagram-v2
+  [*] --> Active
+  Active --> [*]
+```
+
+#### Gantt Chart
+
+```
+gantt
+  title Project Timeline
+  section Phase 1
+  Task 1: 2024-01-01, 30d
+```
+
+#### Pie Chart
+
+```
+pie
+  "Dogs" : 42
+  "Cats" : 38
+  "Birds" : 20
+```
+
+#### ER Diagram
+
+```
+erDiagram
+  CUSTOMER ||--o{ ORDER : places
+  ORDER ||--|{ LINE-ITEM : contains
+```
+
+### Interactive Controls
+
+The toolbar provides these controls:
+
+1. **Pan mode toggle** — Switch between select and pan modes (or use Shift+click)
+2. **Zoom in** — Increase scale (or press `+`)
+3. **Zoom out** — Decrease scale (or press `-`)
+4. **Reset** — Reset zoom and pan (or press `0`)
+5. **Fit to container** — Auto-scale to fit (or press `f`)
+6. **Fullscreen** — Toggle fullscreen mode (exit with `Esc`)
+7. **Download** — Export as SVG
+
+### Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `+` / `=` | Zoom in |
+| `-` | Zoom out |
+| `0` | Reset zoom and pan |
+| `f` | Fit to container |
+| `Shift` + drag | Pan (when not in pan mode) |
+| `Esc` | Exit fullscreen |
+
+### Mouse Controls
+
+- **Scroll wheel** — Zoom in/out (zooms toward cursor position)
+- **Left click + drag** — Pan (when in pan mode or holding Shift)
+- **Click on element** — Select element (when not in pan mode)
+
+### Theme Configuration
+
+The component automatically configures Mermaid theme variables based on `resolvedTheme`:
+
+**Dark mode:**
+```typescript
+{
+  primaryColor: "#6366f1",
+  primaryTextColor: "#f8fafc",
+  primaryBorderColor: "#4f46e5",
+  lineColor: "#64748b",
+  background: "#020617",
+  mainBkg: "#1e293b",
+  // ... more theme variables
+}
+```
+
+**Light mode:**
+```typescript
+{
+  primaryColor: "#6366f1",
+  primaryTextColor: "#1e293b",
+  background: "#ffffff",
+  mainBkg: "#f8fafc",
+  // ... more theme variables
+}
+```
+
+### Transform State
+
+The component manages pan/zoom transform state:
+
+```typescript
+interface Transform {
+  scale: number;  // Zoom level (0.25 to 4)
+  x: number;      // Horizontal pan offset
+  y: number;      // Vertical pan offset
+}
+```
+
+Zoom is constrained between `MIN_SCALE` (0.25x) and `MAX_SCALE` (4x), with a step size of 0.25.
+
+### Props Interface
+
+```typescript
+interface MermaidProps {
+  chart: string;        // Mermaid diagram definition
+  className?: string;   // Additional CSS classes
+  title?: string;       // Diagram title (shown in title bar)
+}
+```
+
+### Error Handling
+
+If Mermaid fails to render a diagram, the component displays an error message with the failure reason. Common causes:
+
+- Invalid Mermaid syntax
+- Unsupported diagram type
+- Browser compatibility issues
+
+### Performance
+
+- **Dynamic import** — Mermaid.js is loaded on demand (not bundled in main JS)
+- **React Suspense** — Loading state while Mermaid initializes
+- **Re-render optimization** — Only re-renders when `chart` or `resolvedTheme` change
+- **Transform state isolation** — Pan/zoom state doesn't trigger re-renders of diagram SVG
+
+## LaTeX Support (via remark-math)
+
+The MDX pipeline includes `remark-math` and `remark-mdx-math-enhanced` plugins that detect LaTeX syntax in Markdown and transform it into `<Math>` component calls.
+
+### Delimiters
+
+| Syntax | Type | Output |
+|--------|------|--------|
+| `$...$` | Inline | `<Math>...</Math>` |
+| `$$...$$` | Display | `<Math display>...</Math>` |
+
+### Common LaTeX Commands
+
+#### Greek Letters
+
+```latex
+\alpha \beta \gamma \Delta \Sigma \Omega
+```
+
+#### Fractions
+
+```latex
+\frac{a}{b} \quad \dfrac{a}{b} \quad \tfrac{a}{b}
+```
+
+#### Integrals and Sums
+
+```latex
+\int_a^b f(x) dx \quad \sum_{i=1}^n x_i
+```
+
+#### Matrices
+
+```latex
+\begin{bmatrix}
+a & b \\
+c & d
+\end{bmatrix}
+```
+
+#### Aligned Equations
+
+```latex
+\begin{align}
+E &= mc^2 \\
+F &= ma
+\end{align}
+```
+
+### KaTeX vs MathJax
+
+This site uses **KaTeX** instead of MathJax because:
+
+- **Faster** — KaTeX renders 10-100x faster than MathJax
+- **No JavaScript runtime** — Static HTML output (no client-side rendering)
+- **Smaller bundle** — ~100KB vs 1MB+ for MathJax
+- **Build-time rendering** — Math is pre-rendered at build time
+
+### Limitations
+
+KaTeX supports most common LaTeX math commands but not all. For unsupported commands, the component falls back to best-effort rendering with `throwOnError: false`.
+
+## Styling and Theming
+
+Both Math and Mermaid components use CSS custom properties for theming:
+
+**Math component:**
+- `.math-display` — Container styling
+- `.math-content` — KaTeX output styling
+- `.equation-controls` — Button panel styling
+- `.equation-number` — Equation number badge
+
+**Mermaid component:**
+- Theme colors set via Mermaid config (not CSS)
+- Toolbar uses Tailwind classes with theme variables
+- Fullscreen mode applies `fixed inset-0 z-50`
+
+## Related Documentation
+
+- [MDX Pipeline](/docs/content/mdx-pipeline) — How math is processed
+- [MDX Components](/docs/content/mdx-components) — Full component reference
+- [Blog Authoring](/docs/content/blog-authoring) — Writing posts with math

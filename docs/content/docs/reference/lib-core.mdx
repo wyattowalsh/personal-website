@@ -1,0 +1,659 @@
+---
+title: "lib/core.ts"
+description: "Core types, schemas, utilities, and error handling used throughout the application"
+---
+
+The `lib/core.ts` module is the foundational layer of the w4w.dev website. It exports all core TypeScript interfaces, Zod validation schemas, the logging system, error handling classes, and utility functions used across the entire application.
+
+## Core Interfaces
+
+### Config
+
+Site-wide configuration object structure.
+
+```typescript
+interface Config {
+  site: {
+    title: string;
+    description: string;
+    url: string;
+    author: {
+      name: string;
+      email: string;
+      twitter?: string;
+      github?: string;
+      linkedin?: string;
+    }
+  };
+  blog: {
+    postsPerPage: number;
+    featuredLimit: number;
+  };
+  cache: {
+    ttl: number;        // Time to live in milliseconds
+    maxSize: number;    // Max cache entries
+  };
+}
+```
+
+**Usage:**
+```typescript
+import { config, getConfig } from '@/lib/core';
+
+// Get the singleton config instance
+const siteConfig = getConfig();
+console.log(siteConfig.site.title); // "Wyatt Walsh"
+```
+
+---
+
+### Post
+
+Full post object with all metadata and content.
+
+```typescript
+interface Post {
+  slug: string;
+  title: string;
+  summary?: string;
+  content: string;        // Full MDX content
+  created: string;        // ISO date string
+  updated?: string;       // ISO date string
+  tags: string[];
+  image?: string;         // Hero image path
+  caption?: string;       // Hero caption
+  readingTime?: string;   // e.g., "5 min read"
+  wordCount: number;
+  adjacent?: {
+    prev: AdjacentPost | null;
+    next: AdjacentPost | null;
+  };
+}
+```
+
+**Notes:**
+- `slug` is the URL-safe post identifier (derived from directory name)
+- `content` contains the full MDX markdown with frontmatter removed
+- `wordCount` is calculated during preprocessing
+- `adjacent` is populated dynamically when needed
+
+---
+
+### PostMetadata
+
+Post metadata without full content or word count (lighter weight).
+
+```typescript
+interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
+  caption?: string;
+}
+```
+
+**Usage:**
+```typescript
+// When you only need metadata, not full content
+const metadata: PostMetadata = {
+  slug: 'my-post',
+  title: 'My Post',
+  summary: 'A short summary',
+  content: '...',
+  created: '2026-01-15',
+  tags: ['tech']
+};
+```
+
+---
+
+### AdjacentPost
+
+Minimal post reference for navigation.
+
+```typescript
+interface AdjacentPost {
+  slug: string;
+  title: string;
+}
+```
+
+---
+
+### SearchResult
+
+Search result wrapper from Fuse.js.
+
+```typescript
+interface SearchResult<T> {
+  item: T;              // The matched item (usually a Post)
+  score: number;        // 0-1, lower is better
+  matches: Array<{
+    key: string;        // Which field matched
+    value: string;      // The matched text
+    indices: number[][]; // Character ranges of matches
+  }>;
+}
+```
+
+**Usage:**
+```typescript
+import { services } from '@/lib/services';
+import type { SearchResult, Post } from '@/lib/core';
+
+const results: SearchResult<Post>[] = await services.posts.search('react');
+results.forEach(result => {
+  console.log(result.item.title, result.score);
+});
+```
+
+---
+
+### PreprocessStats
+
+Statistics from the build preprocessing step.
+
+```typescript
+interface PreprocessStats {
+  duration: number;         // Milliseconds
+  postsProcessed: number;   // Total posts scanned
+  searchIndexSize: number;  // Number of indexed posts
+  cacheSize: number;        // Cache entries created
+  errors: number;           // Number of errors encountered
+  memory: string;           // Memory usage (e.g., "12.5MB")
+  particleConfigPath?: string; // Optional path to particle config
+}
+```
+
+---
+
+### ApiResponse
+
+Standard API response wrapper with metadata.
+
+```typescript
+interface ApiResponse<T> {
+  data: T;
+  meta: ApiResponseMeta;
+}
+
+interface ApiResponseMeta {
+  timestamp: string;        // ISO timestamp
+  duration?: number;        // Response time in ms
+  cache?: {
+    hit: boolean;
+    ttl: number;
+  };
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+```
+
+**Usage:**
+```typescript
+// API route handler returns this shape
+return Response.json({
+  data: posts,
+  meta: {
+    timestamp: new Date().toISOString(),
+    duration: 42.5,
+    pagination: { page: 1, limit: 10, total: 25, pages: 3 }
+  }
+});
+```
+
+---
+
+## Validation Schemas
+
+All Zod schemas for runtime validation.
+
+### schemas
+
+Common validation schemas for API endpoints.
+
+```typescript
+const schemas = {
+  slug: z.object({
+    slug: z.string().min(1).max(200)
+  }),
+
+  search: z.object({
+    query: z.string().min(1).max(100)
+  }),
+
+  tag: z.object({
+    tag: z.string().min(1).max(50)
+  }),
+
+  pagination: z.object({
+    page: z.coerce.number().int().min(1).default(1),
+    limit: z.coerce.number().int().min(1).max(100).default(10),
+    sort: z.enum(['asc', 'desc']).default('desc'),
+    orderBy: z.string().default('created')
+  }),
+
+  filter: z.object({
+    tags: z.array(z.string()).optional(),
+    before: z.string().datetime().optional(),
+    after: z.string().datetime().optional(),
+  })
+};
+```
+
+**Usage:**
+```typescript
+import { schemas } from '@/lib/core';
+
+// Validate API input
+const input = schemas.pagination.parse({ page: '2', limit: '20' });
+// Result: { page: 2, limit: 20, sort: 'desc', orderBy: 'created' }
+```
+
+---
+
+### apiSchemas
+
+Legacy API validation schemas (prefer `schemas` above).
+
+```typescript
+const apiSchemas = {
+  post: z.object({ slug: z.string().min(1) }),
+  search: z.object({ query: z.string().min(1) }),
+  pagination: z.object({
+    page: z.number().optional().default(1),
+    limit: z.number().optional().default(10),
+  }),
+};
+```
+
+---
+
+## Error Handling
+
+### ApiError
+
+Custom error class for API responses.
+
+```typescript
+class ApiError extends Error {
+  constructor(
+    public statusCode: number,
+    message: string,
+    public details?: any,
+    public code?: string
+  )
+
+  toResponse(): Response
+}
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `statusCode` | `number` | HTTP status code (e.g., 404, 500) |
+| `message` | `string` | Human-readable error message |
+| `details` | `any` | Optional additional context |
+| `code` | `string` | Optional error code (defaults to `ERR_{statusCode}`) |
+
+**Methods:**
+
+- `toResponse()`: Converts the error to a Next.js `Response` object with proper JSON formatting
+
+**Usage:**
+```typescript
+import { ApiError } from '@/lib/core';
+
+// In an API route
+if (!post) {
+  throw new ApiError(404, 'Post not found', { slug });
+}
+
+// Error handling middleware
+try {
+  return handler();
+} catch (error) {
+  if (error instanceof ApiError) {
+    return error.toResponse();
+  }
+  throw error;
+}
+```
+
+**Response format:**
+```json
+{
+  "error": {
+    "message": "Post not found",
+    "code": "ERR_404",
+    "details": { "slug": "my-post" }
+  }
+}
+```
+
+---
+
+### ApiErrorDetails
+
+TypeScript interface for error response shape.
+
+```typescript
+interface ApiErrorDetails {
+  code: string;
+  message: string;
+  details?: unknown;
+  stack?: string;  // Only in development
+}
+```
+
+---
+
+## Logging System
+
+### logger
+
+Comprehensive logging utility with multiple log levels and formatters.
+
+```typescript
+const logger = {
+  // Log levels
+  level: LogLevel.INFO,
+  setLevel(level: LogLevel): void,
+
+  // Basic logging methods
+  info(msg: string, data?: any): void,
+  success(msg: string, data?: any): void,
+  warning(msg: string, data?: any): void,
+  error(msg: string, error?: Error): void,
+  debug(msg: string, data?: any): void,
+
+  // Specialized logging
+  step(msg: string, current?: number, total?: number): void,
+  timing(label: string, duration: number): void,
+  progress(current: number, total: number, msg: string): void,
+  memory(): void,
+  file(action: string, filePath: string, details?: any): void,
+
+  // Grouping
+  group(label: string): void,
+  groupEnd(): void,
+
+  // Data display
+  table(data: any[], columns?: string[]): void,
+
+  // Formatters
+  formatters: {
+    duration(ms: number): string,
+    fileSize(bytes: number): string,
+    path(fullPath: string): string
+  }
+}
+
+enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  SUCCESS = 2,
+  WARNING = 3,
+  ERROR = 4
+}
+```
+
+**Usage:**
+
+```typescript
+import { logger, LogLevel } from '@/lib/core';
+
+// Basic logging
+logger.info('Starting preprocessing');
+logger.success('Posts loaded successfully', { count: 42 });
+logger.warning('Cache miss for slug', { slug: 'my-post' });
+logger.error('Failed to parse frontmatter', error);
+
+// Debug logging (only shows if level is DEBUG)
+logger.setLevel(LogLevel.DEBUG);
+logger.debug('Raw post data', rawPost);
+
+// Progress tracking
+logger.group('Processing posts');
+for (let i = 0; i < posts.length; i++) {
+  logger.progress(i + 1, posts.length, `Processing ${posts[i].slug}`);
+}
+logger.groupEnd();
+
+// Performance timing
+const start = performance.now();
+await processPost();
+logger.timing('Post processing', performance.now() - start);
+
+// File operations
+logger.file('Read', '/path/to/post.mdx', { size: '12KB' });
+
+// Memory usage
+logger.memory(); // Logs heap usage, RSS, etc.
+
+// Tabular data
+logger.table([
+  { slug: 'post-1', wordCount: 1200 },
+  { slug: 'post-2', wordCount: 850 }
+]);
+```
+
+**Output format:**
+- All logs are color-coded with chalk
+- Icons indicate log type (✓, ✖, ⚠, ℹ, etc.)
+- Structured data is pretty-printed
+- Stack traces are indented and dimmed
+
+---
+
+### formatters
+
+Utility functions for formatting values in logs.
+
+| Function | Input | Output Example |
+|----------|-------|----------------|
+| `duration(ms)` | `2500` | `"2.50s"` |
+| `duration(ms)` | `45` | `"45.00ms"` |
+| `fileSize(bytes)` | `1024` | `"1.00KB"` |
+| `fileSize(bytes)` | `1048576` | `"1.00MB"` |
+| `path(fullPath)` | `"/Users/.../app/page.tsx"` | `"app/page.tsx"` |
+
+---
+
+## Cache Control
+
+### cacheControl
+
+Prebuilt Cache-Control header strings.
+
+```typescript
+const cacheControl = {
+  public: (maxAge: number = 3600) => string,
+  private: (maxAge: number = 60) => string,
+  dynamic: (maxAge: number = 3600) => string,
+}
+```
+
+**Usage:**
+```typescript
+import { cacheControl } from '@/lib/core';
+
+// Public, cacheable resource
+return Response.json(data, {
+  headers: { 'Cache-Control': cacheControl.public(3600) }
+});
+// Result: "public, s-maxage=3600, stale-while-revalidate=7200"
+
+// Private, user-specific data
+return Response.json(data, {
+  headers: { 'Cache-Control': cacheControl.private(60) }
+});
+// Result: "private, must-revalidate, max-age=60"
+
+// Dynamic with extended stale handling
+return Response.json(data, {
+  headers: { 'Cache-Control': cacheControl.dynamic(1800) }
+});
+// Result: "public, s-maxage=1800, stale-while-revalidate=3600, stale-if-error=7200"
+```
+
+---
+
+## Configuration Management
+
+### ConfigManager
+
+Singleton class managing site configuration.
+
+```typescript
+class ConfigManager {
+  private static instance: ConfigManager;
+  private config: Config;
+
+  static getInstance(): ConfigManager;
+  getConfig(): Config;
+}
+```
+
+**Note:** Use the exported `getConfig()` function instead of accessing ConfigManager directly.
+
+---
+
+### getConfig
+
+Returns the singleton Config instance.
+
+```typescript
+function getConfig(): Config
+```
+
+**Usage:**
+```typescript
+import { getConfig } from '@/lib/core';
+
+const config = getConfig();
+console.log(config.site.url); // "https://w4w.dev"
+console.log(config.blog.postsPerPage); // 10
+```
+
+---
+
+### config
+
+Pre-exported config instance for convenience.
+
+```typescript
+import { config } from '@/lib/core';
+
+console.log(config.cache.ttl); // 3600000
+```
+
+---
+
+### getDefaultMetadata
+
+Returns default metadata for the site.
+
+```typescript
+function getDefaultMetadata(): {
+  title: string;
+  description: string;
+  url: string;
+  author: {
+    name: string;
+    email: string;
+    twitter: string;
+    github: string;
+    linkedin: string;
+  };
+  other: Record<string, any>;
+}
+```
+
+---
+
+## API Middleware
+
+### api.middleware
+
+Request validation and error handling utilities.
+
+```typescript
+const api = {
+  middleware: {
+    validateRequest: <T>(req: Request, schema: z.Schema<T>) => Promise<T>,
+    withErrorHandler: (handler: Function) => Function
+  }
+}
+```
+
+**Usage:**
+
+```typescript
+import { api, schemas, ApiError } from '@/lib/core';
+
+// Validate incoming request
+export async function GET(req: Request) {
+  const params = await api.middleware.validateRequest(req, schemas.pagination);
+  // params is type-safe and validated
+  // Throws ApiError(400) if validation fails
+}
+
+// Wrap handler with error handling
+const safeHandler = api.middleware.withErrorHandler(async (slug: string) => {
+  const post = await getPost(slug);
+  if (!post) throw new ApiError(404, 'Not found');
+  return Response.json(post);
+});
+
+export const GET = safeHandler;
+```
+
+---
+
+## Server-Only
+
+**⚠️ Important:** `lib/core.ts` exports are safe to use in both server and client contexts, but some utilities (like `logger`) are primarily designed for server-side use. The `logger` will work in the browser console but is most useful during build/preprocessing.
+
+---
+
+## Type Exports
+
+All interfaces and types are exported for use throughout the application:
+
+```typescript
+export type {
+  Config,
+  Post,
+  PostMetadata,
+  AdjacentPost,
+  SearchResult,
+  PreprocessStats,
+  ApiResponse,
+  ApiResponseMeta,
+  ApiErrorDetails,
+  ApiMiddleware
+};
+```
+
+---
+
+## Summary
+
+`lib/core.ts` is the **single source of truth** for:
+- ✅ TypeScript types and interfaces
+- ✅ Zod validation schemas
+- ✅ Error handling (`ApiError`)
+- ✅ Logging system (`logger`)
+- ✅ Configuration management
+- ✅ Cache control headers
+- ✅ API middleware helpers
+
+**When to use:**
+- Import types for type safety across the app
+- Use `ApiError` in API routes for consistent error responses
+- Use `logger` in scripts and server-side code for debugging
+- Use `schemas` to validate API inputs
+- Use `config` to access site-wide settings

@@ -1,0 +1,482 @@
+---
+title: Testing
+description: Testing infrastructure including Storybook, Lighthouse CI, ESLint, TypeScript strict mode, and GitHub Actions workflows.
+icon: fa/FaFlask
+---
+
+## Overview
+
+The project uses a multi-layered testing approach with static analysis, visual regression testing, and performance auditing. No unit/integration tests are currently configured.
+
+## Storybook
+
+Storybook 10 provides a component explorer and visual regression testing environment.
+
+### Configuration
+
+**Version:** Storybook 10.1.10 with Next.js integration
+
+**Key dependencies:**
+
+```json
+"@storybook/nextjs": "^10.1.10",
+"@storybook/react": "^10.1.10",
+"@storybook/addon-essentials": "^8.6.14",
+"@storybook/addon-interactions": "^8.6.14",
+"@chromatic-com/storybook": "^4.1.3"
+```
+
+**Note:** Some core packages are on v8.6 while framework packages are on v10.1 — this is a transitional state during the Storybook 8→10 migration.
+
+### Running Storybook
+
+Start the development server:
+
+```bash
+pnpm storybook
+```
+
+Runs on `http://localhost:6006`.
+
+Build for production:
+
+```bash
+pnpm build-storybook
+```
+
+Outputs to `storybook-static/`.
+
+### Story Files
+
+Stories are ignored by ESLint and Next.js builds (see `eslint.config.js:11`):
+
+```javascript
+ignores: [
+  "*.stories.*",
+  // ...
+]
+```
+
+**Recommended location:** Co-locate stories with components:
+
+```
+components/
+├── Button.tsx
+└── Button.stories.tsx
+```
+
+**Example story:**
+
+```tsx
+import type { Meta, StoryObj } from '@storybook/react';
+import { Button } from './Button';
+
+const meta: Meta<typeof Button> = {
+  title: 'UI/Button',
+  component: Button,
+  tags: ['autodocs'],
+};
+
+export default meta;
+type Story = StoryObj<typeof Button>;
+
+export const Primary: Story = {
+  args: {
+    variant: 'primary',
+    children: 'Click me',
+  },
+};
+```
+
+### Addons
+
+Installed addons:
+
+- **Essentials** — controls, actions, viewport, backgrounds, toolbars, measure, outline
+- **Interactions** — interaction testing with `@storybook/test`
+- **Onboarding** — getting started guide
+- **Chromatic** — visual regression testing (integration optional)
+
+## Lighthouse CI
+
+Lighthouse CI runs automated performance, accessibility, and SEO audits.
+
+### Configuration
+
+The Lighthouse CI config is in `lighthouserc.js`:
+
+```javascript
+module.exports = {
+  ci: {
+    collect: {
+      url: ['http://localhost:3000/', 'http://localhost:3000/blog'],
+      numberOfRuns: 3,
+      startServerCommand: 'pnpm start',
+      startServerReadyPattern: 'ready',
+      startServerReadyTimeout: 30000,
+    },
+    assert: {
+      assertions: {
+        'categories:performance': ['warn', { minScore: 0.9 }],
+        'categories:accessibility': ['error', { minScore: 0.95 }],
+        'categories:best-practices': ['warn', { minScore: 0.9 }],
+        'categories:seo': ['warn', { minScore: 0.9 }],
+      },
+    },
+    upload: {
+      target: 'temporary-public-storage',
+    },
+  },
+};
+```
+
+### Thresholds
+
+| Category | Level | Minimum Score |
+| :--- | :--- | :--- |
+| Performance | `warn` | 0.9 (90%) |
+| Accessibility | `error` | 0.95 (95%) |
+| Best Practices | `warn` | 0.9 (90%) |
+| SEO | `warn` | 0.9 (90%) |
+
+**Accessibility is the only failing threshold** — scores below 0.95 will fail the CI build.
+
+### Audited URLs
+
+Lighthouse audits two pages per run:
+
+1. **Homepage** — `http://localhost:3000/`
+2. **Blog index** — `http://localhost:3000/blog`
+
+Each URL is tested **3 times** and results are averaged.
+
+### Running Locally
+
+Run Lighthouse CI manually:
+
+```bash
+pnpm lighthouse
+```
+
+This will:
+
+1. Build the site (`pnpm build`)
+2. Start the production server (`pnpm start`)
+3. Wait for "ready" log message
+4. Run Lighthouse on all configured URLs (3 runs each)
+5. Upload results to temporary public storage
+6. Print report URLs
+
+**Output example:**
+
+```
+✓ Started server on port 3000
+✓ Collected Lighthouse results (6 total runs)
+✓ Assertions passed
+📊 View report: https://storage.googleapis.com/lighthouse-infrastructure.appspot.com/...
+```
+
+## GitHub Actions
+
+The Lighthouse CI workflow runs on every push and pull request.
+
+### Workflow Configuration
+
+File: `.github/workflows/lighthouse.yml`
+
+```yaml
+name: Lighthouse CI
+on: [push, pull_request]
+
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+```
+
+### Workflow Steps
+
+1. **Checkout** — `actions/checkout@v4`
+2. **Setup pnpm** — `pnpm/action-setup@v4` with version 9
+3. **Setup Node.js** — `actions/setup-node@v4` with Node 22 and pnpm cache
+4. **Install** — `pnpm install`
+5. **Build** — `pnpm build`
+6. **Audit** — `lhci autorun` (uses `lighthouserc.js` config)
+
+### Secrets
+
+The workflow requires a secret for uploading results:
+
+- `LHCI_GITHUB_APP_TOKEN` — Lighthouse CI GitHub App token (optional)
+
+If not configured, results are still uploaded to temporary public storage.
+
+### CI Behavior
+
+- **Push events** — runs on all branches
+- **Pull request events** — runs on all PRs (includes forks with `pull_request_target`)
+- **Failures** — accessibility scores below 0.95 fail the build
+- **Warnings** — performance/SEO/best-practices below 0.9 print warnings but don't fail
+
+## ESLint
+
+ESLint 9 with flat config provides static analysis for JavaScript and TypeScript files.
+
+### Configuration
+
+File: `eslint.config.js`
+
+**Plugins:**
+
+- `@next/eslint-plugin-next` — Next.js best practices and performance rules
+- `eslint-plugin-react` — React rules
+- `eslint-plugin-react-hooks` — hooks rules
+- `@typescript-eslint/eslint-plugin` — TypeScript rules
+
+**Parser:**
+
+- `@typescript-eslint/parser` — TypeScript AST parser with JSX support
+
+### Rules
+
+Key rules enabled:
+
+```javascript
+rules: {
+  ...nextPlugin.configs.recommended.rules,
+  ...nextPlugin.configs["core-web-vitals"].rules,
+  "react-hooks/rules-of-hooks": "error",
+  "react-hooks/exhaustive-deps": "warn",
+  "react/react-in-jsx-scope": "off",
+  "react/prop-types": "off",
+  "@typescript-eslint/no-explicit-any": "warn",
+  "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+}
+```
+
+**Notable configurations:**
+
+- **Next.js core-web-vitals** — enforces performance best practices (Image, Script, Font optimization)
+- **React Hooks** — prevents invalid hook usage (`rules-of-hooks` is `error`)
+- **Unused vars** — allows underscore-prefixed vars (`_foo`) to be unused
+- **React import** — disabled because Next.js auto-imports React
+- **Prop types** — disabled because TypeScript provides type checking
+
+### Ignored Paths
+
+```javascript
+ignores: [
+  "*.stories.*",          // Storybook stories
+  ".next/**",             // Next.js build output
+  "node_modules/**",      // Dependencies
+  "out/**",               // Static export output
+  "public/**",            // Static assets
+  "docs/**",              // Docs site (separate config)
+  ".storybook/**",        // Storybook config
+  "**/*.d.ts",            // Type declarations
+]
+```
+
+### Running ESLint
+
+Lint all files:
+
+```bash
+pnpm lint
+```
+
+Auto-fix issues:
+
+```bash
+pnpm lint --fix
+```
+
+**Output:**
+
+ESLint reports warnings and errors with file paths and line numbers:
+
+```
+components/Button.tsx
+  12:7  warning  'onClick' is missing in props validation  react/prop-types
+
+✖ 1 problem (0 errors, 1 warning)
+```
+
+## TypeScript
+
+TypeScript strict mode is enabled for maximum type safety.
+
+### Configuration
+
+File: `tsconfig.json`
+
+**Strict mode settings:**
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
+```
+
+**Key features:**
+
+- **Strict mode** — enables all strict type-checking options
+- **Module resolution** — `Bundler` (Next.js Turbopack compatible)
+- **Path aliases** — `@/*` maps to project root
+- **JSX** — `react-jsx` (no need to import React)
+- **Incremental** — faster rebuilds via `.tsbuildinfo`
+
+### Path Aliases
+
+```json
+"paths": {
+  "@/*": ["./*"],
+  "lib/*": ["lib/*"]
+}
+```
+
+**Usage:**
+
+```typescript
+import { services } from '@/lib/services'
+import { Button } from '@/components/ui/button'
+```
+
+### Type Checking
+
+Run type checking without emitting files:
+
+```bash
+pnpm typecheck
+```
+
+**Output:**
+
+```
+src/components/Button.tsx:12:7 - error TS2322: Type 'string' is not assignable to type 'number'.
+
+Found 1 error.
+```
+
+### ts-node Configuration
+
+For scripts (`scripts/*.ts`):
+
+```json
+"ts-node": {
+  "transpileOnly": true,
+  "require": ["tsconfig-paths/register"],
+  "compilerOptions": {
+    "module": "CommonJS",
+    "moduleResolution": "Node"
+  }
+}
+```
+
+This allows scripts to use `@/` imports while still running in Node.js CommonJS mode.
+
+**Note:** The `moduleResolution: "Node"` setting in the `ts-node` section is separate from the main `compilerOptions`, which uses `"Bundler"` for Next.js compatibility.
+
+## Pre-commit Workflow
+
+Recommended pre-commit checks (not automated):
+
+```bash
+# 1. Lint
+pnpm lint
+
+# 2. Type check
+pnpm typecheck
+
+# 3. Build
+pnpm build
+
+# 4. (Optional) Lighthouse
+pnpm lighthouse
+```
+
+**Automating with Husky:**
+
+The project does not currently use Husky, but you can add it:
+
+```bash
+pnpm add -D husky lint-staged
+npx husky init
+```
+
+Then create `.husky/pre-commit`:
+
+```bash
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+pnpm lint && pnpm typecheck
+```
+
+## Common Issues
+
+### Storybook Build Failures
+
+**Issue:** `TypeError: Cannot read property 'addons' of undefined`
+
+**Cause:** Version mismatch between `@storybook/react` (v10) and `@storybook/addon-*` (v8)
+
+**Solution:** Upgrade all addons to v10 or downgrade framework to v8
+
+### Lighthouse Low Scores
+
+**Issue:** Performance score below 0.9
+
+**Common causes:**
+
+- Large bundle size (check with `ANALYZE=true pnpm build`)
+- Unoptimized images (use `next/image`)
+- Blocking scripts (move to `next/script` with `strategy="afterInteractive"`)
+- Large TSParticles configs (reduce particle count or disable on mobile)
+
+### ESLint False Positives
+
+**Issue:** `'React' must be in scope when using JSX`
+
+**Cause:** Outdated ESLint config (old React versions required explicit import)
+
+**Solution:** Already fixed — `"react/react-in-jsx-scope": "off"` is set
+
+### TypeScript Path Alias Errors
+
+**Issue:** `Cannot find module '@/lib/services'`
+
+**Cause:** `tsconfig.json` not loaded or path not configured
+
+**Solution:** Ensure `baseUrl: "."` and `paths` are set correctly
+
+## Related
+
+- [Operations > Scripts and Tooling](/docs/operations/scripts-and-tooling) — build pipeline
+- [Operations > Deployment](/docs/operations/deployment) — production deployment
+- [Architecture > Build Process](/docs/architecture/build-process) — full build flow
