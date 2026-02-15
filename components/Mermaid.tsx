@@ -159,27 +159,29 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       const delta = -e.deltaY * 0.001;
-      
+
       setTransform(prev => {
         const newScale = Math.min(Math.max(prev.scale + delta, MIN_SCALE), MAX_SCALE);
-        
+
         // Zoom toward mouse position
         const rect = container.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
-        
+
         const scaleRatio = newScale / prev.scale;
         const newX = mouseX - (mouseX - prev.x) * scaleRatio;
         const newY = mouseY - (mouseY - prev.y) * scaleRatio;
-        
+
         return { scale: newScale, x: newX, y: newY };
       });
     };
 
     container.addEventListener("wheel", handleWheel, { passive: false });
-    return () => container.removeEventListener("wheel", handleWheel);
+    return () => {
+      container.removeEventListener("wheel", handleWheel);
+    };
   }, []);
 
   // Pan handlers
@@ -248,13 +250,17 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
   // Fullscreen toggle
   const toggleFullscreen = useCallback(() => {
     if (!containerRef.current) return;
-    
+
     if (!isFullscreen) {
-      containerRef.current.requestFullscreen?.();
-      setIsFullscreen(true);
+      if (document.fullscreenEnabled && containerRef.current.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+        setIsFullscreen(true);
+      }
     } else {
-      document.exitFullscreen?.();
-      setIsFullscreen(false);
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
     }
   }, [isFullscreen]);
 

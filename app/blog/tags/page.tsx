@@ -1,8 +1,7 @@
 import { BackendService, backend } from "@/lib/server";
 import TagsGrid from '@/components/TagsGrid';
 import { TagsList } from '@/components/TagsList';
-import { Separator } from "@/components/ui/separator"; // Add this import
-import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 export const metadata = {
   title: "Blog Tags",
@@ -18,10 +17,14 @@ export default async function TagsIndexPage() {
   ]);
 
   const validPosts = posts.filter(post => post && post.tags?.length > 0);
-  const tagCounts = tags.reduce((acc, tag) => {
-    acc[tag] = validPosts.filter((post) => post.tags.includes(tag)).length;
-    return acc;
-  }, {} as Record<string, number>);
+  // Single-pass tag counting to avoid O(tags * posts) nested loop
+  const tagCounts = new Map<string, number>();
+  validPosts.forEach(post => {
+    post.tags?.forEach(tag => {
+      tagCounts.set(tag, (tagCounts.get(tag) ?? 0) + 1);
+    });
+  });
+  const tagCountsRecord = Object.fromEntries(tagCounts);
 
   const sortedTags = [...tags].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 
@@ -33,7 +36,7 @@ export default async function TagsIndexPage() {
         <h1 className="text-4xl font-bold mb-8 text-center text-foreground">
           Browse by Tag
         </h1>
-        <TagsGrid tags={sortedTags} tagCounts={tagCounts} />
+        <TagsGrid tags={sortedTags} tagCounts={tagCountsRecord} />
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import type { PostMetadata } from "@/lib/types"; // Update import path
+import type { PostMetadata } from "@/lib/core";
 import { cn } from "@/lib/utils";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation"; // Update import
 import { Separator } from "@/components/ui/separator";
 import ThemeAwareHero, { getHeroConfig, isThemedHero } from "@/components/heroes/ThemeAwareHero";
 import RisoHero from "@/components/heroes/RisoHero";
+import { TagPill } from "@/components/ui/tag-pill";
 
 // Remove the local PostMetadata interface since we're importing it
 
@@ -80,41 +81,13 @@ interface MetadataTagsProps {
 // Add a new ClientLink component for tag navigation
 function TagButton({ tag }: { tag: string }) {
   const router = useRouter();
-  
+
   return (
-    <button
+    <TagPill
+      tag={tag}
       onClick={() => router.push(`/blog/tags/${tag}`)}
-      className={cn(
-        // ... keep existing className ...
-        "inline-flex items-center pointer-events-auto",
-        "text-xs sm:text-sm font-medium",
-        "px-2 py-0.5 sm:px-2.5 sm:py-1",
-        "rounded-full",
-        "border transition-all duration-200",
-        "no-underline",
-        "transform-gpu hover:scale-[1.02] active:scale-[0.98]",
-        
-        // Light mode styles
-        "bg-white/50 hover:bg-primary/10",
-        "text-muted-foreground hover:text-primary",
-        "border-muted-foreground/20 hover:border-primary/50",
-        
-        // Dark mode styles
-        "dark:bg-white/5 dark:hover:bg-primary/20",
-        "dark:text-muted-foreground dark:hover:text-primary-light",
-        "dark:border-muted-foreground/10 dark:hover:border-primary/40",
-        
-        // Shadow effects
-        "shadow-sm hover:shadow-md",
-        "dark:shadow-none dark:hover:shadow-primary/20",
-        
-        // Focus styles
-        "focus:outline-none focus:ring-2 focus:ring-primary/40",
-        "dark:focus:ring-primary/40"
-      )}
-    >
-      #{tag}
-    </button>
+      className="pointer-events-auto"
+    />
   );
 }
 
@@ -162,16 +135,16 @@ const useSafePost = (pathname: string) => {
         if (mounted) {
           setState(prev => ({ ...prev, isLoading: true, error: null }));
         }
-        
+
         // Fix the slug extraction - now handles both /blog/[slug] and /blog/posts/[slug]
         const slug = pathname.split('/').filter(segment => segment && segment !== 'blog' && segment !== 'posts').pop();
-        
+
         if (!slug) {
           throw new Error('Invalid URL format');
         }
 
-        // Update API endpoint path
-        const response = await fetch(`/api/blog/posts/${slug}/metadata`);
+        // Update API endpoint path with AbortController signal
+        const response = await fetch(`/api/blog/posts/${slug}/metadata`, { signal: controller.signal });
         if (!response.ok) {
           if (response.status === 404) {
             throw new Error('Post not found');
@@ -182,8 +155,8 @@ const useSafePost = (pathname: string) => {
         const { data } = await response.json();
         if (!mounted) return;
 
-        setState(prev => ({ 
-          ...prev, 
+        setState(prev => ({
+          ...prev,
           post: {
             ...data,
             title: data.title || "Untitled Post",
@@ -194,12 +167,12 @@ const useSafePost = (pathname: string) => {
             image: data.image || "/logo.webp",
             caption: data.caption || null,
           },
-          isLoading: false 
+          isLoading: false
         }));
       } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') return;
         console.error('Error in useSafePost:', error);
         if (!mounted) return;
-        console.error("Error loading post:", error);
         setState(prev => ({
           ...prev,
           error: error instanceof Error ? error.message : 'Failed to load post',
@@ -210,7 +183,7 @@ const useSafePost = (pathname: string) => {
     };
 
     fetchPost();
-    
+
     return () => {
       mounted = false;
       controller.abort();
@@ -294,13 +267,10 @@ export default function PostHeader() {
     );
   }
 
-  console.log('Post data:', postData.post); // Add this debug line
-
   const imageSrc = postData.post.image || "/logo.webp";
   const isSvg = imageSrc.endsWith(".svg");
   const heroConfig = getHeroConfig(imageSrc);
   const isRisoHero = imageSrc === "/riso-hero.svg";
-  console.log('Hero debug:', { imageSrc, isRisoHero, hasHeroConfig: !!heroConfig });
   const altText = postData.post.image
     ? `Header image for ${postData.post.title}`
     : "Default post header image";

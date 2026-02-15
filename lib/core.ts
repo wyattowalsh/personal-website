@@ -68,17 +68,16 @@ export interface PreprocessStats {
   postsProcessed: number;
   searchIndexSize: number;
   cacheSize: number;
-  errors: Error[];
+  errors: number;
+  memory: string;
+  particleConfigPath?: string;
 }
 
-// Schema definitions
-export const ConfigSchema = z.object({
-  // ... existing ConfigSchema
-});
+// Schema definitions removed - ConfigSchema was unused
 
 // Export common validation schemas
 export const schemas = {
-  slug: z.object({ slug: z.string().min(1).max(200) }),
+  slug: z.object({ slug: z.string().min(1).max(200).regex(/^[a-zA-Z0-9_-]+$/, 'Invalid slug format') }),
   search: z.object({ query: z.string().min(1).max(100) }),
   tag: z.object({ tag: z.string().min(1).max(50) }),
   pagination: z.object({

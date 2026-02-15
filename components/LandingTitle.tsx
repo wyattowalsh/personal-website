@@ -110,13 +110,10 @@ export default function LandingTitle() {
           "relative font-extrabold tracking-tight leading-none select-none cursor-default text-center",
           // Adjusted responsive sizes
           "text-4xl sm:text-5xl md:text-6xl lg:text-7xl",
-          // Enhanced gradient effect
+          // Enhanced gradient effect (handled by SCSS)
           "bg-clip-text text-transparent",
-          "bg-gradient-to-r",
-          "from-blue-600 via-purple-600 to-pink-600",
-          "dark:from-blue-400 dark:via-purple-400 dark:to-pink-400",
           // Simpler hover effect without perspective
-          "hover:scale-102 transition-all duration-500",
+          "hover:scale-[1.02] transition-all duration-500",
           // Enhanced shadow
           "drop-shadow-[0_0_15px_rgba(59,130,246,0.3)]",
           "dark:drop-shadow-[0_0_15px_rgba(147,197,253,0.3)]",
@@ -149,6 +146,7 @@ export default function LandingTitle() {
             key={wordIndex}
             // Reduced gap between title and subtitle
             className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2"
+            aria-live="off"
           >
             <motion.p
               className={cn(
@@ -170,19 +168,6 @@ export default function LandingTitle() {
           </motion.div>
         </AnimatePresence>
       )}
-
-      {/* Theme-aware decorative elements */}
-      <div className={cn(
-        "cyber-grid absolute inset-0",
-        "opacity-5 dark:opacity-10",
-        "transition-opacity duration-300"
-      )} />
-      <div className={cn(
-        "glitch-scanlines absolute inset-0",
-        "pointer-events-none",
-        "opacity-[0.015] dark:opacity-[0.03]",
-        "transition-opacity duration-300"
-      )} />
     </motion.div>
   );
 }

@@ -19,23 +19,21 @@ export default function Math({ children = '', display = false, options = {}, lab
   const [copiedEquation, setCopiedEquation] = useState(false);
   const mathRef = useRef<HTMLDivElement>(null);
   const { getNextNumber } = useMathContext();
-  const numberRef = useRef<number | null>(null);
-  
+
   // Add logging for debugging
   useEffect(() => {
     console.debug('[Math] Rendering equation:', { display, label, number });
   }, [display, label, number]);
 
-  // Get equation number only once and store it in ref
-  const equationId = useMemo(() => {
+  // Get equation number only once using lazy initializer
+  const [equationNumber] = useState(() => {
     if (!display) return undefined;
     if (label) return label;
     if (typeof number === 'number') return number;
-    if (numberRef.current === null) {
-      numberRef.current = getNextNumber();
-    }
-    return numberRef.current;
-  }, [display, label, number, getNextNumber]);
+    return getNextNumber();
+  });
+
+  const equationId = equationNumber;
 
   // Handle clicking equation number
   const handleEquationClick = (e: React.MouseEvent) => {

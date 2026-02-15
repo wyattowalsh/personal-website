@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useMotionTemplate } from "motion/react";
+import { motion } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import React from "react";
@@ -133,27 +133,8 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
   const prefersReducedMotion = useReducedMotion();
   const isInternalLink = link.url.startsWith("/");
 
-  // Motion values for interactive effects
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (prefersReducedMotion) return;
-    const rect = event.currentTarget.getBoundingClientRect();
-    mouseX.set(event.clientX - rect.left);
-    mouseY.set(event.clientY - rect.top);
-  };
-
-  // Dynamic gradient background
-  const gradientBackground = useMotionTemplate`
-    radial-gradient(
-      600px circle at ${mouseX}px ${mouseY}px,
-      var(--tw-gradient-stops)
-    )
-  `;
-
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   // Ensure default color from links array is used
   const colors = adjustColorForMode(link.color || "#6a9fb5", isDark);
 
@@ -170,7 +151,6 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
     "shadow-lg dark:shadow-black/30",
     // Animations
     "transform-gpu transition-all duration-500",
-    "group-hover:scale-110 group-hover:rotate-3",
     // Additional contrast
     "after:absolute after:inset-0 after:rounded-xl",
     "after:bg-gradient-to-br",
@@ -184,9 +164,8 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
     "mt-4 text-sm md:text-base lg:text-lg",
     "font-medium text-center",
     "transition-all duration-500",
-    "group-hover:scale-105",
     // Ensure text contrast and remove underline
-    "no-underline", // Add this class
+    "no-underline",
     "text-slate-900 dark:text-slate-100",
     "drop-shadow-sm dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
   );
@@ -203,7 +182,6 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
         "bg-white/5 dark:bg-black/20",
         "border border-black/5 dark:border-white/10",
         // Hover and animation
-        "hover:scale-105 hover:-translate-y-1",
         "transition-all duration-500 ease-out",
         // Shadows
         "shadow-lg hover:shadow-xl",
@@ -211,7 +189,7 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
       )}
       style={{
         '--hover-color': colors.bgHoverStyle,
-      } as any}
+      } as React.CSSProperties}
       whileHover={prefersReducedMotion ? undefined : {
         scale: 1.05,
         rotateX: 2,
@@ -228,9 +206,7 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
         <div
           className={cn(
             "relative z-10",
-            "transition-all duration-500",
-            // Hover effects
-            "group-hover:scale-110 group-hover:rotate-3",
+            "transition-all duration-500"
           )}
           style={{ color: colors.iconColor }}
         >
@@ -285,11 +261,15 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
     );
   }
 
+  // Determine if this is a social profile link (not email, not blog)
+  const isSocialProfile = !link.url.startsWith('mailto:') && !isInternalLink;
+
   return (
     <a
       href={link.url}
       target="_blank"
-      rel="noopener noreferrer"
+      rel={isSocialProfile ? "me noopener noreferrer" : "noopener noreferrer"}
+      aria-label={`${link.name} (opens in new tab)`}
       className={cn(
         "block w-full h-full rounded-2xl no-underline",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

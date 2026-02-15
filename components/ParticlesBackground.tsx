@@ -5,7 +5,7 @@ import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
 import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
-import { type Container, type Engine } from "@tsparticles/engine";
+import { type Container } from "@tsparticles/engine";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
 import ParticleControls, { type DensityLevel } from "./ParticleControls";
@@ -56,21 +56,9 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
     }
   };
 
-  // Handle mounting
+  // Handle mounting and initialization
   useEffect(() => {
     setMounted(true);
-    return () => {
-      setMounted(false);
-      // Cleanup container if it exists
-      if (containerRef.current) {
-        containerRef.current.destroy();
-      }
-    };
-  }, []);
-
-  // Initialize particle engine once and set initial config
-  useEffect(() => {
-    if (!mounted) return;
 
     const initEngine = async () => {
       try {
@@ -90,12 +78,20 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
     };
 
     initEngine();
-  }, [mounted, currentTheme]);
+
+    return () => {
+      setMounted(false);
+      // Cleanup container if it exists
+      if (containerRef.current) {
+        containerRef.current.destroy();
+      }
+    };
+  }, [currentTheme]);
 
   // Update theme effect
   useEffect(() => {
     if (!mounted || !init || !resolvedTheme) return;
-    
+
     const theme = resolvedTheme as "light" | "dark";
     const newConfigUrl = getRandomConfigUrl(theme);
     setCurrentConfigUrl(newConfigUrl);
@@ -138,7 +134,10 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
   }, [currentTheme]);
 
   if (!mounted || !init) return null;
-  if (error) return <div className="text-destructive">{error}</div>;
+  if (error) {
+    console.error("Particles error:", error);
+    return <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20" />;
+  }
 
   // Show static gradient for users who prefer reduced motion or density is off
   if (prefersReducedMotion || density === 'off') {
@@ -177,7 +176,7 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
               url={currentConfigUrl}
               particlesLoaded={particlesLoaded}
               options={{
-                fps_limit: 60,
+                fpsLimit: 60,
                 pauseOnBlur: true,
                 pauseOnOutsideViewport: true,
                 particles: {

@@ -7,7 +7,7 @@ import { type Route } from 'next';
 import { motion } from 'motion/react';
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
-import { links, type Href } from './Links';  // Single import for links and Href
+import { links } from './Links';
 import { RssIcon, FileJson, AtomIcon, HomeIcon, BookOpenIcon, TagIcon } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";

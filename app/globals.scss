@@ -14,12 +14,12 @@
     --primary: 222.2 47.4% 11.2%;
     --primary-light: 222.2 47.4% 11.2%;
     --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
+    --secondary: 214 32% 91%;
     --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
+    --muted: 220 14% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 217 91% 60%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
@@ -31,6 +31,19 @@
     --selection-heading-bg: 210 40% 96.1%;
     --selection-heading-text: 222.2 47.4% 11.2%;
     --gradient-heading: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
+    --shadow-glow: 0 0 15px rgba(59 130 246 / 0.3);
+    --shadow-soft: 0 2px 8px rgba(0 0 0 / 0.08);
+    --math-text-color: inherit;
+    --math-inline-bg: rgba(210 40% 96.1% / 0.4);
+    --math-display-bg: rgba(210 40% 96.1% / 0.3);
+    --math-index-color: 215.4 16.3% 46.9%;
+    --font-code: var(--font-fira-code), 'Fira Code', 'Courier New', monospace;
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    --gradient-start: #3b82f6;
+    --gradient-mid: #8b5cf6;
+    --gradient-end: #ec4899;
   }
 
   .dark {
@@ -43,12 +56,12 @@
     --primary: 210 40% 98%;
     --primary-light: 210 40% 98%;
     --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 215 20% 25%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 217 15% 12%;
     --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 217 91% 70%;
+    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     --border: 217.2 32.6% 17.5%;
@@ -59,6 +72,19 @@
     --selection-heading-bg: 217.2 32.6% 17.5%;
     --selection-heading-text: 210 40% 98%;
     --gradient-heading: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
+    --shadow-glow: 0 0 20px rgba(56 189 248 / 0.5);
+    --shadow-soft: 0 2px 8px rgba(0 0 0 / 0.3);
+    --math-text-color: hsl(210 40% 98%);
+    --math-inline-bg: rgba(217.2 32.6% 17.5% / 0.3);
+    --math-display-bg: rgba(217.2 32.6% 17.5% / 0.2);
+    --math-index-color: 215 20.2% 65.1%;
+    --font-code: var(--font-fira-code), 'Fira Code', 'Courier New', monospace;
+    --duration-fast: 150ms;
+    --duration-normal: 300ms;
+    --duration-slow: 500ms;
+    --gradient-start: #38bdf8;
+    --gradient-mid: #818cf8;
+    --gradient-end: #f472b6;
   }
 
   body {
@@ -153,16 +179,13 @@
     }
   }
 
-  .math-inline {
-    @apply inline-flex items-center rounded border border-border/30 bg-muted/30 px-2 py-1 dark:bg-muted/10;
-  }
-
   .math {
     font-family: 'KaTeX_Main', serif;
     color: var(--math-text-color);
   }
 
   .math-inline {
+    @apply inline-flex items-center rounded border border-border/30 bg-muted/30 px-2 py-1 dark:bg-muted/10;
     display: inline-block;
     background-color: var(--math-inline-bg);
     padding: 0.1em 0.2em;
@@ -187,32 +210,6 @@
     color: var(--math-index-color);
   }
 
-/* Add styles for anchor links on headings */
-  h1, h2, h3, h4, h5, h6 {
-    scroll-margin-top: 100px;
-    position: relative;
-    
-    .anchor-link {
-      @apply opacity-0 absolute;
-      left: -1.5em;
-      padding-right: 0.5em;
-      cursor: pointer;
-      
-      &:hover {
-        @apply opacity-100;
-      }
-      
-      .anchor-icon {
-        @apply inline-block align-middle;
-        width: 1em;
-        height: 1em;
-      }
-    }
-    
-    &:hover .anchor-link {
-      @apply opacity-100;
-    }
-  }
 
 /* Enhanced equation styles */
   .math-display {
@@ -249,67 +246,39 @@
     }
   }
 
+/* Enhanced header styles with autolink and responsive sizing */
   h1, h2, h3, h4, h5, h6 {
-    @apply scroll-mt-20 relative;
+    @apply scroll-mt-20 relative overflow-visible;
 
-    .anchor {
-      @apply absolute opacity-0 -left-5 top-1/2 -translate-y-1/2;
-      @apply transition-all duration-200 ease-out;
-      @apply p-1 rounded-md;
-      @apply hover:bg-primary/5;
-      
-      .anchor-icon {
-        @apply block w-4 h-4;
-        @apply text-muted-foreground;
-        @apply transition-all duration-200;
-        @apply transform scale-90;
-        
-        &:hover {
-          @apply text-primary scale-100;
-        }
-      }
-    }
-
-    &:hover .anchor {
-      @apply opacity-100;
-    }
-  }
-
-/* Enhanced header styles with autolink */
-  h1, h2, h3, h4, h5, h6 {
-    @apply scroll-mt-20 relative;
-    
 /* Anchor link container */
     .anchor {
       @apply absolute -left-8 top-1/2 -translate-y-1/2;
-      @apply opacity-0 invisible;
-      @apply p-2 -m-2; /* Larger touch target */
-      @apply rounded-lg;
+      @apply opacity-0 invisible transform -translate-x-2;
+      @apply p-2 -m-2 rounded-lg;
       @apply transition-all duration-300 ease-out;
       @apply hover:bg-primary/5 dark:hover:bg-primary/10;
       @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
-      @apply sm:visible; /* Only show on larger screens */
-      
+      @apply sm:visible;
+
 /* Responsive positioning */
-      @apply md:-left-10;
-      @apply lg:-left-12;
-      
+      @apply md:-left-10 lg:-left-12;
+
+      @screen md {
+        @apply -translate-x-4;
+      }
+
+      @screen lg {
+        @apply -translate-x-6;
+      }
+
 /* Icon styling */
       .anchor-icon {
-        @apply block;
+        @apply block w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6;
         @apply text-muted-foreground opacity-50;
         @apply dark:text-muted-foreground dark:opacity-40;
-        @apply transition-all duration-300;
-        @apply transform scale-75;
+        @apply transition-all duration-300 transform scale-75;
         @apply hover:scale-100 hover:text-primary hover:opacity-100;
         @apply dark:hover:text-primary dark:hover:opacity-100;
-        
-/* Responsive icon sizing */
-        @apply w-4 h-4;
-        @apply sm:w-5 sm:h-5;
-        @apply md:w-6 md:h-6;
-        
-/* Add subtle glow on hover */
         @apply hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.3)];
         @apply dark:hover:drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.4)];
       }
@@ -317,17 +286,31 @@
 
 /* Show anchor on header hover */
     &:hover .anchor {
-      @apply opacity-100;
-      @apply visible;
-      @apply translate-x-0;
+      @apply opacity-100 visible translate-x-0;
+    }
+
+/* Progressive reveal effect on hover */
+    &::after {
+      @apply content-[''] absolute bottom-0 left-0 w-full h-[2px];
+      @apply bg-primary/30 dark:bg-primary/20;
+      @apply transform scale-x-0 origin-left;
+      @apply transition-transform duration-300 ease-out;
+    }
+
+    &:hover::after {
+      @apply scale-x-100;
+    }
+
+/* Enhanced focus styles */
+    &:focus-visible {
+      @apply outline-none ring-2 ring-primary/50 dark:ring-primary/40 rounded-lg;
     }
 
 /* Mobile-friendly touch target */
     @media (hover: none) {
       .anchor {
-        @apply opacity-50 visible;
-        @apply -left-6 sm:-left-8;
-        
+        @apply opacity-50 visible -left-6 sm:-left-8;
+
         .anchor-icon {
           @apply scale-90;
         }
@@ -336,22 +319,17 @@
 
 /* Active state styles */
     .anchor:active {
-      @apply scale-95;
-      @apply bg-primary/10 dark:bg-primary/15;
+      @apply scale-95 bg-primary/10 dark:bg-primary/15;
     }
 
 /* When header is targeted by URL hash */
     &:target {
-      @apply relative;
-      
       &::before {
         content: "";
-        @apply absolute -inset-x-4 -inset-y-2;
-        @apply bg-primary/5 dark:bg-primary/10;
-        @apply rounded-lg;
+        @apply absolute -inset-x-4 -inset-y-2 bg-primary/5 dark:bg-primary/10 rounded-lg;
         @apply animate-[highlight_2s_ease-out];
       }
-      
+
       .anchor {
         @apply opacity-100 visible;
       }
@@ -405,55 +383,6 @@
     @apply mt-4 sm:mt-6 md:mt-8 mb-2 sm:mb-3;
   }
 
-/* Enhanced heading hover and focus states */
-  h1, h2, h3, h4, h5, h6 {
-    @apply relative overflow-visible;
-    
-/* Progressive reveal effect on hover */
-    &::after {
-      @apply content-[''] absolute bottom-0 left-0 w-full;
-      @apply h-[2px] bg-primary/30 dark:bg-primary/20;
-      @apply transform scale-x-0 origin-left;
-      @apply transition-transform duration-300 ease-out;
-    }
-
-    &:hover::after {
-      @apply scale-x-100;
-    }
-
-/* Enhanced focus styles */
-    &:focus-visible {
-      @apply outline-none ring-2 ring-primary/50 dark:ring-primary/40;
-      @apply rounded-lg;
-    }
-
-/* Improved anchor link visibility */
-    .anchor {
-      @apply opacity-0 transform -translate-x-2;
-      @apply transition-all duration-300 ease-out;
-
-      @screen md {
-        @apply opacity-0 -translate-x-4;
-      }
-
-      @screen lg {
-        @apply opacity-0 -translate-x-6;
-      }
-    }
-
-    &:hover .anchor {
-      @apply opacity-100 translate-x-0;
-    }
-  }
-
-/* Enhanced mobile experience */
-  @media (hover: none) {
-    h1, h2, h3, h4, h5, h6 {
-      .anchor {
-        @apply opacity-50 translate-x-0;
-      }
-    }
-  }
 }
 
 @layer base {
@@ -510,73 +439,6 @@
 }
 
 @layer components {
-  .cyber-grid {
-    background-image: 
-      linear-gradient(var(--cyber-grid-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--cyber-grid-color) 1px, transparent 1px);
-    background-size: var(--cyber-grid-size) var(--cyber-grid-size);
-    width: 100%;
-    height: 100%;
-    transform-origin: center;
-    animation: grid-flow 20s linear infinite;
-  }
-
-  .glitch-scanlines {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0%,
-      var(--scan-line-color) 0.5%,
-      transparent 1%
-    );
-    animation: scanlines 10s linear infinite;
-  }
-
-  .noise-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org-2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    opacity: var(--noise-intensity);
-    mix-blend-mode: overlay;
-    pointer-events: none;
-  }
-
-  .glitch-text {
-    position: relative;
-    animation: glitch-text 3s infinite;
-    
-    &::before,
-    &::after {
-      content: attr(data-text);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-    
-    &::before {
-      left: 2px;
-      text-shadow: -2px 0 var(--glitch-color-1);
-      clip: rect(24px, 550px, 90px, 0);
-      animation: glitch-anim 3s infinite linear alternate-reverse;
-    }
-    
-    &::after {
-      left: -2px;
-      text-shadow: -2px 0 var(--glitch-color-2);
-      clip: rect(85px, 550px, 140px, 0);
-      animation: glitch-anim 2s infinite linear alternate-reverse;
-    }
-  }
-
   .math-display {
     @apply relative my-8 px-8 py-6;
     @apply rounded-xl border border-border;
@@ -646,36 +508,6 @@
     }
   }
 
-  .math-inline {
-    @apply relative inline-flex items-center justify-center;
-    @apply px-2 py-1 rounded-md;
-    @apply bg-muted/40 dark:bg-muted/20;
-    @apply border border-border/30;
-    @apply transition-all duration-300;
-    @apply hover:bg-muted/60 dark:hover:bg-muted/40;
-    @apply hover:border-border/50;
-    @apply hover:shadow-sm dark:hover:shadow-primary/5;
-  }
-
-  .subtitle-container {
-    perspective: 1000px;
-    
-    .subtitle-text {
-      backface-visibility: hidden;
-      transform-style: preserve-3d;
-      background: linear-gradient(
-        45deg,
-        var(--subtitle-gradient-start),
-        var(--subtitle-gradient-end)
-      );
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      
-      animation: subtitle-gradient 8s linear infinite;
-      background-size: 200% 200%;
-    }
-  }
 
 /* Add search-related components */
   .search-input {
@@ -915,26 +747,17 @@
 }
 
 @keyframes highlight {
-  0% {
-    background-color: var(--primary-20);
-  }
-  100% {
-    background-color: transparent;
-  }
-}
-
-@keyframes equation-highlight {
-  0% { background-color: hsl(var(--primary) / 0.2); }
-  100% { background-color: hsl(var(--primary) / 0.05); }
-}
-
-@keyframes highlight {
   from {
     background-color: hsl(var(--primary) / 0.2);
   }
   to {
     background-color: hsl(var(--primary) / 0.05);
   }
+}
+
+@keyframes equation-highlight {
+  0% { background-color: hsl(var(--primary) / 0.2); }
+  100% { background-color: hsl(var(--primary) / 0.05); }
 }
 
 /* Add spinner animations */

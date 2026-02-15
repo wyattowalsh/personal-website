@@ -1,8 +1,18 @@
 import { BackendService } from './server';
 import { Post, SearchResult } from './core';
-import type { AdjacentPost } from '@/lib/types';
+import type { AdjacentPost } from '@/lib/core';
 
-// Create services object using BackendService directly
+/**
+ * Simplified services API for server-side usage.
+ *
+ * This thin wrapper around BackendService provides a cleaner import path
+ * and consistent API surface for server components and API routes.
+ * All methods automatically ensure preprocessing has completed before execution.
+ *
+ * Usage:
+ *   import { services } from '@/lib/services'
+ *   const posts = await services.posts.getAll()
+ */
 export const services = {
   posts: {
     get: async (slug: string): Promise<Post | null> => {

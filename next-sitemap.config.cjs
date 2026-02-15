@@ -1,31 +1,40 @@
 /** @type {import('next-sitemap').IConfig} */
 const config = {
-  siteUrl: "https://w4w.dev",
-  changefreq: "daily",
-  priority: 0.7,
-  sitemapSize: 50000,
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev',
   generateRobotsTxt: true,
-  exclude: [
-    "/favicon.icon",
-    "/apple-icon.png",
-    "/manifest.webmanifest",
-    "/tags/*",
-    "/logo.png",
-    "/logo.webp",
-    "/opengraph.png",
-    "/twitter-image.png",
-  ],
-  generateIndexSitemap: true,
+  generateIndexSitemap: false,
+  sitemapSize: 5000,
+  exclude: ['/api/*'],
   robotsTxtOptions: {
     policies: [
       {
-        userAgent: "*",
-        allow: "/",
+        userAgent: '*',
+        allow: '/',
+        disallow: ['/api/', '/_next/'],
       },
     ],
-    additionalSitemaps: [
-      "https://w4w.dev/sitemap.xml",
-    ],
+  },
+  transform: async (config, path) => {
+    let priority = 0.7;
+    let changefreq = 'weekly';
+
+    if (path === '/') {
+      priority = 1.0;
+      changefreq = 'daily';
+    } else if (path.startsWith('/blog/posts/')) {
+      priority = 0.8;
+      changefreq = 'monthly';
+    } else if (path === '/blog') {
+      priority = 0.9;
+      changefreq = 'daily';
+    }
+
+    return {
+      loc: path,
+      changefreq,
+      priority,
+      lastmod: config.autoLastmod ? new Date().toISOString() : undefined,
+    };
   },
 };
 

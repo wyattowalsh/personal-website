@@ -5,6 +5,9 @@ import NotFoundContent from "@/components/NotFoundContent";
 import { cn } from "@/lib/utils";
 import ParticlesBackground from "@/components/ParticlesBackground";
 
+// Note: metadata export must be in a server component layout or page
+// For client components like this one, metadata should be set in a parent layout
+
 interface FloatingParticle {
   left: string;
   top: string;

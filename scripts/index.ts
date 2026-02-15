@@ -2,7 +2,7 @@
 import path from 'path';
 import { BackendService } from '../lib/server';
 import { logger, LogLevel } from '../lib/core';
-import type { PreprocessStats } from '../lib/types';  // Update this import
+import type { PreprocessStats } from '../lib/core';
 import { generateParticleConfigs } from './particles';
 
 // Main preprocessing function

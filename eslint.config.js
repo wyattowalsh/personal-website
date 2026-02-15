@@ -39,7 +39,9 @@ const config = [
       ...nextPlugin.configs["core-web-vitals"].rules,
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      // Disable overly strict rules from react-hooks that require significant refactoring
+      // TODO: Enable these rules after fixing violations:
+      // - purity: BlogTitle.tsx calls impure functions during render
+      // - set-state-in-effect: not-found.tsx calls setState synchronously in useEffect
       "react-hooks/purity": "off",
       "react-hooks/set-state-in-effect": "off",
       "react/react-in-jsx-scope": "off",

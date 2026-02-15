@@ -1,5 +1,6 @@
-import { NextResponse } from 'next/server';
-import { BackendService } from '@/lib/server';
+import { BackendService, handleRequest } from '@/lib/server';
+import { schemas, ApiError } from '@/lib/core';
+import { API_REVALIDATE_SECONDS } from '@/lib/constants';
 
 type Props = {
   params: Promise<{
@@ -12,8 +13,19 @@ export async function GET(
   props: Props
 ) {
   const { slug } = await props.params;
+
+  // Validate slug
+  const validation = schemas.slug.safeParse({ slug });
+  if (!validation.success) {
+    throw new ApiError(400, 'Invalid slug format', { errors: validation.error.issues });
+  }
+
   await BackendService.ensurePreprocessed();
-  const result = await BackendService.getInstance().getAdjacentPosts(slug);
-  
-  return NextResponse.json({ data: result });
+
+  return handleRequest({
+    handler: async () => {
+      return BackendService.getInstance().getAdjacentPosts(slug);
+    },
+    cache: API_REVALIDATE_SECONDS
+  });
 }

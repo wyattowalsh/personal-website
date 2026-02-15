@@ -7,8 +7,7 @@ import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import type { AdjacentPost } from "@/lib/types"; // Change this import
-import { getAdjacentPosts } from "@/lib/services";
+import type { AdjacentPost } from "@/lib/core";
 import type { Route } from "next";
 
 export default function PostPagination() {
@@ -48,7 +47,7 @@ export default function PostPagination() {
 				setState((prev) => ({
 					...prev,
 					data: {
-						prevPost: data?.prev || null,
+						prevPost: data?.previous || null,
 						nextPost: data?.next || null,
 					},
 					isLoading: false,

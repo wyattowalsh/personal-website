@@ -1,17 +1,17 @@
 "use client";
 
-import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import Links from "@/components/Links";
 import LandingTitle from "@/components/LandingTitle";
-import ParticlesBackground from "@/components/ParticlesBackground";
 import PostCard from "@/components/PostCard";
-import { motion, useScroll, useSpring, useTransform, AnimatePresence, Variants } from "motion/react";
+import { motion, useScroll, useTransform, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
-import { useMediaQuery } from "usehooks-ts";
 import { cn } from "@/lib/utils";
 import styles from "@/app/page.module.scss";
+
+const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground'), { ssr: false });
 
 interface Post {
   slug: string;
@@ -30,15 +30,8 @@ interface HomePageClientProps {
 
 export default function HomePageClient({ recentPosts }: HomePageClientProps) {
   const prefersReducedMotion = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
 
-  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
   const imageScale = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.85]);
   const imageOpacity = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.8]);
   const imageRotate = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [0, 0] : [0, -5]);
@@ -77,7 +70,7 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
   };
 
   return (
-    <motion.main
+    <motion.div
       initial="hidden"
       animate="visible"
       variants={pageVariants}
@@ -88,27 +81,21 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
         styles.mainContainer
       )}
     >
-      <ParticlesBackground />
+      <div aria-hidden="true">
+        <ParticlesBackground />
+      </div>
 
       <motion.div
-        className={styles.progressBar}
-        style={{ scaleX }}
-      />
-
-      <motion.div
-        ref={ref}
         className={cn(
           "relative z-10 flex flex-col justify-center min-h-screen",
           "px-4 sm:px-6 lg:px-8",
           "py-12 sm:py-16 lg:py-20",
-          "max-w-7xl mx-auto w-full",
-          "backdrop-blur-sm"
+          "max-w-7xl mx-auto w-full"
         )}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            className="flex flex-col items-center justify-center space-y-8"
-          >
+        <motion.div
+          className="flex flex-col items-center justify-center space-y-8"
+        >
             <motion.div
               className={cn(styles.imageContainer, "relative group")}
               variants={imageContainerVariants}
@@ -119,7 +106,7 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
                 rotate: imageRotate
               }}
             >
-              <div className={styles.imageGlow} />
+              <div className={styles.imageGlow} aria-hidden="true" />
               <Image
                 className={cn(
                   "rounded-full shadow-2xl transition-all duration-300",
@@ -136,24 +123,11 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
                        (max-width: 1280px) 220px,
                        240px"
                 priority
-                quality={100}
+                quality={85}
               />
             </motion.div>
 
             <LandingTitle />
-
-            <motion.div
-              className="w-full max-w-2xl"
-              variants={{
-                hidden: { opacity: 0, scaleX: 0 },
-                visible: {
-                  opacity: 1,
-                  scaleX: 1,
-                  transition: { duration: 0.8, ease: "easeInOut" }
-                }
-              }}
-            >
-            </motion.div>
 
             <motion.div
               variants={{
@@ -203,9 +177,8 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
                 </Link>
               </motion.section>
             )}
-          </motion.div>
-        </AnimatePresence>
+        </motion.div>
       </motion.div>
-    </motion.main>
+    </motion.div>
   );
 }

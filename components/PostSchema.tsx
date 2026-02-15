@@ -93,7 +93,7 @@ export function ArticleJsonLd({
 }
 
 /**
- * WebSite schema for the root layout.
+ * WebSite schema for the root layout with SearchAction.
  */
 export function WebSiteJsonLd() {
   const schema = {
@@ -121,6 +121,14 @@ export function WebSiteJsonLd() {
         url: `${siteUrl}/logo.webp`,
       },
     },
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/blog?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   };
 
   return (
@@ -128,6 +136,58 @@ export function WebSiteJsonLd() {
       type="application/ld+json"
       dangerouslySetInnerHTML={{
         __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
+      }}
+    />
+  );
+}
+
+/**
+ * Person and ProfilePage schema for the homepage.
+ */
+export function PersonJsonLd() {
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: 'Wyatt Walsh',
+    url: siteUrl,
+    email: 'mail@w4w.dev',
+    jobTitle: 'Software Engineer',
+    description: 'Software engineer writing about software engineering, data science, and technology',
+    sameAs: [
+      'https://github.com/wyattowalsh',
+      'https://twitter.com/wyattowalsh',
+      'https://linkedin.com/in/wyattowalsh',
+      'https://www.kaggle.com/wyattowalsh',
+      'https://codepen.io/wyattowalsh',
+      'https://www.reddit.com/user/onelonedatum',
+    ],
+  };
+
+  const profilePageSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    dateCreated: '2024-01-01T00:00:00Z',
+    dateModified: new Date().toISOString(),
+    mainEntity: {
+      '@type': 'Person',
+      name: 'Wyatt Walsh',
+      url: siteUrl,
+      sameAs: [
+        'https://github.com/wyattowalsh',
+        'https://twitter.com/wyattowalsh',
+        'https://linkedin.com/in/wyattowalsh',
+        'https://www.kaggle.com/wyattowalsh',
+        'https://codepen.io/wyattowalsh',
+        'https://www.reddit.com/user/onelonedatum',
+      ],
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{
+        __html: JSON.stringify([personSchema, profilePageSchema]).replace(/</g, '\\u003c'),
       }}
     />
   );

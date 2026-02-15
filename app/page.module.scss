@@ -1,17 +1,6 @@
 @use "variables.module.scss" as variables;
 @reference "./globals.scss";
 
-@keyframes backgroundAnimation {
-  0%,
-  100% { 
-    background-position: 0% 50%;
-    will-change: background-position;
-  }
-
-  50% { 
-    background-position: 100% 50%;
-  }
-}
 
 @keyframes pulse {
   0%,
@@ -26,93 +15,11 @@
   }
 }
 
-@keyframes patternMove {
-  0% {
-    background-position: 0 0;
-  }
 
-  100% {
-    background-position: 1000px 1000px;
-  }
-}
 
-.enhanced-title-landing {
-  // Base styles
-  @apply relative font-extrabold tracking-tight leading-none select-none cursor-default text-center;
-  
-  // Responsive font sizes using clamp
-  font-size: clamp(2.5rem, 6vw, 9rem);
-  
-  // Advanced gradient text effect with CSS variables
-  background: linear-gradient(
-    90deg,
-    var(--title-gradient-start),
-    var(--title-gradient-end)
-  );
-  background-size: 200% 200%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  animation: gradientAnimation 10s ease infinite;
 
-  // 3D text shadow and filters
-  filter: drop-shadow(0 0 10px var(--title-shadow));
 
-  // Hover effects
-  &:hover {
-    animation-play-state: paused;
-    transform: perspective(600px) rotateY(15deg) rotateX(5deg) scale(1.05);
-    filter: brightness(1.2) drop-shadow(0 0 20px var(--title-shadow));
-  }
-
-  // Dark mode styles via global class
-  :global(.dark) & {
-    background: linear-gradient(
-      90deg,
-      var(--title-gradient-start-dark),
-      var(--title-gradient-end-dark)
-    );
-  }
-}
-
-@keyframes gradientAnimation {
-  0% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(360deg);
-  }
-  100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(720deg);
-  }
-}
-
-@keyframes solarpunkFlow {
-  0%, 100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg) brightness(1);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(15deg) brightness(1.1);
-  }
-}
-
-@keyframes ambientPulse {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-// Improved gradient animation
+// Gradient animation
 @keyframes titleGradient {
   0%, 100% {
     background-position: 0% 50%;
@@ -124,220 +31,11 @@
   }
 }
 
-// Enhanced gradient animation
-@keyframes titleGradient {
-  0%, 100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(15deg);
-  }
-}
 
-// Mobile-specific animations
-@keyframes titleGradientMobile {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
 
-@keyframes titleGlowMobile {
-  0%, 100% {
-    opacity: 0.3;
-    transform: translateY(2px) scale(1);
-  }
-  50% {
-    opacity: 0.6;
-    transform: translateY(1px) scale(1.02);
-  }
-}
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
-.enhanced-separator {
-  position: relative;
-  width: 75%;
-  max-width: 28rem;
-  height: 2px;
-  margin: 2rem auto;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--primary) 50%,
-    transparent 100%
-  );
-  opacity: 0.7;
-  transition: all 0.3s ease;
-
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--primary);
-    transform: translateY(-50%);
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    box-shadow: 0 0 15px var(--primary);
-  }
-
-  &::before {
-    left: 0;
-    animation-delay: 0s;
-  }
-
-  &::after {
-    right: 0;
-    animation-delay: 1s;
-  }
-
-  &:hover {
-    opacity: 1;
-    transform: scaleX(1.05);
-    filter: brightness(1.2);
-    box-shadow: 0 0 20px var(--primary);
-
-    &::before,
-    &::after {
-      animation-duration: 1.5s;
-    }
-  }
-}
-
-.enhanced-animated-text {
-  background: var(--gradient-text);
-  background-size: 400% 400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientBackground 8s ease infinite;
-  position: relative;
-  
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
-  will-change: background-position, transform;
-
-  &:hover {
-  animation-play-state: paused;
-  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8));
-  }
-}
-
-@keyframes gradientBackground {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-:global(html.dark) .enhanced-animated-text {
-  background: var(--gradient-text);
-}
-
-@media (max-width: 1024px) {
-  .logo-image {
-    max-width: 192px;
-  }
-}
-
-.image-container {
-  position: relative;
-  transition: all 0.3s ease;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: 9999px;
-    background: linear-gradient(
-      45deg,
-      var(--primary) 0%,
-      var(--accent) 50%,
-      var(--primary) 100%
-    );
-    opacity: 0.5;
-    z-index: -1;
-    transition: all 0.3s ease;
-    animation: rotate 10s linear infinite;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 9999px;
-    background: radial-gradient(
-      circle at center,
-      var(--primary) 0%,
-      transparent 70%
-    );
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    filter: blur(15px);
-  }
-
-  &:hover {
-    transform: scale(1.02);
-
-    &::before {
-      opacity: 0.8;
-      filter: blur(3px);
-    }
-
-    &::after {
-      opacity: 0.4;
-    }
-
-    :global(img) {
-      transform: scale(1.05);
-      filter: brightness(1.1);
-    }
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .image-container {
-    animation: float 6s ease-in-out infinite;
-  }
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 
 @keyframes rotate {
   from {
@@ -348,31 +46,6 @@
   }
 }
 
-// Add new glass-morphism utility
-.glass-panel {
-  @apply backdrop-blur-md bg-white/10 dark:bg-black/10;
-  @apply border border-white/20 dark:border-white/10;
-  @apply shadow-xl;
-}
-
-// Add animated background patterns
-.bg-grid-pattern {
-  background-image: linear-gradient(
-    var(--primary)/10% 1px,
-    transparent 1px
-  ),
-  linear-gradient(
-    90deg,
-    var(--primary)/10% 1px,
-    transparent 1px
-  );
-  background-size: 20px 20px;
-}
-
-.bg-noise-pattern {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
-  opacity: 0.5;
-}
 
 .mainContainer {
   &::before {
@@ -487,15 +160,6 @@
   100% { transform: translateX(100%); }
 }
 
-// Export variables using a local class
-.root {
-  :global(:root) {
-    --landing-title-gradient-light: var(--landing-title-gradient-light-def);
-    --landing-title-gradient-dark: var(--landing-title-gradient-dark-def);
-  }
-}
-
-// ...existing code...
 
 .enhancedTitleLanding {
   position: relative;

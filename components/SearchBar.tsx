@@ -28,7 +28,7 @@ import TagLink from "@/components/TagLink"; // Ensure this is the correct import
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import { backend } from "@/lib/server"; // Update this line
-import type { PostMetadata } from "@/lib/types";
+import type { PostMetadata } from "@/lib/core";
 import type { Route } from "next";
 
 // Update interface to extend PostMetadata
@@ -81,6 +81,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 	// Ensure stable initial states
 	const [mounted, setMounted] = useState(false);
 	const [query, setQuery] = useState("");
+	const [debouncedQuery, setDebouncedQuery] = useState("");
 	const [results, setResults] = useState<Post[]>([]); // Start empty
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [sortMethod, setSortMethod] = useState<string>("date");
@@ -98,6 +99,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		setResults(sortedPosts);
 		setMounted(true);
 	}, [posts]);
+
+	// Debounce search query
+	useEffect(() => {
+		const timer = setTimeout(() => setDebouncedQuery(query), 300);
+		return () => clearTimeout(timer);
+	}, [query]);
 
 	// Memoize the Fuse instance
 	const fuse = useMemo(
@@ -118,12 +125,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		[posts]
 	);
 
-	// Update search effect to maintain sort order
+	// Update search effect to maintain sort order - use debouncedQuery instead of query
 	useEffect(() => {
 		let searchResults = [...posts]; // Create new array to avoid mutating props
 
-		if (query.trim()) {
-			const fuseResults = fuse.search(query);
+		if (debouncedQuery.trim()) {
+			const fuseResults = fuse.search(debouncedQuery);
 			// Sort by score and map to items
 			searchResults = fuseResults
 				.sort((a, b) => (a.score || 0) - (b.score || 0))
@@ -147,7 +154,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		});
 
 		setResults(searchResults);
-	}, [query, selectedTags, sortMethod, sortDirection, posts, fuse]);
+	}, [debouncedQuery, selectedTags, sortMethod, sortDirection, posts, fuse]);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value);
@@ -226,8 +233,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
               onClick={() => toggleTag(tag)}
               whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
               whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
+              aria-pressed={selectedTags.includes(tag)}
               className={cn(
                 "inline-flex items-center",
+                "min-h-[44px] min-w-[44px]", // Touch target size
                 "px-2 py-1 sm:px-2.5 sm:py-1 md:px-3 md:py-1.5", // Responsive padding
                 "rounded-full",
                 "text-xs sm:text-sm", // Smaller base text size

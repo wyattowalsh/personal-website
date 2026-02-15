@@ -4,7 +4,7 @@ import { motion } from 'motion/react';
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import SearchBar from "@/components/SearchBar";
-import type { PostMetadata } from "@/lib/types";
+import type { PostMetadata } from "@/lib/core";
 
 interface BlogContentProps {
   posts: PostMetadata[];

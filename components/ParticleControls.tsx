@@ -45,6 +45,17 @@ export default function ParticleControls({
     }
   }, [configs, currentConfigUrl, onConfigChange]);
 
+  // Close panel on Escape key
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
   const buttonBaseStyles = cn(
     "p-2 rounded-full",
     "backdrop-blur-md",
@@ -169,6 +180,7 @@ export default function ParticleControls({
           whileTap={prefersReducedMotion ? undefined : { scale: 0.9 }}
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Close particle settings" : "Open particle settings"}
+          aria-expanded={isOpen}
           className={buttonBaseStyles}
         >
           <Settings className="w-5 h-5" />

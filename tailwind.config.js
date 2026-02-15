@@ -49,7 +49,6 @@ const config = {
       },
       fontFamily: {
         sans: ['Montserrat', 'sans-serif'],
-        display: ['Oswald', 'sans-serif'],
         mono: ['Fira Code', 'monospace'],
       },
       keyframes: {
@@ -80,7 +79,7 @@ const config = {
         soft: 'var(--shadow-soft)',
       },
       borderRadius: {
-        xl: 'var(--radius)',
+        xl: 'calc(var(--radius) + 4px)',
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",

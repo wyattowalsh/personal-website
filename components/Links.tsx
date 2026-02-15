@@ -1,7 +1,5 @@
 "use client";
 
-import { type LinkProps } from 'next/link';
-import { type Route } from 'next';
 import SocialLink from "./SocialLink";
 import { motion, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
@@ -9,9 +7,6 @@ import { cn } from "@/lib/utils";
 import { Github, Linkedin, Twitter, Codepen, BookOpen, Mail } from 'lucide-react';
 import { Reddit } from './icons/Reddit';
 import { Kaggle } from './icons/Kaggle';
-
-// Update Href type to handle both internal and external URLs
-export type Href = Route | URL | string;
 
 // Update Link interface
 interface Link {

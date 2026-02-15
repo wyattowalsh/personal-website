@@ -8,6 +8,8 @@ import ScrollIndicator from "@/components/ScrollIndicator";
 import Header from "@/components/Header";
 import { StrictMode } from "react";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@/lib/utils";
 import { getDefaultMetadata } from "@/lib/core";
 import { WebSiteJsonLd } from "@/components/PostSchema";
@@ -27,6 +29,8 @@ const montserrat = Montserrat({
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
 // Base metadata configuration
 export const metadata: Metadata = {
@@ -81,6 +85,9 @@ export default function RootLayout({
 				<head>
 					{/* WebSite JSON-LD structured data */}
 					<WebSiteJsonLd />
+					{/* Preconnect to Google services for analytics */}
+					<link rel="preconnect" href="https://www.googletagmanager.com" />
+					<link rel="preconnect" href="https://www.google-analytics.com" />
 				</head>
 				<body
 					className={cn(
@@ -94,6 +101,13 @@ export default function RootLayout({
 					)}
 					suppressHydrationWarning
 				>
+					{/* Skip to main content link for accessibility */}
+					<a
+						href="#main-content"
+						className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
+					>
+						Skip to content
+					</a>
 					<ThemeProvider
 						attribute="class"
 						defaultTheme="system"
@@ -103,13 +117,15 @@ export default function RootLayout({
 						<TooltipProvider>
 							<div className="relative flex min-h-screen flex-col">
 								<Header />
-								<main role="main" aria-label="Main content" className="flex-1 flex flex-col">{children}</main>
+								<main id="main-content" role="main" aria-label="Main content" className="flex-1 flex flex-col">{children}</main>
 							</div>
 						</TooltipProvider>
 						<ScrollIndicator />
 					</ThemeProvider>
-					<GoogleTagManager gtmId="GTM-P7VFKNK6" />
-					<GoogleAnalytics gaId="G-17PRGFZN0C" />
+					{gtmId && <GoogleTagManager gtmId={gtmId} />}
+					{gaId && <GoogleAnalytics gaId={gaId} />}
+					<Analytics />
+					<SpeedInsights />
 				</body>
 			</html>
 		</StrictMode>

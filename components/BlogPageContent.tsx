@@ -3,7 +3,7 @@
 import { motion } from 'motion/react';
 import ParticlesBackground from "@/components/ParticlesBackground";
 import BlogContent from "@/components/BlogContent";
-import type { PostMetadata } from "@/lib/types";
+import type { PostMetadata } from "@/lib/core";
 
 interface BlogPageContentProps {
   posts: PostMetadata[];

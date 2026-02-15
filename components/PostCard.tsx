@@ -5,13 +5,13 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { useRouter } from "next/navigation"; // Add this import
 import { motion } from "motion/react";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import TagLink from "@/components/TagLink";
 import { cn } from "@/lib/utils";
+import { TagPill } from "@/components/ui/tag-pill";
 import { Calendar, Clock } from "lucide-react";
 import type { Route } from "next";
 import ThemeAwareHero, { getHeroConfig } from "@/components/heroes/ThemeAwareHero";
@@ -44,7 +44,6 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post, className }: PostCardProps) => {
-	const router = useRouter(); // Add this
 	const {
 		slug,
 		title = "Untitled Post",
@@ -58,23 +57,9 @@ const PostCard = ({ post, className }: PostCardProps) => {
 	const isSvg = image.endsWith(".svg");
 	const heroConfig = getHeroConfig(image);
 
-	// Option 1: Use template literal type assertion
-	const handleCardClick = () => {
-		router.push(`/blog/posts/${slug}` as Route);
-	};
-
-	// Alternative Option 2: Use pathname + params object
-	// const handleCardClick = () => {
-	//     router.push({
-	//         pathname: '/blog/posts/[slug]',
-	//         params: { slug }
-	//     } as Route);
-	// };
-
 	return (
-		<div className="block h-full">
+		<article className="block h-full relative group">
 			<Card
-				onClick={handleCardClick}
 				className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col"
 			>
 				<div className="relative aspect-video w-full">
@@ -116,7 +101,12 @@ const PostCard = ({ post, className }: PostCardProps) => {
 								"tracking-tight"
 							)}
 						>
-							{title}
+							<Link
+								href={`/blog/posts/${slug}` as Route}
+								className="after:absolute after:inset-0 after:z-[1]"
+							>
+								{title}
+							</Link>
 						</h3>
 						<p
 							className={cn(
@@ -158,51 +148,21 @@ const PostCard = ({ post, className }: PostCardProps) => {
 							{[...tags]
 								.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
 								.map((tag) => (
-									<Link
+									<TagPill
 										key={tag}
+										tag={tag}
 										href={`/blog/tags/${tag}`}
 										onClick={(e) => {
 											e.stopPropagation();
-											e.preventDefault();
-											router.push(`/blog/tag/${tag}`);
 										}}
-										className={cn(
-											// Base styles
-											"inline-flex items-center pointer-events-auto",
-											"text-xs sm:text-sm font-medium",
-											"px-2 py-0.5 sm:px-2.5 sm:py-1",
-											"rounded-full",
-											"border transition-all duration-200",
-											"no-underline",
-											"transform-gpu hover:scale-[1.02] active:scale-[0.98]",
-											
-											// Light mode styles
-											"bg-white/50 hover:bg-primary/10",
-											"text-muted-foreground hover:text-primary",
-											"border-muted-foreground/20 hover:border-primary/50",
-											
-											// Dark mode styles
-											"dark:bg-white/5 dark:hover:bg-primary/20",
-											"dark:text-muted-foreground dark:hover:text-primary-light",
-											"dark:border-muted-foreground/10 dark:hover:border-primary/40",
-											
-											// Shadow effects
-											"shadow-sm hover:shadow-md",
-											"dark:shadow-none dark:hover:shadow-primary/20",
-											
-											// Focus styles
-											"focus:outline-none focus:ring-2 focus:ring-primary/40",
-											"dark:focus:ring-primary/40"
-										)}
-									>
-										#{tag}
-									</Link>
+										className="pointer-events-auto"
+									/>
 								))}
 						</div>
 					)}
 				</div>
 			</Card>
-		</div>
+		</article>
 	);
 };
 

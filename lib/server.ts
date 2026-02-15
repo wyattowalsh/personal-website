@@ -1,33 +1,21 @@
 import { LRUCache } from 'lru-cache';
-import { NextResponse, NextRequest } from 'next/server';
 import { Feed } from 'feed';
 import Fuse from 'fuse.js';
 import matter from 'gray-matter';
 import path from 'path';
 import fs from 'fs/promises';
-import { logger, Post, formatters } from './core';
-import { PreprocessStats } from './types'; // Add this import
-import { cacheControl } from '@/lib/core';
+import { glob } from 'glob';
+import readingTime from 'reading-time';
+import { logger, Post, formatters, PreprocessStats, ApiError, cacheControl } from './core';
+import {
+  CACHE_TTL_MS,
+  LRU_MAX_ENTRIES,
+  SEARCH_THRESHOLD,
+  SEARCH_CACHE_TTL_SECONDS,
+  API_REVALIDATE_SECONDS
+} from './constants';
 
-// Custom glob-like function
-async function findFiles(dir: string, pattern: RegExp): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  const files: string[] = [];
-
-  await Promise.all(
-    entries.map(async entry => {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        const subFiles = await findFiles(fullPath, pattern);
-        files.push(...subFiles);
-      } else if (pattern.test(entry.name)) {
-        files.push(fullPath);
-      }
-    })
-  );
-
-  return files;
-}
+// Removed custom findFiles() - using glob package instead
 
 // Git utilities - now using file stats instead of git commands
 async function getFileData(filePath: string) {
@@ -56,24 +44,7 @@ const INDICES = {
   RSS: path.join(CACHE_DIR, 'rss.xml'),
 } as const;
 
-// API error handling
-class ApiError extends Error {
-  constructor(
-    public statusCode: number,
-    message: string,
-    public details?: any
-  ) {
-    super(message);
-    this.name = 'ApiError';
-  }
-
-  toResponse() {
-    return NextResponse.json(
-      { error: this.message, details: this.details },
-      { status: this.statusCode }
-    );
-  }
-}
+// ApiError is now imported from @/lib/core
 
 // Backend service implementation
 class BackendService {
@@ -84,12 +55,13 @@ class BackendService {
   private posts: Map<string, Post>;
   private tags: Set<string>;
   private preprocessed: boolean = false;
+  private sortedPostsCache: Post[] | null = null;
 
   private constructor() {
-    this.cache = new LRUCache({ max: 500, ttl: 1000 * 60 * 60 });
+    this.cache = new LRUCache({ max: LRU_MAX_ENTRIES, ttl: CACHE_TTL_MS });
     this.searchIndex = new Fuse([], {
       keys: ['title', 'summary', 'content', 'tags'],
-      threshold: 0.3,
+      threshold: SEARCH_THRESHOLD,
       includeMatches: true
     });
     this.posts = new Map();
@@ -105,18 +77,24 @@ class BackendService {
 
   public static async ensurePreprocessed() {
     const instance = BackendService.getInstance();
-    if (!instance.preprocessed && !instance.preprocessPromise) {
-      const isDev = process.env.NODE_ENV === 'development';
-      instance.preprocessPromise = instance.preprocess(isDev)
-        .then(() => {
-          instance.preprocessed = true;
-          instance.preprocessPromise = null;
-        })
-        .catch((err) => {
-          instance.preprocessPromise = null;
-          throw err;
-        });
-    }
+    // Return existing promise if preprocessing is in progress
+    if (instance.preprocessPromise) return instance.preprocessPromise;
+
+    // Return immediately if already preprocessed
+    if (instance.preprocessed) return Promise.resolve();
+
+    // Set promise BEFORE awaiting to prevent race condition
+    const isDev = process.env.NODE_ENV === 'development';
+    instance.preprocessPromise = instance.preprocess(isDev)
+      .then(() => {
+        instance.preprocessed = true;
+        instance.preprocessPromise = null;
+      })
+      .catch((err) => {
+        instance.preprocessPromise = null;
+        throw err;
+      });
+
     return instance.preprocessPromise;
   }
 
@@ -177,8 +155,14 @@ class BackendService {
   }
 
   async getAllPosts(): Promise<Post[]> {
-    return Array.from(this.posts.values())
+    // Return cached sorted array if available
+    if (this.sortedPostsCache) return this.sortedPostsCache;
+
+    // Sort and cache the result
+    this.sortedPostsCache = Array.from(this.posts.values())
       .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+
+    return this.sortedPostsCache;
   }
 
   async getAllTags(): Promise<string[]> {
@@ -188,14 +172,14 @@ class BackendService {
   async getAdjacentPosts(slug: string) {
     const posts = await this.getAllPosts();
     const index = posts.findIndex(p => p.slug === slug);
-    
+
     return {
-      prev: index > 0 ? posts[index - 1] : null,
+      previous: index > 0 ? posts[index - 1] : null,
       next: index < posts.length - 1 ? posts[index + 1] : null
     };
   }
 
-  async preprocess(isDev: boolean): Promise<Omit<PreprocessStats, 'particleConfigPath'>> {
+  async preprocess(isDev: boolean): Promise<PreprocessStats> {
     const startTime = Date.now();
     const errors: Error[] = [];
     
@@ -208,12 +192,13 @@ class BackendService {
       this.cache.clear();
       this.posts.clear();
       this.tags.clear();
+      this.sortedPostsCache = null;
       logger.debug('Cleared all caches');
 
-      // Update posts directory path and use custom file finder
+      // Update posts directory path and use glob
       const postsDir = path.join(process.cwd(), 'app/blog/posts');
-      const files = await findFiles(postsDir, /page\.mdx$/);
-      
+      const files = await glob('**/page.mdx', { cwd: postsDir, absolute: true });
+
       logger.info(`Found ${files.length} posts to process`);
       
       for (const filePath of files) {
@@ -236,9 +221,11 @@ class BackendService {
             .replace(/^export const metadata = \{[\s\S]*?\};\s*/m, '')
             .replace(/<ArticleJsonLd[\s\S]*?\/>\s*/g, '')
             .trim();
-          
-          // Calculate word count from clean content
+
+          // Calculate word count and reading time from clean content
           const wordCount = cleanContent.trim().split(/\s+/).length;
+          const readingTimeResult = readingTime(cleanContent);
+          const readingTimeText = readingTimeResult.text;
           
           // Ensure title exists
           if (!data.title) {
@@ -251,6 +238,7 @@ class BackendService {
             title: data.title, // explicitly include title
             content: cleanContent,
             wordCount, // add word count
+            readingTime: readingTimeText, // add reading time
             created: data.created || fileData.firstModified || new Date().toISOString(),
             updated: data.updated || fileData.lastModified || new Date().toISOString(),
             tags: data.tags || [],
@@ -272,7 +260,7 @@ class BackendService {
       // Rebuild search index
       this.searchIndex = new Fuse(Array.from(this.posts.values()), {
         keys: ['title', 'summary', 'content', 'tags'],
-        threshold: 0.3,
+        threshold: SEARCH_THRESHOLD,
         includeMatches: true
       });
 
@@ -348,8 +336,8 @@ async function handleRequest<T>(
     // Determine cache control
     const cacheHeader = typeof options.cache === 'number'
       ? cacheControl.dynamic(options.cache)
-      : options.cache 
-        ? cacheControl.public()
+      : options.cache
+        ? cacheControl.public(API_REVALIDATE_SECONDS)
         : cacheControl.private();
 
     // Return response
@@ -360,7 +348,7 @@ async function handleRequest<T>(
         duration: Math.round(duration * 100) / 100,
         cache: {
           hit: false,
-          ttl: typeof options.cache === 'number' ? options.cache : 3600
+          ttl: typeof options.cache === 'number' ? options.cache : API_REVALIDATE_SECONDS
         }
       }
     }, {
@@ -394,7 +382,7 @@ async function getPostHandler(slug: string) {
       if (!post) throw new ApiError(404, 'Post not found');
       return post;
     },
-    cache: 3600
+    cache: API_REVALIDATE_SECONDS
   });
 }
 
@@ -404,7 +392,7 @@ async function getPostsHandler() {
     handler: async () => {
       return BackendService.getInstance().getAllPosts();
     },
-    cache: 3600
+    cache: API_REVALIDATE_SECONDS
   });
 }
 
@@ -414,7 +402,7 @@ async function searchPostsHandler(query: string) {
     handler: async () => {
       return BackendService.getInstance().search(query);
     },
-    cache: 1800
+    cache: SEARCH_CACHE_TTL_SECONDS
   });
 }
 
@@ -450,7 +438,6 @@ const backend = {
 
 // Single consolidated export statement at the end of the file
 export {
-  ApiError,
   BackendService,
   handleRequest,
   getPostHandler,

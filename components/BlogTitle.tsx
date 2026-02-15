@@ -47,9 +47,11 @@ const icons = [
 const FloatingIcon = ({
 	icon: Icon,
 	containerSize,
+	isVisible,
 }: {
 	icon: React.ComponentType<{ className?: string }>;
 	containerSize: { width: number; height: number };
+	isVisible: boolean;
 }) => {
 	const iconSize = 16;
 
@@ -68,6 +70,8 @@ const FloatingIcon = ({
 	const rotationZ = useMotionValue(Math.random() * 360);
 
 	useAnimationFrame((_, delta) => {
+		if (!isVisible) return;
+
 		const deltaInSeconds = delta / 1000;
 
 		let newX = x.get() + velocity.current.x * deltaInSeconds;
@@ -227,6 +231,14 @@ const BlogTitle = () => {
 	const prefersReducedMotion = useReducedMotion();
 	const { theme } = useTheme();
 	const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+	const [isVisible, setIsVisible] = useState(false);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting));
+		if (containerRef.current) observer.observe(containerRef.current);
+		return () => observer.disconnect();
+	}, []);
 
 	useEffect(() => {
 		const updateSize = () => {
@@ -242,7 +254,7 @@ const BlogTitle = () => {
 	}, []);
 
 	return (
-		<motion.div className="relative w-full" suppressHydrationWarning>
+		<motion.div ref={containerRef} className="relative w-full" suppressHydrationWarning>
 			<div className="max-w-4xl mx-auto mt-4">
 				<motion.div
 					initial={{ opacity: 0, y: 20 }}
@@ -273,6 +285,7 @@ const BlogTitle = () => {
 									key={index}
 									icon={Icon}
 									containerSize={containerSize}
+									isVisible={isVisible}
 								/>
 							))}
 
