@@ -26,7 +26,7 @@
 - Math in `<Math>` component for numbering
 
 **Key entry points:**
-- `lib/services.ts` — `services.posts.*`, `services.tags.*`
+- `lib/server.ts` — `BackendService` singleton (posts, search, cache)
 - `lib/utils.ts` — cn(), formatDate
 - `components/ui/` — Button, Card, etc.
 

@@ -37,7 +37,6 @@ components/
 
 lib/
 ├── server.ts             # BackendService singleton (posts, search, cache)
-├── services.ts           # Simplified API wrapper ← USE THIS
 ├── client.ts             # Type-safe API client
 ├── core.ts               # Types, Zod schemas, ApiError, logger
 ├── metadata.ts           # SEO metadata generators
@@ -72,10 +71,11 @@ export function MyComponent({ variant, children }: Props) {
 
 ### Server Components — Data fetching
 ```typescript
-import { services } from '@/lib/services'
+import { BackendService } from '@/lib/server'
 
 export default async function Page() {
-  const posts = await services.posts.getAll()
+  await BackendService.ensurePreprocessed()
+  const posts = await BackendService.getInstance().getAllPosts()
   return <PostList posts={posts} />
 }
 ```
@@ -147,12 +147,11 @@ Create via `pnpm new-post` or manually.
 
 | File | Purpose |
 |------|---------|
-| `lib/services.ts` | Simplified API: `services.posts.*`, `services.tags.*` |
 | `lib/server.ts` | BackendService: posts, search, LRU cache |
 | `lib/metadata.ts` | SEO: `generatePostMetadata()` |
 | `lib/schema.ts` | JSON-LD: `generateArticleSchema()` |
 | `lib/core.ts` | Types, Zod schemas, `ApiError`, logger |
-| `next.config.mjs` | MDX plugins (35+ remark/rehype), webpack |
+| `next.config.mjs` | MDX plugins, webpack |
 | `tailwind.config.js` | Theme, 30+ custom animations |
 
 ## Gotchas
