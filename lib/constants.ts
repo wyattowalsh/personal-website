@@ -7,7 +7,7 @@
 
 // Cache configuration
 export const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-export const LRU_MAX_ENTRIES = 500;
+export const LRU_MAX_ENTRIES = 50;
 
 // Blog configuration
 export const POSTS_PER_PAGE = 20;
