@@ -18,38 +18,6 @@ import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
 import Math, { MathProps } from "@/components/Math";
 import Mermaid from "@/components/Mermaid";
-import { RisoModuleMatrix, RisoSaaSStack, RisoSampleVariants } from "@/components/RisoMatrix";
-
-// MDX Components
-import {
-  Chart,
-  Timeline,
-  Comparison,
-  ComparisonCard,
-  ImageGallery,
-  VideoEmbed,
-  Terminal,
-  Diff,
-  APIReference,
-  PropTable,
-  FileTree,
-  PackageInstall,
-  Quiz,
-  Spoiler,
-  InlineSpoiler,
-  Bookmark,
-  BookmarkGrid,
-  Newsletter,
-  Columns,
-  Column,
-  Split,
-  Aside,
-  InlineAside,
-  Figure,
-  FigureGroup,
-  Steps,
-  Step,
-} from "@/components/mdx";
 import type { UrlObject } from 'url';
 import { Route as NextRoute } from 'next';
 
@@ -706,46 +674,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         // Mermaid diagrams
         Mermaid,
 
-        // Riso template matrix components
-        RisoModuleMatrix,
-        RisoSaaSStack,
-        RisoSampleVariants,
-
-        // Phase 1: Interactive/Visual Components
-        Chart,
-        Timeline,
-        Comparison,
-        ComparisonCard,
-        ImageGallery,
-        VideoEmbed,
-        Terminal,
-        Diff,
-
-        // Phase 2: Data/Code Components
-        APIReference,
-        PropTable,
-        FileTree,
-        PackageInstall,
-
-        // Phase 3: Engagement Components
-        Quiz,
-        Spoiler,
-        InlineSpoiler,
-        Bookmark,
-        BookmarkGrid,
-        Newsletter,
-
-        // Phase 4: Layout Components
-        Columns,
-        Column,
-        Split,
-        Aside,
-        InlineAside,
-        Figure,
-        FigureGroup,
-        Steps,
-        Step,
-        
         ...components,
     };
 }
