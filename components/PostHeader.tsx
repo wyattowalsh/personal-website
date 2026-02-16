@@ -131,7 +131,6 @@ const useSafePost = (pathname: string) => {
 
     const fetchPost = async () => {
       try {
-        console.log('Fetching post for pathname:', pathname);
         if (mounted) {
           setState(prev => ({ ...prev, isLoading: true, error: null }));
         }

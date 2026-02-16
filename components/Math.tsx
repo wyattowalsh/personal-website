@@ -20,11 +20,6 @@ export default function Math({ children = '', display = false, options = {}, lab
   const mathRef = useRef<HTMLDivElement>(null);
   const { getNextNumber } = useMathContext();
 
-  // Add logging for debugging
-  useEffect(() => {
-    console.debug('[Math] Rendering equation:', { display, label, number });
-  }, [display, label, number]);
-
   // Get equation number only once using lazy initializer
   const [equationNumber] = useState(() => {
     if (!display) return undefined;

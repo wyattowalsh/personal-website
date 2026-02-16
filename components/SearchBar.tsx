@@ -27,7 +27,6 @@ import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import TagLink from "@/components/TagLink"; // Ensure this is the correct import path
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import { backend } from "@/lib/server"; // Update this line
 import type { PostMetadata } from "@/lib/core";
 import type { Route } from "next";
 

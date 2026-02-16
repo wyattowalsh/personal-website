@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'motion/react';
-import ParticlesBackground from "@/components/ParticlesBackground";
+import dynamic from "next/dynamic";
+const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground"), { ssr: false });
 import BlogContent from "@/components/BlogContent";
 import type { PostMetadata } from "@/lib/core";
 

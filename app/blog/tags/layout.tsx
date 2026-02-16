@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import ParticlesBackground from "@/components/ParticlesBackground";
+import dynamic from "next/dynamic";
+const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground"), { ssr: false });
 
 export default function TagsLayout({
   children,

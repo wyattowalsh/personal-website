@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import NotFoundContent from "@/components/NotFoundContent";
 import { cn } from "@/lib/utils";
-import ParticlesBackground from "@/components/ParticlesBackground";
+import dynamic from "next/dynamic";
+const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground"), { ssr: false });
 
 // Note: metadata export must be in a server component layout or page
 // For client components like this one, metadata should be set in a parent layout
