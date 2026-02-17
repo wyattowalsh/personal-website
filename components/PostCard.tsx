@@ -3,31 +3,16 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { motion } from "motion/react";
 import { formatDate } from "@/lib/utils";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import TagLink from "@/components/TagLink";
 import { cn } from "@/lib/utils";
 import { TagPill } from "@/components/ui/tag-pill";
 import { Calendar, Clock } from "lucide-react";
 import type { Route } from "next";
 import ThemeAwareHero, { getHeroConfig } from "@/components/heroes/ThemeAwareHero";
 import RisoHero from "@/components/heroes/RisoHero";
-
-// Add the same helper function
-function isDifferentDate(
-	date1: string | undefined,
-	date2: string | undefined
-): boolean {
-	if (!date1 || !date2) return false;
-	// Remove any milliseconds and 'Z' suffix for comparison
-	const clean1 = date1.split(".")[0].replace("Z", "");
-	const clean2 = date2.split(".")[0].replace("Z", "");
-	return clean1 !== clean2;
-}
 
 interface PostCardProps {
 	post: {
@@ -43,13 +28,13 @@ interface PostCardProps {
 	className?: string;
 }
 
-const PostCard = ({ post, className }: PostCardProps) => {
+const PostCard = ({ post, className: _className }: PostCardProps) => {
 	const {
 		slug,
 		title = "Untitled Post",
 		summary = "No summary available.",
 		created, // Changed from date
-		updated,
+		updated: _updated,
 		tags = [],
 		image = "/logo.webp",
 		readingTime = "A few minutes",
@@ -73,11 +58,14 @@ const PostCard = ({ post, className }: PostCardProps) => {
 							className="absolute inset-0 w-full h-full transition-transform duration-500 hover:scale-105"
 						/>
 					) : isSvg ? (
-						<img
-							src={image}
-							alt={title}
-							className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-						/>
+						<>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={image}
+								alt={title}
+								className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+							/>
+						</>
 					) : (
 						<Image
 							src={image}
@@ -103,7 +91,7 @@ const PostCard = ({ post, className }: PostCardProps) => {
 						>
 							<Link
 								href={`/blog/posts/${slug}` as Route}
-								className="after:absolute after:inset-0 after:z-[1]"
+								className="no-underline text-inherit after:absolute after:inset-0 after:z-[1]"
 							>
 								{title}
 							</Link>
