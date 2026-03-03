@@ -43,15 +43,31 @@ test.describe('Studio Gallery', () => {
       await expect(createNewLink).toHaveAttribute('href', '/studio/new')
     })
 
-    test('auth providers endpoint includes google and github', async ({
+    test('auth providers endpoint returns configured providers', async ({
       page,
     }) => {
       const response = await page.request.get('/api/auth/providers')
       expect(response.ok()).toBe(true)
 
       const providers = await response.json()
-      expect(providers).toHaveProperty('google')
-      expect(providers).toHaveProperty('github')
+      const hasGoogleEnv = Boolean(
+        process.env.AUTH_GOOGLE_ID || process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_ID
+      )
+      const hasGithubEnv = Boolean(
+        process.env.AUTH_GITHUB_ID || process.env.GITHUB_CLIENT_ID || process.env.GITHUB_ID
+      )
+
+      if (hasGoogleEnv) {
+        expect(providers).toHaveProperty('google')
+      } else {
+        expect(providers).not.toHaveProperty('google')
+      }
+
+      if (hasGithubEnv) {
+        expect(providers).toHaveProperty('github')
+      } else {
+        expect(providers).not.toHaveProperty('github')
+      }
     })
 
     test('sort buttons are visible', async ({ page }) => {

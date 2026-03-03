@@ -19,6 +19,90 @@ const sessionCookieName = isProduction
 
 type AuthFailureReason = 'missing_account' | 'db_error'
 
+function resolveEnv(...keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = process.env[key]
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value.trim()
+    }
+  }
+  return undefined
+}
+
+const authSecret = resolveEnv('AUTH_SECRET', 'NEXTAUTH_SECRET')
+const authUrl = resolveEnv('AUTH_URL', 'NEXTAUTH_URL', 'NEXT_PUBLIC_SITE_URL')
+
+if (!process.env.AUTH_SECRET && authSecret) {
+  process.env.AUTH_SECRET = authSecret
+}
+
+if (!process.env.AUTH_URL && authUrl) {
+  process.env.AUTH_URL = authUrl
+}
+
+const googleClientId = resolveEnv('AUTH_GOOGLE_ID', 'GOOGLE_CLIENT_ID', 'GOOGLE_ID')
+const googleClientSecret = resolveEnv('AUTH_GOOGLE_SECRET', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_SECRET')
+const githubClientId = resolveEnv('AUTH_GITHUB_ID', 'GITHUB_CLIENT_ID', 'GITHUB_ID')
+const githubClientSecret = resolveEnv('AUTH_GITHUB_SECRET', 'GITHUB_CLIENT_SECRET', 'GITHUB_SECRET')
+
+if (isProduction && !authSecret) {
+  console.error(JSON.stringify({
+    event: 'auth_env_missing_secret',
+    required: ['AUTH_SECRET'],
+    fallbackAccepted: ['NEXTAUTH_SECRET'],
+    timestamp: new Date().toISOString(),
+  }))
+}
+
+if (isProduction && !authUrl) {
+  console.warn(JSON.stringify({
+    event: 'auth_env_missing_url',
+    recommended: ['AUTH_URL'],
+    fallbackAccepted: ['NEXTAUTH_URL', 'NEXT_PUBLIC_SITE_URL'],
+    timestamp: new Date().toISOString(),
+  }))
+}
+
+if (!googleClientId || !googleClientSecret) {
+  console.warn(JSON.stringify({
+    event: 'auth_provider_unconfigured',
+    provider: 'google',
+    missing: [
+      !googleClientId ? 'AUTH_GOOGLE_ID|GOOGLE_CLIENT_ID|GOOGLE_ID' : null,
+      !googleClientSecret ? 'AUTH_GOOGLE_SECRET|GOOGLE_CLIENT_SECRET|GOOGLE_SECRET' : null,
+    ].filter(Boolean),
+    timestamp: new Date().toISOString(),
+  }))
+}
+
+if (!githubClientId || !githubClientSecret) {
+  console.warn(JSON.stringify({
+    event: 'auth_provider_unconfigured',
+    provider: 'github',
+    missing: [
+      !githubClientId ? 'AUTH_GITHUB_ID|GITHUB_CLIENT_ID|GITHUB_ID' : null,
+      !githubClientSecret ? 'AUTH_GITHUB_SECRET|GITHUB_CLIENT_SECRET|GITHUB_SECRET' : null,
+    ].filter(Boolean),
+    timestamp: new Date().toISOString(),
+  }))
+}
+
+const providers = [
+  ...(googleClientId && googleClientSecret
+    ? [Google({ clientId: googleClientId, clientSecret: googleClientSecret })]
+    : []),
+  ...(githubClientId && githubClientSecret
+    ? [GitHub({ clientId: githubClientId, clientSecret: githubClientSecret })]
+    : []),
+]
+
+if (providers.length === 0) {
+  console.error(JSON.stringify({
+    event: 'auth_no_providers_configured',
+    timestamp: new Date().toISOString(),
+  }))
+}
+
 async function persistAuthFailure(
   throttleKey: string,
   provider: string | null,
@@ -53,16 +137,8 @@ async function persistAuthFailure(
 }
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
-  providers: [
-    Google({
-      clientId: process.env.AUTH_GOOGLE_ID,
-      clientSecret: process.env.AUTH_GOOGLE_SECRET,
-    }),
-    GitHub({
-      clientId: process.env.AUTH_GITHUB_ID,
-      clientSecret: process.env.AUTH_GITHUB_SECRET,
-    }),
-  ],
+  providers,
+  secret: authSecret,
   callbacks: {
     async signIn({ user, account }) {
       const throttleKey = createAuthFailureThrottleKey(account?.provider, account?.providerAccountId)
