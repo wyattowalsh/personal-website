@@ -1,43 +1,12 @@
 'use client';
 
-import { motion, useMotionTemplate, useMotionValue } from "motion/react";
+import { motion, useMotionValue } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
-
-// Enhanced animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.12,
-      delayChildren: 0.1,
-      type: 'spring' as const,
-      stiffness: 100
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: {
-    y: 20,
-    scale: 0.9,
-  },
-  show: {
-    y: 0,
-    scale: 1,
-    transition: {
-      type: "spring" as const,
-      stiffness: 200,
-      damping: 20,
-      mass: 0.8
-    }
-  }
-};
 
 interface TagsGridProps {
   tags: string[];
@@ -51,19 +20,20 @@ export default function TagsGrid({ tags, tagCounts }: TagsGridProps) {
   useEffect(() => setMounted(true), []);
 
   return (
-    <motion.div 
-      variants={containerVariants}
-      initial="hidden"
-      animate="show"
+    <div
       className={cn(
         "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
         "gap-4 sm:gap-6 lg:gap-8",
         "p-4 sm:p-6 lg:p-8",
-        "max-w-7xl mx-auto"
+        "max-w-7xl mx-auto",
+        "opacity-100",
+        "transition-opacity duration-500",
+        "[&:not(.loaded)]:opacity-0",
+        "loaded"
       )}
     >
       {tags.map((tag, index) => (
-        <TagCard 
+        <TagCard
           key={tag}
           tag={tag}
           count={tagCounts[tag]}
@@ -71,7 +41,7 @@ export default function TagsGrid({ tags, tagCounts }: TagsGridProps) {
           theme={mounted ? theme : 'light'}
         />
       ))}
-    </motion.div>
+    </div>
   );
 }
 
@@ -96,11 +66,20 @@ function TagCard({ tag, count, index }: TagCardProps) {
 
   return (
     <motion.div
-      variants={itemVariants}
       onMouseMove={handleMouseMove}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="relative"
+      className={cn(
+        "relative",
+        "opacity-100 translate-y-0 scale-100",
+        "transition-[opacity,transform] duration-500 ease-out",
+        "[&:not(.loaded)]:opacity-0 [&:not(.loaded)]:translate-y-5 [&:not(.loaded)]:scale-90",
+        "loaded"
+      )}
+      style={{
+        transitionDelay: `${index * 120}ms`,
+        animation: `slideUp 0.5s ease-out ${index * 0.12}s backwards`
+      }}
     >
       <Link href={`/blog/tags/${tag}`} className="block">
         <Card className={cn(

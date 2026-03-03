@@ -14,25 +14,8 @@ export interface SchemaOptions {
   dateModified?: string;
 }
 
-export function generateArticleStructuredData(post: Post, siteUrl: string) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'BlogPosting',
-    headline: post.title,
-    description: post.summary,
-    image: post.image ? [`${siteUrl}${post.image}`] : [],
-    datePublished: new Date(post.created).toISOString(),
-    dateModified: new Date(post.updated || post.created).toISOString(),
-    author: {
-      '@type': 'Person',
-      name: 'Wyatt Walsh',
-      url: siteUrl,
-    },
-  };
-}
-
 // Cache the generation of the website schema
-export const generateWebSiteSchema = cache((url = 'https://w4w.dev') => {
+export const generateWebSiteSchema = cache(() => {
   const config = getConfig();
   const currentYear = new Date().getFullYear();
 
@@ -71,17 +54,25 @@ export const generateWebSiteSchema = cache((url = 'https://w4w.dev') => {
     license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
     keywords: [
       'Software Engineering',
-      'Web Development', 
+      'Web Development',
       'Technology',
       'Blog'
-    ]
+    ],
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${config.site.url}/blog?q={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
   };
 });
 
 export function generateArticleSchema(post: Post, options?: SchemaOptions) {
   const config = getConfig();
   const baseUrl = options?.baseUrl || config.site.url;
-  
+
   return {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -103,6 +94,10 @@ export function generateArticleSchema(post: Post, options?: SchemaOptions) {
         url: `${baseUrl}/logo.webp`
       }
     },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${baseUrl}/blog/posts/${post.slug}`,
+    },
     keywords: post.tags,
     isAccessibleForFree: true,
     license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
@@ -110,7 +105,7 @@ export function generateArticleSchema(post: Post, options?: SchemaOptions) {
 }
 
 export const generateBreadcrumbSchema = cache(
-  (items: BreadcrumbItem[], baseUrl = 'https://w4w.dev') => {
+  (items: BreadcrumbItem[], baseUrl = getConfig().site.url) => {
     return {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',

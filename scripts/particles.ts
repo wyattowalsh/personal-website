@@ -469,8 +469,6 @@ export async function generateParticleConfigs(): Promise<string> {
     const code = `// This file is auto-generated. Do not edit manually.
 // Last generated: ${new Date().toISOString()}
 
-import { type ISourceOptions } from "@tsparticles/engine";
-
 type ParticleConfig = {
   url: string;
   hash: string;

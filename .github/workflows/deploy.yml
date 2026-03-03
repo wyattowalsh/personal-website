@@ -1,33 +1,70 @@
-name: github pages
+name: CI Quality Gates
 
 on:
   push:
     branches:
-      - master # Set a branch to deploy
+      - master
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-quality-gates-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  deploy:
-    runs-on: ubuntu-20.04
+  quality-gates:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash --noprofile --norc -eo pipefail {0}
     steps:
-      - uses: actions/checkout@v2
-        with:
-          submodules: true  # Fetch Hugo themes (true OR recursive)
-          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+      - uses: actions/checkout@v4
 
-      - name: Setup Hugo
-        uses: peaceiris/actions-hugo@v2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          hugo-version: 'latest'
-          extended: true
-          
+          version: 9
+          run_install: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: DB migration preflight guard
+        run: DB_MIGRATION_CHECK_ONLY=true pnpm exec tsx scripts/migrate.ts
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
       - name: Build
-        run: hugo --minify -s v2/wwalsh
+        run: pnpm build
 
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
-        if: github.ref == 'refs/heads/master'
+      - name: Install Playwright browser
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Pragmatic E2E gate
+        env:
+          CI: '1'
+          PLAYWRIGHT_WEB_SERVER_COMMAND: pnpm exec next start --port 3101
+        run: pnpm e2e -- --project=no-auth e2e/smoke.spec.ts
+
+      - name: Upload Playwright artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./v2/wwalsh/public
-          publish_branch: gh-pages2  # default: gh-pages
+          name: playwright-results-${{ github.run_id }}
+          path: |
+            test-results/**
+            playwright-report/**
+          if-no-files-found: ignore

@@ -5,7 +5,7 @@ import { getConfig } from '@/lib/core';
 import { PersonJsonLd } from '@/components/PostSchema';
 
 const config = getConfig();
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+const siteUrl = config.site.url;
 
 export const metadata: Metadata = {
   title: config.site.title,

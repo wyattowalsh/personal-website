@@ -11,9 +11,13 @@ import { cn } from "@/lib/utils";
 export default function BlogBackLink() {
   const pathname = usePathname();
   const isBlogHome = pathname === "/blog";
+  const isStudio = pathname.startsWith("/studio");
   const showBackLink = pathname !== "/";
 
   if (!showBackLink) return null;
+
+  const backHref = isBlogHome || isStudio ? "/" : "/blog";
+  const backText = isBlogHome || isStudio ? "Home" : "Blog";
 
   return (
     <motion.div
@@ -30,39 +34,40 @@ export default function BlogBackLink() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeOut" }}
     >
-      <Link href={isBlogHome ? "/" : "/blog"}>
-        <Button
-          variant="ghost"
-          className={cn(
-            // Base styles
-            "relative group",
-            // Mobile optimization
-            "h-12 md:h-10",
-            "min-w-[48px] md:min-w-0",
-            // Sizing and spacing
-            "px-4 md:px-3",
-            "rounded-full",
-            // Visual styles
-            "bg-back-link-bg/95 dark:bg-back-link-bg/90",
-            "backdrop-blur-sm",
-            "border border-back-link-border",
-            "shadow-back-link",
-            // Transitions
-            "transition-all duration-300",
-            // Hover states
-            "hover:shadow-back-link-hover",
-            "hover:bg-back-link-hover-bg",
-            // Active/touch states
-            "active:scale-95",
-            // Text styles
-            "text-primary dark:text-primary-foreground/90",
-            "font-medium",
-            // Mobile-specific styles
-            "md:hover:translate-x-1",
-            // Show full text only on larger screens
-            "flex items-center gap-2"
-          )}
-        >
+      <Button
+        asChild
+        variant="ghost"
+        className={cn(
+          // Base styles
+          "relative group",
+          // Mobile optimization
+          "h-12 md:h-10",
+          "min-w-[48px] md:min-w-0",
+          // Sizing and spacing
+          "px-4 md:px-3",
+          "rounded-full",
+          // Visual styles
+          "bg-back-link-bg/95 dark:bg-back-link-bg/90",
+          "backdrop-blur-sm",
+          "border border-back-link-border",
+          "shadow-back-link",
+          // Transitions
+          "transition-all duration-300",
+          // Hover states
+          "hover:shadow-back-link-hover",
+          "hover:bg-back-link-hover-bg",
+          // Active/touch states
+          "active:scale-95",
+          // Text styles
+          "text-primary dark:text-foreground/90",
+          "font-medium",
+          // Mobile-specific styles
+          "md:hover:translate-x-1",
+          // Show full text only on larger screens
+          "flex items-center gap-2"
+        )}
+      >
+        <Link href={backHref} aria-label={`Back to ${backText}`}>
           {/* Mobile Icon */}
           <ChevronLeft className={cn(
             "w-6 h-6 md:hidden",
@@ -80,8 +85,9 @@ export default function BlogBackLink() {
           
           {/* Text - Hidden on mobile */}
           <span className="hidden md:inline-block">
-            Back to {isBlogHome ? "Home" : "Blog"}
+            Back to {backText}
           </span>
+          <span className="sr-only md:hidden">Back to {backText}</span>
 
           {/* Touch Ripple Effect */}
           <span className={cn(
@@ -90,8 +96,8 @@ export default function BlogBackLink() {
             "transition-transform duration-300",
             "group-active:bg-primary/10"
           )} />
-        </Button>
-      </Link>
+        </Link>
+      </Button>
     </motion.div>
   );
 }

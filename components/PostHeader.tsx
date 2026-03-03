@@ -2,18 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { PostMetadata } from "@/lib/core";
 import { cn } from "@/lib/utils";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
 import { useRouter } from "next/navigation"; // Update import
 import { Separator } from "@/components/ui/separator";
-import ThemeAwareHero, { getHeroConfig, isThemedHero } from "@/components/heroes/ThemeAwareHero";
+import ThemeAwareHero, { getHeroConfig } from "@/components/heroes/ThemeAwareHero";
 import RisoHero from "@/components/heroes/RisoHero";
 import { TagPill } from "@/components/ui/tag-pill";
 
@@ -269,13 +267,9 @@ export default function PostHeader() {
   const imageSrc = postData.post.image || "/logo.webp";
   const isSvg = imageSrc.endsWith(".svg");
   const heroConfig = getHeroConfig(imageSrc);
-  const isRisoHero = imageSrc === "/riso-hero.svg";
   const altText = postData.post.image
     ? `Header image for ${postData.post.title}`
     : "Default post header image";
-
-  // Extract slug from pathname
-  const slug = pathname.split('/').filter(segment => segment && segment !== 'blog' && segment !== 'posts').pop() || '';
 
   return (
     <>
@@ -344,6 +338,7 @@ export default function PostHeader() {
             onLoad={handleImageLoad}
           />
         ) : isSvg ? (
+          /* eslint-disable-next-line @next/next/no-img-element */
           <img
             src={imageSrc}
             alt={altText}

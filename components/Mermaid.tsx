@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
-import { 
-  ZoomIn, 
-  ZoomOut, 
-  Maximize2, 
-  RotateCcw, 
+import { track } from "@/lib/analytics";
+import {
+  ZoomIn,
+  ZoomOut,
+  Maximize2,
+  RotateCcw,
   Download,
   Move,
   MousePointer2
@@ -235,7 +236,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
   // Download SVG
   const downloadSvg = useCallback(() => {
     if (!svg) return;
-    
+
     const blob = new Blob([svg], { type: "image/svg+xml" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -245,6 +246,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    track('diagram_download');
   }, [svg, title]);
 
   // Fullscreen toggle
@@ -377,6 +379,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
             panMode ? "bg-primary/20 text-primary" : "text-muted-foreground"
           )}
           title={panMode ? "Click to select (P)" : "Click to pan (P)"}
+          aria-label={panMode ? "Click to select" : "Click to pan"}
         >
           {panMode ? <Move className="w-4 h-4" /> : <MousePointer2 className="w-4 h-4" />}
         </button>
@@ -393,6 +396,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
             "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
           title="Zoom out (-)"
+          aria-label="Zoom out"
         >
           <ZoomOut className="w-4 h-4" />
         </button>
@@ -410,6 +414,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
             "disabled:opacity-50 disabled:cursor-not-allowed"
           )}
           title="Zoom in (+)"
+          aria-label="Zoom in"
         >
           <ZoomIn className="w-4 h-4" />
         </button>
@@ -424,6 +429,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
             "hover:bg-muted text-muted-foreground"
           )}
           title="Reset view (0)"
+          aria-label="Reset view"
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -436,6 +442,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
             "hover:bg-muted text-muted-foreground"
           )}
           title="Fullscreen (F)"
+          aria-label="Toggle fullscreen"
         >
           <Maximize2 className="w-4 h-4" />
         </button>
@@ -448,6 +455,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
             "hover:bg-muted text-muted-foreground"
           )}
           title="Download SVG"
+          aria-label="Download SVG"
         >
           <Download className="w-4 h-4" />
         </button>

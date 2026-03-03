@@ -11,13 +11,15 @@ import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@/lib/utils";
-import { getDefaultMetadata } from "@/lib/core";
+import { getDefaultMetadata, getConfig } from "@/lib/core";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { WebVitals } from "@/components/WebVitals";
 
 const firaCode = Fira_Code({
 	subsets: ["latin"],
 	variable: "--font-fira-code",
+	display: "swap",
 });
 
 const montserrat = Montserrat({
@@ -28,12 +30,13 @@ const montserrat = Montserrat({
 	fallback: ["system-ui", "arial"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+const siteUrl = getConfig().site.url;
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
 // Base metadata configuration
 export const metadata: Metadata = {
+	metadataBase: new URL(siteUrl),
 	...getDefaultMetadata(),
 	icons: {
 		icon: [
@@ -56,7 +59,7 @@ export const metadata: Metadata = {
 		title: "Wyatt Walsh",
 		description: "Articles about software engineering, data science, and technology",
 		url: siteUrl,
-		images: [{ url: `${siteUrl}/opengraph.png`, width: 1200, height: 630, alt: "onelonedatum" }],
+		images: [{ url: '/opengraph.png', width: 1200, height: 630, alt: "onelonedatum" }],
 	},
 	twitter: {
 		card: "summary_large_image",
@@ -64,15 +67,15 @@ export const metadata: Metadata = {
 		creator: "@wyattowalsh",
 		title: "Wyatt Walsh",
 		description: "Articles about software engineering, data science, and technology",
-		images: [`${siteUrl}/opengraph.png`],
+		images: ['/opengraph.png'],
 	},
 	// Feed autodiscovery links
 	alternates: {
-		canonical: siteUrl,
+		canonical: "/",
 		types: {
-			"application/rss+xml": `${siteUrl}/feed.xml`,
-			"application/atom+xml": `${siteUrl}/feed.atom`,
-			"application/feed+json": `${siteUrl}/feed.json`,
+			"application/rss+xml": "/feed.xml",
+			"application/atom+xml": "/feed.atom",
+			"application/feed+json": "/feed.json",
 		},
 	},
 };
@@ -99,9 +102,13 @@ export default function RootLayout({
 				<head>
 					{/* WebSite JSON-LD structured data */}
 					<WebSiteJsonLd />
-					{/* Preconnect to Google services for analytics */}
-					<link rel="preconnect" href="https://www.googletagmanager.com" />
-					<link rel="preconnect" href="https://www.google-analytics.com" />
+					{/* Preconnect to Google services when analytics are enabled */}
+					{(gtmId || gaId) && (
+						<>
+							<link rel="preconnect" href="https://www.googletagmanager.com" />
+							<link rel="preconnect" href="https://www.google-analytics.com" />
+						</>
+					)}
 				</head>
 				<body
 					className={cn(
@@ -131,7 +138,7 @@ export default function RootLayout({
 						<TooltipProvider>
 							<div className="relative flex min-h-screen flex-col">
 								<Header />
-								<main id="main-content" role="main" aria-label="Main content" className="flex-1 flex flex-col">{children}</main>
+								<main id="main-content" role="main" aria-label="Main content" className="flex-1 flex flex-col pt-16 sm:pt-[4.5rem] md:pt-20">{children}</main>
 							</div>
 						</TooltipProvider>
 						<ScrollIndicator />
@@ -140,6 +147,7 @@ export default function RootLayout({
 					{gaId && <GoogleAnalytics gaId={gaId} />}
 					<Analytics />
 					<SpeedInsights />
+					<WebVitals />
 				</body>
 			</html>
 		</StrictMode>

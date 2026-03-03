@@ -82,7 +82,7 @@ const PostCard = ({ post, className: _className }: PostCardProps) => {
 
 					{/* Title and summary section */}
 					<div className="absolute bottom-0 left-0 right-0 p-4 z-[1]">
-						<h3
+						<h2
 							className={cn(
 								"text-xl font-semibold leading-tight mb-2",
 								"text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
@@ -95,7 +95,7 @@ const PostCard = ({ post, className: _className }: PostCardProps) => {
 							>
 								{title}
 							</Link>
-						</h3>
+						</h2>
 						<p
 							className={cn(
 								"text-sm line-clamp-2",

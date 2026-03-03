@@ -1,5 +1,5 @@
-import { ClassValue, clsx } from "clsx";
 import chalk from "chalk";
+import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 
 // Core interfaces and types
@@ -80,17 +80,6 @@ export const schemas = {
   slug: z.object({ slug: z.string().min(1).max(200).regex(/^[a-zA-Z0-9_-]+$/, 'Invalid slug format') }),
   search: z.object({ query: z.string().min(1).max(100) }),
   tag: z.object({ tag: z.string().min(1).max(50) }),
-  pagination: z.object({
-    page: z.coerce.number().int().min(1).default(1),
-    limit: z.coerce.number().int().min(1).max(100).default(10),
-    sort: z.enum(['asc', 'desc']).default('desc'),
-    orderBy: z.string().default('created')
-  }),
-  filter: z.object({
-    tags: z.array(z.string()).optional(),
-    before: z.string().datetime().optional(),
-    after: z.string().datetime().optional(),
-  })
 };
 
 // API validation schemas
@@ -147,7 +136,7 @@ export const formatters = {
 
 // Enhanced logger implementation
 export const logger = {
-  info: (msg: string, data?: any) => {
+  info: (msg: string, data?: unknown) => {
     console.log(
       chalk.blue('ℹ'),
       chalk.blue.dim('[INFO]'),
@@ -157,7 +146,7 @@ export const logger = {
     );
   },
   
-  success: (msg: string, data?: any) => {
+  success: (msg: string, data?: unknown) => {
     console.log(
       chalk.green('✓'),
       chalk.green.dim('[SUCCESS]'),
@@ -167,7 +156,7 @@ export const logger = {
     );
   },
   
-  warning: (msg: string, data?: any) => {
+  warning: (msg: string, data?: unknown) => {
     console.log(
       chalk.yellow('⚠'),
       chalk.yellow.dim('[WARN]'),
@@ -193,7 +182,7 @@ export const logger = {
     }
   },
   
-  debug: (msg: string, data?: any) => {
+  debug: (msg: string, data?: unknown) => {
     if (logger.level <= LogLevel.DEBUG) {
       console.log(
         chalk.magenta('🔍'),
@@ -235,7 +224,7 @@ export const logger = {
 
   groupEnd: () => console.groupEnd(),
 
-  table: (data: any[], columns?: string[]) => {
+  table: (data: unknown[], columns?: string[]) => {
     console.log(chalk.blue('▤'), chalk.blue.dim('[TABLE]'));
     console.table(data, columns);
   },
@@ -269,7 +258,7 @@ export const logger = {
     );
   },
 
-  file: (action: string, filePath: string, details?: any) => {
+  file: (action: string, filePath: string, details?: unknown) => {
     console.log(
       chalk.yellow('📄'),
       chalk.yellow.dim('[FILE]'),
@@ -282,53 +271,33 @@ export const logger = {
   formatters
 };
 
-// Add middleware types
-export interface ApiMiddleware {
-  validateRequest: <T>(req: Request, schema: z.Schema<T>) => Promise<T>;
-  withErrorHandler: (handler: Function) => Function;
-}
-
-// Enhanced API response types
-export interface ApiResponseMeta {
-  timestamp: string;
-  duration?: number;
-  cache?: {
-    hit: boolean;
-    ttl: number;
-  };
-  pagination?: {
-    page: number;
-    limit: number;
-    total: number;
-    pages: number;
-  };
-}
-
-export interface ApiResponse<T> {
-  data: T;
-  meta: ApiResponseMeta;
-}
 
 // Enhanced error handling
 export class ApiError extends Error {
   constructor(
     public statusCode: number,
     message: string,
-    public details?: any,
+    public details?: Record<string, unknown>,
     public code?: string
   ) {
     super(message);
     this.name = 'ApiError';
   }
 
-  toResponse() {
+  toResponse(correlationId?: string) {
+    const isProduction = process.env.NODE_ENV === 'production';
+    const details = this.details && isProduction && 'stack' in this.details
+      ? Object.fromEntries(Object.entries(this.details).filter(([key]) => key !== 'stack'))
+      : this.details;
+
     return Response.json({
       error: {
         message: this.message,
         code: this.code || `ERR_${this.statusCode}`,
-        details: this.details
+        details,
+        ...(correlationId ? { correlationId } : {})
       }
-    }, { 
+    }, {
       status: this.statusCode,
       headers: {
         'Content-Type': 'application/json'
@@ -337,13 +306,6 @@ export class ApiError extends Error {
   }
 }
 
-// Enhanced error types
-export interface ApiErrorDetails {
-  code: string;
-  message: string;
-  details?: unknown;
-  stack?: string;
-}
 
 // Cache control utilities
 export const cacheControl = {
@@ -380,20 +342,12 @@ const defaultConfig: Config = {
 };
 
 export function getDefaultMetadata() {
+  const config = getConfig();
   return {
-    title: "Wyatt Walsh",
-    description: "Articles about software engineering, data science, and technology",
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev',
-    author: {
-      name: 'Wyatt Walsh',
-      email: 'mail@w4w.dev',
-      twitter: 'wyattowalsh',
-      github: 'wyattowalsh',
-      linkedin: 'wyattowalsh',
-    },
-    other: {
-      // Add any other metadata fields here
-    }
+    title: config.site.title,
+    description: config.site.description,
+    url: config.site.url,
+    author: config.site.author,
   };
 }
 
@@ -420,32 +374,124 @@ class ConfigManager {
 export const getConfig = () => ConfigManager.getInstance().getConfig();
 export const config = getConfig();
 
+const STUDIO_JSON_CONTENT_TYPE = 'application/json';
+const STUDIO_MAX_JSON_PAYLOAD_BYTES = 1_000_000; // 1MB
+const CORRELATION_ID_HEADER = 'x-correlation-id';
+const CORRELATION_ID_MAX_LENGTH = 128;
+
+function getRequestFromHandlerArgs(args: unknown[]): Request | null {
+  for (const arg of args) {
+    if (arg instanceof Request) {
+      return arg;
+    }
+  }
+  return null;
+}
+
+function resolveCorrelationId(req: Request | null): string {
+  const inbound = req?.headers.get(CORRELATION_ID_HEADER)?.trim();
+  if (inbound && inbound.length <= CORRELATION_ID_MAX_LENGTH) {
+    return inbound;
+  }
+  return crypto.randomUUID();
+}
+
+function withCorrelationId(response: Response, correlationId: string): Response {
+  response.headers.set(CORRELATION_ID_HEADER, correlationId);
+  return response;
+}
+
+function isStudioApiRequest(req: Request): boolean {
+  return new URL(req.url).pathname.startsWith('/api/studio/');
+}
+
+function hasJsonContentType(req: Request): boolean {
+  const contentType = req.headers.get('content-type');
+  if (!contentType) return false;
+  const [mediaType] = contentType.split(';', 1);
+  return mediaType.trim().toLowerCase() === STUDIO_JSON_CONTENT_TYPE;
+}
+
 // API middleware exports
 export const api = {
   middleware: {
     validateRequest: async <T>(req: Request, schema: z.Schema<T>): Promise<T> => {
-      try {
-        const data = req.method === 'GET' 
-          ? Object.fromEntries(new URL(req.url).searchParams)
-          : await req.json();
-        return schema.parse(data);
-      } catch (error) {
-        if (error instanceof z.ZodError) {
-          throw new ApiError(400, 'Invalid request data', { errors: error.issues });
+      let data: unknown;
+
+      if (req.method === 'GET') {
+        data = Object.fromEntries(new URL(req.url).searchParams);
+      } else {
+        const enforceStudioBoundaries = isStudioApiRequest(req);
+
+        if (enforceStudioBoundaries && !hasJsonContentType(req)) {
+          throw new ApiError(415, `Unsupported content type. Expected ${STUDIO_JSON_CONTENT_TYPE}`);
         }
-        throw error;
+
+        try {
+          if (enforceStudioBoundaries) {
+            const contentLength = Number(req.headers.get('content-length'));
+            if (Number.isFinite(contentLength) && contentLength > STUDIO_MAX_JSON_PAYLOAD_BYTES) {
+              throw new ApiError(413, `Payload too large. Maximum size is ${STUDIO_MAX_JSON_PAYLOAD_BYTES} bytes`);
+            }
+
+            const rawBody = await req.text();
+            const payloadBytes = new TextEncoder().encode(rawBody).byteLength;
+            if (payloadBytes > STUDIO_MAX_JSON_PAYLOAD_BYTES) {
+              throw new ApiError(413, `Payload too large. Maximum size is ${STUDIO_MAX_JSON_PAYLOAD_BYTES} bytes`);
+            }
+
+            data = JSON.parse(rawBody);
+          } else {
+            data = await req.json();
+          }
+        } catch (error) {
+          if (error instanceof ApiError) {
+            throw error;
+          }
+          if (error instanceof SyntaxError) {
+            throw new ApiError(400, 'Malformed JSON request body');
+          }
+          throw error;
+        }
       }
+
+      const validation = schema.safeParse(data);
+      if (!validation.success) {
+        throw new ApiError(400, 'Invalid request data', { errors: validation.error.issues });
+      }
+
+      return validation.data;
     },
     
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     withErrorHandler: (handler: Function) => async (...args: any[]) => {
+      const request = getRequestFromHandlerArgs(args);
+      const correlationId = resolveCorrelationId(request);
       try {
-        return await handler(...args);
+        const response = await handler(...args);
+        if (response instanceof Response) {
+          return withCorrelationId(response, correlationId);
+        }
+        return response;
       } catch (error) {
         if (error instanceof ApiError) {
-          return error.toResponse();
+          if (error.statusCode >= 500) {
+            Sentry.withScope(scope => {
+              scope.setTag('correlation_id', correlationId);
+              Sentry.captureException(error);
+            });
+          }
+          return withCorrelationId(error.toResponse(correlationId), correlationId);
         }
-        console.error('Unhandled error:', error);
-        return new ApiError(500, 'Internal server error').toResponse();
+        console.error(`Unhandled error [${correlationId}]:`, error);
+        Sentry.withScope(scope => {
+          scope.setTag('correlation_id', correlationId);
+          Sentry.captureException(error);
+        });
+        return withCorrelationId(
+          new ApiError(500, 'Internal server error').toResponse(correlationId),
+          correlationId
+        );
       }
     }
   }

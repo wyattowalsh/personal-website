@@ -50,7 +50,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   variant,
   size,
   color,
-  message = "Loading",
+  message: _message = "Loading",
   className,
   ...motionProps // Renamed from props to motionProps for clarity
 }) => {
@@ -72,8 +72,8 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
         )}
         {...motionProps}
       >
-        <Spinner variant={variant} size={size} color={color} message={message} />
-        {message && (
+        <Spinner variant={variant} size={size} color={color} message={_message} />
+        {_message && (
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -84,7 +84,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
               "animate-pulse"
             )}
           >
-            {message}
+            {_message}
           </motion.span>
         )}
       </motion.div>
@@ -96,7 +96,6 @@ const Spinner: React.FC<LoadingSpinnerProps> = ({
   variant,
   size,
   color,
-  message,
 }) => {
   switch (variant) {
     case "glitch":

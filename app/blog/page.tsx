@@ -1,8 +1,9 @@
-import { BackendService, backend } from "@/lib/server";
+import { BackendService } from "@/lib/server";
 import BlogPageContent from "@/components/BlogPageContent";
 import { Metadata } from 'next';
+import { getConfig } from '@/lib/core';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+const siteUrl = getConfig().site.url;
 
 export const metadata: Metadata = {
   title: 'Blog',
@@ -26,12 +27,9 @@ export const metadata: Metadata = {
 
 export default async function BlogPostsPage() {
   await BackendService.ensurePreprocessed();
-  const posts = await backend.getAllPosts();
-  const tags = await backend.getAllTags();
+  const instance = BackendService.getInstance();
+  const posts = await instance.getAllPosts();
+  const tags = await instance.getAllTags();
 
-  const validPosts = posts.filter(post =>
-    post && post.title && post.slug && post.created && post.tags
-  );
-
-  return <BlogPageContent posts={validPosts} tags={tags} />;
+  return <BlogPageContent posts={posts} tags={tags} />;
 }

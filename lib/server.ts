@@ -1,5 +1,4 @@
 import { LRUCache } from 'lru-cache';
-import { Feed } from 'feed';
 import Fuse from 'fuse.js';
 import matter from 'gray-matter';
 import path from 'path';
@@ -35,21 +34,13 @@ async function getFileData(filePath: string) {
   }
 }
 
-// Constants
-const CACHE_DIR = '.cache';
-const INDICES = {
-  SEARCH: path.join(CACHE_DIR, 'search.json'),
-  METADATA: path.join(CACHE_DIR, 'metadata.json'),
-  TAGS: path.join(CACHE_DIR, 'tags.json'),
-  RSS: path.join(CACHE_DIR, 'rss.xml'),
-} as const;
-
 // ApiError is now imported from @/lib/core
 
 // Backend service implementation
 class BackendService {
   private static instance: BackendService;
-  private preprocessPromise: Promise<any> | null = null;
+  private preprocessPromise: Promise<void> | null = null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private cache: LRUCache<string, any>;
   private searchIndex: Fuse<Post>;
   private posts: Map<string, Post>;
@@ -75,27 +66,29 @@ class BackendService {
     return BackendService.instance;
   }
 
-  public static async ensurePreprocessed() {
+  public static ensurePreprocessed() {
     const instance = BackendService.getInstance();
-    // Return existing promise if preprocessing is in progress
-    if (instance.preprocessPromise) return instance.preprocessPromise;
 
     // Return immediately if already preprocessed
     if (instance.preprocessed) return Promise.resolve();
 
-    // Set promise BEFORE awaiting to prevent race condition
+    // Return existing promise if preprocessing is in progress (prevents race condition)
+    if (instance.preprocessPromise) return instance.preprocessPromise;
+
+    // Atomically assign the promise before any async work begins
     const isDev = process.env.NODE_ENV === 'development';
-    instance.preprocessPromise = instance.preprocess(isDev)
+    const promise = instance.preprocess(isDev)
       .then(() => {
         instance.preprocessed = true;
-        instance.preprocessPromise = null;
       })
       .catch((err) => {
+        // Reset so next call retries
         instance.preprocessPromise = null;
         throw err;
       });
 
-    return instance.preprocessPromise;
+    instance.preprocessPromise = promise;
+    return promise;
   }
 
   async getPost(slug: string): Promise<Post | null> {
@@ -119,7 +112,7 @@ class BackendService {
     if (!post) return null;
     
     // Return only metadata fields
-    const { content, ...metadata } = post;
+    const { content: _content, ...metadata } = post;
     return metadata;
   }
 
@@ -300,21 +293,6 @@ class BackendService {
     }
   }
 
-  async getPostsWithPagination(page: number = 1, limit: number = 10) {
-    const posts = await this.getAllPosts();
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    
-    return {
-      posts: posts.slice(start, end),
-      pagination: {
-        total: posts.length,
-        page,
-        limit,
-        pages: Math.ceil(posts.length / limit)
-      }
-    };
-  }
 }
 
 // Enhanced request handler with better type safety and error handling
@@ -322,15 +300,12 @@ async function handleRequest<T>(
   options: {
     handler: () => Promise<T>;
     cache?: boolean | number;
-    transform?: (data: T) => unknown;
   }
 ) {
   const startTime = performance.now();
 
   try {
-    // Execute handler without URL parsing since we're using route handlers
-    const result = await options.handler();
-    const data = options.transform ? options.transform(result) : result;
+    const data = await options.handler();
     const duration = performance.now() - startTime;
 
     // Determine cache control
@@ -418,25 +393,7 @@ const api = {
   }
 };
 
-// Create the serverUtils const first
-const serverUtils = {
-  getPost: async (slug: string) => BackendService.getInstance().getPost(slug),
-  searchPosts: async (query: string) => BackendService.getInstance().search(query),
-  getPostsByTag: async (tag: string) => BackendService.getInstance().getPostsByTag(tag),
-  getAllPosts: async () => BackendService.getInstance().getAllPosts(),
-  getAllTags: async () => BackendService.getInstance().getAllTags(),
-  getAdjacentPosts: async (slug: string) => BackendService.getInstance().getAdjacentPosts(slug),
-  preprocess: async (isDev: boolean) => BackendService.getInstance().preprocess(isDev),
-  handleRequest,
-};
-
-// Create backend object using serverUtils functionality
-const backend = {
-  ...serverUtils,
-  api
-};
-
-// Single consolidated export statement at the end of the file
+// Single consolidated export statement
 export {
   BackendService,
   handleRequest,
@@ -444,6 +401,4 @@ export {
   getPostsHandler,
   searchPostsHandler,
   api,
-  serverUtils,
-  backend // Add backend export
 };

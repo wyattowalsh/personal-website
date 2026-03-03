@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-import path from 'path';
 import { BackendService } from '../lib/server';
 import { logger, LogLevel } from '../lib/core';
 import type { PreprocessStats } from '../lib/core';
@@ -70,7 +69,7 @@ if (isMainModule) {
   });
 
   // Run preprocessing
-  processFiles(isDev).then((stats) => {
+  processFiles(isDev).then((_stats) => {
     logger.success(`${isDev ? 'Development' : 'Production'} preprocessing complete!`);
   }).catch((error) => {
     logger.error(`${isDev ? 'Development' : 'Production'} preprocessing failed!`, error as Error);

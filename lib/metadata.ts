@@ -3,7 +3,7 @@ import { getConfig } from './core';
 import { generateArticleSchema, generateBreadcrumbSchema } from './schema';
 import type { Post } from './core';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+const siteUrl = getConfig().site.url;
 
 export interface PostMetadataOptions {
   post: Post;
@@ -89,8 +89,6 @@ export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metad
  * Generate JSON-LD structured data for a blog post
  */
 export function generatePostStructuredData(post: Post, slug: string): string {
-  const postUrl = `${siteUrl}/blog/posts/${slug}`;
-  
   const articleSchema = generateArticleSchema(post, { baseUrl: siteUrl });
   
   const breadcrumbSchema = generateBreadcrumbSchema([

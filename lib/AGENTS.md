@@ -5,43 +5,31 @@
 | File | Purpose | Key Exports |
 |------|---------|-------------|
 | `server.ts` | Backend singleton | `BackendService` |
-| `services.ts` | Simplified API wrapper | `services.posts.*`, `services.tags.*` |
 | `client.ts` | Browser API client | `api` |
 | `core.ts` | Types, schemas, logger | `Post`, `ApiError`, `logger`, `schemas` |
 | `metadata.ts` | SEO metadata | `generatePostMetadata()`, `generatePostStructuredData()` |
 | `schema.ts` | JSON-LD generators | `generateArticleSchema()`, `generateBreadcrumbSchema()` |
-| `types.ts` | TypeScript interfaces | `PostMetadata`, `AdjacentPost` |
 | `utils.ts` | Helpers | `cn()`, `formatDate()`, `slugify()` |
 
-## services (Recommended API)
-
-Prefer `services` over `BackendService` directly—handles preprocessing automatically:
-
-```typescript
-import { services } from '@/lib/services'
-
-// Posts
-const posts = await services.posts.getAll()
-const post = await services.posts.get(slug)    // null if not found
-const results = await services.posts.search(query)
-const tagged = await services.posts.getByTag(tag)
-const { previous, next } = await services.posts.getAdjacent(slug)
-
-// Tags
-const tags = await services.tags.getAll()
-```
-
-## BackendService (Low-level)
+## BackendService (Primary API)
 
 ```typescript
 import { BackendService } from '@/lib/server'
+
+// Must call ensurePreprocessed() before accessing data
+await BackendService.ensurePreprocessed()
 const backend = BackendService.getInstance()
 
-// Same methods as services, but must call ensurePreprocessed() first
-await BackendService.ensurePreprocessed()
+// Available methods:
+const posts = await backend.getAllPosts()
+const post = await backend.getPost(slug)       // null if not found
+const results = await backend.search(query)
+const tagged = await backend.getPostsByTag(tag)
+const adjacent = await backend.getAdjacentPosts(slug)  // { previous, next }
+const tags = await backend.getAllTags()
 ```
 
-Features: LRU cache (500 items, 1hr TTL), Fuse.js search
+Features: LRU cache (50 items, 1hr TTL), Fuse.js search
 
 ## Metadata & SEO (metadata.ts)
 
@@ -98,6 +86,6 @@ throw new ApiError('Not found', 404)
 
 ## Conventions
 
-- Use `services.*` in app code (auto-preprocesses)
-- Use `BackendService` only in build scripts
+- Use `BackendService` in app code (call `ensurePreprocessed()` first)
+- `BackendService` is the single entry point for all post data access
 - Keep utils pure and tree-shakeable

@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { animateScroll } from "react-scroll";
-import { cn } from "@/lib/utils";
 
 const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
   const [showButton, setShowButton] = useState(false);

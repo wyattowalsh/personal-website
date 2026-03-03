@@ -3,7 +3,7 @@ import { api as coreApi } from '@/lib/core';
 import { API_REVALIDATE_SECONDS } from '@/lib/constants';
 
 export const GET = coreApi.middleware.withErrorHandler(
-  async (request: Request) => {
+  async (_request: Request) => {
     return api.utils.handleRequest({
       handler: async () => ({ message: "API endpoint working" }),
       cache: API_REVALIDATE_SECONDS
@@ -12,7 +12,7 @@ export const GET = coreApi.middleware.withErrorHandler(
 );
 
 export const POST = coreApi.middleware.withErrorHandler(
-  async (request: Request) => {
+  async (_request: Request) => {
     return api.utils.handleRequest({
       handler: async () => ({ message: "POST endpoint working" })
     });

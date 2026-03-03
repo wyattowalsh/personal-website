@@ -88,13 +88,6 @@ All components auto-imported via `mdx-components.tsx` — no import needed:
 | `<Note type="info\|warning\|terminal">` | Info/warning boxes |
 | `<Callout type="info\|warning\|error\|success">` | Styled callouts |
 
-### Special
-| Component | Usage |
-|-----------|-------|
-| `<RisoModuleMatrix>` | Riso template grid |
-| `<RisoSaaSStack>` | SaaS stack visualizer |
-| `<RisoSampleVariants>` | Sample variant grid |
-
 ### Markdown callouts (rehype-callouts)
 ```md
 > [!NOTE] Optional title
@@ -109,13 +102,17 @@ All components auto-imported via `mdx-components.tsx` — no import needed:
 
 ## Data Fetching
 
-Posts loaded via `services`:
+Posts loaded via `BackendService`:
 ```typescript
-import { services } from '@/lib/services'
+import { BackendService } from '@/lib/server'
 
-const posts = await services.posts.getAll()
-const post = await services.posts.get(slug)  // null if not found
-const { previous, next } = await services.posts.getAdjacent(slug)
+await BackendService.ensurePreprocessed()
+const backend = BackendService.getInstance()
+
+const posts = await backend.getAllPosts()
+const post = await backend.getPost(slug)       // null if not found
+const adjacent = await backend.getAdjacentPosts(slug)  // { previous, next }
+const tags = await backend.getAllTags()
 ```
 
 See [lib/AGENTS.md](../../lib/AGENTS.md) for full API.

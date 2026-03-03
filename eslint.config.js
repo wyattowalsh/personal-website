@@ -15,6 +15,7 @@ const config = [
       "public/**",
       "docs/**",
       ".storybook/**",
+      ".claude/helpers/**",
       "**/*.d.ts",
     ],
   },

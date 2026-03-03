@@ -59,6 +59,7 @@ This value is used for:
 | Variable | Description | Default |
 | :--- | :--- | :--- |
 | `ANALYZE` | Enable webpack bundle analyzer | `false` |
+| `LINK_REWRITE_TARGET` | Upstream origin/base URL for `/l/:path*` rewrite | unset (rewrite disabled) |
 | `NODE_ENV` | Build environment | `production` |
 | `DEBUG` | Enable verbose logging | `false` |
 | `LOG_LEVEL` | Logging level (`debug`, `info`, `warn`, `error`) | `info` |
@@ -87,6 +88,7 @@ The analyzer generates interactive HTML reports in `.next/analyze/`.
 No `.env.local` file is required for local development. All variables have sensible defaults:
 
 - `NEXT_PUBLIC_SITE_URL` defaults to `https://w4w.dev`
+- `/l/:path*` rewrite is disabled unless `LINK_REWRITE_TARGET` is set
 - `NODE_ENV` is automatically set to `development` by Next.js
 - `DEBUG` and `LOG_LEVEL` are optional
 
@@ -277,6 +279,49 @@ pnpm build
 ```
 .next
 ```
+
+## Canary + Rollback Drill
+
+Run a local dry-run drill (no production credentials required):
+
+```bash
+pnpm drill:canary --scenario rollback
+```
+
+This produces a verifiable artifact at `.cache/drills/canary-rollback-<timestamp>.json` with checkpoint results, observed metrics, and the selected decision path.
+
+Rollback triggers used by the drill:
+
+- `error_rate_pct > 1`
+- `p95_latency_ms > 1200`
+- `success_rate_pct < 99.5`
+
+Primary rollback command path:
+
+```bash
+vercel rollback $LAST_GOOD_DEPLOYMENT_URL --yes
+vercel alias set $LAST_GOOD_DEPLOYMENT_URL $SITE_DOMAIN
+vercel alias rm canary.$SITE_DOMAIN
+```
+
+## Production Go-Live Signoff (Roadmap Implementation)
+
+Executed locally on `2026-03-02` using closure-wave rerun outcomes.
+
+| Gate | Status | Verification | Evidence |
+| :--- | :--- | :--- | :--- |
+| Typecheck + Build blocker | ✅ Pass | `pnpm typecheck`, `pnpm build` | Both commands exited `0`; build completed successfully after preprocess and TypeScript stages. |
+| Smoke E2E determinism | ✅ Pass | `CI=1 pnpm e2e -- --project=no-auth e2e/smoke.spec.ts --reporter=line` (run twice) | Run 1: `1 passed (21.9s)`; Run 2: `1 passed (21.5s)` with the Playwright web server booting on port `3101`. |
+| Dependency governance command validity | ❌ Fail | `pnpm audit --audit-level high` | Command is valid and executed (no unknown-option error) but exited `1` with `53 vulnerabilities found` (`21 high`, `5 critical`). |
+| Lighthouse gate (perf/a11y/SEO) | ❌ Fail | `pnpm exec lhci autorun --config=./lighthouserc.js` | Assertions failed across 3 URLs: performance (`/` 0.79, `/blog` 0.55, `/studio/new` 0.52), accessibility (`/blog` 0.88, `/studio/new` 0.75), SEO (`/studio/new` 0.66). |
+| Release drill artifacts | ✅ Pass | `pnpm drill:canary --scenario rollback`, `pnpm drill:canary --scenario pass` | Artifacts generated: `.cache/drills/canary-rollback-2026-03-02T08-51-53-545Z.json`, `.cache/drills/canary-rollback-2026-03-02T08-51-54-263Z.json`. |
+
+**Readiness decision:** ❌ **NO-GO** (do not promote to production).
+
+**Residual risks:**
+
+- High/critical dependency vulnerabilities remain in the governance audit gate.
+- Lighthouse thresholds are not met for performance, accessibility, and SEO (especially `/studio/new`).
 
 ## Deployment Workflow
 

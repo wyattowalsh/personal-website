@@ -3,10 +3,6 @@ import PostCard from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 
-interface TagPageProps {
-    params: Promise<{ tag: string }>;
-}
-
 export async function generateStaticParams() {
     await BackendService.ensurePreprocessed();
     const tags = await BackendService.getInstance().getAllTags();

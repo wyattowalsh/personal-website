@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from "react";
 import katex from 'katex';
+import type { KatexOptions } from 'katex';
 import { cn } from "@/lib/utils";
 import { Link, Copy, Check } from "lucide-react";
 import { useMathContext } from "./MathContext";
@@ -9,7 +10,7 @@ import { useMathContext } from "./MathContext";
 export interface MathProps {  // Add export here
   children?: string;
   display?: boolean;
-  options?: any;
+  options?: KatexOptions;
   label?: string;
   number?: number;
 }
@@ -70,25 +71,15 @@ export default function Math({ children = '', display = false, options = {}, lab
 
     if (!mathString) return '';
 
-    try {
-      return katex.renderToString(mathString, {
-        displayMode: display,
-        throwOnError: true,
-        globalGroup: true,
-        trust: true,
-        strict: false,
-        fleqn: false,
-        ...options
-      });
-    } catch (error) {
-      console.error('KaTeX error:', error);
-      return katex.renderToString(mathString, {
-        displayMode: display,
-        throwOnError: false,
-        strict: 'ignore',
-        ...options
-      });
-    }
+    return katex.renderToString(mathString, {
+      displayMode: display,
+      throwOnError: false,
+      globalGroup: true,
+      trust: true,
+      strict: 'ignore',
+      fleqn: false,
+      ...options
+    });
   }, [children, display, options]);
 
   useEffect(() => {

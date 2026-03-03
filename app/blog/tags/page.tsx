@@ -1,4 +1,4 @@
-import { BackendService, backend } from "@/lib/server";
+import { BackendService } from "@/lib/server";
 import TagsGrid from '@/components/TagsGrid';
 import { TagsList } from '@/components/TagsList';
 import { Separator } from "@/components/ui/separator";
@@ -11,9 +11,10 @@ export const metadata = {
 export default async function TagsIndexPage() {
   await BackendService.ensurePreprocessed();
   
+  const instance = BackendService.getInstance();
   const [tags, posts] = await Promise.all([
-    backend.getAllTags(),
-    backend.getAllPosts()
+    instance.getAllTags(),
+    instance.getAllPosts()
   ]);
 
   const validPosts = posts.filter(post => post && post.tags?.length > 0);

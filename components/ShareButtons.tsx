@@ -11,6 +11,7 @@ import {
 } from "react-share";
 import { Check, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { track } from "@/lib/analytics";
 
 interface ShareButtonsProps {
 	url: string;
@@ -32,6 +33,7 @@ export function ShareButtons({
 			await navigator.clipboard.writeText(url);
 			setCopied(true);
 			setTimeout(() => setCopied(false), 2000);
+			track('link_copied');
 		} catch (error) {
 			console.error("Failed to copy link:", error);
 		}
@@ -42,15 +44,28 @@ export function ShareButtons({
 
 	return (
 		<div className={cn("flex items-center gap-3", className)}>
-			<TwitterShareButton url={url} title={title}>
+			<TwitterShareButton
+				url={url}
+				title={title}
+				onClick={() => track('share_click', { platform: 'twitter' })}
+			>
 				<TwitterIcon size={iconSize} round={false} borderRadius={iconBorderRadius} />
 			</TwitterShareButton>
 
-			<LinkedinShareButton url={url} title={title} summary={description}>
+			<LinkedinShareButton
+				url={url}
+				title={title}
+				summary={description}
+				onClick={() => track('share_click', { platform: 'linkedin' })}
+			>
 				<LinkedinIcon size={iconSize} round={false} borderRadius={iconBorderRadius} />
 			</LinkedinShareButton>
 
-			<FacebookShareButton url={url} hashtag="#tech">
+			<FacebookShareButton
+				url={url}
+				hashtag="#tech"
+				onClick={() => track('share_click', { platform: 'facebook' })}
+			>
 				<FacebookIcon size={iconSize} round={false} borderRadius={iconBorderRadius} />
 			</FacebookShareButton>
 

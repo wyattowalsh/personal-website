@@ -4,6 +4,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/analytics";
 
 interface CodeBlockProps {
   children: React.ReactNode;
@@ -12,13 +13,21 @@ interface CodeBlockProps {
 export function CodeBlock({ children }: CodeBlockProps) {
   const handleCopy = () => {
     let text = '';
+    let language = 'unknown';
     if (typeof children === 'string') {
       text = children;
     } else if (React.isValidElement(children)) {
-      const childProps = children.props as { children?: React.ReactNode };
+      const childProps = children.props as { children?: React.ReactNode; className?: string };
       text = childProps?.children?.toString() || '';
+      // Extract language from className (e.g., "language-typescript")
+      const className = childProps?.className || '';
+      const match = className.match(/language-(\w+)/);
+      if (match) {
+        language = match[1];
+      }
     }
     navigator.clipboard.writeText(text);
+    track('code_copied', { language });
   };
 
   return (
@@ -58,7 +67,7 @@ export function CodeBlock({ children }: CodeBlockProps) {
       <pre className={cn(
         "p-4 overflow-x-auto",
         "bg-card/50 dark:bg-card/30",
-        "text-foreground dark:text-primary-foreground",
+        "text-foreground",
         "rounded-xl"
       )}>
         {children}

@@ -2,23 +2,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, useMotionValue, useAnimationFrame } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
-import { useTheme } from "next-themes";
 import {
 	Code,
-	Binary,
 	Terminal,
 	Brain,
-	Sparkles,
 	CircuitBoard,
 	Cpu,
 	Database,
-	Cloud,
-	Network,
 	Github,
-	Chrome,
-	Command,
-	Server,
-	Share2,
 	Workflow,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,20 +18,12 @@ import styles from '@/components/blogtitle.module.scss';
 
 const icons = [
 	Code,
-	Binary,
 	Terminal,
 	Brain,
-	Sparkles,
 	CircuitBoard,
 	Cpu,
 	Database,
-	Cloud,
-	Network,
 	Github,
-	Chrome,
-	Command,
-	Server,
-	Share2,
 	Workflow,
 ];
 
@@ -207,32 +190,12 @@ const BackgroundParticles = () => {
 	);
 };
 
-const AnimatedBackground = () => (
-	<div className="absolute inset-0 z-0 overflow-hidden">
-		<motion.div
-			className="absolute inset-0"
-			animate={{
-				backgroundPosition: ["0% 50%", "100% 50%"],
-			}}
-			transition={{
-				duration: 30,
-				repeat: Infinity,
-				ease: "linear",
-			}}
-			style={{
-				backgroundImage: "linear-gradient(270deg, #00FFFF, #FF00FF, #00FFFF)",
-				backgroundSize: "600% 600%",
-			}}
-		/>
-	</div>
-);
-
 const BlogTitle = () => {
 	const prefersReducedMotion = useReducedMotion();
-	const { theme } = useTheme();
 	const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 	const [isVisible, setIsVisible] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const showDecorativeMotion = !prefersReducedMotion && containerSize.width >= 500;
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting));
@@ -276,10 +239,10 @@ const BlogTitle = () => {
 						)}
 					>
 						<div className={styles['cyber-grid']}></div>
-						<BackgroundParticles />
+						{showDecorativeMotion ? <BackgroundParticles /> : null}
 						<div className={styles.scanlines} />
 
-						{!prefersReducedMotion && containerSize.width > 0 &&
+						{showDecorativeMotion && containerSize.width > 0 &&
 							icons.map((Icon, index) => (
 								<FloatingIcon
 									key={index}

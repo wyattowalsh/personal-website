@@ -1,0 +1,62 @@
+[
+  {
+    "week": "2026-02-16",
+    "prompt": "Recursive Patterns",
+    "description": "Create art using recursion \u2014 fractals, trees, or nested shapes that repeat at different scales."
+  },
+  {
+    "week": "2026-02-23",
+    "prompt": "Flow Fields",
+    "description": "Use noise-driven vector fields to guide particles, lines, or color across the canvas."
+  },
+  {
+    "week": "2026-03-02",
+    "prompt": "Symmetry & Tessellation",
+    "description": "Explore rotational or reflective symmetry. Tile the plane with repeating patterns."
+  },
+  {
+    "week": "2026-03-09",
+    "prompt": "Cellular Automata",
+    "description": "Implement rule-based systems where cells evolve based on their neighbors."
+  },
+  {
+    "week": "2026-03-16",
+    "prompt": "Color Palette",
+    "description": "Focus on color theory. Create a piece that explores complementary, analogous, or gradient palettes."
+  },
+  {
+    "week": "2026-03-23",
+    "prompt": "Physics Simulation",
+    "description": "Simulate gravity, springs, collisions, or fluid dynamics in a visual piece."
+  },
+  {
+    "week": "2026-03-30",
+    "prompt": "Typography as Art",
+    "description": "Use letters, words, or text as the primary visual element in your composition."
+  },
+  {
+    "week": "2026-04-06",
+    "prompt": "Sound Reactive",
+    "description": "Create visuals that respond to audio input or generated sound patterns."
+  },
+  {
+    "week": "2026-04-13",
+    "prompt": "Minimalism",
+    "description": "Express maximum impact with minimum elements. Less is more."
+  },
+  {
+    "week": "2026-04-20",
+    "prompt": "Organic Growth",
+    "description": "Simulate natural growth patterns: branching, diffusion, or biological morphogenesis."
+  },
+  {
+    "week": "2026-04-27",
+    "prompt": "Optical Illusions",
+    "description": "Create patterns that trick the eye \u2014 moire, impossible geometry, or motion illusions."
+  },
+  {
+    "week": "2026-05-04",
+    "prompt": "Data as Art",
+    "description": "Visualize a dataset in an artistic way. Transform numbers into beauty."
+  }
+]

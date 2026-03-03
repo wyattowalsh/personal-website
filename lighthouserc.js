@@ -1,22 +1,41 @@
-module.exports = {
-  ci: {
-    collect: {
-      url: ['http://localhost:3000/', 'http://localhost:3000/blog'],
-      numberOfRuns: 3,
-      startServerCommand: 'pnpm start',
-      startServerReadyPattern: 'ready',
-      startServerReadyTimeout: 30000,
-    },
-    assert: {
-      assertions: {
-        'categories:performance': ['warn', { minScore: 0.9 }],
-        'categories:accessibility': ['error', { minScore: 0.95 }],
-        'categories:best-practices': ['warn', { minScore: 0.9 }],
-        'categories:seo': ['warn', { minScore: 0.9 }],
+const baseUrls = ['http://localhost:3000/', 'http://localhost:3000/blog'];
+const studioUrls = ['http://localhost:3000/studio/new'];
+
+if (process.env.POSTGRES_URL) {
+  studioUrls.unshift('http://localhost:3000/studio');
+}
+
+export const ci = {
+  collect: {
+    url: [...baseUrls, ...studioUrls],
+    numberOfRuns: 3,
+    startServerCommand: 'pnpm start',
+    startServerReadyPattern: 'ready',
+    startServerReadyTimeout: 30000,
+  },
+  assert: {
+    assertMatrix: [
+      {
+        matchingUrlPattern: '^(?!.*\\/studio\\/new$).*',
+        assertions: {
+          'categories:performance': ['error', { minScore: 0.8 }],
+          'categories:accessibility': ['error', { minScore: 0.95 }],
+          'categories:best-practices': ['error', { minScore: 0.9 }],
+          'categories:seo': ['error', { minScore: 0.9 }],
+        },
       },
-    },
-    upload: {
-      target: 'temporary-public-storage',
-    },
+      {
+        matchingUrlPattern: '.*/studio/new$',
+        assertions: {
+          'categories:performance': ['error', { minScore: 0.8 }],
+          'categories:accessibility': ['error', { minScore: 0.95 }],
+          'categories:best-practices': ['error', { minScore: 0.9 }],
+          'categories:seo': 'off',
+        },
+      },
+    ],
+  },
+  upload: {
+    target: 'temporary-public-storage',
   },
 };

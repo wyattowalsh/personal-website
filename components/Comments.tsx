@@ -2,22 +2,25 @@
 
 import Giscus from "@giscus/react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export default function Comments() {
 	const { resolvedTheme } = useTheme();
-	const [giscusTheme, setGiscusTheme] = useState("/giscus-light.css");
 
 	useEffect(() => {
-		if (resolvedTheme === "dark") {
-			setGiscusTheme("/giscus-dark.css");
-		} else {
-			setGiscusTheme("/giscus-light.css");
+		// Send theme change message to Giscus iframe
+		const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+		if (iframe && iframe.contentWindow) {
+			const theme = resolvedTheme === "dark" ? "dark" : "light";
+			iframe.contentWindow.postMessage(
+				{ giscus: { setConfig: { theme } } },
+				'https://giscus.app'
+			);
 		}
 	}, [resolvedTheme]);
 
 	return (
-		<section key={giscusTheme}>
+		<section>
 			<Giscus
 				id="comments"
 				repo="wyattowalsh/personal-website"

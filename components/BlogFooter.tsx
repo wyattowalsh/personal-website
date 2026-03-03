@@ -72,21 +72,6 @@ const FeedLink = ({ href, icon: Icon, children }: {
   </Link>
 );
 
-// Add type definitions for dynamic link components
-type LinkComponentProps = {
-  href: Route;
-  className: string;
-  children: React.ReactNode;
-};
-
-type AnchorComponentProps = {
-  href: string;
-  className: string;
-  target: string;
-  rel: string;
-  children: React.ReactNode;
-};
-
 // Update FeedFormatButton component with proper typing
 const FeedFormatButton = ({ href, icon: Icon, format, description }: {
   href: string;
@@ -176,7 +161,7 @@ const BlogFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer role="contentinfo" aria-label="Blog footer" className={cn("w-full py-4", "bg-gradient-to-b from-background to-muted/30", "border-t border-border/50")}>
+    <footer aria-label="Blog footer" className={cn("w-full py-4", "bg-gradient-to-b from-background to-muted/30", "border-t border-border/50")}>
       {/* Add subscription section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -273,7 +258,7 @@ const BlogFooter = () => {
           </div>
 
           {/* Quick Links */}
-          <div className={cn(
+          <nav aria-label="Quick links" className={cn(
             "flex flex-col h-full",
             "items-center", // Center horizontally
             "justify-start", // Center vertically
@@ -286,18 +271,18 @@ const BlogFooter = () => {
             )}>
               Quick Links
             </h3>
-            <nav className={cn(
+            <div className={cn(
               "flex flex-col space-y-1", // Tighter nav spacing
               "items-center" // Center nav items
             )}>
               <FooterLink href="/" icon={HomeIcon}>Home</FooterLink>
               <FooterLink href="/blog" icon={BookOpenIcon}>Blog</FooterLink>
               <FooterLink href="/blog/tags" icon={TagIcon}>Tags</FooterLink>
-            </nav>
-          </div>
+            </div>
+          </nav>
 
           {/* Connect Section */}
-          <div className={cn(
+          <nav aria-label="Connect" className={cn(
             "flex flex-col h-full",
             "items-center", // Center horizontally
             "justify-start", // Center vertically
@@ -310,7 +295,7 @@ const BlogFooter = () => {
             )}>
               Connect
             </h3>
-            <nav className={cn(
+            <div className={cn(
               "flex flex-col space-y-1", // Tighter nav spacing
               "items-center" // Center nav items
             )}>
@@ -330,8 +315,8 @@ const BlogFooter = () => {
                 <FeedLink href="/feed.atom" icon={AtomIcon}>Atom</FeedLink>
                 <FeedLink href="/feed.json" icon={FileJson}>JSON</FeedLink>
               </div>
-            </nav>
-          </div>
+            </div>
+          </nav>
         </div>
 
         {/* Copyright - Centered */}

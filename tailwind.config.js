@@ -66,6 +66,26 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 4px hsl(var(--accent) / 0.2)" },
+          "50%": { boxShadow: "0 0 16px hsl(var(--accent) / 0.4)" },
+        },
+        "slide-down-in": {
+          "0%": { transform: "translateY(-100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "slide-up-in": {
+          "0%": { transform: "translateY(100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "handle-glow": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.7" },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 1s forwards',
@@ -73,6 +93,11 @@ const config = {
         pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "slide-down-in": "slide-down-in 0.3s ease-out",
+        "slide-up-in": "slide-up-in 0.3s ease-out",
+        shimmer: "shimmer 2s linear infinite",
+        "handle-glow": "handle-glow 2s ease-in-out infinite",
       },
       boxShadow: {
         glow: 'var(--shadow-glow)',

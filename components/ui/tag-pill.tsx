@@ -16,7 +16,7 @@ export interface TagPillProps {
 }
 
 const TagPill = React.forwardRef<HTMLElement, TagPillProps>(
-  ({ tag, href, variant = "default", onClick, className, asChild = false }, ref) => {
+  ({ tag, href, variant = "default", onClick, className, asChild: _asChild = false }, ref) => {
     const baseStyles = cn(
       // Base styles
       "inline-flex items-center",
@@ -42,8 +42,8 @@ const TagPill = React.forwardRef<HTMLElement, TagPillProps>(
       "dark:shadow-none dark:hover:shadow-primary/20",
 
       // Focus styles
-      "focus:outline-none focus:ring-2 focus:ring-primary/40",
-      "dark:focus:ring-primary/40",
+      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+      "dark:focus-visible:ring-primary/60",
 
       // Variant-specific overrides
       variant === "active" && [

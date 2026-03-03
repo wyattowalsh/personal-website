@@ -8,14 +8,6 @@ import { Github, Linkedin, Twitter, Codepen, BookOpen, Mail } from 'lucide-react
 import { Reddit } from './icons/Reddit';
 import { Kaggle } from './icons/Kaggle';
 
-// Update Link interface
-interface Link {
-  name: string;
-  url: string;  // Keep as string since we're handling URLs
-  icon: React.ComponentType<{ className?: string }>;
-  color?: string;
-}
-
 export const links = [
   {
     name: "GitHub",

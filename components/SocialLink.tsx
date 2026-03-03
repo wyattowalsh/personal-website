@@ -42,24 +42,6 @@ function hexToRGB(hex: string): string {
   return `${r}, ${g}, ${b}`;
 }
 
-// Enhanced color manipulation functions
-function enhanceColor(hex: string, amount: number): string {
-  const rgb = hex.replace('#', '').match(/.{2}/g);
-  if (!rgb) return hex;
-  
-  const [r, g, b] = rgb.map(x => parseInt(x, 16));
-  const enhanceChannel = (c: number) => {
-    const saturationBoost = Math.floor(c * amount);
-    return Math.min(255, Math.max(0, c + saturationBoost));
-  };
-  
-  const rr = enhanceChannel(r).toString(16).padStart(2, '0');
-  const gg = enhanceChannel(g).toString(16).padStart(2, '0');
-  const bb = enhanceChannel(b).toString(16).padStart(2, '0');
-  
-  return `#${rr}${gg}${bb}`;
-}
-
 function lightenColor(hex: string, amount: number): string {
   const rgb = hex.replace('#', '').match(/.{2}/g);
   if (!rgb) return hex;

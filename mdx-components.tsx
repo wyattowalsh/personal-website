@@ -10,7 +10,6 @@ import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Tooltip } from "@/components/ui/tooltip";
 
 import GistWrapper from "@/components/GistWrapper";
@@ -18,7 +17,9 @@ import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
 import Math, { MathProps } from "@/components/Math";
 import Mermaid from "@/components/Mermaid";
-import type { UrlObject } from 'url';
+import { SketchEmbed } from "@/components/studio/SketchEmbed";
+
+
 import { Route as NextRoute } from 'next';
 
 import {
@@ -39,9 +40,6 @@ interface GistWrapperProps {
     url?: string;
     id?: string;
 }
-
-type Route = string | Partial<URL>
-type Href = Route | URL
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
@@ -80,7 +78,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             <h1 className={cn(
                 "sm:text-4xl md:text-5xl lg:text-6xl",
                 "mt-8 mb-4",
-                "text-foreground dark:text-primary-foreground",
+                "text-foreground",
                 "pb-4",
                 "bg-clip-text bg-gradient-to-r from-primary via-primary-80 to-primary",
                 "hover:text-transparent transition-colors duration-300",
@@ -92,11 +90,11 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
         h2: ({ children }) => (
             <h2 className={cn(
-                "scroll-m-20", 
+                "scroll-m-20",
                 "text-2xl font-display font-semibold tracking-tight",
                 "sm:text-3xl md:text-4xl lg:text-5xl",
                 "mt-10 mb-4",
-                "text-foreground dark:text-primary-foreground",
+                "text-foreground",
                 "pb-2",
                 "relative group",
                 "transition-all duration-300 ease-out",
@@ -114,7 +112,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "text-xl font-display font-semibold tracking-tight",
                 "sm:text-2xl md:text-3xl",
                 "mt-8 mb-4",
-                "text-foreground dark:text-primary-foreground",
+                "text-foreground",
                 "relative group",
                 "hover:text-primary transition-colors duration-300",
                 // Remove right padding and update flex layout
@@ -128,10 +126,10 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             <p className={cn(
                 "leading-7 [&:not(:first-child)]:mt-6",
                 "text-base sm:text-lg",
-                "text-muted-foreground dark:text-primary-foreground-80",
+                "text-muted-foreground",
                 "relative group",
                 "transition-all duration-300",
-                "hover:text-foreground dark:hover:text-primary-foreground",
+                "hover:text-foreground",
                 "after:content-[''] after:absolute after:bottom-0 after:left-0",
                 "after:w-full after:h-[1px] after:bg-primary-10",
                 "after:transform after:scale-x-0",
@@ -168,7 +166,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                         "[&_th]:border-b [&_th]:border-border-50",
                         "[&_td]:border-b [&_td]:border-border-20",
                         "[&_th]:text-left [&_th]:font-medium",
-                        "[&_th]:text-foreground dark:[&_th]:text-primary-foreground"
+                        "[&_th]:text-foreground"
                     )}>
                         {children}
                     </table>
@@ -673,6 +671,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
         // Mermaid diagrams
         Mermaid,
+
+        // Studio sketch embeds
+        Sketch: SketchEmbed,
 
         ...components,
     };

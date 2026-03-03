@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 import Links from "@/components/Links";
 import LandingTitle from "@/components/LandingTitle";
 import PostCard from "@/components/PostCard";
@@ -31,6 +32,19 @@ interface HomePageClientProps {
 export default function HomePageClient({ recentPosts }: HomePageClientProps) {
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
+  const [showParticles, setShowParticles] = useState(false);
+
+  useEffect(() => {
+    const show = () => setShowParticles(true);
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(show, { timeout: 1200 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(show, 400);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
 
   const imageScale = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.85]);
   const imageOpacity = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.8]);
@@ -71,7 +85,7 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
 
   return (
     <motion.div
-      initial="hidden"
+      initial={false}
       animate="visible"
       variants={pageVariants}
       className={cn(
@@ -81,9 +95,11 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
         styles.mainContainer
       )}
     >
-      <div aria-hidden="true">
-        <ParticlesBackground />
-      </div>
+      {showParticles && (
+        <div aria-hidden="true">
+          <ParticlesBackground />
+        </div>
+      )}
 
       <motion.div
         className={cn(
@@ -123,6 +139,7 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
                        (max-width: 1280px) 220px,
                        240px"
                 priority
+                fetchPriority="high"
                 quality={85}
               />
             </motion.div>
