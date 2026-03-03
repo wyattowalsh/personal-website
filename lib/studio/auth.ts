@@ -255,5 +255,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
   trustHost: true,
   pages: {
     signIn: '/studio',
+    error: '/studio',
   },
 })

@@ -59,6 +59,14 @@ OAuth callback URIs must exactly match your canonical domain:
 
 If you serve both apex and `www`, register the same callback host in providers and `AUTH_URL` to avoid mismatch failures.
 
+#### OAuth Login Troubleshooting
+
+If login fails with provider `redirect_uri_mismatch` or NextAuth `error=Configuration`, verify:
+
+- **Google**: Authorized redirect URIs include `https://w4w.dev/api/auth/callback/google` (and `https://www.w4w.dev/api/auth/callback/google` if serving `www`).
+- **GitHub**: Authorization callback URL uses the canonical host with `/api/auth/callback/github`.
+- **Host parity**: `AUTH_URL` matches the canonical host and the host used in provider callback settings.
+
 **Usage in code:**
 
 ```typescript

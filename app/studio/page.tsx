@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { SketchGallery } from '@/components/studio/SketchGallery'
 import { SketchCardSkeleton } from '@/components/studio/SketchCardSkeleton'
@@ -14,6 +15,18 @@ import { createStudioMetadata } from '@/lib/studio/metadata'
 export const metadata: Metadata = createStudioMetadata({
   path: '/studio',
 })
+
+const authErrorMessages: Record<string, string> = {
+  Configuration: 'Sign-in is temporarily unavailable due to a setup issue. Please try again later.',
+}
+
+function getAuthErrorMessage(error: string | undefined): string | null {
+  if (typeof error === 'undefined') {
+    return null
+  }
+
+  return authErrorMessages[error] ?? 'Sign-in failed. Please try again.'
+}
 
 async function GalleryContent() {
   const { sketches, total, nextCursor } = await getRecentSketches({
@@ -31,8 +44,14 @@ async function GalleryContent() {
   )
 }
 
-export default async function StudioPage() {
-  const session = await auth()
+export default async function StudioPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string | string[] }>
+}) {
+  const [session, params] = await Promise.all([auth(), searchParams])
+  const errorParam = Array.isArray(params.error) ? params.error[0] : params.error
+  const authErrorMessage = getAuthErrorMessage(errorParam)
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6">
@@ -57,6 +76,13 @@ export default async function StudioPage() {
           </Button>
         </div>
       </div>
+
+      {authErrorMessage ? (
+        <Alert variant="destructive" className="mb-6">
+          <AlertTitle>Sign-in error</AlertTitle>
+          <AlertDescription>{authErrorMessage}</AlertDescription>
+        </Alert>
+      ) : null}
 
       <Suspense
         fallback={
