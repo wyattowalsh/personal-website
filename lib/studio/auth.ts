@@ -29,14 +29,31 @@ function resolveEnv(...keys: string[]): string | undefined {
   return undefined
 }
 
+function alignAuthUrlHost(url: string | undefined): string | undefined {
+  if (!url) return undefined
+
+  try {
+    const parsed = new URL(url)
+    if (parsed.hostname !== 'w4w.dev') return url
+
+    parsed.hostname = 'www.w4w.dev'
+    if (parsed.pathname === '/' && !parsed.search && !parsed.hash) {
+      return parsed.origin
+    }
+    return parsed.toString()
+  } catch {
+    return url
+  }
+}
+
 const authSecret = resolveEnv('AUTH_SECRET', 'NEXTAUTH_SECRET')
-const authUrl = resolveEnv('AUTH_URL', 'NEXTAUTH_URL', 'NEXT_PUBLIC_SITE_URL')
+const authUrl = alignAuthUrlHost(resolveEnv('AUTH_URL', 'NEXTAUTH_URL', 'NEXT_PUBLIC_SITE_URL'))
 
 if (!process.env.AUTH_SECRET && authSecret) {
   process.env.AUTH_SECRET = authSecret
 }
 
-if (!process.env.AUTH_URL && authUrl) {
+if (authUrl && process.env.AUTH_URL !== authUrl) {
   process.env.AUTH_URL = authUrl
 }
 
