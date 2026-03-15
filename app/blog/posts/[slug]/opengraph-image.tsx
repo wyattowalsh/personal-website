@@ -144,7 +144,6 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       (
         <div style={{ height: '100%', width: '100%', display: 'flex', position: 'relative' }}>
           {/* Hero image background */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroDataUri}
             alt=""
