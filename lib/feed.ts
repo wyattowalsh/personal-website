@@ -1,6 +1,7 @@
 import { Feed } from 'feed';
 import { BackendService } from '@/lib/server';
 import { getConfig } from '@/lib/core';
+import { stripMdxSyntax } from '@/lib/utils';
 
 /**
  * Build a feed object with posts data.
@@ -16,8 +17,15 @@ export async function buildFeed(): Promise<Feed> {
     throw new Error('No posts found for feed');
   }
 
-  // Limit to 20 most recent posts
   const posts = allPosts.slice(0, 20);
+
+  // Use the most recent updated/created date across all posts
+  const latestDate = posts.reduce((latest, post) => {
+    const d = new Date(post.updated || post.created);
+    return d > latest ? d : latest;
+  }, new Date(0));
+
+  const currentYear = new Date().getFullYear();
 
   const feed = new Feed({
     title: site.title,
@@ -26,38 +34,38 @@ export async function buildFeed(): Promise<Feed> {
     link: site.url,
     language: "en",
     favicon: `${site.url}/favicon.ico`,
-    copyright: `All rights reserved ${new Date().getFullYear()}, ${site.author.name}`,
-    updated: new Date(posts[0].created),
+    copyright: `All rights reserved ${currentYear}, ${site.author.name}`,
+    updated: latestDate,
     generator: "Next.js using Feed for Node.js",
     feedLinks: {
       rss2: `${site.url}/feed.xml`,
       json: `${site.url}/feed.json`,
       atom: `${site.url}/feed.atom`,
     },
-    author: site.author
+    author: site.author,
+    image: `${site.url}/opengraph.png`,
   });
 
   for (const post of posts) {
     const url = `${site.url}/blog/posts/${post.slug}`;
-
-    // Further clean content for feed - strip any remaining JSX/MDX syntax
-    const feedContent = post.content
-      .replace(/<[A-Z][a-zA-Z0-9]*[\s\S]*?\/>/g, '') // Self-closing JSX components
-      .replace(/<[A-Z][a-zA-Z0-9]*[\s\S]*?>[\s\S]*?<\/[A-Z][a-zA-Z0-9]*>/g, '') // JSX components with children
-      .replace(/\{[\s\S]*?\}/g, '') // JSX expressions
-      .trim();
+    const feedContent = stripMdxSyntax(post.content);
+    const postDate = new Date(post.updated || post.created);
+    const publishedDate = new Date(post.created);
+    const imageUrl = post.image ? `${site.url}${post.image}` : undefined;
 
     feed.addItem({
       title: post.title,
       id: url,
       link: url,
+      guid: url,
       description: post.summary,
       content: feedContent,
       author: [site.author],
-      date: new Date(post.created),
-      published: new Date(post.created),
-      image: post.image ? `${site.url}${post.image}` : undefined,
+      date: postDate,
+      published: publishedDate,
+      image: imageUrl,
       category: post.tags.map(tag => ({ name: tag })),
+      copyright: `${currentYear} ${site.author.name}`,
     });
   }
 

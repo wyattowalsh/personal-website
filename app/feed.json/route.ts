@@ -1,6 +1,8 @@
 import { buildFeed } from '@/lib/feed';
 import { api as coreApi, logger } from '@/lib/core';
 
+export const revalidate = 3600;
+
 export const GET = coreApi.middleware.withErrorHandler(
   async () => {
     try {

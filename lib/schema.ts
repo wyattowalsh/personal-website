@@ -99,7 +99,10 @@ export function generateArticleSchema(post: Post, options?: SchemaOptions) {
       '@id': `${baseUrl}/blog/posts/${post.slug}`,
     },
     keywords: post.tags,
+    wordCount: post.wordCount,
+    ...(post.readingTime ? { timeRequired: `PT${parseInt(post.readingTime)}M` } : {}),
     isAccessibleForFree: true,
+    inLanguage: 'en-US',
     license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/'
   };
 }

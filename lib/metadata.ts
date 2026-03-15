@@ -32,9 +32,14 @@ export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metad
     creator: config.site.author.name,
     publisher: config.site.author.name,
     
-    // Canonical URL
+    // Canonical URL and feed discovery
     alternates: {
       canonical: postUrl,
+      types: {
+        'application/rss+xml': '/feed.xml',
+        'application/atom+xml': '/feed.atom',
+        'application/feed+json': '/feed.json',
+      },
     },
 
     // OpenGraph metadata
@@ -55,6 +60,7 @@ export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metad
       publishedTime: post.created,
       modifiedTime: post.updated || post.created,
       authors: [config.site.author.name],
+      section: post.tags[0],
       tags: post.tags,
     },
 

@@ -10,6 +10,22 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/**
+ * Strip JSX/MDX syntax from content for use in feeds and plain-text contexts.
+ * Removes: import statements, export blocks, JSX components, JSX expressions.
+ */
+export function stripMdxSyntax(content: string): string {
+  return content
+    .replace(/^import\s+.*$/gm, '')
+    .replace(/^export\s+(const|default|function)\s+[\s\S]*?(?=\n\n|\n#|\n---)/gm, '')
+    .replace(/<[A-Z][a-zA-Z0-9]*[\s\S]*?\/>/g, '')
+    .replace(/<[A-Z][a-zA-Z0-9]*[\s\S]*?>[\s\S]*?<\/[A-Z][a-zA-Z0-9]*>/g, '')
+    .replace(/<ArticleJsonLd[\s\S]*?\/>/g, '')
+    .replace(/\{[\s\S]*?\}/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
 // Enhanced date formatting utilities
 export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOptions): string {
   if (!date) return '';

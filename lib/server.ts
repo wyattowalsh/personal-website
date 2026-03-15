@@ -6,6 +6,7 @@ import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
 import { logger, Post, formatters, PreprocessStats, ApiError, cacheControl } from './core';
+import { stripMdxSyntax } from './utils';
 import {
   CACHE_TTL_MS,
   LRU_MAX_ENTRIES,
@@ -205,15 +206,7 @@ class BackendService {
           
           const fileData = await getFileData(filePath);
           
-          // Strip out JS/JSX that shouldn't appear in feeds:
-          // - import statements
-          // - metadata export block
-          // - ArticleJsonLd component
-          const cleanContent = markdown
-            .replace(/^import\s+\{[^}]+\}\s+from\s+['"][^'"]+['"];\s*/gm, '')
-            .replace(/^export const metadata = \{[\s\S]*?\};\s*/m, '')
-            .replace(/<ArticleJsonLd[\s\S]*?\/>\s*/g, '')
-            .trim();
+          const cleanContent = stripMdxSyntax(markdown);
 
           // Calculate word count and reading time from clean content
           const wordCount = cleanContent.trim().split(/\s+/).length;
@@ -237,9 +230,19 @@ class BackendService {
             tags: data.tags || [],
           };
 
+          // Validate hero image exists
+          if (post.image) {
+            const imagePath = path.join(process.cwd(), 'public', post.image);
+            try {
+              await fs.access(imagePath);
+            } catch {
+              logger.warning(`Post "${post.slug}" references missing image: ${post.image}`);
+            }
+          }
+
           this.posts.set(slug, post);
           post.tags.forEach(tag => this.tags.add(tag));
-          
+
           logger.file('Processed', filePath, {
             size: formatters.fileSize(content.length),
             tags: post.tags.length
