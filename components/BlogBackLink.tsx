@@ -11,13 +11,12 @@ import { cn } from "@/lib/utils";
 export default function BlogBackLink() {
   const pathname = usePathname();
   const isBlogHome = pathname === "/blog";
-  const isStudio = pathname.startsWith("/studio");
   const showBackLink = pathname !== "/";
 
   if (!showBackLink) return null;
 
-  const backHref = isBlogHome || isStudio ? "/" : "/blog";
-  const backText = isBlogHome || isStudio ? "Home" : "Blog";
+  const backHref = isBlogHome ? "/" : "/blog";
+  const backText = isBlogHome ? "Home" : "Blog";
 
   return (
     <motion.div

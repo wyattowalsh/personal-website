@@ -19,9 +19,7 @@ const TooltipContent = React.forwardRef<
   React.ElementRef<typeof TooltipPrimitive.Content>,
   TooltipContentProps
 >(({ className, sideOffset = 4, container, ...props }, ref) => {
-  const resolvedContainer = container
-    ?? (typeof document !== "undefined" ? document.getElementById("studio-root") : null)
-    ?? undefined
+  const resolvedContainer = container ?? undefined
 
   return (
     <TooltipPrimitive.Portal container={resolvedContainer}>

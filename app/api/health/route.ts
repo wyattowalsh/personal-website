@@ -1,6 +1,5 @@
-import { api as coreApi } from '@/lib/core'
-import { getStudioHealthResponse } from '@/lib/studio/health'
+import { NextResponse } from 'next/server'
 
-export const GET = coreApi.middleware.withErrorHandler(
-  async () => getStudioHealthResponse({ includeInternalDetails: false }),
-)
+export async function GET() {
+  return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() })
+}

@@ -7,9 +7,6 @@
       "dom.iterable",
       "esnext"
     ],
-    "types": [
-      "@webgpu/types"
-    ],
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,

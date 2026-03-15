@@ -374,8 +374,6 @@ class ConfigManager {
 export const getConfig = () => ConfigManager.getInstance().getConfig();
 export const config = getConfig();
 
-const STUDIO_JSON_CONTENT_TYPE = 'application/json';
-const STUDIO_MAX_JSON_PAYLOAD_BYTES = 1_000_000; // 1MB
 const CORRELATION_ID_HEADER = 'x-correlation-id';
 const CORRELATION_ID_MAX_LENGTH = 128;
 
@@ -401,17 +399,6 @@ function withCorrelationId(response: Response, correlationId: string): Response 
   return response;
 }
 
-function isStudioApiRequest(req: Request): boolean {
-  return new URL(req.url).pathname.startsWith('/api/studio/');
-}
-
-function hasJsonContentType(req: Request): boolean {
-  const contentType = req.headers.get('content-type');
-  if (!contentType) return false;
-  const [mediaType] = contentType.split(';', 1);
-  return mediaType.trim().toLowerCase() === STUDIO_JSON_CONTENT_TYPE;
-}
-
 // API middleware exports
 export const api = {
   middleware: {
@@ -421,33 +408,9 @@ export const api = {
       if (req.method === 'GET') {
         data = Object.fromEntries(new URL(req.url).searchParams);
       } else {
-        const enforceStudioBoundaries = isStudioApiRequest(req);
-
-        if (enforceStudioBoundaries && !hasJsonContentType(req)) {
-          throw new ApiError(415, `Unsupported content type. Expected ${STUDIO_JSON_CONTENT_TYPE}`);
-        }
-
         try {
-          if (enforceStudioBoundaries) {
-            const contentLength = Number(req.headers.get('content-length'));
-            if (Number.isFinite(contentLength) && contentLength > STUDIO_MAX_JSON_PAYLOAD_BYTES) {
-              throw new ApiError(413, `Payload too large. Maximum size is ${STUDIO_MAX_JSON_PAYLOAD_BYTES} bytes`);
-            }
-
-            const rawBody = await req.text();
-            const payloadBytes = new TextEncoder().encode(rawBody).byteLength;
-            if (payloadBytes > STUDIO_MAX_JSON_PAYLOAD_BYTES) {
-              throw new ApiError(413, `Payload too large. Maximum size is ${STUDIO_MAX_JSON_PAYLOAD_BYTES} bytes`);
-            }
-
-            data = JSON.parse(rawBody);
-          } else {
-            data = await req.json();
-          }
+          data = await req.json();
         } catch (error) {
-          if (error instanceof ApiError) {
-            throw error;
-          }
           if (error instanceof SyntaxError) {
             throw new ApiError(400, 'Malformed JSON request body');
           }
@@ -462,7 +425,7 @@ export const api = {
 
       return validation.data;
     },
-    
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     withErrorHandler: (handler: Function) => async (...args: any[]) => {
       const request = getRequestFromHandlerArgs(args);

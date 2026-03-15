@@ -22,19 +22,13 @@ function getLinkRewriteDestination() {
 
 const linkRewriteDestination = getLinkRewriteDestination()
 
-// CSP builder — shared directives defined once, per-route overrides via extraScriptSrc
-function buildCsp(extraCdnSrc = '', extraConnectSrc = '', frameAncestors = "'none'") {
+// CSP builder
+function buildCsp() {
   const scriptSrc = [
     "'self'", "'unsafe-inline'", "'wasm-unsafe-eval'",
     'https://giscus.app', 'https://www.googletagmanager.com',
     'https://www.google-analytics.com', 'https://*.sentry.io',
     'https://va.vercel-scripts.com',
-    ...(extraCdnSrc ? [extraCdnSrc] : []),
-  ].join(' ')
-
-  const styleSrc = [
-    "'self'", "'unsafe-inline'",
-    ...(extraCdnSrc ? [extraCdnSrc] : []),
   ].join(' ')
 
   const connectSrc = [
@@ -42,21 +36,18 @@ function buildCsp(extraCdnSrc = '', extraConnectSrc = '', frameAncestors = "'non
     'https://www.google-analytics.com', 'https://*.google-analytics.com',
     'https://*.analytics.google.com', 'https://vitals.vercel-insights.com',
     'https://*.sentry.io', 'https://va.vercel-scripts.com',
-    'https://github.com', 'https://accounts.google.com',
-    ...(extraCdnSrc ? [extraCdnSrc] : []),
-    ...(extraConnectSrc ? [extraConnectSrc] : []),
   ].join(' ')
 
   return [
     "default-src 'self'",
     `script-src ${scriptSrc}`,
-    `style-src ${styleSrc}`,
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' data:",
     `connect-src ${connectSrc}`,
     "worker-src 'self' blob:",
     "frame-src 'self' https://giscus.app",
-    `frame-ancestors ${frameAncestors}`,
+    "frame-ancestors 'none'",
   ].join('; ')
 }
 
@@ -92,9 +83,6 @@ const nextConfig = {
     ]
   },
   async headers() {
-    // Order matters: Next.js merges all matching routes, and for duplicate
-    // header keys the LAST match wins. Put the catch-all first so that
-    // more-specific studio routes override it.
     return [
       {
         source: '/(.*)',
@@ -107,32 +95,6 @@ const nextConfig = {
           { key: 'X-DNS-Prefetch-Control', value: 'on' },
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
           { key: 'Content-Security-Policy', value: buildCsp() },
-        ],
-      },
-      {
-        source: '/studio/(.*)',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-          { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
-          { key: 'Content-Security-Policy', value: buildCsp('https://cdn.jsdelivr.net', 'https://huggingface.co https://*.hf.co https://raw.githubusercontent.com https://cdn-lfs.huggingface.co', "'self'") },
-        ],
-      },
-      {
-        source: '/studio/embed/(.*)',
-        headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-          { key: 'X-XSS-Protection', value: '1; mode=block' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
-          { key: 'X-DNS-Prefetch-Control', value: 'on' },
-          { key: 'Permissions-Policy', value: 'camera=(), microphone=(self), geolocation=()' },
-          { key: 'Content-Security-Policy', value: buildCsp('https://cdn.jsdelivr.net', 'https://huggingface.co https://*.hf.co https://raw.githubusercontent.com https://cdn-lfs.huggingface.co', "'self'") },
         ],
       },
     ]

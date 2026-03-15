@@ -17,8 +17,6 @@ import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
 import Math, { MathProps } from "@/components/Math";
 import Mermaid from "@/components/Mermaid";
-import { SketchEmbed } from "@/components/studio/SketchEmbed";
-
 
 import { Route as NextRoute } from 'next';
 
@@ -671,9 +669,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
         // Mermaid diagrams
         Mermaid,
-
-        // Studio sketch embeds
-        Sketch: SketchEmbed,
 
         ...components,
     };

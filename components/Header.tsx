@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
-import { Palette } from "lucide-react";
 import BlogBackLink from "@/components/BlogBackLink";
 import DarkModeToggle from "@/components/DarkModeToggle";
 
@@ -15,13 +13,6 @@ export default function Header() {
 		>
 			<BlogBackLink />
 			<div className="flex items-center space-x-4 ml-auto">
-				<Link
-					href="/studio"
-					className="text-foreground/70 hover:text-foreground transition-colors"
-					aria-label="Studio"
-				>
-					<Palette className="h-5 w-5" />
-				</Link>
 				<DarkModeToggle />
 			</div>
 		</header>
