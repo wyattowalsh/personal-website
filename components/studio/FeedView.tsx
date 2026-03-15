@@ -80,7 +80,7 @@ export function FeedView({ className }: FeedViewProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none text-muted-foreground" />
       </div>
     )
   }
@@ -137,7 +137,7 @@ export function FeedView({ className }: FeedViewProps) {
 
       {loadingMore && (
         <div className="flex justify-center py-4">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none text-muted-foreground" />
         </div>
       )}
 

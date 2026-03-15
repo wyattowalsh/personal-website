@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Loader2, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -48,6 +48,7 @@ export function SketchGallery({
   const [activeTag, setActiveTag] = React.useState<string | null>(null)
   const [loading, setLoading] = React.useState(false)
   const searchInputId = React.useId()
+  const prefersReducedMotion = useReducedMotion()
 
   const sentinelRef = React.useRef<HTMLDivElement>(null)
   const initialFilterRef = React.useRef(true)
@@ -200,23 +201,27 @@ export function SketchGallery({
         <motion.div
           key={sketch.id}
           layout
-          initial={{ opacity: 0, scale: 0.9 }}
+          initial={prefersReducedMotion ? false : { opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.2) }}
+          exit={prefersReducedMotion ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.96 }}
+          transition={
+            prefersReducedMotion
+              ? { duration: 0 }
+              : { duration: 0.18, delay: Math.min(i * 0.02, 0.16) }
+          }
         >
           <SketchCard sketch={sketch} />
         </motion.div>
       )),
-    [sketches]
+    [sketches, prefersReducedMotion]
   )
 
   return (
-    <div className={cn('space-y-4', className)}>
+    <div className={cn('space-y-6', className)}>
       {/* Controls */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative sm:w-72">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
+      <div className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-background/60 p-3 backdrop-blur-xl sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative sm:w-80">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/50" />
           <label htmlFor={searchInputId} className="sr-only">
             Search sketches
           </label>
@@ -226,42 +231,44 @@ export function SketchGallery({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search sketches..."
-            className="h-10 w-full rounded-lg border border-input bg-background/50 pl-10 pr-4 text-sm shadow-sm backdrop-blur-sm placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-transparent transition-shadow duration-200"
+            className="h-10 w-full rounded-lg border border-input/80 bg-background/70 pl-10 pr-4 text-sm placeholder:text-muted-foreground/60 transition-colors duration-200 focus-visible:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70"
           />
         </div>
-        <div className="flex flex-wrap items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-2">
           {/* Engine filter */}
-          <div className="flex gap-0.5 rounded-lg bg-muted/50 p-0.5">
+          <div className="flex gap-0.5 rounded-lg border border-border/70 bg-background/50 p-0.5">
             {ENGINE_OPTIONS.map((eng) => (
               <Button
                 key={eng}
                 variant={engine === (eng === 'all' ? undefined : eng) ? 'secondary' : 'ghost'}
                 size="sm"
                 className={cn(
-                  'h-8 rounded-md text-xs font-medium transition-all',
-                  engine === (eng === 'all' ? undefined : eng) && 'shadow-sm'
+                  'h-8 rounded-md px-2.5 text-xs font-medium transition-colors',
+                  engine === (eng === 'all' ? undefined : eng) && 'bg-background/80 text-foreground shadow-none'
                 )}
                 onClick={() => setEngine(eng === 'all' ? undefined : eng)}
+                aria-pressed={engine === (eng === 'all' ? undefined : eng)}
               >
                 {ENGINE_LABELS[eng]}
               </Button>
             ))}
           </div>
 
-          <div className="mx-1 h-5 w-px bg-border/60" />
+          <div className="mx-0.5 h-5 w-px bg-border/70" />
 
           {/* Sort buttons */}
-          <div className="flex gap-0.5 rounded-lg bg-muted/50 p-0.5">
+          <div className="flex gap-0.5 rounded-lg border border-border/70 bg-background/50 p-0.5">
             {SORT_OPTIONS.map((s) => (
               <Button
                 key={s}
                 variant={sort === s ? 'secondary' : 'ghost'}
                 size="sm"
                 className={cn(
-                  'h-8 rounded-md text-xs font-medium transition-all',
-                  sort === s && 'shadow-sm'
+                  'h-8 rounded-md px-2.5 text-xs font-medium transition-colors',
+                  sort === s && 'bg-background/80 text-foreground shadow-none'
                 )}
                 onClick={() => setSort(s)}
+                aria-pressed={sort === s}
               >
                 {s.charAt(0).toUpperCase() + s.slice(1)}
               </Button>
@@ -272,11 +279,12 @@ export function SketchGallery({
 
       {/* Tags */}
       {allTags.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5 rounded-xl border border-border/60 bg-background/40 p-2">
           <TagPill
             tag="All"
             variant={activeTag === null ? 'active' : 'interactive'}
             onClick={() => setActiveTag(null)}
+            className="text-xs shadow-none hover:scale-100 active:scale-100"
           />
           {allTags.map((tag) => (
             <TagPill
@@ -284,6 +292,7 @@ export function SketchGallery({
               tag={tag}
               variant={activeTag === tag ? 'active' : 'interactive'}
               onClick={() => setActiveTag(activeTag === tag ? null : tag)}
+              className="text-xs shadow-none hover:scale-100 active:scale-100"
             />
           ))}
         </div>
@@ -291,22 +300,22 @@ export function SketchGallery({
 
       {/* Results count */}
       {(debouncedSearch || activeTag || engine) && (
-        <p className="text-sm text-muted-foreground">
+        <p className="text-xs uppercase tracking-wide text-muted-foreground/80">
           {total} {total === 1 ? 'sketch' : 'sketches'} found
         </p>
       )}
 
       {/* Grid */}
-      <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
         <AnimatePresence mode="popLayout">{sketchItems}</AnimatePresence>
       </div>
 
       {/* Empty state */}
       {sketches.length === 0 && !loading && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/60 bg-muted/30 py-20 text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-muted/80">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border/70 bg-background/40 px-6 py-16 text-center backdrop-blur-sm">
+          <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-xl border border-border/70 bg-muted/40">
             <svg
-              className="h-10 w-10 text-muted-foreground/40"
+              className="h-8 w-8 text-muted-foreground/45"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -317,14 +326,14 @@ export function SketchGallery({
               <path d="m21 15-5-5L5 21" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold">No sketches found</h3>
-          <p className="mt-2 max-w-xs text-sm text-muted-foreground">
+          <h3 className="text-lg font-medium">No sketches found</h3>
+          <p className="mt-2 max-w-xs text-sm text-muted-foreground/90">
             {debouncedSearch || activeTag || engine
               ? 'Try adjusting your search or filters'
               : 'Be the first to create something amazing'}
           </p>
           {!debouncedSearch && !activeTag && !engine && (
-            <Button asChild className="mt-6 shadow-sm">
+            <Button asChild className="mt-6 shadow-none">
               <Link href="/studio/new">Create a Sketch</Link>
             </Button>
           )}
@@ -333,8 +342,9 @@ export function SketchGallery({
 
       {/* Loading indicator */}
       {loading && (
-        <div className="flex justify-center py-4">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <div className="flex justify-center py-5" role="status" aria-live="polite">
+          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground motion-reduce:animate-none" />
+          <span className="sr-only">Loading sketches</span>
         </div>
       )}
 

@@ -4,6 +4,7 @@ import { auth } from '@/lib/studio/auth'
 import { redirect } from 'next/navigation'
 import { getUserBookmarks } from '@/lib/studio/db'
 import { SketchGallery } from '@/components/studio/SketchGallery'
+import { StudioPageContainer, StudioPageHeader } from '@/components/studio/StudioShell'
 import { Bookmark } from 'lucide-react'
 import { createStudioMetadata, studioNoIndexRobots } from '@/lib/studio/metadata'
 
@@ -37,15 +38,11 @@ export default async function BookmarksPage() {
   if (!session?.user?.id) redirect('/studio')
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Bookmarks
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          Sketches you&apos;ve saved for later
-        </p>
-      </div>
+    <StudioPageContainer className="py-6">
+      <StudioPageHeader
+        heading="Bookmarks"
+        description="Sketches you&apos;ve saved for later"
+      />
       <Suspense
         fallback={
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -60,6 +57,6 @@ export default async function BookmarksPage() {
       >
         <BookmarkContent userId={session.user.id} />
       </Suspense>
-    </div>
+    </StudioPageContainer>
   )
 }

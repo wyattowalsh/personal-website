@@ -39,15 +39,8 @@ export function PreviewChrome({
 
   return (
     <div className={cn('relative flex flex-col', className)}>
-      {/* Ambient engine glow */}
-      <div
-        className="absolute inset-0 -z-10 scale-150 opacity-[0.15] blur-3xl"
-        style={{ backgroundColor: engineColor }}
-        aria-hidden
-      />
-
       {/* Top info bar */}
-      <div className="flex items-center gap-3 bg-muted/30 px-2 py-1 text-[10px] font-mono text-foreground/80">
+      <div className="flex items-center gap-3 border-b border-border/60 bg-background/70 px-2.5 py-1 text-[10px] font-mono text-muted-foreground/90">
         {/* Engine badge */}
         <span className="inline-flex items-center gap-1.5">
           <span
@@ -71,14 +64,14 @@ export function PreviewChrome({
       {/* Canvas frame */}
       <div
         className={cn(
-          'relative overflow-hidden rounded-md ring-1 ring-white/[0.06] dark:ring-white/[0.04]',
+          'relative overflow-hidden rounded-md border border-border/60',
           bgStyles[previewBg],
         )}
         style={
           previewBg === 'checkerboard'
             ? {
                 backgroundImage:
-                  'repeating-conic-gradient(rgba(128,128,128,0.15) 0% 25%, transparent 0% 50%)',
+                  'repeating-conic-gradient(rgba(128,128,128,0.12) 0% 25%, transparent 0% 50%)',
                 backgroundSize: '16px 16px',
               }
             : undefined

@@ -235,9 +235,9 @@ export function SketchEditorPage({
   }, [session, saveStatus, sketchId, title, description, tags, forkedFrom, router])
 
   return (
-    <div className="flex h-full min-h-0 flex-col">
+    <div className="flex h-full min-h-0 flex-col bg-background">
       {/* Metadata bar */}
-      <div className="shrink-0 border-b border-border px-4 py-3">
+      <div className="shrink-0 border-b border-border/60 bg-background/80 px-4 py-2.5">
         <SketchMeta
           title={title}
           description={description}

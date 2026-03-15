@@ -4,6 +4,7 @@ import { auth } from '@/lib/studio/auth'
 import { redirect } from 'next/navigation'
 import { getOwnedSketches } from '@/lib/studio/db'
 import { MySketchesList } from '@/components/studio/MySketchesList'
+import { StudioPageContainer, StudioPageHeader } from '@/components/studio/StudioShell'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -26,23 +27,19 @@ export default async function MySketchesPage() {
   if (!session?.user?.id) redirect('/studio')
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            My Sketches
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Manage your creations
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/studio/new" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create New
-          </Link>
-        </Button>
-      </div>
+    <StudioPageContainer className="py-6">
+      <StudioPageHeader
+        heading="My Sketches"
+        description="Manage your creations"
+        actions={(
+          <Button asChild>
+            <Link href="/studio/new" className="gap-2">
+              <Plus className="h-4 w-4" />
+              Create New
+            </Link>
+          </Button>
+        )}
+      />
 
       <Suspense
         fallback={
@@ -55,6 +52,6 @@ export default async function MySketchesPage() {
       >
         <SketchesContent userId={session.user.id} />
       </Suspense>
-    </div>
+    </StudioPageContainer>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { Code2, Search, X } from 'lucide-react'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import type { EngineType } from '@/lib/studio/types'
@@ -523,6 +523,7 @@ export function SnippetPalette({
   const inputRef = React.useRef<HTMLInputElement>(null)
   const dialogRef = React.useRef<HTMLDivElement>(null)
   const previousFocusRef = React.useRef<HTMLElement | null>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   const snippets = React.useMemo(() => getSnippets(engine), [engine])
   const categories = React.useMemo(() => getCategories(snippets), [snippets])
@@ -624,11 +625,11 @@ export function SnippetPalette({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md"
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
+            exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.1 }}
             onClick={() => onOpenChange(false)}
             aria-hidden="true"
           />
@@ -637,11 +638,11 @@ export function SnippetPalette({
           <div className="fixed inset-0 z-50 flex items-start justify-center pt-[12vh]">
             <motion.div
               ref={dialogRef}
-              className="mx-4 flex w-full max-w-xl flex-col overflow-hidden rounded-xl border border-white/[0.08] bg-background/90 shadow-2xl backdrop-blur-2xl"
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              className="mx-4 flex w-full max-w-xl flex-col overflow-hidden rounded-xl border border-border/80 bg-card/95 text-card-foreground shadow-[0_32px_80px_-32px_rgba(0,0,0,0.85)] backdrop-blur-xl"
+              initial={prefersReducedMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
+              exit={prefersReducedMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: -10 }}
+              transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15, ease: 'easeOut' }}
               style={{ maxHeight: '70vh' }}
               onKeyDown={handleDialogKeyDown}
               role="dialog"
@@ -650,19 +651,19 @@ export function SnippetPalette({
               aria-describedby="snippet-palette-help"
             >
               {/* Title bar */}
-              <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.06] px-4 py-3">
+              <div className="flex shrink-0 items-center gap-3 border-b border-border/70 px-4 py-3">
                 <Code2 className="h-4 w-4 text-primary" />
                 <span id="snippet-palette-title" className="text-sm font-medium">
                   Insert Snippet
                 </span>
-                <span className="rounded bg-muted/50 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
+                <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground">
                   {engineLabel(engine)}
                 </span>
                 <div className="flex-1" />
                 <button
                   type="button"
                   onClick={() => onOpenChange(false)}
-                  className="rounded-md p-1 text-muted-foreground/60 transition-colors hover:bg-white/[0.06] hover:text-foreground"
+                  className="rounded-md p-1 text-muted-foreground/60 transition-colors hover:bg-accent/70 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                   aria-label="Close"
                 >
                   <X className="h-4 w-4" />
@@ -670,7 +671,7 @@ export function SnippetPalette({
               </div>
 
               {/* Search */}
-              <div className="flex shrink-0 items-center gap-3 border-b border-white/[0.06] px-4 py-2.5">
+              <div className="flex shrink-0 items-center gap-3 border-b border-border/70 px-4 py-2.5 transition-colors focus-within:bg-muted/20">
                 <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground/50" />
                 <label htmlFor="snippet-palette-search" className="sr-only">
                   Search snippets
@@ -682,7 +683,7 @@ export function SnippetPalette({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search snippets..."
-                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/50"
+                  className="flex-1 rounded-sm bg-transparent px-1 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                   autoComplete="off"
                   spellCheck={false}
                 />
@@ -699,13 +700,13 @@ export function SnippetPalette({
                   onValueChange={setActiveTab}
                   className="flex min-h-0 flex-1 flex-col"
                 >
-                  <div className="shrink-0 overflow-x-auto border-b border-white/[0.04] px-4">
+                  <div className="shrink-0 overflow-x-auto border-b border-border/60 px-4">
                     <TabsList className="h-8 bg-transparent p-0">
                       {filteredCategories.map((cat) => (
                         <TabsTrigger
                           key={cat}
                           value={cat}
-                          className="rounded-none border-b-2 border-transparent px-3 py-1.5 text-xs data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
+                          className="rounded-none border-b-2 border-transparent px-3 py-1.5 text-xs data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                         >
                           {cat}
                         </TabsTrigger>
@@ -726,7 +727,7 @@ export function SnippetPalette({
                               key={snippet.name}
                               type="button"
                               onClick={() => handleInsert(snippet.code)}
-                              className="group cursor-pointer rounded-lg border border-white/[0.04] bg-white/[0.03] p-3 text-left transition-colors hover:bg-white/[0.06]"
+                              className="group cursor-pointer rounded-lg border border-border/70 bg-muted/20 p-3 text-left transition-colors hover:border-border hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                             >
                               <div className="text-sm font-medium text-foreground">
                                 {snippet.name}
@@ -734,7 +735,7 @@ export function SnippetPalette({
                               <div className="mt-0.5 text-xs text-muted-foreground">
                                 {snippet.description}
                               </div>
-                              <div className="mt-2 line-clamp-2 rounded bg-black/20 px-2 py-1 font-mono text-[10px] leading-relaxed text-muted-foreground/70">
+                              <div className="mt-2 line-clamp-2 rounded bg-background/70 px-2 py-1 font-mono text-[10px] leading-relaxed text-muted-foreground/70">
                                 {snippet.code}
                               </div>
                             </button>
@@ -749,7 +750,7 @@ export function SnippetPalette({
               {/* Footer */}
               <div
                 id="snippet-palette-help"
-                className="shrink-0 border-t border-white/[0.04] px-4 py-2 text-[10px] text-muted-foreground/40"
+                className="shrink-0 border-t border-border/60 px-4 py-2 text-[10px] text-muted-foreground/50"
               >
                 <span className="select-none">
                   Click to insert at cursor

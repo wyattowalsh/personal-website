@@ -100,7 +100,7 @@ export function CodeEditor({
             <button
               type="button"
               onClick={enableAdvancedEditor}
-              className="rounded px-2 py-1 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="rounded px-2 py-1 font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
               aria-label="Enable advanced code editor"
             >
               Enable advanced editor
@@ -120,7 +120,7 @@ export function CodeEditor({
             readOnly={readOnly}
             spellCheck={false}
             aria-label="Code editor"
-            className="h-full w-full resize-none border-0 bg-background p-3 font-mono text-sm text-foreground outline-none"
+            className="h-full w-full resize-none border-0 bg-background p-3 font-mono text-sm text-foreground outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
           />
         </div>
       )}

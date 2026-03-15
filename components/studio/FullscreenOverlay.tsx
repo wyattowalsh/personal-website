@@ -31,6 +31,14 @@ export function FullscreenOverlay({
   const [hudVisible, setHudVisible] = React.useState(true)
   const [hintVisible, setHintVisible] = React.useState(true)
   const hudTimerRef = React.useRef<ReturnType<typeof setTimeout>>(null)
+  const hudFocusWithinRef = React.useRef(false)
+
+  const clearHudTimer = React.useCallback(() => {
+    if (hudTimerRef.current) {
+      clearTimeout(hudTimerRef.current)
+      hudTimerRef.current = null
+    }
+  }, [])
 
   // Show keyboard hint briefly on entry
   React.useEffect(() => {
@@ -43,17 +51,20 @@ export function FullscreenOverlay({
   // Auto-hide HUD after inactivity
   const resetHudTimer = React.useCallback(() => {
     setHudVisible(true)
-    if (hudTimerRef.current) clearTimeout(hudTimerRef.current)
+    clearHudTimer()
+    if (hudFocusWithinRef.current) return
     hudTimerRef.current = setTimeout(() => setHudVisible(false), HUD_HIDE_DELAY)
-  }, [])
+  }, [clearHudTimer])
 
   React.useEffect(() => {
-    if (!visible) return
-    resetHudTimer()
-    return () => {
-      if (hudTimerRef.current) clearTimeout(hudTimerRef.current)
+    if (!visible) {
+      hudFocusWithinRef.current = false
+      clearHudTimer()
+      return
     }
-  }, [visible, resetHudTimer])
+    resetHudTimer()
+    return clearHudTimer
+  }, [visible, resetHudTimer, clearHudTimer])
 
   // Escape key to exit
   React.useEffect(() => {
@@ -72,6 +83,22 @@ export function FullscreenOverlay({
   const handleMouseMove = React.useCallback(() => {
     resetHudTimer()
   }, [resetHudTimer])
+
+  const handleHudFocusCapture = React.useCallback(() => {
+    hudFocusWithinRef.current = true
+    setHudVisible(true)
+    clearHudTimer()
+  }, [clearHudTimer])
+
+  const handleHudBlurCapture = React.useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      const nextTarget = event.relatedTarget as Node | null
+      if (nextTarget && event.currentTarget.contains(nextTarget)) return
+      hudFocusWithinRef.current = false
+      resetHudTimer()
+    },
+    [resetHudTimer],
+  )
 
   return (
     <AnimatePresence>
@@ -112,6 +139,8 @@ export function FullscreenOverlay({
             className="fixed bottom-0 left-0 right-0 z-[51]"
             animate={{ opacity: hudVisible ? 1 : 0 }}
             transition={{ duration: 0.3 }}
+            onFocusCapture={handleHudFocusCapture}
+            onBlurCapture={handleHudBlurCapture}
           >
             <div className="bg-gradient-to-t from-black/80 to-transparent px-6 pb-6 pt-16">
               <div className="mx-auto flex max-w-md items-center justify-center gap-3">

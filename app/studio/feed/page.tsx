@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { auth } from '@/lib/studio/auth'
 import { redirect } from 'next/navigation'
 import { FeedView } from '@/components/studio/FeedView'
+import { StudioPageContainer, StudioPageHeader } from '@/components/studio/StudioShell'
 import { Loader2 } from 'lucide-react'
 import { createStudioMetadata, studioNoIndexRobots } from '@/lib/studio/metadata'
 
@@ -20,15 +21,11 @@ export default async function FeedPage() {
   }
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Your Feed
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          Latest sketches from artists you follow
-        </p>
-      </div>
+    <StudioPageContainer className="py-6">
+      <StudioPageHeader
+        heading="Your Feed"
+        description="Latest sketches from artists you follow"
+      />
 
       <Suspense
         fallback={
@@ -39,6 +36,6 @@ export default async function FeedPage() {
       >
         <FeedView />
       </Suspense>
-    </div>
+    </StudioPageContainer>
   )
 }

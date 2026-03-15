@@ -51,7 +51,7 @@ export function StatusBar({
 
   return (
     <div className={cn(
-      'flex items-center gap-2 border-t border-white/[0.06] bg-background/60 px-3 py-0.5 text-[11px] text-muted-foreground backdrop-blur-sm',
+      'flex items-center gap-2 border-t border-border/60 bg-background/70 px-3 py-1 text-[11px] text-muted-foreground',
       className
     )}>
       {/* Engine badge */}
@@ -64,7 +64,7 @@ export function StatusBar({
       />
 
       {/* Cursor position */}
-      <span className="rounded-full bg-muted/40 px-2 py-0.5">
+      <span className="rounded-md border border-border/60 bg-muted/25 px-1.5 py-0.5">
         Ln {cursorLine}, Col {cursorColumn}
       </span>
 
@@ -86,10 +86,10 @@ export function StatusBar({
       {/* Save status */}
       {saveLabel && (
         <span className={cn(
-          'rounded-full px-2 py-0.5',
-          saveStatus === 'error' && 'bg-destructive/10 text-destructive',
-          saveStatus === 'saved' && 'bg-emerald-500/10 text-emerald-500',
-          saveStatus === 'saving' && 'bg-muted/40'
+          'rounded-md border px-1.5 py-0.5',
+          saveStatus === 'error' && 'border-destructive/40 bg-destructive/10 text-destructive',
+          saveStatus === 'saved' && 'border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+          saveStatus === 'saving' && 'border-border/60 bg-muted/25'
         )}>
           {saveLabel}
         </span>
@@ -100,12 +100,14 @@ export function StatusBar({
         <button
           type="button"
           onClick={onToggleAiAutoMode}
+          aria-pressed={aiAutoMode}
+          aria-label={aiAutoMode ? 'Disable AI autocomplete' : 'Enable AI autocomplete'}
           title={aiAutoMode ? 'AI autocomplete: on (click to disable)' : 'AI autocomplete: off (click to enable)'}
           className={cn(
-            'flex items-center gap-1 rounded-full px-2 py-0.5 transition-colors',
+            'flex items-center gap-1 rounded-md border px-1.5 py-0.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
             aiAutoMode
-              ? 'bg-violet-500/10 text-violet-500 hover:text-violet-400'
-              : 'hover:bg-muted/40 hover:text-foreground'
+              ? 'border-violet-500/40 bg-violet-500/10 text-violet-700 hover:bg-violet-500/15 dark:text-violet-300'
+              : 'border-transparent hover:border-border/60 hover:bg-muted/25 hover:text-foreground'
           )}
         >
           <Sparkles className="h-3 w-3" />

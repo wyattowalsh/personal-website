@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/lib/studio/auth'
 import { getUserProfile } from '@/lib/studio/db'
 import { ProfileEditor } from '@/components/studio/ProfileEditor'
+import { StudioPageContainer, StudioPageHeader } from '@/components/studio/StudioShell'
 import { createStudioMetadata, studioNoIndexRobots } from '@/lib/studio/metadata'
 
 export const metadata: Metadata = createStudioMetadata({
@@ -22,9 +23,9 @@ export default async function StudioSettingsPage() {
   if (!user) redirect('/studio')
 
   return (
-    <div className="container mx-auto max-w-2xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">Profile Settings</h1>
+    <StudioPageContainer className="max-w-2xl py-6">
+      <StudioPageHeader heading="Profile Settings" />
       <ProfileEditor user={user} />
-    </div>
+    </StudioPageContainer>
   )
 }

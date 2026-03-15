@@ -1,0 +1,51 @@
+---
+description: Best practices for composing project rules in Cursor (.mdc files)
+globs: .cursor/rules/**/*.mdc, .cursor/rules/**/*.md
+alwaysApply: false
+---
+
+## 🧭 Cursor Project Rule Composition – Standards
+
+- **One file, one concern** – keep each rule focused (e.g., *API Validation*, *Commit Style*).
+- **Mandatory metadata** – include `description`, accurate `globs` and set `alwaysApply: true` only when the rule is universal.
+- **Imperative clarity** – use direct, actionable sentences (“Use semantic commit messages”).
+- **Show, don’t tell** – embed concise code examples or reference `@template.tsx`.
+- **Token hygiene** – ≤ 500 lines (~2 k tokens); reference external docs for bulky content.
+- **Conflict checks** – inspect existing User & Project rules to prevent contradictions.
+- **Self‑validation** – finish with a prompt like:
+
+```text
+If instructions conflict or uncertainty arises, ask for clarification before generating code.
+```
+
+---
+
+### 📂 Correct `globs:` Field Syntax
+
+Cursor expects **comma‑separated patterns on a single line**—no brackets, no quotes, no YAML lists.[1]
+
+```mdc
+globs: src/**/*.ts, src/**/*.tsx          # ✅ valid
+globs: **/*.mdc                           # ✅ valid
+globs:
+  - src/**/*.ts                           # ❌ invalid (list not supported)
+globs: "**/*.ts"                          # ❌ invalid (quotes not supported)
+```
+
+Guidelines for patterns:
+
+1. Patterns follow `.gitignore` semantics (e.g., `**` matches nested folders).[1]  
+2. Separate patterns with `,` optionally followed by a space for readability.[2]  
+3. Omit `globs:` entirely if the rule is always relevant—use `alwaysApply: true` instead.[2]
+
+---
+
+### ✅ Quick Audit Checklist
+1. Clear `description` summarises when to apply the rule.
+2. `globs` accurately targets relevant files.
+3. Rule topic is unique among siblings.
+4. Examples are concise and illustrate intent.
+5. Total length fits project token budget.
+6. Contains a self‑check clause.
+
+_Follow these standards to ensure maintainable and effective Cursor project rules._

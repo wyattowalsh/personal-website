@@ -1,0 +1,89 @@
+{
+  "mcpServers": {
+    "Web: Brave Search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-brave-search"
+      ],
+      "env": {
+        "BRAVE_API_KEY": "BSAhG_BpEB5vbMfqv_dmO7WWCSyTH_O"
+      },
+      "description": "Web and local search capability powered by Brave's Search API. Allows AI models to search the internet for recent information, images, and news through a privacy-respecting search engine with customizable filtering options.",
+      "sourceUrl": "https://github.com/modelcontextprotocol/server-brave-search",
+      "disabled": false
+    },
+    "Web: Tavily AI Search": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tavily-mcp@0.1.2"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "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"
+      },
+      "description": "AI-optimized web search engine specializing in providing highly relevant results for AI applications. Features semantic search capabilities, content filtering, and structured data extraction designed specifically for AI-driven research and information gathering.",
+      "sourceUrl": "https://www.tavily.com/",
+      "disabled": false
+    },
+    "Web: Firecrawl Scraper": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-5f434788ff774ab3944b678d467d45fd"
+      },
+      "description": "Advanced web scraping tool with JavaScript rendering support. Enables extraction of content from websites including those with dynamic content, PDF documents, and complex layouts. Features smart rate limiting and efficient caching.",
+      "sourceUrl": "https://firecrawl.dev/",
+      "disabled": false
+    },
+    "Web: Content Fetcher": {
+      "command": "node",
+      "args": [
+        "~/dev/tools/mcp/fetch-mcp/dist/index.js"
+      ],
+      "description": "Web content fetching and conversion tool for efficient LLM usage. Retrieves web page content and converts it to formats optimized for AI consumption, including text extraction, HTML parsing, and content summarization.",
+      "sourceUrl": "https://github.com/modelcontextprotocol/servers/wiki/Servers-List",
+      "disabled": false
+    },
+    "AI: Sequential Thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "description": "Structured problem-solving framework that breaks down complex problems into sequential steps. Supports revision, branching, and hypothesis testing with a flexible thinking process that adapts as understanding deepens.",
+      "disabled": false
+    },
+    "Browser: Puppeteer Automation": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-puppeteer"
+      ],
+      "description": "Browser automation powered by Google's Puppeteer. Enables web navigation, screenshot capture, form interaction, and JavaScript execution in Chrome/Chromium browsers. Ideal for web testing, data extraction, and automated documentation.",
+      "sourceUrl": "https://github.com/modelcontextprotocol/server-puppeteer",
+      "disabled": false
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase",
+        "--access-token",
+        "sbp_b943c0b20e9a4cb33d743c7b263d5cafd8daeb8f"
+      ]
+    },
+    "Media: YouTube Transcript": {
+      "command": "node",
+      "args": [
+        "/Users/ww/dev/tools/mcp/mcp-youtube-transcript/dist/index.js"
+      ],
+      "description": "YouTube video transcript extraction and analysis tool. Features time-stamped caption retrieval from any public YouTube video with support for multiple languages, speaker identification, and text parsing capabilities. Enables content analysis, summarization, and information extraction from video lectures, interviews, and presentations without requiring full video download.",
+      "sourceUrl": "https://github.com/modelcontextprotocol/servers/wiki/Servers-List",
+      "disabled": false
+    }
+  }
+}

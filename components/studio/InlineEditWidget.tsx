@@ -75,7 +75,7 @@ export function InlineEditWidget({
             className={cn(
               'h-6 w-56 rounded border-none bg-transparent px-1',
               'text-foreground placeholder:text-muted-foreground',
-              'outline-none ring-0 focus:ring-0',
+              'outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
             )}
           />
           <button
@@ -88,6 +88,7 @@ export function InlineEditWidget({
               'flex h-6 w-6 shrink-0 items-center justify-center rounded',
               'bg-primary text-primary-foreground',
               'hover:bg-primary/90 disabled:opacity-40',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'transition-colors',
             )}
             aria-label="Submit edit instruction"
@@ -112,6 +113,7 @@ export function InlineEditWidget({
             className={cn(
               'flex h-6 w-6 items-center justify-center rounded',
               'text-emerald-500 hover:bg-emerald-500/10',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'transition-colors',
             )}
             aria-label="Accept edit"
@@ -124,6 +126,7 @@ export function InlineEditWidget({
             className={cn(
               'flex h-6 w-6 items-center justify-center rounded',
               'text-red-500 hover:bg-red-500/10',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'transition-colors',
             )}
             aria-label="Reject edit"
@@ -165,7 +168,7 @@ function SpinnerIcon() {
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
-      className="animate-spin"
+      className="animate-spin motion-reduce:animate-none"
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>

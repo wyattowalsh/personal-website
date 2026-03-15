@@ -48,7 +48,7 @@ export function AuthButton() {
 
   if (status === 'loading') {
     return (
-      <div className="h-8 w-8 animate-pulse rounded-full bg-muted" />
+      <div className="h-8 w-8 animate-pulse motion-reduce:animate-none rounded-full bg-muted" />
     )
   }
 

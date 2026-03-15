@@ -77,6 +77,7 @@ export function VariationsPicker({
             className={cn(
               'inline-flex h-5 w-5 items-center justify-center rounded',
               'hover:bg-accent hover:text-accent-foreground',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'text-muted-foreground transition-colors',
             )}
             aria-label="Previous variation"
@@ -94,6 +95,7 @@ export function VariationsPicker({
             className={cn(
               'inline-flex h-5 w-5 items-center justify-center rounded',
               'hover:bg-accent hover:text-accent-foreground',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'text-muted-foreground transition-colors',
             )}
             aria-label="Next variation"
@@ -109,7 +111,7 @@ export function VariationsPicker({
       <div className="min-h-[80px] px-3 py-2">
         {current?.isLoading && !current.text ? (
           <div className="flex items-center gap-2 py-4 text-xs text-muted-foreground">
-            <svg className="h-3.5 w-3.5 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="h-3.5 w-3.5 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 12a9 9 0 1 1-6.219-8.56" />
             </svg>
             <span>Generating variation {activeIndex + 1}...</span>
@@ -127,7 +129,7 @@ export function VariationsPicker({
             </pre>
             {current?.isLoading && (
               <div className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
-                <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="h-3 w-3 animate-spin motion-reduce:animate-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 12a9 9 0 1 1-6.219-8.56" />
                 </svg>
                 <span>Streaming...</span>
@@ -166,6 +168,7 @@ export function VariationsPicker({
             className={cn(
               'rounded px-2 py-1 text-xs',
               'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'transition-colors',
             )}
           >
@@ -178,6 +181,7 @@ export function VariationsPicker({
             className={cn(
               'rounded px-2 py-1 text-xs font-medium',
               'bg-primary text-primary-foreground',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
               'hover:bg-primary/90 transition-colors',
               'disabled:opacity-50 disabled:pointer-events-none',
             )}

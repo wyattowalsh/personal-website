@@ -8,6 +8,7 @@ import { auth } from '@/lib/studio/auth'
 import { UserAvatar } from '@/components/studio/UserAvatar'
 import { SketchGallery } from '@/components/studio/SketchGallery'
 import { FollowButton } from '@/components/studio/FollowButton'
+import { StudioPageContainer } from '@/components/studio/StudioShell'
 import { Button } from '@/components/ui/button'
 import { createStudioMetadata, studioNoIndexRobots } from '@/lib/studio/metadata'
 
@@ -53,15 +54,17 @@ async function StatsCards({ userId }: { userId: string }) {
   ]
 
   return (
-    <div className="mb-8 grid grid-cols-3 gap-4">
+    <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
       {items.map((item) => (
         <div
           key={item.label}
-          className="rounded-lg border border-border bg-card p-4 text-center"
+          className="rounded-xl border border-border/60 bg-card/50 p-4 text-center backdrop-blur-sm"
         >
-          <item.icon className="mx-auto mb-1 h-4 w-4 text-muted-foreground" />
+          <item.icon className="mx-auto mb-2 h-4 w-4 text-muted-foreground" />
           <p className="text-2xl font-bold tabular-nums">{item.value}</p>
-          <p className="text-xs text-muted-foreground">{item.label}</p>
+          <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+            {item.label}
+          </p>
         </div>
       ))}
     </div>
@@ -85,64 +88,81 @@ export default async function UserProfilePage({ params }: PageProps) {
   const displayName = user.displayName ?? user.name ?? 'Anonymous'
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <StudioPageContainer className="max-w-5xl py-6">
       {/* Profile header */}
-      <div className="mb-6 flex items-start justify-between">
-        <div className="flex items-center gap-4">
-          <UserAvatar name={user.name} image={user.image} size="lg" />
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              {displayName}
-            </h1>
-            <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Calendar className="h-3.5 w-3.5" />
-              Joined{' '}
-              {new Date(user.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-              })}
-            </p>
-            <p className="flex items-center gap-3 text-sm text-muted-foreground">
-              <span><strong className="text-foreground">{followCounts.followers}</strong> followers</span>
-              <span><strong className="text-foreground">{followCounts.following}</strong> following</span>
-            </p>
+      <div className="mb-6 rounded-2xl border border-border/60 bg-card/40 p-4 sm:p-6">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex items-start gap-4">
+            <UserAvatar name={user.name} image={user.image} size="lg" />
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                {displayName}
+              </h1>
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Calendar className="h-3.5 w-3.5" />
+                Joined{' '}
+                {new Date(user.createdAt).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                })}
+              </p>
+              <p className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                <span>
+                  <strong className="text-foreground">
+                    {followCounts.followers}
+                  </strong>{' '}
+                  followers
+                </span>
+                <span>
+                  <strong className="text-foreground">
+                    {followCounts.following}
+                  </strong>{' '}
+                  following
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {!isOwnProfile && (
-            <FollowButton
-              userId={user.id}
-              initialFollowing={isUserFollowing}
-              currentUserId={session?.user?.id}
-            />
-          )}
-          {isOwnProfile && (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/studio/settings">
-                <Settings className="mr-2 h-4 w-4" />
-                Edit Profile
-              </Link>
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {!isOwnProfile && (
+              <FollowButton
+                userId={user.id}
+                initialFollowing={isUserFollowing}
+                currentUserId={session?.user?.id}
+              />
+            )}
+            {isOwnProfile && (
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="border-border/70 bg-background/60"
+              >
+                <Link href="/studio/settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Edit Profile
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Bio */}
       {user.bio && (
-        <p className="mb-6 max-w-2xl text-sm text-muted-foreground">
+        <p className="mb-4 max-w-3xl text-sm leading-relaxed text-muted-foreground">
           {user.bio}
         </p>
       )}
 
       {/* Social links */}
       {(user.website || user.socialLinks?.github || user.socialLinks?.twitter) && (
-        <div className="mb-6 flex flex-wrap items-center gap-4">
+        <div className="mb-6 flex flex-wrap items-center gap-2.5">
           {user.website && (
             <a
               href={user.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ExternalLink className="h-3.5 w-3.5" />
               {new URL(user.website).hostname}
@@ -153,7 +173,7 @@ export default async function UserProfilePage({ params }: PageProps) {
               href={user.socialLinks.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Github className="h-3.5 w-3.5" />
               GitHub
@@ -164,7 +184,7 @@ export default async function UserProfilePage({ params }: PageProps) {
               href={user.socialLinks.twitter}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/40 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <Twitter className="h-3.5 w-3.5" />
               Twitter
@@ -176,9 +196,12 @@ export default async function UserProfilePage({ params }: PageProps) {
       {/* Stats cards */}
       <Suspense
         fallback={
-          <div className="mb-8 grid grid-cols-3 gap-4">
+          <div className="mb-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-24 animate-pulse rounded-lg bg-muted" />
+              <div
+                key={i}
+                className="h-24 animate-pulse rounded-xl border border-border/60 bg-muted/50"
+              />
             ))}
           </div>
         }
@@ -187,7 +210,9 @@ export default async function UserProfilePage({ params }: PageProps) {
       </Suspense>
 
       {/* Sketches grid */}
-      <h2 className="mb-4 text-lg font-semibold">Sketches</h2>
+      <div className="mb-4 border-t border-border/60 pt-6">
+        <h2 className="text-lg font-semibold tracking-tight">Sketches</h2>
+      </div>
       <Suspense
         fallback={
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -202,6 +227,6 @@ export default async function UserProfilePage({ params }: PageProps) {
       >
         <UserSketches userId={userId} viewerId={session?.user?.id} />
       </Suspense>
-    </div>
+    </StudioPageContainer>
   )
 }

@@ -57,20 +57,27 @@ export function PreviewControls({
   const timerRef = React.useRef<ReturnType<typeof setTimeout>>(null)
   const [recordSeconds, setRecordSeconds] = React.useState(0)
   const recordTimerRef = React.useRef<ReturnType<typeof setInterval>>(null)
+  const focusWithinRef = React.useRef(false)
+
+  const clearTimer = React.useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current)
+      timerRef.current = null
+    }
+  }, [])
 
   // Auto-hide timer management
   const resetTimer = React.useCallback(() => {
     setVisible(true)
-    if (timerRef.current) clearTimeout(timerRef.current)
+    clearTimer()
+    if (focusWithinRef.current) return
     timerRef.current = setTimeout(() => setVisible(false), AUTO_HIDE_DELAY)
-  }, [])
+  }, [clearTimer])
 
   React.useEffect(() => {
     resetTimer()
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current)
-    }
-  }, [resetTimer])
+    return clearTimer
+  }, [resetTimer, clearTimer])
 
   // Track recording time
   React.useEffect(() => {
@@ -94,6 +101,22 @@ export function PreviewControls({
     return `${m}:${s.toString().padStart(2, '0')}`
   }
 
+  const handleFocusCapture = React.useCallback(() => {
+    focusWithinRef.current = true
+    setVisible(true)
+    clearTimer()
+  }, [clearTimer])
+
+  const handleBlurCapture = React.useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      const nextTarget = event.relatedTarget as Node | null
+      if (nextTarget && event.currentTarget.contains(nextTarget)) return
+      focusWithinRef.current = false
+      resetTimer()
+    },
+    [resetTimer],
+  )
+
   const zoomPercent = `${Math.round(zoom * 100)}%`
 
   return (
@@ -104,6 +127,8 @@ export function PreviewControls({
       )}
       onMouseMove={resetTimer}
       onMouseEnter={() => setVisible(true)}
+      onFocusCapture={handleFocusCapture}
+      onBlurCapture={handleBlurCapture}
       animate={{ opacity: visible ? 1 : 0 }}
       transition={{ duration: 0.2 }}
     >
@@ -129,7 +154,7 @@ export function PreviewControls({
           <button
             type="button"
             onClick={() => onZoomChange(1)}
-            className="min-w-[3rem] text-center font-mono text-[10px] text-foreground/80 transition-colors hover:text-foreground"
+            className="min-w-[3rem] rounded px-1 text-center font-mono text-[10px] text-foreground/80 transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
             title="Reset zoom to 100%"
             aria-label="Reset zoom to 100%"
           >
@@ -191,6 +216,7 @@ export function PreviewControls({
                     onClick={onToggleRecording}
                     className={cn(
                       'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium transition-colors',
+                      'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1',
                       isRecording
                         ? 'bg-red-500/20 text-red-400'
                         : 'text-muted-foreground hover:text-foreground',
@@ -198,7 +224,7 @@ export function PreviewControls({
                   >
                     {isRecording ? (
                       <>
-                        <span className="inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+                        <span className="inline-block h-1.5 w-1.5 animate-pulse motion-reduce:animate-none rounded-full bg-red-500" />
                         {formatTime(recordSeconds)}
                       </>
                     ) : (

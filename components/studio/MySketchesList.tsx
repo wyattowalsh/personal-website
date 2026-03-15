@@ -178,7 +178,7 @@ export function MySketchesList({ initialSketches }: MySketchesListProps) {
               title={sketch.isPublic ? 'Make private' : 'Make public'}
             >
               {togglingId === sketch.id ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin motion-reduce:animate-none" />
               ) : sketch.isPublic ? (
                 <EyeOff className="h-3.5 w-3.5" />
               ) : (
@@ -198,7 +198,7 @@ export function MySketchesList({ initialSketches }: MySketchesListProps) {
               className="text-destructive hover:text-destructive"
             >
               {deletingId === sketch.id ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin motion-reduce:animate-none" />
               ) : (
                 <Trash2 className="h-3.5 w-3.5" />
               )}

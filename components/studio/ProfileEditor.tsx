@@ -60,7 +60,7 @@ export function ProfileEditor({ user }: ProfileEditorProps) {
           value={displayName}
           onChange={(e) => setDisplayName(e.target.value)}
           maxLength={100}
-          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="Your display name"
         />
       </div>
@@ -75,7 +75,7 @@ export function ProfileEditor({ user }: ProfileEditorProps) {
           onChange={(e) => setBio(e.target.value)}
           maxLength={500}
           rows={3}
-          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="Tell us about yourself..."
         />
         <p className="text-xs text-muted-foreground">{bio.length}/500</p>
@@ -91,7 +91,7 @@ export function ProfileEditor({ user }: ProfileEditorProps) {
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
           maxLength={500}
-          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="https://yoursite.com"
         />
       </div>
@@ -105,7 +105,7 @@ export function ProfileEditor({ user }: ProfileEditorProps) {
           type="url"
           value={github}
           onChange={(e) => setGithub(e.target.value)}
-          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="https://github.com/username"
         />
       </div>
@@ -119,14 +119,14 @@ export function ProfileEditor({ user }: ProfileEditorProps) {
           type="url"
           value={twitter}
           onChange={(e) => setTwitter(e.target.value)}
-          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+          className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
           placeholder="https://x.com/username"
         />
       </div>
 
       <Button onClick={handleSave} disabled={saving}>
         {saving ? (
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2 className="mr-2 h-4 w-4 animate-spin motion-reduce:animate-none" />
         ) : (
           <Save className="mr-2 h-4 w-4" />
         )}

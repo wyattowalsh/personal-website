@@ -103,6 +103,49 @@
     --studio-accent-glow: 0 0 20px hsl(217 91% 70% / 0.3);
   }
 
+  #studio-root {
+    color-scheme: dark;
+    --background: 224 32% 7%;
+    --foreground: 220 26% 92%;
+    --card: 223 29% 9%;
+    --card-foreground: 220 26% 92%;
+    --popover: 223 29% 9%;
+    --popover-foreground: 220 26% 92%;
+    --primary: 220 35% 96%;
+    --primary-light: 220 35% 96%;
+    --primary-foreground: 224 32% 12%;
+    --secondary: 223 22% 16%;
+    --secondary-foreground: 220 26% 92%;
+    --muted: 223 18% 13%;
+    --muted-foreground: 220 12% 70%;
+    --accent: 217 91% 66%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 70% 46%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 223 18% 20%;
+    --input: 223 18% 20%;
+    --ring: 217 91% 66%;
+    --selection-bg: 217 91% 66%;
+    --selection-text: 224 32% 7%;
+    --selection-heading-bg: 217 91% 66%;
+    --selection-heading-text: 224 32% 7%;
+    --gradient-heading: linear-gradient(90deg, #60a5fa 0%, #818cf8 55%, #a78bfa 100%);
+    --shadow-glow: 0 0 20px rgba(96 165 250 / 0.25);
+    --shadow-soft: 0 10px 40px rgba(2 6 23 / 0.45);
+    --math-text-color: hsl(var(--foreground));
+    --math-inline-bg: rgba(148 163 184 / 0.1);
+    --math-display-bg: rgba(148 163 184 / 0.08);
+    --math-index-color: 220 12% 70%;
+    --studio-glass-bg: rgba(15 23 42 / 0.6);
+    --studio-glass-border: rgba(148 163 184 / 0.16);
+    --studio-surface-1: rgba(148 163 184 / 0.04);
+    --studio-surface-2: rgba(148 163 184 / 0.08);
+    --studio-surface-3: rgba(148 163 184 / 0.12);
+    --studio-accent-glow: 0 0 20px hsl(217 91% 66% / 0.25);
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Montserrat', sans-serif;
@@ -826,4 +869,3 @@
     scroll-behavior: auto !important;
   }
 }
-

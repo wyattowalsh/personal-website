@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "preprocess": "tsx scripts/index.ts",
-    "predev": "NODE_ENV=development npm run preprocess",
+    "predev": "NODE_ENV=development pnpm preprocess",
     "dev": "DEBUG=true LOG_LEVEL=debug next dev --turbopack",
-    "prebuild": "NODE_ENV=production npm run preprocess",
+    "prebuild": "NODE_ENV=production pnpm preprocess",
     "build": "next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "start": "next start",

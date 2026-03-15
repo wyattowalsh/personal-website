@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { motion } from 'motion/react'
 import {
   Play,
   Square,
@@ -61,6 +60,8 @@ interface PremiumToolbarProps {
   children?: React.ReactNode
 }
 
+type OverlayPortalContainer = HTMLElement | null
+
 /* -------------------------------------------------------------------------- */
 /*                             Internal Components                            */
 /* -------------------------------------------------------------------------- */
@@ -75,7 +76,7 @@ function ToolbarSection({
   return (
     <div
       className={cn(
-        'flex items-center gap-0.5 rounded-lg bg-muted/30 px-1 py-0.5 dark:bg-white/[0.04]',
+        'flex items-center gap-0.5 rounded-md border border-border/60 bg-muted/25 px-1.5 py-1',
         className,
       )}
     >
@@ -85,12 +86,8 @@ function ToolbarSection({
 }
 
 function GradientDivider() {
-  return (
-    <div className="mx-1 h-6 w-px bg-gradient-to-b from-transparent via-border/50 to-transparent" />
-  )
+  return <div className="mx-1 h-5 w-px bg-border/50" />
 }
-
-const springTransition = { type: 'spring', stiffness: 400, damping: 25 } as const
 
 function PremiumToolbarButton({
   icon: Icon,
@@ -98,37 +95,33 @@ function PremiumToolbarButton({
   onClick,
   disabled,
   className,
+  portalContainer,
 }: {
   icon: React.ElementType
   label: string
   onClick: () => void
   disabled?: boolean
   className?: string
+  portalContainer?: OverlayPortalContainer
 }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <motion.div
-          whileHover={disabled ? undefined : { scale: 1.08, y: -1 }}
-          whileTap={disabled ? undefined : { scale: 0.92 }}
-          transition={springTransition}
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(
+            'h-8 w-8 rounded-md text-muted-foreground transition-colors duration-150 hover:bg-muted/70 hover:text-foreground',
+            className,
+          )}
+          onClick={onClick}
+          disabled={disabled}
+          aria-label={label}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className={cn(
-              'h-8 w-8 rounded-lg transition-colors duration-150',
-              className,
-            )}
-            onClick={onClick}
-            disabled={disabled}
-            aria-label={label}
-          >
-            <Icon className="h-4 w-4" />
-          </Button>
-        </motion.div>
+          <Icon className="h-4 w-4" />
+        </Button>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent container={portalContainer}>{label}</TooltipContent>
     </Tooltip>
   )
 }
@@ -140,9 +133,11 @@ function PremiumToolbarButton({
 function SaveButton({
   onClick,
   saveStatus,
+  portalContainer,
 }: {
   onClick: () => void
   saveStatus: 'idle' | 'saving' | 'saved' | 'error'
+  portalContainer?: OverlayPortalContainer
 }) {
   const label =
     saveStatus === 'saving'
@@ -156,30 +151,24 @@ function SaveButton({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <motion.div
-          whileHover={saveStatus === 'saving' ? undefined : { scale: 1.08, y: -1 }}
-          whileTap={saveStatus === 'saving' ? undefined : { scale: 0.92 }}
-          transition={springTransition}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-md text-muted-foreground transition-colors duration-150 hover:bg-muted/70 hover:text-foreground"
+          onClick={onClick}
+          disabled={saveStatus === 'saving'}
+          aria-label={label}
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg transition-colors duration-150"
-            onClick={onClick}
-            disabled={saveStatus === 'saving'}
-            aria-label={label}
-          >
-            {saveStatus === 'saving' ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : saveStatus === 'saved' ? (
-              <Check className="h-4 w-4 text-green-500" />
-            ) : (
-              <Save className="h-4 w-4" />
-            )}
-          </Button>
-        </motion.div>
+          {saveStatus === 'saving' ? (
+            <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />
+          ) : saveStatus === 'saved' ? (
+            <Check className="h-4 w-4 text-emerald-700 dark:text-emerald-400" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
+        </Button>
       </TooltipTrigger>
-      <TooltipContent>{label}</TooltipContent>
+      <TooltipContent container={portalContainer}>{label}</TooltipContent>
     </Tooltip>
   )
 }
@@ -192,43 +181,28 @@ function PlaybackButton({
   isRunning,
   onRun,
   onStop,
+  portalContainer,
 }: {
   isRunning: boolean
   onRun: () => void
   onStop: () => void
+  portalContainer?: OverlayPortalContainer
 }) {
   if (isRunning) {
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <motion.div
-            animate={{
-              boxShadow: [
-                '0 0 0 0 rgba(239,68,68,0.4)',
-                '0 0 0 8px rgba(239,68,68,0)',
-              ],
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="rounded-lg"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 rounded-md bg-rose-500/10 text-rose-700 transition-colors duration-150 hover:bg-rose-500/15 hover:text-rose-800 dark:text-rose-400 dark:hover:text-rose-300"
+            onClick={onStop}
+            aria-label="Stop (Cmd+Enter)"
           >
-            <motion.div
-              whileHover={{ scale: 1.08, y: -1 }}
-              whileTap={{ scale: 0.92 }}
-              transition={springTransition}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg text-red-500 transition-colors duration-150 hover:text-red-400"
-                onClick={onStop}
-                aria-label="Stop (Cmd+Enter)"
-              >
-                <Square className="h-4 w-4" />
-              </Button>
-            </motion.div>
-          </motion.div>
+            <Square className="h-4 w-4" />
+          </Button>
         </TooltipTrigger>
-        <TooltipContent>Stop (Cmd+Enter)</TooltipContent>
+        <TooltipContent container={portalContainer}>Stop (Cmd+Enter)</TooltipContent>
       </Tooltip>
     )
   }
@@ -236,23 +210,17 @@ function PlaybackButton({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <motion.div
-          whileHover={{ scale: 1.08, y: -1 }}
-          whileTap={{ scale: 0.92 }}
-          transition={springTransition}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 rounded-md bg-emerald-500/10 text-emerald-700 transition-colors duration-150 hover:bg-emerald-500/15 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300"
+          onClick={onRun}
+          aria-label="Run (Cmd+Enter)"
         >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg text-green-500 transition-colors duration-150 hover:text-green-400 hover:shadow-[0_0_8px_rgba(34,197,94,0.2)]"
-            onClick={onRun}
-            aria-label="Run (Cmd+Enter)"
-          >
-            <Play className="h-4 w-4" />
-          </Button>
-        </motion.div>
+          <Play className="h-4 w-4" />
+        </Button>
       </TooltipTrigger>
-      <TooltipContent>Run (Cmd+Enter)</TooltipContent>
+      <TooltipContent container={portalContainer}>Run (Cmd+Enter)</TooltipContent>
     </Tooltip>
   )
 }
@@ -267,38 +235,34 @@ function ExportDropdown({
   onCapture,
   onCaptureSvg,
   onDownload,
+  portalContainer,
 }: {
   isRunning: boolean
   svgAvailable: boolean
   onCapture: () => void
   onCaptureSvg?: () => void
   onDownload: () => void
+  portalContainer?: OverlayPortalContainer
 }) {
   return (
     <DropdownMenu>
       <Tooltip>
         <TooltipTrigger asChild>
-          <motion.div
-            whileHover={!isRunning ? undefined : { scale: 1.08, y: -1 }}
-            whileTap={!isRunning ? undefined : { scale: 0.92 }}
-            transition={springTransition}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 rounded-lg transition-colors duration-150"
-                disabled={!isRunning}
-                aria-label="Export"
-              >
-                <Download className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-          </motion.div>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-md text-muted-foreground transition-colors duration-150 hover:bg-muted/70 hover:text-foreground"
+              disabled={!isRunning}
+              aria-label="Export"
+            >
+              <Download className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
         </TooltipTrigger>
-        <TooltipContent>Export</TooltipContent>
+        <TooltipContent container={portalContainer}>Export</TooltipContent>
       </Tooltip>
-      <DropdownMenuContent align="end">
+      <DropdownMenuContent align="end" container={portalContainer}>
         <DropdownMenuItem onClick={onCapture}>
           <Camera className="mr-2 h-4 w-4" />
           Export as PNG
@@ -349,13 +313,18 @@ export function PremiumToolbar({
   children,
 }: PremiumToolbarProps) {
   const svgAvailable = engine === 'p5js'
+  const [portalContainer, setPortalContainer] = React.useState<OverlayPortalContainer>(null)
+
+  React.useEffect(() => {
+    setPortalContainer(document.getElementById('studio-root'))
+  }, [])
 
   return (
     <TooltipProvider delayDuration={300}>
-      <div className="flex items-center gap-1 border-b border-white/[0.06] bg-background/60 px-3 py-1.5 backdrop-blur-xl dark:border-white/[0.04]">
+      <div className="flex items-center gap-1.5 border-b border-border/60 bg-background/80 px-3 py-2 backdrop-blur-md">
         {/* Playback */}
         <ToolbarSection>
-          <PlaybackButton isRunning={isRunning} onRun={onRun} onStop={onStop} />
+          <PlaybackButton isRunning={isRunning} onRun={onRun} onStop={onStop} portalContainer={portalContainer} />
         </ToolbarSection>
 
         <GradientDivider />
@@ -363,7 +332,7 @@ export function PremiumToolbar({
         {/* Save */}
         <ToolbarSection>
           {onSave && (
-            <SaveButton onClick={onSave} saveStatus={saveStatus} />
+            <SaveButton onClick={onSave} saveStatus={saveStatus} portalContainer={portalContainer} />
           )}
           {onPublish && (
             <PremiumToolbarButton
@@ -371,6 +340,7 @@ export function PremiumToolbar({
               label="Publish"
               onClick={onPublish}
               disabled={saveStatus === 'saving'}
+              portalContainer={portalContainer}
             />
           )}
         </ToolbarSection>
@@ -385,6 +355,7 @@ export function PremiumToolbar({
             onCapture={onCapture}
             onCaptureSvg={onCaptureSvg}
             onDownload={onDownload}
+            portalContainer={portalContainer}
           />
         </ToolbarSection>
 
@@ -400,8 +371,9 @@ export function PremiumToolbar({
               onClick={onOpenFix}
               className={cn(
                 hasErrors &&
-                  'text-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.3)] hover:text-amber-400',
+                  'text-amber-400 hover:text-amber-300',
               )}
+              portalContainer={portalContainer}
             />
           )}
           {onOpenGenerate && (
@@ -410,6 +382,7 @@ export function PremiumToolbar({
               label="Generate with AI"
               onClick={onOpenGenerate}
               className="hover:text-primary/80"
+              portalContainer={portalContainer}
             />
           )}
         </ToolbarSection>
@@ -422,12 +395,14 @@ export function PremiumToolbar({
             icon={Layers}
             label="Templates"
             onClick={onOpenTemplates}
+            portalContainer={portalContainer}
           />
           {onToggleFullscreen && (
             <PremiumToolbarButton
               icon={Maximize2}
               label="Fullscreen Preview (Cmd+Shift+F)"
               onClick={onToggleFullscreen}
+              portalContainer={portalContainer}
             />
           )}
           {onOpenShortcuts && (
@@ -435,6 +410,7 @@ export function PremiumToolbar({
               icon={Keyboard}
               label="Keyboard Shortcuts (Cmd+?)"
               onClick={onOpenShortcuts}
+              portalContainer={portalContainer}
             />
           )}
         </ToolbarSection>
@@ -447,6 +423,7 @@ export function PremiumToolbar({
             icon={Settings}
             label="Settings"
             onClick={onOpenSettings}
+            portalContainer={portalContainer}
           />
         )}
 

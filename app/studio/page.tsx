@@ -8,6 +8,7 @@ import { SketchGallery } from '@/components/studio/SketchGallery'
 import { SketchCardSkeleton } from '@/components/studio/SketchCardSkeleton'
 import { AuthButton } from '@/components/studio/AuthButton'
 import { NotificationBell } from '@/components/studio/NotificationBell'
+import { StudioPageContainer, StudioPageHeader } from '@/components/studio/StudioShell'
 import { getRecentSketches } from '@/lib/studio/db'
 import { auth } from '@/lib/studio/auth'
 import { createStudioMetadata } from '@/lib/studio/metadata'
@@ -54,28 +55,24 @@ export default async function StudioPage({
   const authErrorMessage = getAuthErrorMessage(errorParam)
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-6 sm:px-6">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
-            Studio
-          </h1>
-          <p className="mt-1.5 text-sm text-muted-foreground sm:text-base">
-            Create, share, and remix generative art
-          </p>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <NotificationBell currentUserId={session?.user?.id} />
-          <AuthButton />
-          <Button asChild size="sm" className="gap-2 shadow-sm">
-            <Link href="/studio/new">
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">Create New</span>
-              <span className="sm:hidden">New</span>
-            </Link>
-          </Button>
-        </div>
-      </div>
+    <StudioPageContainer className="py-6">
+      <StudioPageHeader
+        heading="Studio"
+        description="Create, share, and remix generative art"
+        actions={(
+          <>
+            <NotificationBell currentUserId={session?.user?.id} />
+            <AuthButton />
+            <Button asChild size="sm" className="gap-2 shadow-sm">
+              <Link href="/studio/new">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">Create New</span>
+                <span className="sm:hidden">New</span>
+              </Link>
+            </Button>
+          </>
+        )}
+      />
 
       {authErrorMessage ? (
         <Alert variant="destructive" className="mb-6">
@@ -95,6 +92,6 @@ export default async function StudioPage({
       >
         <GalleryContent />
       </Suspense>
-    </div>
+    </StudioPageContainer>
   )
 }

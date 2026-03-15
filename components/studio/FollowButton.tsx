@@ -51,7 +51,7 @@ export function FollowButton({ userId, initialFollowing, currentUserId, classNam
       className={cn('gap-1.5', className)}
     >
       {loading ? (
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+        <Loader2 className="h-3.5 w-3.5 animate-spin motion-reduce:animate-none" />
       ) : following ? (
         <UserMinus className="h-3.5 w-3.5" />
       ) : (

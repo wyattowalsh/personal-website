@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { auth } from '@/lib/studio/auth'
 import { redirect } from 'next/navigation'
 import { getUserCollections } from '@/lib/studio/db'
+import { StudioPageContainer, StudioPageHeader } from '@/components/studio/StudioShell'
 import { FolderOpen } from 'lucide-react'
 import { createStudioMetadata, studioNoIndexRobots } from '@/lib/studio/metadata'
 
@@ -35,7 +36,7 @@ async function CollectionsList({ userId }: { userId: string }) {
         <Link
           key={col.id}
           href={`/studio/collections/${col.id}`}
-          className="group rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          className="group rounded-lg border border-border bg-card p-4 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <h3 className="font-medium group-hover:text-foreground">{col.name}</h3>
           {col.description && (
@@ -58,17 +59,11 @@ export default async function CollectionsPage() {
   if (!session?.user?.id) redirect('/studio')
 
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-            Collections
-          </h1>
-          <p className="mt-1 text-muted-foreground">
-            Organize your favorite sketches
-          </p>
-        </div>
-      </div>
+    <StudioPageContainer className="py-6">
+      <StudioPageHeader
+        heading="Collections"
+        description="Organize your favorite sketches"
+      />
       <Suspense
         fallback={
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -80,6 +75,6 @@ export default async function CollectionsPage() {
       >
         <CollectionsList userId={session.user.id} />
       </Suspense>
-    </div>
+    </StudioPageContainer>
   )
 }

@@ -97,7 +97,7 @@ export function CommentSection({ sketchId, currentUserId, className }: CommentSe
 
       {loading ? (
         <div className="flex justify-center py-8">
-          <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+          <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none text-muted-foreground" />
         </div>
       ) : comments.length === 0 ? (
         <p className="py-8 text-center text-sm text-muted-foreground">
@@ -158,7 +158,7 @@ export function CommentSection({ sketchId, currentUserId, className }: CommentSe
               aria-label={replyTo ? 'Post reply' : 'Post comment'}
             >
               {submitting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />
               ) : (
                 <Send className="h-4 w-4" />
               )}

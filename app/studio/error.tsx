@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import * as Sentry from '@sentry/nextjs'
 import Link from 'next/link'
 import { AlertTriangle } from 'lucide-react'
+import { StudioPageContainer } from '@/components/studio/StudioShell'
 import { Button } from '@/components/ui/button'
 
 export default function StudioError({
@@ -19,7 +20,11 @@ export default function StudioError({
   }, [error])
 
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
+    <StudioPageContainer
+      className="flex min-h-[60vh] flex-col items-center justify-center gap-4 py-8 text-center"
+      role="alert"
+      aria-live="assertive"
+    >
       <AlertTriangle className="h-12 w-12 text-destructive/60" />
       <h2 className="text-2xl font-bold">Something went wrong</h2>
       <p className="text-muted-foreground">
@@ -31,6 +36,6 @@ export default function StudioError({
           <Link href="/studio">Back to Studio</Link>
         </Button>
       </div>
-    </div>
+    </StudioPageContainer>
   )
 }

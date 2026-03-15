@@ -79,7 +79,7 @@ export function SketchMeta({
           onBlur={() => onChange('title', title.trim())}
           placeholder="Untitled Sketch"
           maxLength={STUDIO_MAX_TITLE_LENGTH}
-          className="w-full border-0 bg-transparent text-lg font-semibold placeholder:text-muted-foreground/50 focus:outline-none"
+          className="w-full border-0 bg-transparent text-lg font-semibold placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
       <div>
@@ -89,7 +89,7 @@ export function SketchMeta({
           onBlur={() => onChange('description', description.trim())}
           placeholder="Add a description..."
           rows={2}
-          className="w-full resize-none border-0 bg-transparent text-sm text-muted-foreground placeholder:text-muted-foreground/50 focus:outline-none"
+          className="w-full resize-none border-0 bg-transparent text-sm text-muted-foreground placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
       <div>
@@ -103,7 +103,7 @@ export function SketchMeta({
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="text-muted-foreground hover:text-foreground"
+                className="rounded-sm text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label={`Remove tag ${tag}`}
               >
                 <X className="h-3 w-3" />
@@ -121,7 +121,7 @@ export function SketchMeta({
               }}
               placeholder={tags.length === 0 ? 'Add tags...' : ''}
               className={cn(
-                'flex-1 border-0 bg-transparent text-xs placeholder:text-muted-foreground/50 focus:outline-none',
+                'flex-1 border-0 bg-transparent text-xs placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
                 'min-w-[60px]'
               )}
             />

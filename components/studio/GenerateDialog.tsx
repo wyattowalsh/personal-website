@@ -169,7 +169,7 @@ export function GenerateDialog({
             <button
               type="button"
               onClick={() => setMode('generate')}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 mode === 'generate'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -181,7 +181,7 @@ export function GenerateDialog({
             <button
               type="button"
               onClick={() => setMode('fix')}
-              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 mode === 'fix'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
@@ -223,7 +223,7 @@ export function GenerateDialog({
                   : 'A colorful spirograph pattern that responds to mouse movement...'
               }
               rows={3}
-              className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+              className="w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             />
             {error && (
               <p className="text-sm text-destructive">{error}</p>
@@ -249,7 +249,7 @@ export function GenerateDialog({
           </div>
         ) : stage === 'generating' ? (
           <div className="flex flex-col items-center gap-3 py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <Loader2 className="h-8 w-8 animate-spin motion-reduce:animate-none text-primary" />
             <p className="text-sm text-muted-foreground">
               {modeConfig.gerund}
             </p>

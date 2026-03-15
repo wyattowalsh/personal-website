@@ -38,7 +38,7 @@ export default async function EmbedPage({ params }: PageProps) {
         href={`/studio/${id}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 text-[10px] text-white/60 transition-colors hover:text-white/90"
+        className="absolute bottom-2 right-2 rounded bg-black/50 px-2 py-1 text-[10px] text-white/80 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/90 focus-visible:ring-offset-2 focus-visible:ring-offset-black"
       >
         w4w.dev/studio
       </Link>

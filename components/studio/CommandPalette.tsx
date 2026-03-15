@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import {
   Play,
   Square,
@@ -60,6 +60,7 @@ export function CommandPalette({
   const listRef = React.useRef<HTMLDivElement>(null)
   const dialogRef = React.useRef<HTMLDivElement>(null)
   const previousFocusRef = React.useRef<HTMLElement | null>(null)
+  const prefersReducedMotion = useReducedMotion()
 
   // Filter actions by search query
   const filtered = React.useMemo(() => {
@@ -196,11 +197,11 @@ export function CommandPalette({
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-black/70 backdrop-blur-md"
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.1 }}
+            exit={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.1 }}
             onClick={() => onOpenChange(false)}
             aria-hidden="true"
           />
@@ -209,11 +210,11 @@ export function CommandPalette({
           <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh]">
             <motion.div
               ref={dialogRef}
-              className="mx-4 w-full max-w-lg overflow-hidden rounded-xl border border-white/[0.08] bg-background/90 shadow-2xl backdrop-blur-2xl"
-              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              className="mx-4 w-full max-w-lg overflow-hidden rounded-xl border border-border/80 bg-card/95 text-card-foreground shadow-[0_32px_80px_-32px_rgba(0,0,0,0.85)] backdrop-blur-xl"
+              initial={prefersReducedMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: -10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: -10 }}
-              transition={{ duration: 0.15, ease: 'easeOut' }}
+              exit={prefersReducedMotion ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.95, y: -10 }}
+              transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.15, ease: 'easeOut' }}
               onKeyDown={handleKeyDown}
               role="dialog"
               aria-modal="true"
@@ -224,7 +225,7 @@ export function CommandPalette({
                 Command palette
               </h2>
               {/* Search input */}
-              <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
+              <div className="flex items-center gap-3 border-b border-border/70 px-4 py-3 transition-colors focus-within:bg-muted/20">
                 <Search className="h-4 w-4 shrink-0 text-muted-foreground/50" />
                 <label htmlFor="command-palette-search" className="sr-only">
                   Search commands
@@ -236,14 +237,14 @@ export function CommandPalette({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Type a command..."
-                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground/50"
+                  className="flex-1 rounded-sm bg-transparent px-1 text-sm text-foreground outline-none placeholder:text-muted-foreground/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background"
                   autoComplete="off"
                   spellCheck={false}
                 />
               </div>
 
               {/* Results */}
-              <div ref={listRef} className="max-h-80 overflow-y-auto py-1">
+              <div ref={listRef} className="max-h-80 overflow-y-auto py-1" role="listbox" aria-label="Commands">
                 {flatItems.length === 0 ? (
                   <div className="px-4 py-8 text-center text-sm text-muted-foreground/60">
                     No matching commands
@@ -264,11 +265,13 @@ export function CommandPalette({
                             key={action.id}
                             type="button"
                             data-selected={isSelected}
+                            role="option"
+                            aria-selected={isSelected}
                             className={cn(
-                              'flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors',
+                              'flex w-full items-center gap-3 px-4 py-2 text-left text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background',
                               isSelected
-                                ? 'bg-primary/10 text-primary'
-                                : 'text-foreground hover:bg-white/[0.06]',
+                                ? 'bg-accent text-accent-foreground'
+                                : 'text-foreground hover:bg-accent/60',
                               action.disabled &&
                                 'cursor-not-allowed opacity-40'
                             )}
@@ -279,7 +282,7 @@ export function CommandPalette({
                             <Icon className="h-4 w-4 shrink-0" />
                             <span className="flex-1">{action.label}</span>
                             {action.shortcut && (
-                              <span className="rounded bg-muted/50 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                              <span className="rounded bg-muted/60 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                                 {action.shortcut}
                               </span>
                             )}
@@ -294,7 +297,7 @@ export function CommandPalette({
               {/* Footer */}
               <div
                 id="command-palette-help"
-                className="border-t border-white/[0.04] px-4 py-2 text-[10px] text-muted-foreground/40"
+                className="border-t border-border/60 px-4 py-2 text-[10px] text-muted-foreground/50"
               >
                 <span className="select-none">
                   ↑↓ Navigate · Enter Select · Esc Close

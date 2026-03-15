@@ -1,8 +1,14 @@
 import { SketchCardSkeleton } from '@/components/studio/SketchCardSkeleton'
+import { StudioPageContainer } from '@/components/studio/StudioShell'
 
 export default function StudioLoading() {
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8">
+    <StudioPageContainer
+      className="py-8"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading studio content"
+    >
       <div className="mb-8">
         <div className="h-9 w-32 rounded bg-muted" />
         <div className="mt-1 h-5 w-48 rounded bg-muted" />
@@ -12,6 +18,6 @@ export default function StudioLoading() {
           <SketchCardSkeleton key={i} />
         ))}
       </div>
-    </div>
+    </StudioPageContainer>
   )
 }

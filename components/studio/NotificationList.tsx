@@ -75,7 +75,7 @@ export function NotificationList({ className }: NotificationListProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+        <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none text-muted-foreground" />
       </div>
     )
   }
@@ -93,7 +93,7 @@ export function NotificationList({ className }: NotificationListProps) {
             onClick={markAllRead}
             disabled={markingRead}
           >
-            {markingRead ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : null}
+            {markingRead ? <Loader2 className="mr-1 h-3 w-3 animate-spin motion-reduce:animate-none" /> : null}
             Mark all read
           </Button>
         </div>
