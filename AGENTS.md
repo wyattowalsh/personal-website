@@ -14,6 +14,7 @@ pnpm dev                  # Dev server (port 3000)
 pnpm build                # Production build
 pnpm lint                 # ESLint
 pnpm typecheck            # TypeScript strict mode
+pnpm test                 # Run vitest tests
 pnpm new-post             # Create blog post (interactive)
 pnpm new-post --title "X" --tags "A,B"  # CLI mode
 pnpm storybook            # Component explorer (port 6006)
@@ -25,7 +26,7 @@ pnpm lclean               # Clean .next, .cache
 
 ```
 app/                      # Next.js App Router
-├── blog/posts/{slug}/    # Blog posts (page.mdx)
+├── blog/posts/[slug]/    # Blog post route (dynamic segment)
 ├── api/                  # API routes (validated with Zod)
 ├── layout.tsx            # Root layout + providers
 └── globals.scss          # Theme variables, prose styles
@@ -35,13 +36,17 @@ components/
 ├── hooks/                # Custom hooks
 └── particles/            # TSParticles configs
 
+content/posts/{slug}/     # Blog post source (index.mdx)
+
 lib/
-├── server.ts             # BackendService singleton (posts, search, cache)
-├── client.ts             # Type-safe API client
-├── core.ts               # Types, Zod schemas, ApiError, logger
+├── server.ts             # BackendService singleton (posts, search)
+├── types.ts              # Shared types (Post, Config, PostMetadata)
+├── core.ts               # Zod schemas, ApiError, logger (server-only)
 ├── metadata.ts           # SEO metadata generators
 ├── schema.ts             # JSON-LD structured data
-└── utils.ts              # cn(), formatDate, helpers
+├── utils.ts              # cn(), formatDate, isExternal, helpers
+├── constants.ts          # Centralized constants
+└── admin-auth.ts         # Admin authentication
 
 scripts/                  # Build preprocessing (new-post.ts, etc.)
 public/                   # Static assets, particle configs
@@ -108,7 +113,7 @@ export function Interactive() {
 
 ## Blog Posts
 
-**Location:** `app/blog/posts/{slug}/page.mdx`
+**Location:** `content/posts/{slug}/index.mdx`
 
 ```yaml
 ---
@@ -134,7 +139,7 @@ Create via `pnpm new-post` or manually.
 
 | | Rule |
 |---|------|
-| ✅ **Always** | Run `pnpm lint && pnpm typecheck` before commits |
+| ✅ **Always** | Run `pnpm lint && pnpm typecheck && pnpm test` before commits |
 | ✅ **Always** | Use `@/` path aliases |
 | ✅ **Always** | Use existing `components/ui/` primitives |
 | ✅ **Always** | Wrap async in `<Suspense>` |
@@ -147,12 +152,13 @@ Create via `pnpm new-post` or manually.
 
 | File | Purpose |
 |------|---------|
-| `lib/server.ts` | BackendService: posts, search, LRU cache |
+| `lib/server.ts` | BackendService: posts, search |
+| `lib/types.ts` | Shared types: Post, Config, PostMetadata |
+| `lib/core.ts` | Zod schemas, ApiError, logger (server-only) |
 | `lib/metadata.ts` | SEO: `generatePostMetadata()` |
 | `lib/schema.ts` | JSON-LD: `generateArticleSchema()` |
-| `lib/core.ts` | Types, Zod schemas, `ApiError`, logger |
-| `next.config.mjs` | MDX plugins, webpack |
-| `tailwind.config.js` | Theme, 30+ custom animations |
+| `next.config.mjs` | MDX plugins, webpack, CSP |
+| `tailwind.config.js` | Theme, fonts, animations |
 
 ## Gotchas
 
