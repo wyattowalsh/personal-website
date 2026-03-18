@@ -2,22 +2,31 @@
 
 import Giscus from "@giscus/react";
 import { useTheme } from "next-themes";
-import { useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export default function Comments() {
 	const { resolvedTheme } = useTheme();
 
+	// Capture the initial theme so the Giscus component mounts once and never
+	// re-renders due to a theme prop change. All subsequent theme switches are
+	// handled exclusively via the postMessage API below.
+	const initialTheme = useRef(resolvedTheme === "dark" ? "dark" : "light");
+
+	const sendThemeMessage = useCallback((theme: string) => {
+		const iframe = document.querySelector<HTMLIFrameElement>(
+			'iframe.giscus-frame'
+		);
+		iframe?.contentWindow?.postMessage(
+			{ giscus: { setConfig: { theme } } },
+			'https://giscus.app'
+		);
+	}, []);
+
 	useEffect(() => {
-		// Send theme change message to Giscus iframe
-		const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
-		if (iframe && iframe.contentWindow) {
-			const theme = resolvedTheme === "dark" ? "dark" : "light";
-			iframe.contentWindow.postMessage(
-				{ giscus: { setConfig: { theme } } },
-				'https://giscus.app'
-			);
-		}
-	}, [resolvedTheme]);
+		// Update theme in the existing Giscus iframe without remounting
+		const theme = resolvedTheme === "dark" ? "dark" : "light";
+		sendThemeMessage(theme);
+	}, [resolvedTheme, sendThemeMessage]);
 
 	return (
 		<section>
@@ -32,7 +41,7 @@ export default function Comments() {
 				reactionsEnabled="1"
 				emitMetadata="1"
 				inputPosition="bottom"
-				theme={resolvedTheme === "dark" ? "dark" : "light"}
+				theme={initialTheme.current}
 				lang="en"
 				loading="lazy"
 			/>

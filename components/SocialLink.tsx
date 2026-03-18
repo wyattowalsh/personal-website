@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
-import React from "react";
+import React, { useMemo } from "react";
 import { useTheme } from "next-themes";
 import type { Route } from 'next';
 
@@ -117,8 +117,11 @@ export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element
 
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
-  // Ensure default color from links array is used
-  const colors = adjustColorForMode(link.color || "#6a9fb5", isDark);
+  // Memoize color calculations — only recompute when color or theme changes
+  const colors = useMemo(
+    () => adjustColorForMode(link.color || "#6a9fb5", isDark),
+    [link.color, isDark]
+  );
 
   // Update the icon container class names and styles
   const iconContainerClassName = cn(

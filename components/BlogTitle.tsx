@@ -27,6 +27,9 @@ const icons = [
 	Workflow,
 ];
 
+/** Minimum interval between physics updates (~30fps) */
+const PHYSICS_INTERVAL_MS = 1000 / 30;
+
 const FloatingIcon = ({
 	icon: Icon,
 	containerSize,
@@ -51,11 +54,17 @@ const FloatingIcon = ({
 	});
 
 	const rotationZ = useMotionValue(Math.random() * 360);
+	const accumulatedTime = useRef(0);
 
 	useAnimationFrame((_, delta) => {
 		if (!isVisible) return;
 
-		const deltaInSeconds = delta / 1000;
+		// Throttle physics to ~30fps by accumulating frame time
+		accumulatedTime.current += delta;
+		if (accumulatedTime.current < PHYSICS_INTERVAL_MS) return;
+
+		const deltaInSeconds = accumulatedTime.current / 1000;
+		accumulatedTime.current = 0;
 
 		let newX = x.get() + velocity.current.x * deltaInSeconds;
 		let newY = y.get() + velocity.current.y * deltaInSeconds;
