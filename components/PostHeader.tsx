@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { formatDate, isDifferentDate, cn } from "@/lib/utils";
+import { formatDate, isDifferentDate, cn, extractPostSlug } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -118,8 +118,7 @@ const useSafePost = (pathname: string) => {
           setState(prev => ({ ...prev, isLoading: true, error: null }));
         }
 
-        // Fix the slug extraction - now handles both /blog/[slug] and /blog/posts/[slug]
-        const slug = pathname.split('/').filter(segment => segment && segment !== 'blog' && segment !== 'posts').pop();
+        const slug = extractPostSlug(pathname);
 
         if (!slug) {
           throw new Error('Invalid URL format');

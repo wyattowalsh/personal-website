@@ -6,8 +6,8 @@ import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
-import type { AdjacentPost } from "@/lib/core";
+import { cn, extractPostSlug } from "@/lib/utils";
+import type { AdjacentPost } from "@/lib/types";
 import type { Route } from "next";
 
 export default function PostPagination() {
@@ -29,8 +29,7 @@ export default function PostPagination() {
 				setState((prev) => ({ ...prev, isLoading: true, error: null }));
 				
 				// Extract slug from pathname
-				const matches = pathname.match(/^\/blog(?:\/posts)?\/([^\/]+)/);
-				const slug = matches?.[1];
+				const slug = extractPostSlug(pathname);
 				
 				if (!slug) {
 					console.warn('Could not extract slug from pathname:', pathname);

@@ -17,7 +17,9 @@ export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
     // HR-4: rate limit by IP
     const ip =
-      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+      request.headers.get('x-real-ip')
+      || request.headers.get('x-forwarded-for')?.split(',').pop()?.trim()
+      || 'unknown';
     if (!checkRateLimit(ip)) {
       throw new ApiError(429, 'Too many attempts', undefined, 'RATE_LIMITED');
     }

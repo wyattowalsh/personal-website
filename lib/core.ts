@@ -1,10 +1,9 @@
+import 'server-only';
 import chalk from "chalk";
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 import type { Config } from './types';
 
-// Re-export types so existing imports from '@/lib/core' continue to work
-export type { Config, Post, AdjacentPost, PostMetadata, PreprocessStats } from './types';
 
 // Schema definitions removed - ConfigSchema was unused
 
@@ -346,35 +345,36 @@ export const api = {
     },
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    withErrorHandler: (handler: Function) => async (...args: any[]) => {
-      const request = getRequestFromHandlerArgs(args);
-      const correlationId = resolveCorrelationId(request);
-      try {
-        const response = await handler(...args);
-        if (response instanceof Response) {
-          return withCorrelationId(response, correlationId);
-        }
-        return response;
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.statusCode >= 500) {
-            Sentry.withScope(scope => {
-              scope.setTag('correlation_id', correlationId);
-              Sentry.captureException(error);
-            });
+    withErrorHandler: <T extends (...args: any[]) => Promise<Response>>(handler: T): T =>
+      (async (...args: any[]) => {
+        const request = getRequestFromHandlerArgs(args);
+        const correlationId = resolveCorrelationId(request);
+        try {
+          const response = await handler(...args);
+          if (response instanceof Response) {
+            return withCorrelationId(response, correlationId);
           }
-          return withCorrelationId(error.toResponse(correlationId), correlationId);
+          return response;
+        } catch (error) {
+          if (error instanceof ApiError) {
+            if (error.statusCode >= 500) {
+              Sentry.withScope(scope => {
+                scope.setTag('correlation_id', correlationId);
+                Sentry.captureException(error);
+              });
+            }
+            return withCorrelationId(error.toResponse(correlationId), correlationId);
+          }
+          console.error(`Unhandled error [${correlationId}]:`, error);
+          Sentry.withScope(scope => {
+            scope.setTag('correlation_id', correlationId);
+            Sentry.captureException(error);
+          });
+          return withCorrelationId(
+            new ApiError(500, 'Internal server error').toResponse(correlationId),
+            correlationId
+          );
         }
-        console.error(`Unhandled error [${correlationId}]:`, error);
-        Sentry.withScope(scope => {
-          scope.setTag('correlation_id', correlationId);
-          Sentry.captureException(error);
-        });
-        return withCorrelationId(
-          new ApiError(500, 'Internal server error').toResponse(correlationId),
-          correlationId
-        );
-      }
-    }
+      }) as unknown as T
   }
 };

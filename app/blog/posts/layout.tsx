@@ -2,7 +2,6 @@ import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PostLayout } from "@/components/PostLayout";
 import { MathProvider } from "@/components/MathContext";
-import { PostContentHydration } from "@/components/PostContentHydration";
 import { cn } from "@/lib/utils";
 import CustomScrollbars from "@/components/Scroll";
 
@@ -23,7 +22,7 @@ export default function PostsLayout({ children }: Props) {
 					<Suspense fallback={<LoadingSpinner />}>
 					<CustomScrollbars>
 						<PostLayout>
-							<PostContentHydration>{children}</PostContentHydration>
+							{children}
 						</PostLayout>
 						</CustomScrollbars>
 					</Suspense>

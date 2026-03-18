@@ -3,7 +3,7 @@
   "version": "0.6.0",
   "private": true,
   "scripts": {
-    "preprocess": "tsx scripts/index.ts",
+    "preprocess": "tsx --conditions react-server scripts/index.ts",
     "predev": "NODE_ENV=development pnpm preprocess",
     "dev": "DEBUG=true LOG_LEVEL=debug next dev --turbopack",
     "prebuild": "NODE_ENV=production pnpm preprocess",
@@ -92,6 +92,7 @@
     "remark-mdx-math-enhanced": "^0.0.1-beta.3",
     "rimraf": "^6.1.2",
     "sass": "^1.97.1",
+    "server-only": "^0.0.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",

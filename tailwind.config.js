@@ -49,6 +49,7 @@ const config = {
       },
       fontFamily: {
         sans: ['var(--font-bricolage)', 'Bricolage Grotesque', 'sans-serif'],
+        display: ['var(--font-bricolage)', 'Bricolage Grotesque', 'sans-serif'],
         mono: ['var(--font-monaspace)', 'Monaspace Argon', 'monospace'],
       },
       keyframes: {

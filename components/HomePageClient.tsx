@@ -10,23 +10,13 @@ import PostCard from "@/components/PostCard";
 import { motion, useScroll, useTransform, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
+import type { PostMetadata } from "@/lib/types";
 import styles from "@/app/page.module.scss";
 
 const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground'), { ssr: false });
 
-interface Post {
-  slug: string;
-  title?: string;
-  summary?: string;
-  created?: string;
-  updated?: string;
-  tags?: string[];
-  image?: string;
-  readingTime?: string;
-}
-
 interface HomePageClientProps {
-  recentPosts: Post[];
+  recentPosts: PostMetadata[];
 }
 
 export default function HomePageClient({ recentPosts }: HomePageClientProps) {

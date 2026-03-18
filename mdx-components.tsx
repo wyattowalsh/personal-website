@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import type { MDXComponents } from "mdx/types";
 import Image from "next/image";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, isExternal } from "@/lib/utils";
 import { ExternalLink, Info, AlertCircle, Terminal as TerminalIcon } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
 
@@ -607,7 +607,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         a: ({ href, children }) => {
             if (!href) return <span>{children}</span>;
             
-            const isExternal = href.match(/^(https?:\/\/|mailto:|tel:)/i);
+            const external = isExternal(href);
             const isAnchor = href.startsWith('#');
             
             const classes = cn(
@@ -629,7 +629,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             }
 
             // Handle external links
-            if (isExternal) {
+            if (external) {
                 return (
                     <a 
                         href={href}

@@ -11,6 +11,7 @@ export function useReadingProgress(slug: string) {
   const rafId = useRef<number | null>(null);
 
   useEffect(() => {
+    firedRef.current = new Set<number>();
     const fired = firedRef.current;
 
     function onScroll() {

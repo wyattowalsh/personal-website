@@ -63,7 +63,8 @@ const FloatingIcon = ({
 		accumulatedTime.current += delta;
 		if (accumulatedTime.current < PHYSICS_INTERVAL_MS) return;
 
-		const deltaInSeconds = accumulatedTime.current / 1000;
+		const cappedTime = Math.min(accumulatedTime.current, PHYSICS_INTERVAL_MS * 2);
+		const deltaInSeconds = cappedTime / 1000;
 		accumulatedTime.current = 0;
 
 		let newX = x.get() + velocity.current.x * deltaInSeconds;
@@ -204,6 +205,7 @@ const BlogTitle = () => {
 	const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 	const [isVisible, setIsVisible] = useState(false);
 	const containerRef = useRef<HTMLDivElement>(null);
+	const resizeTimerId = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const showDecorativeMotion = !prefersReducedMotion && containerSize.width >= 500;
 
 	useEffect(() => {
@@ -220,9 +222,23 @@ const BlogTitle = () => {
 				setContainerSize({ width, height });
 			}
 		};
-		updateSize();
-		window.addEventListener("resize", updateSize);
-		return () => window.removeEventListener("resize", updateSize);
+		const handleResize = () => {
+			if (resizeTimerId.current !== null) {
+				clearTimeout(resizeTimerId.current);
+			}
+			resizeTimerId.current = setTimeout(() => {
+				updateSize();
+				resizeTimerId.current = null;
+			}, 300);
+		};
+		updateSize(); // Initial measurement without delay
+		window.addEventListener("resize", handleResize);
+		return () => {
+			window.removeEventListener("resize", handleResize);
+			if (resizeTimerId.current !== null) {
+				clearTimeout(resizeTimerId.current);
+			}
+		};
 	}, []);
 
 	return (

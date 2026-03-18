@@ -12,20 +12,34 @@ export default function Comments() {
 	// handled exclusively via the postMessage API below.
 	const initialTheme = useRef(resolvedTheme === "dark" ? "dark" : "light");
 
-	const sendThemeMessage = useCallback((theme: string) => {
+	const sendThemeMessage = useCallback((theme: string): boolean => {
 		const iframe = document.querySelector<HTMLIFrameElement>(
 			'iframe.giscus-frame'
 		);
-		iframe?.contentWindow?.postMessage(
+		if (!iframe?.contentWindow) return false;
+		iframe.contentWindow.postMessage(
 			{ giscus: { setConfig: { theme } } },
 			'https://giscus.app'
 		);
+		return true;
 	}, []);
 
 	useEffect(() => {
 		// Update theme in the existing Giscus iframe without remounting
 		const theme = resolvedTheme === "dark" ? "dark" : "light";
-		sendThemeMessage(theme);
+		const sent = sendThemeMessage(theme);
+		if (!sent) {
+			// Iframe not ready — observe for it
+			const observer = new MutationObserver(() => {
+				const iframe = document.querySelector<HTMLIFrameElement>('iframe.giscus-frame');
+				if (iframe) {
+					sendThemeMessage(theme);
+					observer.disconnect();
+				}
+			});
+			observer.observe(document.body, { childList: true, subtree: true });
+			return () => observer.disconnect();
+		}
 	}, [resolvedTheme, sendThemeMessage]);
 
 	return (

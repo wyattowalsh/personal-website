@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn, isExternal as isExternalUrl } from "@/lib/utils";
 import { Bookmark as BookmarkIcon, ExternalLink, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,9 +26,9 @@ export default function Bookmark({
   external = false,
   className,
 }: BookmarkProps) {
-  const isExternal = external || href.startsWith("http");
-  const LinkComponent = isExternal ? "a" : Link;
-  const linkProps = isExternal
+  const isExternalLink = external || isExternalUrl(href);
+  const LinkComponent = isExternalLink ? "a" : Link;
+  const linkProps = isExternalLink
     ? { href, target: "_blank", rel: "noopener noreferrer" }
     : { href };
 
@@ -83,7 +83,7 @@ export default function Bookmark({
             {title}
           </h4>
 
-          {isExternal ? (
+          {isExternalLink ? (
             <ExternalLink
               className={cn(
                 "w-4 h-4 flex-shrink-0",

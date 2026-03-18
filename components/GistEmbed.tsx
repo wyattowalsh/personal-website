@@ -117,6 +117,7 @@ export function GistEmbed({ id, file }: GistEmbedProps) {
 </html>`
 
   const handleMessage = useCallback((event: MessageEvent) => {
+    if (event.source !== iframeRef.current?.contentWindow) return
     if (!event.data || typeof event.data !== 'object') return
 
     if (event.data.type === 'gist-resize' && typeof event.data.height === 'number') {
@@ -193,6 +194,7 @@ export function GistEmbed({ id, file }: GistEmbedProps) {
         </div>
       )}
       <iframe
+        key={resolvedTheme}
         ref={iframeRef}
         srcDoc={srcdoc}
         sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox"

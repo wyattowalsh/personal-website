@@ -4,7 +4,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
-import { logger, Post, formatters, PreprocessStats, ApiError } from './core';
+import { logger, formatters, ApiError } from './core';
+import type { Post, PreprocessStats } from './types';
 import { stripMdxSyntax } from './utils';
 import {
   SEARCH_THRESHOLD,
