@@ -42,6 +42,10 @@ export interface Post {
     prev: AdjacentPost | null;
     next: AdjacentPost | null;
   };
+  series?: {
+    name: string;
+    order: number;
+  };
 }
 
 export interface AdjacentPost {
@@ -51,16 +55,6 @@ export interface AdjacentPost {
 
 export interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
   caption?: string;
-}
-
-export interface SearchResult<T> {
-  item: T;
-  score: number;
-  matches: Array<{
-    key: string;
-    value: string;
-    indices: number[][];
-  }>;
 }
 
 export interface PreprocessStats {
@@ -89,10 +83,6 @@ export const apiSchemas = {
   }),
   search: z.object({
     query: z.string().min(1),
-  }),
-  pagination: z.object({
-    page: z.number().optional().default(1),
-    limit: z.number().optional().default(10),
   }),
 } as const;
 

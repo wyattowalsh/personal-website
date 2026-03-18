@@ -15,8 +15,6 @@ import {
   API_REVALIDATE_SECONDS
 } from './constants';
 
-// Removed custom findFiles() - using glob package instead
-
 // Git utilities - now using file stats instead of git commands
 async function getFileData(filePath: string) {
   try {
@@ -34,8 +32,6 @@ async function getFileData(filePath: string) {
     };
   }
 }
-
-// ApiError is now imported from @/lib/core
 
 // Backend service implementation
 class BackendService {
@@ -173,6 +169,39 @@ class BackendService {
     };
   }
 
+  async getRelatedPosts(slug: string, limit = 3): Promise<Post[]> {
+    const post = await this.getPost(slug);
+    if (!post) return [];
+
+    const allPosts = await this.getAllPosts();
+    const currentPostDate = new Date(post.created).getTime();
+
+    return allPosts
+      .filter(p => p.slug !== slug)
+      .map(p => {
+        const sharedTags = p.tags.filter(t => post.tags.includes(t)).length;
+        const totalTags = new Set([...p.tags, ...post.tags]).size;
+        const tagScore = totalTags > 0 ? sharedTags / totalTags : 0;
+
+        const postDate = new Date(p.created).getTime();
+        const daysDiff = Math.abs(postDate - currentPostDate) / (1000 * 60 * 60 * 24);
+        const recencyScore = Math.exp(-daysDiff / 365);
+
+        const score = tagScore * 0.7 + recencyScore * 0.3;
+        return { post: p, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map(r => r.post);
+  }
+
+  async getSeriesPosts(seriesName: string): Promise<Post[]> {
+    const allPosts = await this.getAllPosts();
+    return allPosts
+      .filter(p => p.series?.name === seriesName)
+      .sort((a, b) => (a.series?.order ?? 0) - (b.series?.order ?? 0));
+  }
+
   async preprocess(isDev: boolean): Promise<PreprocessStats> {
     const startTime = Date.now();
     const errors: Error[] = [];
@@ -190,8 +219,8 @@ class BackendService {
       logger.debug('Cleared all caches');
 
       // Update posts directory path and use glob
-      const postsDir = path.join(process.cwd(), 'app/blog/posts');
-      const files = await glob('**/page.mdx', { cwd: postsDir, absolute: true });
+      const postsDir = path.join(process.cwd(), 'content/posts');
+      const files = await glob('**/index.mdx', { cwd: postsDir, absolute: true });
 
       logger.info(`Found ${files.length} posts to process`);
       
@@ -228,6 +257,7 @@ class BackendService {
             created: data.created || fileData.firstModified || new Date().toISOString(),
             updated: data.updated || fileData.lastModified || new Date().toISOString(),
             tags: data.tags || [],
+            series: data.series || undefined,
           };
 
           // Validate hero image exists
@@ -351,7 +381,7 @@ async function handleRequest<T>(
   }
 }
 
-// API route handlers
+// API route handlers (internal — consumed via api.handlers, not exported individually)
 async function getPostHandler(slug: string) {
   await BackendService.ensurePreprocessed();
   return handleRequest({
@@ -400,8 +430,5 @@ const api = {
 export {
   BackendService,
   handleRequest,
-  getPostHandler,
-  getPostsHandler,
-  searchPostsHandler,
   api,
 };

@@ -15,7 +15,9 @@
     "typecheck": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "new-post": "tsx scripts/new-post.ts"
+    "new-post": "tsx scripts/new-post.ts",
+    "generate-icons": "tsx scripts/generate-icons.ts",
+    "test": "vitest run"
   },
   "dependencies": {
     "@giscus/react": "^3.1.0",
@@ -63,9 +65,6 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "feed": "^5.1.0",
-    "fumadocs-core": "^16.4.1",
-    "fumadocs-mdx": "^14.2.3",
-    "fumadocs-ui": "^16.4.1",
     "fuse.js": "^7.1.0",
     "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
@@ -75,6 +74,7 @@
     "mermaid": "^11.12.2",
     "motion": "^12.23.26",
     "next": "^16.1.6",
+    "next-mdx-remote": "^6.0.0",
     "next-themes": "^0.4.6",
     "postcss": "^8.5.6",
     "react": "^19.2.3",
@@ -115,10 +115,12 @@
     "@typescript-eslint/parser": "^8.56.1",
     "eslint-plugin-storybook": "^10.1.10",
     "postcss-import": "^16.1.1",
+    "sharp": "^0.34.5",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.2.0",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vitest": "^4.1.0"
   },
   "pnpm": {
     "overrides": {
