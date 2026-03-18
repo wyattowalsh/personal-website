@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server'
+import { api as coreApi } from '@/lib/core';
 
-export async function GET() {
-  return NextResponse.json({ status: 'ok', timestamp: new Date().toISOString() })
-}
+export const GET = coreApi.middleware.withErrorHandler(
+  async () => {
+    return Response.json({ status: 'ok', timestamp: new Date().toISOString() });
+  }
+);
