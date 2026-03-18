@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import SearchBar from "@/components/SearchBar";
-import type { PostMetadata } from "@/lib/core";
+import type { PostMetadata } from "@/lib/types";
 
 interface BlogContentProps {
   posts: PostMetadata[];

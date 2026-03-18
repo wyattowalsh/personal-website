@@ -69,7 +69,6 @@
     "glob": "^13.0.0",
     "gray-matter": "^4.0.3",
     "katex": "^0.16.27",
-    "lru-cache": "^11.2.4",
     "lucide-react": "^0.562.0",
     "mermaid": "^11.12.2",
     "motion": "^12.23.26",

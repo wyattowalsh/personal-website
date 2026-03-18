@@ -6,7 +6,7 @@ import { formatDate } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import type { PostMetadata } from "@/lib/core";
+import type { PostMetadata } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
 import { useRouter } from "next/navigation"; // Update import

@@ -26,7 +26,7 @@ import { motion } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
-import type { PostMetadata } from "@/lib/core";
+import type { PostMetadata } from "@/lib/types";
 
 // Update interface to extend PostMetadata
 interface Post extends PostMetadata {
@@ -387,13 +387,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 				{results.length > 0 ? (
 					results.length === 1 ? (
 						// Single result - centered
-						<div className="sm:col-span-2 lg:col-start-2 lg:col-span-1">
+						<div
+							className="sm:col-span-2 lg:col-start-2 lg:col-span-1"
+							onClick={() => track('search_result_click', { slug: results[0].slug, position: 0 })}
+						>
 								<PostCard post={results[0]} className="h-full" />
 						</div>
 					) : (
 						// Multiple results with staggered animation
 						results.map((post, idx) => (
-							<div key={`${post.slug}-${idx}`} className="h-full">
+							<div
+								key={`${post.slug}-${idx}`}
+								className="h-full"
+								onClick={() => track('search_result_click', { slug: post.slug, position: idx })}
+							>
 								<PostCard post={post} className="h-full" />
 							</div>
 						))

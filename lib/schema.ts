@@ -1,4 +1,5 @@
-import { Post, getConfig } from './core';
+import type { Post } from './types';
+import { getConfig } from './core';
 import { cache } from 'react';
 
 export interface BreadcrumbItem {
@@ -107,17 +108,58 @@ export function generateArticleSchema(post: Post, options?: SchemaOptions) {
   };
 }
 
-export const generateBreadcrumbSchema = cache(
-  (items: BreadcrumbItem[], baseUrl = getConfig().site.url) => {
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
+export function generateBreadcrumbSchema(items: BreadcrumbItem[], baseUrl = getConfig().site.url) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map((item, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: item.name,
+      item: `${baseUrl}${item.item}`,
+    })),
+  };
+}
+
+export interface CollectionPageItem {
+  name: string;
+  url: string;
+  image?: string;
+  datePublished?: string;
+}
+
+export function generateCollectionPageSchema({
+  name,
+  description,
+  url,
+  items,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  items: CollectionPageItem[];
+}) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name,
+    description,
+    url,
+    isPartOf: {
+      '@type': 'WebSite',
+      url: getConfig().site.url,
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: items.length,
       itemListElement: items.map((item, index) => ({
         '@type': 'ListItem',
         position: index + 1,
         name: item.name,
-        item: `${baseUrl}${item.item}`
-      }))
-    }
-  }
-);
+        url: item.url,
+        ...(item.image ? { image: item.image } : {}),
+        ...(item.datePublished ? { datePublished: item.datePublished } : {}),
+      })),
+    },
+  };
+}

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { getConfig } from './core';
 import { generateArticleSchema, generateBreadcrumbSchema } from './schema';
-import type { Post } from './core';
+import type { Post } from './types';
 
 const siteUrl = getConfig().site.url;
 

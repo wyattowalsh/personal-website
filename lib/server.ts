@@ -1,17 +1,13 @@
-import { LRUCache } from 'lru-cache';
 import Fuse from 'fuse.js';
 import matter from 'gray-matter';
 import path from 'path';
 import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
-import { logger, Post, formatters, PreprocessStats, ApiError, cacheControl } from './core';
+import { logger, Post, formatters, PreprocessStats, ApiError } from './core';
 import { stripMdxSyntax } from './utils';
 import {
-  CACHE_TTL_MS,
-  LRU_MAX_ENTRIES,
   SEARCH_THRESHOLD,
-  SEARCH_CACHE_TTL_SECONDS,
   API_REVALIDATE_SECONDS
 } from './constants';
 
@@ -37,8 +33,6 @@ async function getFileData(filePath: string) {
 class BackendService {
   private static instance: BackendService;
   private preprocessPromise: Promise<void> | null = null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private cache: LRUCache<string, any>;
   private searchIndex: Fuse<Post>;
   private posts: Map<string, Post>;
   private tags: Set<string>;
@@ -46,7 +40,6 @@ class BackendService {
   private sortedPostsCache: Post[] | null = null;
 
   private constructor() {
-    this.cache = new LRUCache({ max: LRU_MAX_ENTRIES, ttl: CACHE_TTL_MS });
     this.searchIndex = new Fuse([], {
       keys: ['title', 'summary', 'content', 'tags'],
       threshold: SEARCH_THRESHOLD,
@@ -89,19 +82,7 @@ class BackendService {
   }
 
   async getPost(slug: string): Promise<Post | null> {
-    try {
-      const cached = this.cache.get(`post:${slug}`);
-      if (cached) return cached;
-
-      const post = this.posts.get(slug);
-      if (!post) return null;
-
-      this.cache.set(`post:${slug}`, post);
-      return post;
-    } catch (error) {
-      logger.error(`Error getting post ${slug}:`, error as Error);
-      return null;
-    }
+    return this.posts.get(slug) || null;
   }
 
   async getPostMetadata(slug: string) {
@@ -114,34 +95,13 @@ class BackendService {
   }
 
   async search(query: string) {
-    try {
-      const cached = this.cache.get(`search:${query}`);
-      if (cached) return cached;
-
-      const results = this.searchIndex.search(query);
-      this.cache.set(`search:${query}`, results);
-      return results;
-    } catch (error) {
-      logger.error('Search error:', error as Error);
-      return [];
-    }
+    return this.searchIndex.search(query);
   }
 
   async getPostsByTag(tag: string): Promise<Post[]> {
-    try {
-      const cached = this.cache.get(`tag:${tag}`);
-      if (cached) return cached;
-
-      const posts = Array.from(this.posts.values())
-        .filter(post => post.tags.includes(tag))
-        .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
-
-      this.cache.set(`tag:${tag}`, posts);
-      return posts;
-    } catch (error) {
-      logger.error(`Error getting posts for tag ${tag}:`, error as Error);
-      return [];
-    }
+    return Array.from(this.posts.values())
+      .filter(post => post.tags.includes(tag))
+      .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
   }
 
   async getAllPosts(): Promise<Post[]> {
@@ -212,7 +172,6 @@ class BackendService {
 
     try {
       // Clear caches
-      this.cache.clear();
       this.posts.clear();
       this.tags.clear();
       this.sortedPostsCache = null;
@@ -292,11 +251,10 @@ class BackendService {
 
       // Log final stats
       const duration = Date.now() - startTime;
-      const stats = {
+      const stats: PreprocessStats = {
         duration, // Return raw duration number instead of formatted string
         postsProcessed: this.posts.size,
-        searchIndexSize: Array.from(this.posts.values()).length, // Fix: use posts length instead of searchIndex.size()
-        cacheSize: this.cache.size,
+        searchIndexSize: Array.from(this.posts.values()).length,
         errors: errors.length,
         memory: formatters.fileSize(process.memoryUsage().heapUsed)
       };
@@ -341,12 +299,13 @@ async function handleRequest<T>(
     const data = await options.handler();
     const duration = performance.now() - startTime;
 
-    // Determine cache control
+    // Determine cache control header
+    const maxAge = typeof options.cache === 'number' ? options.cache : API_REVALIDATE_SECONDS;
     const cacheHeader = typeof options.cache === 'number'
-      ? cacheControl.dynamic(options.cache)
+      ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}, stale-if-error=${maxAge * 4}`
       : options.cache
-        ? cacheControl.public(API_REVALIDATE_SECONDS)
-        : cacheControl.private();
+        ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`
+        : `private, must-revalidate, max-age=60`;
 
     // Return response
     return Response.json({
@@ -354,10 +313,6 @@ async function handleRequest<T>(
       meta: {
         timestamp: new Date().toISOString(),
         duration: Math.round(duration * 100) / 100,
-        cache: {
-          hit: false,
-          ttl: typeof options.cache === 'number' ? options.cache : API_REVALIDATE_SECONDS
-        }
       }
     }, {
       headers: {
@@ -410,7 +365,7 @@ async function searchPostsHandler(query: string) {
     handler: async () => {
       return BackendService.getInstance().search(query);
     },
-    cache: SEARCH_CACHE_TTL_SECONDS
+    cache: API_REVALIDATE_SECONDS
   });
 }
 

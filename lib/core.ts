@@ -1,71 +1,10 @@
 import chalk from "chalk";
 import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
+import type { Config } from './types';
 
-// Core interfaces and types
-export interface Config {
-  site: {
-    title: string;
-    description: string;
-    url: string;
-    author: {
-      name: string;
-      email: string;
-      twitter?: string;
-      github?: string;
-      linkedin?: string;
-    }
-  };
-  blog: {
-    postsPerPage: number;
-    featuredLimit: number;
-  };
-  cache: {
-    ttl: number;
-    maxSize: number;
-  };
-}
-
-export interface Post {
-  slug: string;
-  title: string;
-  summary?: string;
-  content: string;
-  created: string;
-  updated?: string;
-  tags: string[];
-  image?: string;
-  caption?: string;
-  readingTime?: string;
-  wordCount: number;
-  adjacent?: {
-    prev: AdjacentPost | null;
-    next: AdjacentPost | null;
-  };
-  series?: {
-    name: string;
-    order: number;
-  };
-}
-
-export interface AdjacentPost {
-  slug: string;
-  title: string;
-}
-
-export interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
-  caption?: string;
-}
-
-export interface PreprocessStats {
-  duration: number;
-  postsProcessed: number;
-  searchIndexSize: number;
-  cacheSize: number;
-  errors: number;
-  memory: string;
-  particleConfigPath?: string;
-}
+// Re-export types so existing imports from '@/lib/core' continue to work
+export type { Config, Post, AdjacentPost, PostMetadata, PreprocessStats } from './types';
 
 // Schema definitions removed - ConfigSchema was unused
 
@@ -296,16 +235,6 @@ export class ApiError extends Error {
   }
 }
 
-
-// Cache control utilities
-export const cacheControl = {
-  public: (maxAge: number = 3600) => 
-    `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
-  private: (maxAge: number = 60) => 
-    `private, must-revalidate, max-age=${maxAge}`,
-  dynamic: (maxAge: number = 3600) =>
-    `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}, stale-if-error=${maxAge * 4}`,
-} as const;
 
 // Configuration management
 const defaultConfig: Config = {

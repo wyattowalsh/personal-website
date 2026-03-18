@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground"), { ssr: false });
 import BlogContent from "@/components/BlogContent";
-import type { PostMetadata } from "@/lib/core";
+import type { PostMetadata } from "@/lib/types";
 
 interface BlogPageContentProps {
   posts: PostMetadata[];
