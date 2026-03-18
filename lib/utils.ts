@@ -21,7 +21,6 @@ export function stripMdxSyntax(content: string): string {
     .replace(/<[A-Z][a-zA-Z0-9]*[\s\S]*?\/>/g, '')
     .replace(/<[A-Z][a-zA-Z0-9]*[\s\S]*?>[\s\S]*?<\/[A-Z][a-zA-Z0-9]*>/g, '')
     .replace(/<ArticleJsonLd[\s\S]*?\/>/g, '')
-    .replace(/\{[\s\S]*?\}/g, '')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
 }
@@ -49,4 +48,27 @@ export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOpt
     console.error('Error formatting date:', error);
     return '';
   }
+}
+
+/** Check if a URL is external (http/https, mailto, or tel) */
+export function isExternal(url: string): boolean {
+  return /^(https?:\/\/|mailto:|tel:)/i.test(url);
+}
+
+/** Compare two date strings and return true if they represent different calendar dates */
+export function isDifferentDate(date1: string | undefined, date2: string | undefined): boolean {
+  try {
+    if (!date1 || !date2) return false;
+    const d1 = new Date(date1).toISOString();
+    const d2 = new Date(date2).toISOString();
+    return d1.split('T')[0] !== d2.split('T')[0];
+  } catch {
+    return false;
+  }
+}
+
+/** Extract blog post slug from pathname */
+export function extractPostSlug(pathname: string): string | null {
+  const match = pathname.match(/\/blog\/posts\/([^/]+)/);
+  return match?.[1] || null;
 }

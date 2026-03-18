@@ -2,12 +2,11 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { formatDate } from "@/lib/utils";
+import { formatDate, isDifferentDate, cn } from "@/lib/utils";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import type { PostMetadata } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
 import { useRouter } from "next/navigation"; // Update import
 import { Separator } from "@/components/ui/separator";
@@ -22,20 +21,6 @@ interface PostHeaderState {
   isLoading: boolean;
   error: string | null;
   imageLoaded: boolean;
-}
-
-// Add a helper function at the top of the file
-function isDifferentDate(date1: string | undefined, date2: string | undefined): boolean {
-  try {
-    if (!date1 || !date2) return false;
-    // Parse dates and convert to UTC ISO strings for comparison
-    const d1 = new Date(date1).toISOString();
-    const d2 = new Date(date2).toISOString();
-    // Compare only date portions (remove time)
-    return d1.split('T')[0] !== d2.split('T')[0];
-  } catch {
-    return false;
-  }
 }
 
 interface MetadataItemProps {

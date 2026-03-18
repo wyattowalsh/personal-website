@@ -92,7 +92,6 @@
     "remark-mdx-math-enhanced": "^0.0.1-beta.3",
     "rimraf": "^6.1.2",
     "sass": "^1.97.1",
-    "super-react-gist": "1.1.1",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",

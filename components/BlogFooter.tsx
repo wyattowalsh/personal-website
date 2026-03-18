@@ -6,16 +6,11 @@ import Link from 'next/link';
 import { type Route } from 'next';
 import { motion } from 'motion/react';
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
-import { cn } from "@/lib/utils";
+import { cn, isExternal } from "@/lib/utils";
 import { links } from './Links';
 import { RssIcon, FileJson, AtomIcon, HomeIcon, BookOpenIcon, TagIcon } from 'lucide-react';
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-
-// Remove duplicate Href type definition
-
-// Utility function to check if a URL is external
-const isExternal = (url: string): boolean => /^https?:\/\//.test(url) || url.startsWith('mailto:');
 
 // Update FooterLink component
 const FooterLink = ({ href, icon: Icon, children }: { 

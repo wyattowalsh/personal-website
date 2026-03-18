@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tooltip } from "@/components/ui/tooltip";
 
-import GistWrapper from "@/components/GistWrapper";
+import { GistEmbed } from "@/components/GistEmbed";
 import ClientSideLink from "@/components/ClientSideLink";
 import TagLink from "@/components/TagLink";
 import Math, { MathProps } from "@/components/Math";
@@ -34,9 +34,10 @@ import {
 } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-interface GistWrapperProps {
+interface GistProps {
     url?: string;
     id?: string;
+    file?: string;
 }
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
@@ -333,9 +334,9 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
 
         TagLink,
 
-        Gist: ({ url, id }: GistWrapperProps) => (
+        Gist: ({ url, id, file }: GistProps) => (
             <div className="my-8 not-prose">
-                <GistWrapper url={url} id={id} />
+                <GistEmbed id={id || url || ''} file={file} />
             </div>
         ),
 
