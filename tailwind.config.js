@@ -48,8 +48,8 @@ const config = {
         },
       },
       fontFamily: {
-        sans: ['Montserrat', 'sans-serif'],
-        mono: ['Fira Code', 'monospace'],
+        sans: ['var(--font-bricolage)', 'Bricolage Grotesque', 'sans-serif'],
+        mono: ['var(--font-monaspace)', 'Monaspace Argon', 'monospace'],
       },
       keyframes: {
         fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },

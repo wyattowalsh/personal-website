@@ -1,5 +1,6 @@
 import { Metadata, Viewport } from "next";
-import { Fira_Code, Montserrat } from "next/font/google";
+import { Bricolage_Grotesque } from "next/font/google";
+import localFont from "next/font/local";
 import "./tailwind.css";  // Tailwind v4 with config directive
 import "./globals.scss";  // Custom styles (no Tailwind directives)
 import "katex/dist/katex.min.css";
@@ -16,16 +17,16 @@ import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebVitals } from "@/components/WebVitals";
 
-const firaCode = Fira_Code({
-	subsets: ["latin"],
-	variable: "--font-fira-code",
+const monaspace = localFont({
+	src: "../public/fonts/MonaspaceArgonVarVF.woff2",
+	variable: "--font-monaspace",
 	display: "swap",
 });
 
-const montserrat = Montserrat({
+const bricolage = Bricolage_Grotesque({
 	subsets: ["latin"],
 	display: "swap",
-	variable: "--font-montserrat",
+	variable: "--font-bricolage",
 	preload: true,
 	fallback: ["system-ui", "arial"],
 });
@@ -117,8 +118,8 @@ export default function RootLayout({
 						"selection:bg-primary/20 selection:text-primary",
 						"scrollbar-thin scrollbar-track-transparent",
 						"scrollbar-thumb-primary/10 hover:scrollbar-thumb-primary/20",
-						montserrat.variable,
-						firaCode.variable
+						bricolage.variable,
+						monaspace.variable
 					)}
 					suppressHydrationWarning
 				>

@@ -7,8 +7,8 @@ $gradient-heading-light: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899
 $gradient-heading-dark: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #f472b6 100%);
 
 // Fonts
-$font-sans: 'Montserrat', sans-serif;
-$font-code: 'Fira Code', monospace;
+$font-sans: 'Bricolage Grotesque', sans-serif;
+$font-code: 'Monaspace Argon', monospace;
 
 @mixin light {
   --primary-rgb: 59, 130, 246;

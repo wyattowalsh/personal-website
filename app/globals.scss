@@ -37,7 +37,7 @@
     --math-inline-bg: rgba(210 40% 96.1% / 0.4);
     --math-display-bg: rgba(210 40% 96.1% / 0.3);
     --math-index-color: 215.4 16.3% 46.9%;
-    --font-code: var(--font-fira-code), 'Fira Code', 'Courier New', monospace;
+    --font-code: var(--font-monaspace), 'Monaspace Argon', 'Courier New', monospace;
     --duration-fast: 150ms;
     --duration-normal: 300ms;
     --duration-slow: 500ms;
@@ -86,7 +86,7 @@
     --math-inline-bg: rgba(217.2 32.6% 17.5% / 0.3);
     --math-display-bg: rgba(217.2 32.6% 17.5% / 0.2);
     --math-index-color: 215 20.2% 65.1%;
-    --font-code: var(--font-fira-code), 'Fira Code', 'Courier New', monospace;
+    --font-code: var(--font-monaspace), 'Monaspace Argon', 'Courier New', monospace;
     --duration-fast: 150ms;
     --duration-normal: 300ms;
     --duration-slow: 500ms;
@@ -148,7 +148,7 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
   }
 
   a:not(.no-underline) {

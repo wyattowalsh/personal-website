@@ -51,7 +51,7 @@ describe('generatePostMetadata', () => {
     const og = meta.openGraph;
 
     expect(og).toBeDefined();
-    expect(og?.type).toBe('article');
+    expect((og as Record<string, unknown>)?.type).toBe('article');
     expect(og?.title).toBe('Test Post Title');
     expect(og?.description).toBe('A summary of the test post');
     expect(og?.url).toContain('/blog/posts/test-post');
@@ -113,7 +113,7 @@ describe('generatePostMetadata', () => {
     const twitter = meta.twitter;
 
     expect(twitter).toBeDefined();
-    expect(twitter?.card).toBe('summary_large_image');
+    expect((twitter as Record<string, unknown>)?.card).toBe('summary_large_image');
     expect(twitter?.title).toBe('Test Post Title');
     expect(twitter?.description).toBe('A summary of the test post');
     expect(twitter?.images).toHaveLength(1);
@@ -159,7 +159,7 @@ describe('generatePostMetadata', () => {
     const meta = generatePostMetadata({ post, slug: 'test-post' });
 
     expect(meta.authors).toHaveLength(1);
-    expect(meta.authors?.[0]?.name).toBeTruthy();
+    expect((meta.authors as Array<{ name: string }>)?.[0]?.name).toBeTruthy();
     expect(meta.creator).toBeTruthy();
     expect(meta.publisher).toBeTruthy();
   });
