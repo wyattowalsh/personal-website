@@ -65,7 +65,9 @@ const FloatingIcon = ({
 
 		const cappedTime = Math.min(accumulatedTime.current, PHYSICS_INTERVAL_MS * 2);
 		const deltaInSeconds = cappedTime / 1000;
-		accumulatedTime.current = 0;
+		accumulatedTime.current = accumulatedTime.current > PHYSICS_INTERVAL_MS * 2
+			? 0
+			: accumulatedTime.current - PHYSICS_INTERVAL_MS;
 
 		let newX = x.get() + velocity.current.x * deltaInSeconds;
 		let newY = y.get() + velocity.current.y * deltaInSeconds;

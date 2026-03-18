@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   checkRateLimit,
   clearRateLimit,
@@ -30,6 +30,14 @@ describe('validatePassword', () => {
     const long2 = 'b'.repeat(499) + 'c';
     expect(validatePassword(long1, long1)).toBe(true);
     expect(validatePassword(long1, long2)).toBe(false);
+  });
+  it('returns false when both passwords are empty', () => {
+    expect(validatePassword('', '')).toBe(false);
+  });
+  it('handles multi-byte UTF-8 passwords correctly', () => {
+    const emoji = '\u{1F600}\u{1F601}';
+    expect(validatePassword(emoji, emoji)).toBe(true);
+    expect(validatePassword(emoji, emoji + 'x')).toBe(false);
   });
 });
 
@@ -70,6 +78,7 @@ describe('createSessionToken / validateSessionToken', () => {
 describe('checkRateLimit', () => {
   const ip = 'test-ip-addr';
   beforeEach(() => clearRateLimit(ip));
+  afterEach(() => { vi.useRealTimers(); });
 
   it('allows first 5 attempts', () => {
     for (let i = 0; i < 5; i++) {
@@ -96,7 +105,6 @@ describe('checkRateLimit', () => {
     expect(checkRateLimit(ip)).toBe(false);
     vi.advanceTimersByTime(15 * 60 * 1000 + 1);
     expect(checkRateLimit(ip)).toBe(true);
-    vi.useRealTimers();
     clearRateLimit(ip);
   });
 });

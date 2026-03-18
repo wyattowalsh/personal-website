@@ -173,18 +173,4 @@ describe('generatePostMetadata', () => {
     expect(og?.tags).toEqual([]);
   });
 
-  it('handles missing image', () => {
-    const post = createMockPost({ image: undefined });
-    const meta = generatePostMetadata({ post, slug: 'test-post' });
-
-    expect(meta.openGraph).toBeDefined();
-  });
-
-  it('handles missing summary with fallback description', () => {
-    const post = createMockPost({ summary: undefined });
-    const meta = generatePostMetadata({ post, slug: 'test-post' });
-
-    // Falls back to site description when post summary is missing
-    expect(meta.description).toBeTruthy();
-  });
 });

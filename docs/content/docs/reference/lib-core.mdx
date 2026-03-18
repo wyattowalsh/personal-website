@@ -81,12 +81,10 @@ interface Post {
 
 ### PostMetadata
 
-Post metadata without full content or word count (lighter weight).
+Post metadata without full content, word count, or adjacency info (lighter weight).
 
 ```typescript
-interface PostMetadata extends Omit<Post, 'wordCount' | 'adjacent'> {
-  caption?: string;
-}
+type PostMetadata = Omit<Post, 'content' | 'wordCount' | 'adjacent'>;
 ```
 
 **Usage:**
@@ -96,7 +94,6 @@ const metadata: PostMetadata = {
   slug: 'my-post',
   title: 'My Post',
   summary: 'A short summary',
-  content: '...',
   created: '2026-01-15',
   tags: ['tech']
 };

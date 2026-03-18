@@ -31,5 +31,5 @@ export default async function BlogPostsPage() {
   const posts = await instance.getAllPosts();
   const tags = await instance.getAllTags();
 
-  return <BlogPageContent posts={posts.map(({ content: _content, ...meta }) => meta)} tags={tags} />;
+  return <BlogPageContent posts={posts.map(({ content: _c, wordCount: _wc, adjacent: _adj, ...meta }) => meta)} tags={tags} />;
 }

@@ -43,7 +43,7 @@ export default async function HomePage() {
   const allPosts = await BackendService.getInstance().getAllPosts();
 
   // Get the 3 most recent posts
-  const recentPosts = allPosts.slice(0, 3);
+  const recentPosts = allPosts.slice(0, 3).map(({ content: _c, wordCount: _wc, adjacent: _adj, ...meta }) => meta);
 
   return (
     <>

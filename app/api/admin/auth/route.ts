@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { api as coreApi, ApiError } from '@/lib/core';
 import {
   checkRateLimit,
-  clearRateLimit,
   validatePassword,
   createSessionToken,
   validateSessionToken,
@@ -18,7 +17,7 @@ export const POST = coreApi.middleware.withErrorHandler(
     // HR-4: rate limit by IP
     const ip =
       request.headers.get('x-real-ip')
-      || request.headers.get('x-forwarded-for')?.split(',').pop()?.trim()
+      || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
       || 'unknown';
     if (!checkRateLimit(ip)) {
       throw new ApiError(429, 'Too many attempts', undefined, 'RATE_LIMITED');
@@ -45,7 +44,6 @@ export const POST = coreApi.middleware.withErrorHandler(
       throw new ApiError(401, 'Invalid password');
     }
 
-    clearRateLimit(ip);
     const token = createSessionToken(adminPassword);
     const response = Response.json({ success: true });
     response.headers.set(

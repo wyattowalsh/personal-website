@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 export default function Comments() {
 	const { resolvedTheme } = useTheme();
+	const sectionRef = useRef<HTMLElement>(null);
 
 	// Capture the initial theme so the Giscus component mounts once and never
 	// re-renders due to a theme prop change. All subsequent theme switches are
@@ -37,13 +38,16 @@ export default function Comments() {
 					observer.disconnect();
 				}
 			});
-			observer.observe(document.body, { childList: true, subtree: true });
-			return () => observer.disconnect();
+			if (sectionRef.current) {
+				observer.observe(sectionRef.current, { childList: true, subtree: true });
+				const timeout = setTimeout(() => observer.disconnect(), 10_000);
+				return () => { clearTimeout(timeout); observer.disconnect(); };
+			}
 		}
 	}, [resolvedTheme, sendThemeMessage]);
 
 	return (
-		<section>
+		<section ref={sectionRef}>
 			<Giscus
 				id="comments"
 				repo="wyattowalsh/personal-website"

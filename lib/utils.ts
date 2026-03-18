@@ -67,8 +67,8 @@ export function isDifferentDate(date1: string | undefined, date2: string | undef
   }
 }
 
-/** Extract blog post slug from pathname (handles /blog/posts/[slug] and /blog/[slug], excluding known sub-paths) */
+/** Extract blog post slug from pathname (matches /blog/posts/[slug]) */
 export function extractPostSlug(pathname: string): string | null {
-  const match = pathname.match(/\/blog\/(?:posts\/)?(?!tags\/|archive\b)([^/]+)/);
+  const match = pathname.match(/\/blog\/posts\/([^/]+)/);
   return match?.[1] || null;
 }

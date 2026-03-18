@@ -50,7 +50,7 @@ export interface AdjacentPost {
   title: string;
 }
 
-export interface PostMetadata extends Omit<Post, 'content' | 'wordCount' | 'adjacent'> {}
+export type PostMetadata = Omit<Post, 'content' | 'wordCount' | 'adjacent'>;
 
 export interface PreprocessStats {
   duration: number;

@@ -135,6 +135,18 @@ describe('extractPostSlug', () => {
   it('returns null for root path', () => {
     expect(extractPostSlug('/')).toBeNull();
   });
+
+  it('extracts archive-prefixed slugs correctly', () => {
+    expect(extractPostSlug('/blog/posts/archive-2024')).toBe('archive-2024');
+  });
+
+  it('returns null for /blog/archive', () => {
+    expect(extractPostSlug('/blog/archive')).toBeNull();
+  });
+
+  it('returns null for /blog/search', () => {
+    expect(extractPostSlug('/blog/search')).toBeNull();
+  });
 });
 
 describe('isDifferentDate', () => {

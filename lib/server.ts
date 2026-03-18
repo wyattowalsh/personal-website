@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
 import { logger, formatters, ApiError } from './core';
-import type { Post, PreprocessStats } from './types';
+import type { Post, PostMetadata, PreprocessStats } from './types';
 import { stripMdxSyntax } from './utils';
 import {
   SEARCH_THRESHOLD,
@@ -86,12 +86,12 @@ class BackendService {
     return this.posts.get(slug) || null;
   }
 
-  async getPostMetadata(slug: string) {
+  async getPostMetadata(slug: string): Promise<PostMetadata | null> {
     const post = await this.getPost(slug);
     if (!post) return null;
-    
+
     // Return only metadata fields
-    const { content: _content, ...metadata } = post;
+    const { content: _c, wordCount: _wc, adjacent: _adj, ...metadata } = post;
     return metadata;
   }
 

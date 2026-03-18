@@ -21,7 +21,7 @@ const monaspace = localFont({
 	src: "../public/fonts/MonaspaceArgonVarVF.woff2",
 	variable: "--font-monaspace",
 	display: "swap",
-	weight: "100 900",
+	weight: "200 800",
 });
 
 const bricolage = Bricolage_Grotesque({

@@ -27,6 +27,12 @@ export function GistEmbed({ id, file }: GistEmbedProps) {
 
   const isDark = resolvedTheme === 'dark'
 
+  // Reset loading state when theme changes so the skeleton reappears
+  useEffect(() => {
+    setLoading(true)
+    setError(false)
+  }, [resolvedTheme])
+
   // Build the srcdoc HTML that loads the GitHub gist embed script
   const srcdoc = `
 <!DOCTYPE html>
