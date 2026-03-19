@@ -1,4 +1,4 @@
-import { BackendService, handleRequest } from '@/lib/server';
+import { BackendService, jsonResponse } from '@/lib/server';
 import { api as coreApi, schemas, ApiError } from '@/lib/core';
 import { API_REVALIDATE_SECONDS } from '@/lib/constants';
 
@@ -19,16 +19,10 @@ export const GET = coreApi.middleware.withErrorHandler(
     }
 
     await BackendService.ensurePreprocessed();
-
-    return handleRequest({
-      handler: async () => {
-        const post = await BackendService.getInstance().getPost(slug);
-        if (!post) {
-          throw new ApiError(404, 'Post not found');
-        }
-        return post;
-      },
-      cache: API_REVALIDATE_SECONDS
-    });
+    const post = await BackendService.getInstance().getPost(slug);
+    if (!post) {
+      throw new ApiError(404, 'Post not found');
+    }
+    return jsonResponse(post, { cache: API_REVALIDATE_SECONDS });
   }
 );

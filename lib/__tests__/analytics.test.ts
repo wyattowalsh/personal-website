@@ -153,7 +153,7 @@ describe('sendBeacon()', () => {
     });
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    const [url, init] = mockFetch.mock.calls[0] as [string, { method: string; body: string; keepalive: boolean }];
+    const [url, init] = (mockFetch.mock.calls[0] as unknown as [string, { method: string; body: string; keepalive: boolean }]);
     expect(url).toBe('/api/analytics/beacon');
     expect(init.method).toBe('POST');
     expect(init.keepalive).toBe(true);
@@ -180,7 +180,7 @@ describe('sendBeacon()', () => {
     });
 
     expect(mockNavSendBeacon).toHaveBeenCalledOnce();
-    const [url, blob] = mockNavSendBeacon.mock.calls[0] as [string, Blob];
+    const [url, blob] = (mockNavSendBeacon.mock.calls[0] as unknown as [string, Blob]);
     expect(url).toBe('/api/analytics/beacon');
     expect(blob).toBeInstanceOf(Blob);
     expect(mockFetch).not.toHaveBeenCalled();
@@ -198,7 +198,7 @@ describe('sendBeacon()', () => {
     await sendBeacon({ event: 'scroll_depth', url: '/test', data: { depth: 75 } });
 
     expect(mockFetch).toHaveBeenCalledOnce();
-    const [, init] = mockFetch.mock.calls[0] as [string, { body: string }];
+    const [, init] = (mockFetch.mock.calls[0] as unknown as [string, { body: string }]);
     const body = JSON.parse(init.body);
 
     expect(body.visitorId).toBe('test-visitor-id');

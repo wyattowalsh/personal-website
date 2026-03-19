@@ -1,5 +1,3 @@
-"use client";
-
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";

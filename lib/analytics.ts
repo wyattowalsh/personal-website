@@ -22,6 +22,10 @@ export type EventProperties = {
   page_exit: { url: string; timeSpent: number };
   scroll_depth: { url: string; depth: number };
   link_click: { url: string; href: string; external: boolean };
+  code_copied: { language?: string };
+  theme_changed: { to: string };
+  diagram_download: { type?: string };
+  web_vital: { name: string; value: number; rating?: string };
 };
 
 export type EventName = keyof EventProperties;

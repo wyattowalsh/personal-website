@@ -19,7 +19,7 @@ export const GET = coreApi.middleware.withErrorHandler(
     }
 
     await BackendService.ensurePreprocessed();
-    const adjacent = await BackendService.getInstance().getAdjacentPosts(slug);
-    return jsonResponse(adjacent, { cache: API_REVALIDATE_SECONDS });
+    const related = await BackendService.getInstance().getRelatedPosts(slug);
+    return jsonResponse(related, { cache: API_REVALIDATE_SECONDS });
   }
 );

@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
 import { z } from 'zod';
-import { logger, formatters, ApiError } from './core';
+import { logger, formatters } from './core';
 import type { Post, PostMetadata, PreprocessStats } from './types';
 import { stripMdxSyntax } from './utils';
 import {
@@ -278,104 +278,29 @@ class BackendService {
 
 }
 
-// Enhanced request handler with better type safety and error handling
-async function handleRequest<T>(
-  options: {
-    handler: () => Promise<T>;
-    cache?: boolean | number;
-  }
-) {
-  const startTime = performance.now();
+function jsonResponse<T>(data: T, options?: { cache?: boolean | number }) {
+  const maxAge = typeof options?.cache === 'number' ? options.cache : API_REVALIDATE_SECONDS;
+  const cacheHeader = typeof options?.cache === 'number'
+    ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}, stale-if-error=${maxAge * 4}`
+    : options?.cache
+      ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`
+      : `private, must-revalidate, max-age=60`;
 
-  try {
-    const data = await options.handler();
-    const duration = performance.now() - startTime;
-
-    // Determine cache control header
-    const maxAge = typeof options.cache === 'number' ? options.cache : API_REVALIDATE_SECONDS;
-    const cacheHeader = typeof options.cache === 'number'
-      ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}, stale-if-error=${maxAge * 4}`
-      : options.cache
-        ? `public, s-maxage=${maxAge}, stale-while-revalidate=${maxAge * 2}`
-        : `private, must-revalidate, max-age=60`;
-
-    // Return response
-    return Response.json({
-      data,
-      meta: {
-        timestamp: new Date().toISOString(),
-        duration: Math.round(duration * 100) / 100,
-      }
-    }, {
-      headers: {
-        'Cache-Control': cacheHeader,
-        'Content-Type': 'application/json',
-        'X-Response-Time': `${duration}ms`
-      }
-    });
-  } catch (err) {
-    const error = err instanceof Error ? err : new Error(String(err));
-    logger.error('Request handler error:', error);
-    
-    if (error instanceof ApiError) {
-      return error.toResponse();
+  return Response.json({
+    data,
+    meta: {
+      timestamp: new Date().toISOString(),
     }
-
-    return new ApiError(500, 'Internal Server Error', {
-      message: error.message || 'Unknown error',
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    }).toResponse();
-  }
-}
-
-// API route handlers (internal — consumed via api.handlers, not exported individually)
-async function getPostHandler(slug: string) {
-  await BackendService.ensurePreprocessed();
-  return handleRequest({
-    handler: async () => {
-      const post = await BackendService.getInstance().getPost(slug);
-      if (!post) throw new ApiError(404, 'Post not found');
-      return post;
-    },
-    cache: API_REVALIDATE_SECONDS
+  }, {
+    headers: {
+      'Cache-Control': cacheHeader,
+      'Content-Type': 'application/json',
+    }
   });
 }
-
-async function getPostsHandler() {
-  await BackendService.ensurePreprocessed();
-  return handleRequest({
-    handler: async () => {
-      return BackendService.getInstance().getAllPosts();
-    },
-    cache: API_REVALIDATE_SECONDS
-  });
-}
-
-async function searchPostsHandler(query: string) {
-  await BackendService.ensurePreprocessed();
-  return handleRequest({
-    handler: async () => {
-      return BackendService.getInstance().search(query);
-    },
-    cache: API_REVALIDATE_SECONDS
-  });
-}
-
-// API exports
-const api = {
-  handlers: {
-    getPost: getPostHandler,
-    getPosts: getPostsHandler,
-    searchPosts: searchPostsHandler
-  },
-  utils: {
-    handleRequest
-  }
-};
 
 // Single consolidated export statement
 export {
   BackendService,
-  handleRequest,
-  api,
+  jsonResponse,
 };

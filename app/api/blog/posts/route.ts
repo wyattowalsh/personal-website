@@ -1,8 +1,11 @@
-import { api } from '@/lib/server';
+import { BackendService, jsonResponse } from '@/lib/server';
 import { api as coreApi } from '@/lib/core';
+import { API_REVALIDATE_SECONDS } from '@/lib/constants';
 
 export const GET = coreApi.middleware.withErrorHandler(
   async (_request: Request) => {
-    return api.handlers.getPosts();
+    await BackendService.ensurePreprocessed();
+    const posts = await BackendService.getInstance().getAllPosts();
+    return jsonResponse(posts, { cache: API_REVALIDATE_SECONDS });
   }
 );

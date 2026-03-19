@@ -140,7 +140,7 @@ export default function RootLayout({
 						<TooltipProvider>
 							<div className="relative flex min-h-screen flex-col">
 								<Header />
-								<main id="main-content" role="main" aria-label="Main content" className="flex-1 flex flex-col pt-16 sm:pt-[4.5rem] md:pt-20">{children}</main>
+								<main id="main-content" className="flex-1 flex flex-col pt-16 sm:pt-[4.5rem] md:pt-20">{children}</main>
 							</div>
 						</TooltipProvider>
 						<ScrollIndicator />
