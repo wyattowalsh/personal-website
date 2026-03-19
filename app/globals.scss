@@ -1,7 +1,6 @@
 /* Tailwind is imported from layout.tsx via tailwind.css */
 /* @reference makes Tailwind theme available for use in this SCSS file */
-@reference "tailwindcss";
-@config "../tailwind.config.js";
+@reference "./tailwind.css";
 
 @layer base {
   :root {

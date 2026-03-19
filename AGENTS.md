@@ -27,7 +27,10 @@ pnpm lclean               # Clean .next, .cache
 ```
 app/                      # Next.js App Router
 ├── blog/posts/[slug]/    # Blog post route (dynamic segment)
+├── blog/archive/         # Blog archive
+├── admin/                # Admin dashboard
 ├── api/                  # API routes (validated with Zod)
+├── .well-known/          # security.txt, webfinger
 ├── layout.tsx            # Root layout + providers
 └── globals.scss          # Theme variables, prose styles
 
@@ -124,6 +127,9 @@ summary: "SEO description"
 tags: ["Category", "Tech"]
 created: "2026-01-15"
 updated: "2026-01-15"
+series:                       # Optional
+  name: "Series Name"
+  order: 1
 ---
 ```
 
@@ -143,9 +149,12 @@ Create via `pnpm new-post` or manually.
 | ✅ **Always** | Use `@/` path aliases |
 | ✅ **Always** | Use existing `components/ui/` primitives |
 | ✅ **Always** | Wrap async in `<Suspense>` |
+| ✅ **Always** | Prefer surgical edits over full rewrites |
+| ✅ **Always** | Prefer named exports over default exports |
 | ⚠️ **Ask** | Adding dependencies |
 | ⚠️ **Ask** | Modifying `next.config.mjs` MDX plugins |
 | ⚠️ **Ask** | Changing `scripts/` or Tailwind config |
+| ⚠️ **Avoid** | Creating new files when editing existing ones suffices |
 | 🚫 **Never** | Touch `.env*`, `node_modules/`, `.next/`, `pnpm-lock.yaml` |
 
 ## Key Files
@@ -158,7 +167,7 @@ Create via `pnpm new-post` or manually.
 | `lib/metadata.ts` | SEO: `generatePostMetadata()` |
 | `lib/schema.ts` | JSON-LD: `generateArticleSchema()` |
 | `next.config.mjs` | MDX plugins, webpack, CSP |
-| `tailwind.config.js` | Theme, fonts, animations |
+| `app/tailwind.css` | Theme, fonts, animations (CSS-first v4) |
 
 ## Gotchas
 

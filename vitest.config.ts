@@ -11,6 +11,8 @@ export default defineConfig({
     include: ['**/*.test.{ts,tsx}'],
     environmentMatchGlobs: [
       ['components/**/*.test.tsx', 'jsdom'],
+      ['lib/__tests__/device.test.ts', 'jsdom'],
+      ['lib/__tests__/analytics.test.ts', 'jsdom'],
     ],
   },
   resolve: {

@@ -1,3 +1,105 @@
-/* Tailwind CSS v4 entry point - separate from SCSS to prevent directive conflicts */
+/* Tailwind CSS v4 entry point - CSS-first configuration */
 @import "tailwindcss";
-@config "../tailwind.config.js";
+
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Font families */
+  --font-sans: var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', sans-serif;
+  --font-mono: var(--font-monaspace), 'Monaspace Argon', monospace;
+
+  /* Colors */
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-light: hsl(var(--primary-light));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  /* Border radius */
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  /* Box shadows */
+  --shadow-glow: var(--shadow-glow);
+  --shadow-soft: var(--shadow-soft);
+
+  /* Keyframes */
+  --animate-fade-in: fade-in 1s forwards;
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-glow-pulse: glow-pulse 2s ease-in-out infinite;
+  --animate-slide-down-in: slide-down-in 0.3s ease-out;
+  --animate-slide-up-in: slide-up-in 0.3s ease-out;
+  --animate-shimmer: shimmer 2s linear infinite;
+  --animate-handle-glow: handle-glow 2s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 4px hsl(var(--accent) / 0.2); }
+  50% { box-shadow: 0 0 16px hsl(var(--accent) / 0.4); }
+}
+
+@keyframes slide-down-in {
+  0% { transform: translateY(-100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slide-up-in {
+  0% { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes handle-glow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}

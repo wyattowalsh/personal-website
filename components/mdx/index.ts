@@ -1,6 +1,8 @@
 // Barrel export for all MDX components
+import dynamic from 'next/dynamic';
+
 // Phase 1: Interactive/Visual Components
-export { default as Chart } from "./Chart";
+export const Chart = dynamic(() => import("./Chart"), { ssr: false });
 export { default as Timeline } from "./Timeline";
 export { default as Comparison, ComparisonCard } from "./Comparison";
 export { default as ImageGallery } from "./ImageGallery";
@@ -18,8 +20,6 @@ export { default as PackageInstall } from "./PackageInstall";
 export { default as Quiz } from "./Quiz";
 export { default as Spoiler, InlineSpoiler } from "./Spoiler";
 export { default as Bookmark, BookmarkGrid } from "./Bookmark";
-export { default as Newsletter } from "./Newsletter";
-
 // Phase 4: Layout Components
 export { default as Columns, Column, Split } from "./Columns";
 export { default as Aside, InlineAside } from "./Aside";

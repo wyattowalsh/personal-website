@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
+import { z } from 'zod';
 import { logger, formatters, ApiError } from './core';
 import type { Post, PostMetadata, PreprocessStats } from './types';
 import { stripMdxSyntax } from './utils';
@@ -12,23 +13,19 @@ import {
   API_REVALIDATE_SECONDS
 } from './constants';
 
-// Git utilities - now using file stats instead of git commands
-async function getFileData(filePath: string) {
-  try {
-    const stats = await fs.stat(filePath);
-    return {
-      firstModified: stats.birthtime.toISOString(),
-      lastModified: stats.mtime.toISOString()
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error : new Error('Unknown error occurred');
-    logger.error('Error getting file data:', errorMessage);
-    return {
-      firstModified: null,
-      lastModified: null
-    };
-  }
-}
+const frontmatterSchema = z.object({
+  title: z.string().min(1),
+  created: z.string().min(1),
+  updated: z.string().optional(),
+  image: z.string().optional(),
+  caption: z.string().optional(),
+  summary: z.string().optional(),
+  tags: z.array(z.string()).default([]),
+  series: z.object({
+    name: z.string(),
+    order: z.number(),
+  }).optional(),
+});
 
 // Backend service implementation
 class BackendService {
@@ -193,31 +190,25 @@ class BackendService {
           const { data, content: markdown } = matter(content);
           const slug = path.basename(path.dirname(relativePath));
           
-          const fileData = await getFileData(filePath);
-          
+          const validated = frontmatterSchema.parse(data);
+
           const cleanContent = stripMdxSyntax(markdown);
 
           // Calculate word count and reading time from clean content
           const wordCount = cleanContent.trim().split(/\s+/).length;
           const readingTimeResult = readingTime(cleanContent);
           const readingTimeText = readingTimeResult.text;
-          
-          // Ensure title exists
-          if (!data.title) {
-            throw new Error(`Missing title in frontmatter for post: ${filePath}`);
-          }
 
           const post: Post = {
             slug,
-            ...data,
-            title: data.title, // explicitly include title
+            ...validated,
             content: cleanContent,
-            wordCount, // add word count
-            readingTime: readingTimeText, // add reading time
-            created: data.created || fileData.firstModified || new Date().toISOString(),
-            updated: data.updated || fileData.lastModified || new Date().toISOString(),
-            tags: data.tags || [],
-            series: data.series || undefined,
+            wordCount,
+            readingTime: readingTimeText,
+            created: validated.created,
+            updated: validated.updated || validated.created,
+            tags: validated.tags,
+            series: validated.series,
           };
 
           // Validate hero image exists
@@ -238,8 +229,8 @@ class BackendService {
             tags: post.tags.length
           });
         } catch (error) {
-          errors.push(error as Error);
-          logger.error(`Failed to process post: ${filePath}`, error as Error);
+          errors.push(error instanceof Error ? error : new Error(String(error)));
+          logger.error(`Failed to process post: ${filePath}`, error instanceof Error ? error : new Error(String(error)));
         }
       }
 

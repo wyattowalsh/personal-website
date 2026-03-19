@@ -174,14 +174,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         ),
 
         code: ({ children }) => (
-            <code className={cn(
+            <code translate="no" className={cn(
                 "relative rounded px-[0.4em] py-[0.2em]",
                 "bg-muted text-accent-foreground",
-                "font-mono font-medium text-[0.9em]", // Update font styling
+                "font-mono font-medium text-[0.9em]",
                 "before:hidden after:hidden",
                 "break-words",
                 "tracking-tight",
-                "[font-variation-settings:'wght'_500]" // Add this for variable fonts
+                "[font-variation-settings:'wght'_500]"
             )}>
                 {children}
             </code>

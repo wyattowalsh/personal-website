@@ -14,16 +14,6 @@ export const schemas = {
   tag: z.object({ tag: z.string().min(1).max(50) }),
 };
 
-// API validation schemas
-export const apiSchemas = {
-  post: z.object({
-    slug: z.string().min(1),
-  }),
-  search: z.object({
-    query: z.string().min(1),
-  }),
-} as const;
-
 // Log levels
 export enum LogLevel {
   DEBUG = 0,

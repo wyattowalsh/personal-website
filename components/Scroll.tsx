@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { animateScroll } from "react-scroll";
 
 const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
   const [showButton, setShowButton] = useState(false);
@@ -30,10 +29,7 @@ const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const scrollToTop = () => {
-    animateScroll.scrollToTop({
-      duration: 500,
-      smooth: "easeInOutQuint",
-    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

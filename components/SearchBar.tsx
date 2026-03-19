@@ -1,8 +1,7 @@
 // components/SearchBar.tsx
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
-import Fuse from "fuse.js";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import PostCard from "./PostCard";
 import { Input } from "@/components/ui/input";
 import {
@@ -96,23 +95,44 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		return () => clearTimeout(timer);
 	}, [query]);
 
-	// Build search index only when a query exists
-	const fuse = useMemo(() => {
-		if (!debouncedQuery.trim()) return null;
+	// Dynamically import Fuse.js only when needed
+	const FuseRef = useRef<typeof import('fuse.js').default | null>(null);
+	const [fuse, setFuse] = useState<import('fuse.js').default<PostMetadata> | null>(null);
 
-		return new Fuse(posts, {
-			keys: [
-				{ name: "title", weight: 1.0 },
-				{ name: "summary", weight: 0.8 },
-				{ name: "content", weight: 0.6 },
-				{ name: "tags", weight: 0.9 },
-			],
-			includeScore: true,
-			threshold: 0.3,
-			ignoreLocation: true, // Important for full-text search
-			useExtendedSearch: true,
-			findAllMatches: true, // Important for thorough search
-		});
+	useEffect(() => {
+		if (!debouncedQuery.trim()) {
+			setFuse(null);
+			return;
+		}
+
+		let cancelled = false;
+
+		(async () => {
+			if (!FuseRef.current) {
+				const mod = await import('fuse.js');
+				FuseRef.current = mod.default;
+			}
+
+			if (cancelled) return;
+
+			const instance = new FuseRef.current(posts, {
+				keys: [
+					{ name: "title", weight: 1.0 },
+					{ name: "summary", weight: 0.8 },
+					{ name: "content", weight: 0.6 },
+					{ name: "tags", weight: 0.9 },
+				],
+				includeScore: true,
+				threshold: 0.3,
+				ignoreLocation: true,
+				useExtendedSearch: true,
+				findAllMatches: true,
+			});
+
+			setFuse(instance);
+		})();
+
+		return () => { cancelled = true; };
 	}, [posts, debouncedQuery]);
 
 	// Update search effect to maintain sort order - use debouncedQuery instead of query
@@ -144,16 +164,35 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		});
 
 		setResults(searchResults);
-
-		// Track search analytics
-		if (debouncedQuery.trim()) {
-			if (searchResults.length === 0) {
-				track('search_no_results', { query: debouncedQuery });
-			} else {
-				track('search_query', { query: debouncedQuery, results_count: searchResults.length });
-			}
-		}
 	}, [debouncedQuery, selectedTags, sortMethod, sortDirection, posts, fuse]);
+
+	// Track search analytics separately with a longer settle timer
+	// to avoid firing on every intermediate keystroke
+	const trackedQueryRef = React.useRef('');
+	const resultsLengthRef = React.useRef(results.length);
+	resultsLengthRef.current = results.length;
+	useEffect(() => {
+		const trimmed = debouncedQuery.trim();
+		if (!trimmed) {
+			trackedQueryRef.current = '';
+			return;
+		}
+
+		const timer = setTimeout(() => {
+			// Only track if query hasn't changed and hasn't been tracked already
+			if (trimmed === trackedQueryRef.current) return;
+			trackedQueryRef.current = trimmed;
+
+			const matchCount = resultsLengthRef.current;
+			if (matchCount === 0) {
+				track('search_no_results', { query: trimmed });
+			} else {
+				track('search_query', { query: trimmed, results_count: matchCount });
+			}
+		}, 1500);
+
+		return () => clearTimeout(timer);
+	}, [debouncedQuery]);
 
 	const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setQuery(e.target.value);
@@ -389,7 +428,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 						// Single result - centered
 						<div
 							className="sm:col-span-2 lg:col-start-2 lg:col-span-1"
-							onClick={() => track('search_result_click', { slug: results[0].slug, position: 0 })}
 						>
 								<PostCard post={results[0]} className="h-full" />
 						</div>
@@ -399,7 +437,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 							<div
 								key={`${post.slug}-${idx}`}
 								className="h-full"
-								onClick={() => track('search_result_click', { slug: post.slug, position: idx })}
 							>
 								<PostCard post={post} className="h-full" />
 							</div>
