@@ -33,7 +33,7 @@ const mockEnsurePreprocessed = vi.fn(() => Promise.resolve());
 
 vi.mock('@/lib/server', () => ({
   BackendService: {
-    ensurePreprocessed: (...args: unknown[]) => mockEnsurePreprocessed(...args),
+    ensurePreprocessed: () => mockEnsurePreprocessed(),
     getInstance: () => ({
       getAllPosts: mockGetAllPosts,
       getPost: mockGetPost,
