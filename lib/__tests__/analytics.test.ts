@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const { mockVercelTrack } = vi.hoisted(() => ({
   mockVercelTrack: vi.fn(),
@@ -67,25 +67,41 @@ import {
 
 const mockFetch = vi.fn(() => Promise.resolve(new Response()));
 
-// Node 25+ built-in localStorage can shadow jsdom's — use setItem/removeItem
-// via the Storage prototype to ensure compatibility
-function clearOptOutKey() {
-  try {
-    Storage.prototype.removeItem.call(window.localStorage, 'analytics-opt-out');
-  } catch {
-    // fallback: just set to empty
-    try { window.localStorage.removeItem('analytics-opt-out'); } catch { /* noop */ }
-  }
+// Node 25 ships a built-in localStorage on globalThis that shadows jsdom's
+// proper Storage implementation. Replace with a spec-compliant mock.
+function createStorageMock(): Storage {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => (key in store ? store[key] : null),
+    setItem: (key: string, value: string) => { store[key] = String(value); },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { store = {}; },
+    key: (index: number) => Object.keys(store)[index] ?? null,
+    get length() { return Object.keys(store).length; },
+  };
 }
 
-function setOptOut() {
-  window.localStorage.setItem('analytics-opt-out', '1');
-}
+let origLocalStorage: Storage;
+let mockLocalStorage: Storage;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  clearOptOutKey();
+  origLocalStorage = globalThis.localStorage;
+  mockLocalStorage = createStorageMock();
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: mockLocalStorage,
+    writable: true,
+    configurable: true,
+  });
   globalThis.fetch = mockFetch;
+});
+
+afterEach(() => {
+  Object.defineProperty(globalThis, 'localStorage', {
+    value: origLocalStorage,
+    writable: true,
+    configurable: true,
+  });
 });
 
 // ---------- track() ----------
@@ -106,7 +122,7 @@ describe('track()', () => {
   });
 
   it('respects opt-out', () => {
-    window.localStorage.setItem('analytics-opt-out', '1');
+    localStorage.setItem('analytics-opt-out', '1');
 
     track('share_click', { platform: 'twitter' });
 
@@ -187,7 +203,7 @@ describe('sendBeacon()', () => {
   });
 
   it('respects opt-out', async () => {
-    window.localStorage.setItem('analytics-opt-out', '1');
+    localStorage.setItem('analytics-opt-out', '1');
 
     await sendBeacon({ event: 'page_view', url: '/test' });
 
@@ -222,16 +238,16 @@ describe('setAnalyticsOptOut() / getAnalyticsOptOut()', () => {
   it('setting to true stores "1" in localStorage', () => {
     setAnalyticsOptOut(true);
 
-    expect(window.localStorage.getItem('analytics-opt-out')).toBe('1');
+    expect(localStorage.getItem('analytics-opt-out')).toBe('1');
     expect(getAnalyticsOptOut()).toBe(true);
   });
 
   it('setting to false removes the key', () => {
-    window.localStorage.setItem('analytics-opt-out', '1');
+    localStorage.setItem('analytics-opt-out', '1');
 
     setAnalyticsOptOut(false);
 
-    expect(window.localStorage.getItem('analytics-opt-out')).toBeNull();
+    expect(localStorage.getItem('analytics-opt-out')).toBeNull();
     expect(getAnalyticsOptOut()).toBe(false);
   });
 

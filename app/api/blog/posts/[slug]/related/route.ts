@@ -2,6 +2,8 @@ import { BackendService, jsonResponse } from '@/lib/server';
 import { api as coreApi, schemas, ApiError } from '@/lib/core';
 import { API_REVALIDATE_SECONDS } from '@/lib/constants';
 
+export const revalidate = false;
+
 type Props = {
   params: Promise<{
     slug: string;

@@ -1,0 +1,168 @@
+import { z } from 'zod';
+import { api as coreApi, ApiError } from '@/lib/core';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
+const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+
+// In-memory rate limiter (resets on cold start — acceptable for serverless).
+// For persistent rate limiting, upgrade to Upstash Redis.
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 100;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+
+  // Evict expired entries when map grows beyond threshold
+  if (rateLimitMap.size > 500) {
+    for (const [key, entry] of rateLimitMap) {
+      if (now > entry.resetAt) rateLimitMap.delete(key);
+    }
+  }
+
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now >= entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return true;
+  }
+
+  entry.count += 1;
+  return entry.count <= RATE_LIMIT_MAX;
+}
+
+/** Validate that the request originates from our own site */
+function checkOrigin(request: Request): boolean {
+  if (!IS_PRODUCTION) return true;
+
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+
+  const siteHost = new URL(SITE_URL).host;
+
+  if (origin) {
+    try {
+      return new URL(origin).host === siteHost;
+    } catch {
+      return false;
+    }
+  }
+
+  if (referer) {
+    try {
+      return new URL(referer).host === siteHost;
+    } catch {
+      return false;
+    }
+  }
+
+  return false;
+}
+
+const beaconSchema = z.object({
+  visitorId: z.string().min(1).max(64),
+  sessionId: z.string().uuid(),
+  event: z.enum([
+    'page_view',
+    'page_exit',
+    'scroll_depth',
+    'link_click',
+  ]),
+  url: z.string().url().max(2048),
+  referrer: z.string().max(2048).optional().default(''),
+  title: z.string().max(512).optional().default(''),
+  timestamp: z.number(),
+
+  // Visitor info
+  isReturning: z.boolean().optional(),
+  visitCount: z.number().int().min(1).optional(),
+  daysSinceFirstVisit: z.number().int().min(0).optional(),
+
+  // Event-specific data
+  data: z
+    .record(z.string().max(64), z.union([z.string().max(256), z.number(), z.boolean(), z.null()]))
+    .refine((r) => Object.keys(r).length <= 20, 'data exceeds 20 keys')
+    .optional(),
+
+  // Device context (full)
+  device: z
+    .object({
+      screenWidth: z.number(),
+      screenHeight: z.number(),
+      devicePixelRatio: z.number(),
+      colorDepth: z.number(),
+      touchPoints: z.number(),
+      userAgent: z.string().max(512),
+      platform: z.string().max(64),
+      language: z.string().max(16),
+      languages: z.array(z.string()),
+      cookieEnabled: z.boolean(),
+      connectionType: z.string().nullable(),
+      connectionDownlink: z.number().nullable(),
+      hardwareConcurrency: z.number(),
+      deviceMemory: z.number().nullable(),
+      viewportWidth: z.number(),
+      viewportHeight: z.number(),
+      orientation: z.string().max(16),
+      timezone: z.string().max(64),
+      timezoneOffset: z.number(),
+      webglRenderer: z.string().max(256).nullable(),
+      webglVendor: z.string().max(256).nullable(),
+      pdfViewerEnabled: z.boolean(),
+    })
+    .optional(),
+});
+
+export type BeaconPayload = z.infer<typeof beaconSchema>;
+
+export const POST = coreApi.middleware.withErrorHandler(
+  async (request: Request) => {
+    const ip = request.headers.get('x-real-ip') || 'unknown';
+
+    if (!checkOrigin(request)) {
+      return Response.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      );
+    }
+
+    if (!checkRateLimit(ip)) {
+      return Response.json(
+        { error: 'Too many requests' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      );
+    }
+
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      throw new ApiError(400, 'Malformed JSON');
+    }
+
+    const validation = beaconSchema.safeParse(body);
+    if (!validation.success) {
+      throw new ApiError(400, 'Invalid beacon payload', {
+        errors: validation.error.issues,
+      });
+    }
+
+    const payload = validation.data;
+
+    const enriched = {
+      ...payload,
+      server: {
+        ip,
+        country: request.headers.get('x-vercel-ip-country') || null,
+        city: request.headers.get('x-vercel-ip-city') || null,
+        region: request.headers.get('x-vercel-ip-region') || null,
+        receivedAt: Date.now(),
+      },
+    };
+
+    // Structured log — can be picked up by Vercel log drain, Datadog, etc.
+    console.log(JSON.stringify({ _type: 'analytics_beacon', ...enriched }));
+
+    return Response.json({ ok: true }, { status: 202 });
+  }
+);

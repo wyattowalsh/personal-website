@@ -6,8 +6,10 @@ const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 min
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
+const SIGNING_KEY = process.env.SESSION_SIGNING_KEY || 'w4w-session-signing-key-dev';
+
 const deriveKey = (password: string) =>
-  createHmac('sha256', 'w4w-session-signing-key').update(password).digest();
+  createHmac('sha256', SIGNING_KEY).update(password).digest();
 
 /** HR-4: in-memory rate limiting keyed by IP */
 export function checkRateLimit(ip: string): boolean {

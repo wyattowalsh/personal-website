@@ -3,6 +3,8 @@ import { BackendService, jsonResponse } from '@/lib/server';
 import { api as coreApi, schemas, ApiError } from '@/lib/core';
 import { API_REVALIDATE_SECONDS } from '@/lib/constants';
 
+export const revalidate = false;
+
 export const GET = coreApi.middleware.withErrorHandler(
   async (request: Request, { params }: { params: Promise<{ slug: string }> }) => {
     const { slug } = await params;

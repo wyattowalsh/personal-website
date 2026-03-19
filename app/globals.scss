@@ -177,16 +177,6 @@
     }
   }
 
-  .prose {
-    @apply mx-auto;
-    color: var(--foreground);
-
-    :first-child {
-      margin-top: 0;
-      padding-top: 0;
-    }
-  }
-
   code {
     @apply bg-muted text-accent-foreground px-1.5 py-0.5 rounded;
     
@@ -419,30 +409,30 @@
     }
   }
 
-/* Enhanced responsive heading styles */
+/* Fluid typography heading styles */
   h1 {
-    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
-    @apply leading-tight sm:leading-tight md:leading-tight lg:leading-tight xl:leading-tight;
-    @apply tracking-tight sm:tracking-tight md:tracking-tight;
+    font-size: clamp(1.5rem, 1rem + 2.5vw, 3.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
     @apply mb-4 sm:mb-6 md:mb-8;
   }
 
   h2 {
-    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl;
-    @apply leading-tight sm:leading-tight md:leading-tight;
-    @apply tracking-tight;
+    font-size: clamp(1.25rem, 0.9rem + 2vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.015em;
     @apply mt-8 sm:mt-10 md:mt-12 mb-4 sm:mb-6;
   }
 
   h3 {
-    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl;
-    @apply leading-snug sm:leading-snug md:leading-snug;
+    font-size: clamp(1.125rem, 0.8rem + 1.5vw, 2.25rem);
+    line-height: 1.2;
     @apply mt-6 sm:mt-8 md:mt-10 mb-3 sm:mb-4;
   }
 
   h4 {
-    @apply text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl;
-    @apply leading-snug;
+    font-size: clamp(1rem, 0.75rem + 1.2vw, 1.875rem);
+    line-height: 1.25;
     @apply mt-4 sm:mt-6 md:mt-8 mb-2 sm:mb-3;
   }
 
@@ -598,7 +588,7 @@
     }
   }
 
-/* Spinner components */
+/* Spinner components — used only by components/LoadingSpinner.tsx, candidate for extraction to a co-located CSS module */
   .spinner {
     --spinner-primary: var(--primary);
     --spinner-secondary: var(--secondary);
@@ -714,29 +704,19 @@
   }
 
   .prose {
-    @apply max-w-none;
-    @apply sm:max-w-[95%] md:max-w-[90%] lg:max-w-[85%] xl:max-w-[80%] 2xl:max-w-[75%];
-    @apply mx-auto;
-  }
-
-/* Enhance text readability on different screen sizes */
-  .text-adaptive {
-    @apply text-sm sm:text-base md:text-lg lg:text-xl;
-    @apply leading-relaxed sm:leading-relaxed md:leading-relaxed;
-    @apply tracking-wide sm:tracking-normal md:tracking-normal;
-  }
-
-/* Update prose utility to match PostHeader width */
-  .prose {
     @apply w-full max-w-5xl mx-auto;
-    
+    color: var(--foreground);
+
 /* Add responsive padding for smaller screens */
     @apply px-4 sm:px-6 lg:px-8;
-    
-/* Ensure content remains readable on larger screens */
-    @screen xl {
-      font-size: calc(14px + 0.2vw);
-      line-height: 1.75;
+
+/* Fluid prose font size */
+    font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    line-height: 1.75;
+
+    :first-child {
+      margin-top: 0;
+      padding-top: 0;
     }
 
 /* Enhance table responsiveness */
@@ -829,7 +809,7 @@
   100% { background-color: hsl(var(--primary) / 0.05); }
 }
 
-/* Add spinner animations */
+/* Spinner animation — used only by components/LoadingSpinner.tsx, candidate for extraction to a co-located CSS module */
 @keyframes rotateCube {
   from {
     transform: rotateX(0) rotateY(0) rotateZ(0);
