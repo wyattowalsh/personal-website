@@ -114,7 +114,7 @@ export const logger = {
       chalk.magenta('⏱'),
       chalk.magenta.dim('[TIME]'),
       chalk.gray('→'),
-      `${label}: ${duration.toFixed(2)}ms`
+      `${label}: ${formatters.duration(duration)}`
     );
   },
 

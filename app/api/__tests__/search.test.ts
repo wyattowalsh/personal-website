@@ -98,4 +98,11 @@ describe('GET /api/blog/search', () => {
     const body = await response.json();
     expect(body.data).toHaveLength(0);
   });
+
+  it('returns 500 when search throws unexpectedly', async () => {
+    mockSearch.mockRejectedValueOnce(new Error('Search engine down'));
+    const request = new Request('http://localhost/api/blog/search?query=test');
+    const response = await GET(request);
+    expect(response.status).toBe(500);
+  });
 });

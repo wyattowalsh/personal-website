@@ -44,6 +44,12 @@
     --gradient-mid: #8b5cf6;
     --gradient-end: #ec4899;
 
+    --chart-1: 217 91% 60%;
+    --chart-2: 271 91% 65%;
+    --chart-3: 162 73% 46%;
+    --chart-4: 43 96% 56%;
+    --chart-5: 339 90% 51%;
+
     /* Studio editor tokens */
     --studio-glass-bg: rgba(255 255 255 / 0.06);
     --studio-glass-border: rgba(255 255 255 / 0.08);
@@ -92,6 +98,11 @@
     --gradient-start: #38bdf8;
     --gradient-mid: #818cf8;
     --gradient-end: #f472b6;
+    --chart-1: 217 91% 70%;
+    --chart-2: 271 81% 75%;
+    --chart-3: 162 63% 56%;
+    --chart-4: 43 96% 66%;
+    --chart-5: 339 80% 61%;
 
     /* Studio editor tokens */
     --studio-glass-bg: rgba(0 0 0 / 0.4);
@@ -238,24 +249,6 @@
     background-color: var(--math-inline-bg);
     padding: 0.1em 0.2em;
     border-radius: 4px;
-  }
-
-  .math-display {
-    display: block;
-    background-color: var(--math-display-bg);
-    padding: 0.5em;
-    margin: 1em 0;
-    border-radius: 8px;
-    text-align: center;
-    position: relative;
-  }
-
-  .equation-number {
-    position: absolute;
-    right: 0.5em;
-    bottom: 0.5em;
-    font-size: 0.85em;
-    color: var(--math-index-color);
   }
 
 
@@ -411,7 +404,7 @@
 
 /* Fluid typography heading styles */
   h1 {
-    font-size: clamp(1.5rem, 1rem + 2.5vw, 3.75rem);
+    font-size: clamp(1.5rem, 1rem + 2.5vw, 3.25rem);
     line-height: 1.1;
     letter-spacing: -0.02em;
     @apply mb-4 sm:mb-6 md:mb-8;
@@ -504,6 +497,7 @@
     @apply bg-muted/95 dark:bg-muted/80;
     @apply shadow-md hover:shadow-lg;
     @apply transition-all duration-300;
+    text-align: center;
 
 /* Enhanced controls container */
     .equation-controls {

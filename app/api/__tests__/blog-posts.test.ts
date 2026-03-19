@@ -86,6 +86,13 @@ describe('GET /api/blog/posts', () => {
     expect(body.meta).toBeDefined();
     expect(body.meta.timestamp).toBeDefined();
   });
+
+  it('returns 500 when BackendService throws unexpectedly', async () => {
+    mockGetAllPosts.mockRejectedValueOnce(new Error('DB down'));
+    const request = new Request('http://localhost/api/blog/posts');
+    const response = await getAll(request);
+    expect(response.status).toBe(500);
+  });
 });
 
 describe('GET /api/blog/posts/[slug]', () => {
@@ -137,5 +144,14 @@ describe('GET /api/blog/posts/[slug]', () => {
     });
 
     expect(mockEnsurePreprocessed).toHaveBeenCalledOnce();
+  });
+
+  it('returns 500 when BackendService throws unexpectedly', async () => {
+    mockGetPost.mockRejectedValueOnce(new Error('DB down'));
+    const request = new Request('http://localhost/api/blog/posts/test-post-1');
+    const response = await getBySlug(request, {
+      params: Promise.resolve({ slug: 'test-post-1' }),
+    });
+    expect(response.status).toBe(500);
   });
 });

@@ -1,35 +1,28 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto';
+import { createRateLimiter } from './rate-limit';
 
 const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24h
-const RATE_LIMIT_MAX = 5;
-const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 min
 
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const rateLimiter = createRateLimiter({ max: 5, windowMs: 15 * 60 * 1000, evictAt: 1000 });
 
-const SIGNING_KEY = process.env.SESSION_SIGNING_KEY || 'w4w-session-signing-key-dev';
+/** Lazy signing key — defers check to runtime so `next build` can import this module. */
+function getSigningKey(): string {
+  const key = process.env.SESSION_SIGNING_KEY;
+  if (!key && process.env.NODE_ENV === 'production')
+    throw new Error('SESSION_SIGNING_KEY environment variable is required in production');
+  return key ?? 'w4w-session-signing-key-dev';
+}
 
 const deriveKey = (password: string) =>
-  createHmac('sha256', SIGNING_KEY).update(password).digest();
+  createHmac('sha256', getSigningKey()).update(password).digest();
 
 /** HR-4: in-memory rate limiting keyed by IP */
 export function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  if (rateLimitMap.size > 1000) {
-    for (const [key, entry] of rateLimitMap) {
-      if (now > entry.resetAt) rateLimitMap.delete(key);
-    }
-  }
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-  entry.count++;
-  return entry.count <= RATE_LIMIT_MAX;
+  return rateLimiter.check(ip);
 }
 
 export function clearRateLimit(ip: string): void {
-  rateLimitMap.delete(ip);
+  rateLimiter.clear(ip);
 }
 
 /** HR-3: constant-time password comparison via SHA-256 — fixed-length, no empty-string bypass */

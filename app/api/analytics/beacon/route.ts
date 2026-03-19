@@ -1,35 +1,11 @@
 import { z } from 'zod';
 import { api as coreApi, ApiError } from '@/lib/core';
+import { createRateLimiter } from '@/lib/rate-limit';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-// In-memory rate limiter (resets on cold start — acceptable for serverless).
-// For persistent rate limiting, upgrade to Upstash Redis.
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 100;
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-
-  // Evict expired entries when map grows beyond threshold
-  if (rateLimitMap.size > 500) {
-    for (const [key, entry] of rateLimitMap) {
-      if (now > entry.resetAt) rateLimitMap.delete(key);
-    }
-  }
-
-  const entry = rateLimitMap.get(ip);
-
-  if (!entry || now >= entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
-    return true;
-  }
-
-  entry.count += 1;
-  return entry.count <= RATE_LIMIT_MAX;
-}
+const rateLimiter = createRateLimiter({ max: 100, windowMs: 60_000, evictAt: 500 });
 
 /** Validate that the request originates from our own site */
 function checkOrigin(request: Request): boolean {
@@ -55,6 +31,9 @@ function checkOrigin(request: Request): boolean {
       return false;
     }
   }
+
+  const secFetchSite = request.headers.get('sec-fetch-site');
+  if (secFetchSite === 'same-origin' || secFetchSite === 'none') return true;
 
   return false;
 }
@@ -117,7 +96,12 @@ export type BeaconPayload = z.infer<typeof beaconSchema>;
 
 export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
-    const ip = request.headers.get('x-real-ip') || 'unknown';
+    const ip = request.headers.get('x-real-ip')
+      ?? request.headers.get('x-forwarded-for')?.split(',')[0].trim()
+      ?? null;
+    if (!ip) {
+      return Response.json({ error: 'Forbidden' }, { status: 403 });
+    }
 
     if (!checkOrigin(request)) {
       return Response.json(
@@ -126,7 +110,7 @@ export const POST = coreApi.middleware.withErrorHandler(
       );
     }
 
-    if (!checkRateLimit(ip)) {
+    if (!rateLimiter.check(ip)) {
       return Response.json(
         { error: 'Too many requests' },
         { status: 429, headers: { 'Retry-After': '60' } }
@@ -149,19 +133,17 @@ export const POST = coreApi.middleware.withErrorHandler(
 
     const payload = validation.data;
 
-    const enriched = {
-      ...payload,
+    // Structured log — stripped of PII (no IP, device fingerprint, or visitorId).
+    // Full payload is validated but only non-PII fields are logged.
+    const { device: _d, visitorId: _vid, ...logPayload } = payload;
+    console.log(JSON.stringify({
+      _type: 'analytics_beacon',
+      ...logPayload,
       server: {
-        ip,
         country: request.headers.get('x-vercel-ip-country') || null,
-        city: request.headers.get('x-vercel-ip-city') || null,
-        region: request.headers.get('x-vercel-ip-region') || null,
         receivedAt: Date.now(),
       },
-    };
-
-    // Structured log — can be picked up by Vercel log drain, Datadog, etc.
-    console.log(JSON.stringify({ _type: 'analytics_beacon', ...enriched }));
+    }));
 
     return Response.json({ ok: true }, { status: 202 });
   }
