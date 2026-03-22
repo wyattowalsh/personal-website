@@ -41,6 +41,13 @@ const mockGetPost = vi.fn((slug: string) => {
   return Promise.resolve(post);
 });
 
+const mockGetPostMetadata = vi.fn((slug: string) => {
+  const post = mockPosts.find((p) => p.slug === slug);
+  if (!post) return Promise.resolve(null);
+  const { content, wordCount, ...metadata } = post;
+  return Promise.resolve(metadata);
+});
+
 const mockEnsurePreprocessed = vi.fn(() => Promise.resolve());
 
 vi.mock('@/lib/server', () => ({
@@ -50,6 +57,7 @@ vi.mock('@/lib/server', () => ({
       getAdjacentPosts: mockGetAdjacentPosts,
       getRelatedPosts: mockGetRelatedPosts,
       getPost: mockGetPost,
+      getPostMetadata: mockGetPostMetadata,
     }),
   },
   jsonResponse: (data: unknown, _options?: unknown) =>
@@ -151,5 +159,55 @@ describe('GET /api/blog/posts/[slug]/metadata', () => {
     const request = new Request('http://localhost/api/blog/posts/test-post-1/metadata');
     await getMetadata(request, makeProps('test-post-1'));
     expect(mockEnsurePreprocessed).toHaveBeenCalledOnce();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Error handling — unexpected exceptions (HR-S-012)
+// ---------------------------------------------------------------------------
+describe('error handling — unexpected exceptions', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  it('returns 500 when getAdjacentPosts throws', async () => {
+    mockGetAdjacentPosts.mockRejectedValueOnce(new Error('db connection failed'));
+    const request = new Request('http://localhost/api/blog/posts/test-post-1/adjacent');
+    const response = await getAdjacent(request, makeProps('test-post-1'));
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body.error).toBeDefined();
+    expect(body.error.message).toBe('Internal server error');
+  });
+
+  it('returns 500 when getRelatedPosts throws', async () => {
+    mockGetRelatedPosts.mockRejectedValueOnce(new Error('unexpected failure'));
+    const request = new Request('http://localhost/api/blog/posts/test-post-1/related');
+    const response = await getRelated(request, makeProps('test-post-1'));
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body.error).toBeDefined();
+    expect(body.error.message).toBe('Internal server error');
+  });
+
+  it('returns 500 when getPostMetadata throws', async () => {
+    mockGetPostMetadata.mockRejectedValueOnce(new TypeError('Cannot read properties'));
+    const request = new Request('http://localhost/api/blog/posts/test-post-1/metadata');
+    const response = await getMetadata(request, makeProps('test-post-1'));
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body.error).toBeDefined();
+    expect(body.error.message).toBe('Internal server error');
+  });
+
+  it('returns 500 when ensurePreprocessed throws', async () => {
+    mockEnsurePreprocessed.mockRejectedValueOnce(new Error('preprocessing failed'));
+    const request = new Request('http://localhost/api/blog/posts/test-post-1/adjacent');
+    const response = await getAdjacent(request, makeProps('test-post-1'));
+    expect(response.status).toBe(500);
+    const body = await response.json();
+    expect(body.error).toBeDefined();
+    expect(body.error.message).toBe('Internal server error');
   });
 });
