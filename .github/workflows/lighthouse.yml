@@ -32,7 +32,7 @@ jobs:
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.14.x
       - name: Run Lighthouse CI
-        run: lhci autorun
+        run: lhci autorun --config=./lighthouserc.cjs
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
       - name: Upload Lighthouse artifacts
