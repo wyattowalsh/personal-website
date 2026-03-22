@@ -14,8 +14,6 @@ import { cn } from "@/lib/utils";
 import { getDefaultMetadata, getConfig } from "@/lib/core";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { WebVitals } from "@/components/WebVitals";
-import { SessionTracker } from "@/components/SessionTracker";
 
 const monaspace = localFont({
 	src: "../public/fonts/MonaspaceArgon-subset.woff2",
@@ -149,8 +147,6 @@ export default function RootLayout({
 					{gaId && <GoogleAnalytics gaId={gaId} />}
 					<Analytics />
 					<SpeedInsights />
-					<WebVitals />
-					<SessionTracker />
 				</body>
 			</html>
 		</StrictMode>

@@ -22,50 +22,14 @@ vi.mock('@/lib/device', () => ({
     connection: '4g',
     platform: 'MacIntel',
   })),
-  getVisitorId: vi.fn(() => 'test-visitor-id'),
-  getSessionId: vi.fn(() => 'test-session-id'),
-  getVisitorInfo: vi.fn(() => ({
-    visitorId: 'test-visitor-id',
-    isReturning: false,
-    visitCount: 1,
-    firstSeen: '2025-01-01T00:00:00.000Z',
-    daysSinceFirstVisit: 0,
-  })),
-  getDeviceContext: vi.fn(() => ({
-    screenWidth: 1920,
-    screenHeight: 1080,
-    devicePixelRatio: 2,
-    colorDepth: 24,
-    touchPoints: 0,
-    userAgent: 'test',
-    platform: 'MacIntel',
-    language: 'en-US',
-    languages: ['en-US'],
-    cookieEnabled: true,
-    connectionType: '4g',
-    connectionDownlink: 10,
-    hardwareConcurrency: 8,
-    deviceMemory: 16,
-    viewportWidth: 1024,
-    viewportHeight: 768,
-    orientation: 'landscape',
-    timezone: 'America/Los_Angeles',
-    timezoneOffset: 480,
-    webglRenderer: 'test',
-    webglVendor: 'test',
-    pdfViewerEnabled: true,
-  })),
 }));
 
 // Must import after mocks are set up
 import {
   track,
-  sendBeacon,
   setAnalyticsOptOut,
   getAnalyticsOptOut,
 } from '@/lib/analytics';
-
-const mockFetch = vi.fn(() => Promise.resolve(new Response()));
 
 // Node 25 ships a built-in localStorage on globalThis that shadows jsdom's
 // proper Storage implementation. Replace with a spec-compliant mock.
@@ -93,7 +57,6 @@ beforeEach(() => {
     writable: true,
     configurable: true,
   });
-  globalThis.fetch = mockFetch;
 });
 
 afterEach(() => {
@@ -154,81 +117,6 @@ describe('track()', () => {
 
     const [, props] = mockVercelTrack.mock.calls[0];
     expect(props.query).toBe('test');
-  });
-});
-
-// ---------- sendBeacon() ----------
-
-describe('sendBeacon()', () => {
-  it('calls fetch for non-page_exit events', async () => {
-    await sendBeacon({
-      event: 'page_view',
-      url: '/test',
-      referrer: 'https://google.com',
-      title: 'Test Page',
-    });
-
-    expect(mockFetch).toHaveBeenCalledOnce();
-    const [url, init] = (mockFetch.mock.calls[0] as unknown as [string, { method: string; body: string; keepalive: boolean }]);
-    expect(url).toBe('/api/analytics/beacon');
-    expect(init.method).toBe('POST');
-    expect(init.keepalive).toBe(true);
-
-    const body = JSON.parse(init.body);
-    expect(body.event).toBe('page_view');
-    expect(body.url).toBe('/test');
-    expect(body.referrer).toBe('https://google.com');
-    expect(body.title).toBe('Test Page');
-  });
-
-  it('uses navigator.sendBeacon for page_exit events', async () => {
-    const mockNavSendBeacon = vi.fn(() => true);
-    Object.defineProperty(window.navigator, 'sendBeacon', {
-      value: mockNavSendBeacon,
-      writable: true,
-      configurable: true,
-    });
-
-    await sendBeacon({
-      event: 'page_exit',
-      url: '/test',
-      data: { timeSpent: 30 },
-    });
-
-    expect(mockNavSendBeacon).toHaveBeenCalledOnce();
-    const [url, blob] = (mockNavSendBeacon.mock.calls[0] as unknown as [string, Blob]);
-    expect(url).toBe('/api/analytics/beacon');
-    expect(blob).toBeInstanceOf(Blob);
-    expect(mockFetch).not.toHaveBeenCalled();
-  });
-
-  it('respects opt-out', async () => {
-    localStorage.setItem('analytics-opt-out', '1');
-
-    await sendBeacon({ event: 'page_view', url: '/test' });
-
-    expect(mockFetch).not.toHaveBeenCalled();
-  });
-
-  it('includes visitor info and device context in payload', async () => {
-    await sendBeacon({ event: 'scroll_depth', url: '/test', data: { depth: 75 } });
-
-    expect(mockFetch).toHaveBeenCalledOnce();
-    const [, init] = (mockFetch.mock.calls[0] as unknown as [string, { body: string }]);
-    const body = JSON.parse(init.body);
-
-    expect(body.visitorId).toBe('test-visitor-id');
-    expect(body.sessionId).toBe('test-session-id');
-    expect(body.isReturning).toBe(false);
-    expect(body.visitCount).toBe(1);
-    expect(body.daysSinceFirstVisit).toBe(0);
-    expect(body.device).toMatchObject({
-      screenWidth: 1920,
-      platform: 'MacIntel',
-      hardwareConcurrency: 8,
-    });
-    expect(body.data).toEqual({ depth: 75 });
-    expect(typeof body.timestamp).toBe('number');
   });
 });
 
