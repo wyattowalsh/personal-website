@@ -77,11 +77,19 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
       }
     };
 
-    initEngine();
+    // Defer particle initialization to avoid competing with LCP
+    let cleanup: (() => void) | undefined;
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      const id = requestIdleCallback(() => initEngine(), { timeout: 3000 });
+      cleanup = () => cancelIdleCallback(id);
+    } else {
+      const timer = setTimeout(initEngine, 3000);
+      cleanup = () => clearTimeout(timer);
+    }
 
     return () => {
+      cleanup?.();
       setMounted(false);
-      // Cleanup container if it exists
       if (containerRef.current) {
         containerRef.current.destroy();
       }

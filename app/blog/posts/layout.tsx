@@ -1,3 +1,4 @@
+import "katex/dist/katex.min.css";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PostLayout } from "@/components/PostLayout";

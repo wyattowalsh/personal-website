@@ -231,7 +231,7 @@ export const BlogFooter = () => {
               }}
             >
               <Image
-                src="/old.webp"
+                src="/logo.webp"
                 alt="Blog Logo"
                 width={48} // Smaller size
                 height={48} // Smaller size

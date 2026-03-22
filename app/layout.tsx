@@ -3,7 +3,6 @@ import { Bricolage_Grotesque } from "next/font/google";
 import localFont from "next/font/local";
 import "./tailwind.css";  // Tailwind v4 with config directive
 import "./globals.scss";  // Custom styles (no Tailwind directives)
-import "katex/dist/katex.min.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { Header } from "@/components/Header";
@@ -19,7 +18,7 @@ import { WebVitals } from "@/components/WebVitals";
 import { SessionTracker } from "@/components/SessionTracker";
 
 const monaspace = localFont({
-	src: "../public/fonts/MonaspaceArgonVarVF.woff2",
+	src: "../public/fonts/MonaspaceArgon-subset.woff2",
 	variable: "--font-monaspace",
 	display: "swap",
 	weight: "200 800",
@@ -141,7 +140,7 @@ export default function RootLayout({
 						<TooltipProvider>
 							<div className="relative flex min-h-screen flex-col">
 								<Header />
-								<main id="main-content" className="flex-1 flex flex-col pt-16 sm:pt-[4.5rem] md:pt-20">{children}</main>
+								<main id="main-content" className="flex-1 flex flex-col pt-14 sm:pt-16">{children}</main>
 							</div>
 						</TooltipProvider>
 						<ScrollIndicator />
