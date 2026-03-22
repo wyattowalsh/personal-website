@@ -2,7 +2,7 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground"), { ssr: false });
+const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground").then(mod => mod.ParticlesBackground), { ssr: false });
 
 export default function TagsLayout({
   children,

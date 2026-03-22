@@ -1,7 +1,7 @@
 // app/blog/layout.tsx
 import React from "react";
-import BlogFooter from "@/components/BlogFooter";
-import ScrollReset from "@/components/ScrollReset";
+import { BlogFooter } from "@/components/BlogFooter";
+import { ScrollReset } from "@/components/ScrollReset";
 import { Metadata } from "next";
 import { cn } from "@/lib/utils";
 import { BlogLayoutContent } from "@/components/BlogLayoutContent";

@@ -1,5 +1,6 @@
 import { buildFeed } from '@/lib/feed';
-import { api as coreApi, logger } from '@/lib/core';
+import { api as coreApi } from '@/lib/core';
+import { logger } from '@/lib/logger';
 
 export const revalidate = 3600;
 

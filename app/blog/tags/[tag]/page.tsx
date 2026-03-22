@@ -1,5 +1,5 @@
 import { BackendService } from "@/lib/server";
-import PostCard from "@/components/PostCard";
+import { PostCard } from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 

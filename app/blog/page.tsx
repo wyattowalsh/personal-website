@@ -1,5 +1,5 @@
 import { BackendService } from "@/lib/server";
-import BlogPageContent from "@/components/BlogPageContent";
+import { BlogPageContent } from "@/components/BlogPageContent";
 import { Metadata } from 'next';
 import { getConfig } from '@/lib/core';
 

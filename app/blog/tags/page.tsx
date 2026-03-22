@@ -1,5 +1,5 @@
 import { BackendService } from "@/lib/server";
-import TagsGrid from '@/components/TagsGrid';
+import { TagsGrid } from '@/components/TagsGrid';
 import { TagsList } from '@/components/TagsList';
 import { Separator } from "@/components/ui/separator";
 

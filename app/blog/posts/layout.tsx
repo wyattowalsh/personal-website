@@ -3,7 +3,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { PostLayout } from "@/components/PostLayout";
 import { MathProvider } from "@/components/MathContext";
 import { cn } from "@/lib/utils";
-import CustomScrollbars from "@/components/Scroll";
+import { CustomScrollbars } from "@/components/Scroll";
 
 type Props = {
 	children: React.ReactNode;
