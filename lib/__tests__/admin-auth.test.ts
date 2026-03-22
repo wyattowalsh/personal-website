@@ -5,6 +5,8 @@ import {
   validatePassword,
   createSessionToken,
   validateSessionToken,
+  validateRequestOrigin,
+  resolveClientIp,
 } from '@/lib/admin-auth';
 
 describe('validatePassword', () => {
@@ -106,5 +108,118 @@ describe('checkRateLimit', () => {
     vi.advanceTimersByTime(15 * 60 * 1000 + 1);
     expect(checkRateLimit(ip)).toBe(true);
     clearRateLimit(ip);
+  });
+});
+
+describe('validateRequestOrigin', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('returns true in dev mode regardless of headers', () => {
+    vi.stubEnv('NODE_ENV', 'test'); // Not 'production'
+    const req = new Request('http://localhost:3000/api/test', {
+      headers: { origin: 'https://evil.com' },
+    });
+    expect(validateRequestOrigin(req)).toBe(true);
+  });
+
+  it('returns true for valid Origin header in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test', {
+      headers: { origin: 'https://w4w.dev' },
+    });
+    expect(validateRequestOrigin(req)).toBe(true);
+  });
+
+  it('returns false for invalid Origin header in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test', {
+      headers: { origin: 'https://evil.com' },
+    });
+    expect(validateRequestOrigin(req)).toBe(false);
+  });
+
+  it('returns true for valid Referer header (no Origin) in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test', {
+      headers: { referer: 'https://w4w.dev/admin/dashboard' },
+    });
+    expect(validateRequestOrigin(req)).toBe(true);
+  });
+
+  it('returns false for invalid Referer header in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test', {
+      headers: { referer: 'https://evil.com/phishing' },
+    });
+    expect(validateRequestOrigin(req)).toBe(false);
+  });
+
+  it('returns true for sec-fetch-site: same-origin in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test', {
+      headers: { 'sec-fetch-site': 'same-origin' },
+    });
+    expect(validateRequestOrigin(req)).toBe(true);
+  });
+
+  it('returns false for sec-fetch-site: cross-site in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test', {
+      headers: { 'sec-fetch-site': 'cross-site' },
+    });
+    expect(validateRequestOrigin(req)).toBe(false);
+  });
+
+  it('returns false when no Origin/Referer/sec-fetch-site in production', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const req = new Request('https://w4w.dev/api/test');
+    expect(validateRequestOrigin(req)).toBe(false);
+  });
+});
+
+describe('resolveClientIp', () => {
+  it('returns x-real-ip when present', () => {
+    const req = new Request('http://localhost:3000/api/test', {
+      headers: { 'x-real-ip': '192.168.1.1' },
+    });
+    expect(resolveClientIp(req)).toBe('192.168.1.1');
+  });
+
+  it('returns first IP from x-forwarded-for', () => {
+    const req = new Request('http://localhost:3000/api/test', {
+      headers: { 'x-forwarded-for': '10.0.0.1, 10.0.0.2, 10.0.0.3' },
+    });
+    expect(resolveClientIp(req)).toBe('10.0.0.1');
+  });
+
+  it('prefers x-real-ip over x-forwarded-for', () => {
+    const req = new Request('http://localhost:3000/api/test', {
+      headers: {
+        'x-real-ip': '192.168.1.1',
+        'x-forwarded-for': '10.0.0.1, 10.0.0.2',
+      },
+    });
+    expect(resolveClientIp(req)).toBe('192.168.1.1');
+  });
+
+  it('returns null when no IP headers present', () => {
+    const req = new Request('http://localhost:3000/api/test');
+    expect(resolveClientIp(req)).toBeNull();
+  });
+
+  it('trims whitespace from x-real-ip', () => {
+    const req = new Request('http://localhost:3000/api/test', {
+      headers: { 'x-real-ip': '  192.168.1.1  ' },
+    });
+    expect(resolveClientIp(req)).toBe('192.168.1.1');
+  });
+
+  it('trims whitespace from x-forwarded-for entries', () => {
+    const req = new Request('http://localhost:3000/api/test', {
+      headers: { 'x-forwarded-for': '  10.0.0.1 , 10.0.0.2' },
+    });
+    expect(resolveClientIp(req)).toBe('10.0.0.1');
   });
 });
