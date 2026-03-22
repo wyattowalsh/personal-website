@@ -12,7 +12,7 @@ interface TagLinkProps {
   isNested?: boolean; // New prop to indicate if it's nested within another link
 }
 
-export default function TagLink({ tag, count, showCount = false, isNested = false }: TagLinkProps) {
+export function TagLink({ tag, count, showCount = false, isNested = false }: TagLinkProps) {
   const content = (
     <motion.div
       whileHover={{ scale: 1.05 }}

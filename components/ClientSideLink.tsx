@@ -6,7 +6,7 @@ interface ClientSideLinkProps extends React.AnchorHTMLAttributes<HTMLAnchorEleme
   isExternal?: boolean
 }
 
-const ClientSideLink: React.FC<ClientSideLinkProps> = ({
+export const ClientSideLink: React.FC<ClientSideLinkProps> = ({
   href,
   isExternal,
   children,
@@ -30,5 +30,3 @@ const ClientSideLink: React.FC<ClientSideLinkProps> = ({
     </a>
   )
 }
-
-export default ClientSideLink

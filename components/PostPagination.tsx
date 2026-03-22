@@ -10,7 +10,7 @@ import { cn, extractPostSlug } from "@/lib/utils";
 import type { AdjacentPost } from "@/lib/types";
 import type { Route } from "next";
 
-export default function PostPagination() {
+export function PostPagination() {
 	const [state, setState] = useState<{
 		data: { prevPost: AdjacentPost | null; nextPost: AdjacentPost | null };
 		isLoading: boolean;

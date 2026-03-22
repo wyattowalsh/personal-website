@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useReportWebVitals } from 'next/web-vitals';
 import { track } from '@/lib/analytics';

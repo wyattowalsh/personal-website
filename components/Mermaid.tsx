@@ -26,7 +26,7 @@ interface Transform {
   y: number;
 }
 
-export default function Mermaid({ chart, className, title }: MermaidProps) {
+export function Mermaid({ chart, className, title }: MermaidProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgContainerRef = useRef<HTMLDivElement>(null);
   const [svg, setSvg] = useState<string>("");
@@ -61,7 +61,7 @@ export default function Mermaid({ chart, className, title }: MermaidProps) {
         mermaid.initialize({
           startOnLoad: false,
           theme: resolvedTheme === "dark" ? "dark" : "default",
-          securityLevel: "loose",
+          securityLevel: "strict",
           fontFamily: "inherit",
           flowchart: {
             htmlLabels: true,

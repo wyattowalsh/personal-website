@@ -15,7 +15,7 @@ export interface MathProps {  // Add export here
   number?: number;
 }
 
-export default function Math({ children = '', display = false, options = {}, label, number }: MathProps) {
+export function Math({ children = '', display = false, options = {}, label, number }: MathProps) {
   const [copied, setCopied] = useState(false);
   const [copiedEquation, setCopiedEquation] = useState(false);
   const mathRef = useRef<HTMLDivElement>(null);

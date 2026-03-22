@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-export default function ScrollReset() {
+export function ScrollReset() {
   const pathname = usePathname();
 
   useEffect(() => {

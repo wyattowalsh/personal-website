@@ -1,9 +1,14 @@
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import PostHeader from "@/components/PostHeader";
-import PostPagination from "@/components/PostPagination";
-import Comments from "@/components/Comments";
+import { PostHeader } from "@/components/PostHeader";
+import { PostPagination } from "@/components/PostPagination";
+import { Comments } from "@/components/Comments";
+import { TableOfContents } from "@/components/TableOfContents";
+import { PostLayoutSeriesNav } from "@/components/PostLayoutSeriesNav";
+import { PostLayoutShareButtons } from "@/components/PostLayoutShareButtons";
+import { RelatedPosts } from "@/components/RelatedPosts";
+import { Webmentions } from "@/components/Webmentions";
 import { cn } from "@/lib/utils";
 
 interface PostLayoutProps {
@@ -49,23 +54,54 @@ export function PostLayout({ children }: PostLayoutProps) {
 					"max-w-5xl mx-auto" // Match PostHeader width
 				)} />
 
+				{/* Series navigation (top) — rendered by client wrapper that fetches series data */}
 				<ErrorBoundary>
-					<div className={cn(
-						"prose-content",
-						"relative z-10",
-						"max-w-5xl mx-auto", // Match PostHeader width
-						// Add responsive text sizing
-						"prose-p:text-base sm:prose-p:text-lg",
-						"prose-headings:scroll-mt-20",
-						// Add responsive spacing
-						"prose-p:my-4 sm:prose-p:my-6",
-						"prose-headings:my-6 sm:prose-headings:my-8",
-						// Ensure inline code and math are responsive
-						"prose-code:text-sm sm:prose-code:text-base",
-						"[&_.math-inline]:text-sm [&_.math-inline]:sm:text-base"
-					)}>
-						{children}
+					<PostLayoutSeriesNav />
+				</ErrorBoundary>
+
+				{/* Table of contents + content area (mobile: collapsible above content, desktop: sticky sidebar) */}
+				<div className="xl:flex xl:flex-row-reverse xl:gap-8 max-w-5xl mx-auto">
+					{/* ToC — on mobile (xl:hidden) it renders a collapsible above content via DOM order;
+					     on desktop (xl:block) it renders as a sticky sidebar in the right column */}
+					<ErrorBoundary>
+						<Suspense fallback={null}>
+							<div className="not-prose">
+								<TableOfContents />
+							</div>
+						</Suspense>
+					</ErrorBoundary>
+
+					<div className="flex-1 min-w-0">
+						<ErrorBoundary>
+							<div className={cn(
+								"prose-content",
+								"relative z-10",
+								// Add responsive text sizing
+								"prose-p:text-base sm:prose-p:text-lg",
+								"prose-headings:scroll-mt-20",
+								// Add responsive spacing
+								"prose-p:my-4 sm:prose-p:my-6",
+								"prose-headings:my-6 sm:prose-headings:my-8",
+								// Ensure inline code and math are responsive
+								"prose-code:text-sm sm:prose-code:text-base",
+								"[&_.math-inline]:text-sm [&_.math-inline]:sm:text-base"
+							)}>
+								{children}
+							</div>
+						</ErrorBoundary>
 					</div>
+				</div>
+
+				{/* Share buttons */}
+				<ErrorBoundary>
+					<div className="not-prose max-w-5xl mx-auto">
+						<PostLayoutShareButtons />
+					</div>
+				</ErrorBoundary>
+
+				{/* Series navigation (bottom) */}
+				<ErrorBoundary>
+					<PostLayoutSeriesNav />
 				</ErrorBoundary>
 
 				<hr className={cn(
@@ -108,6 +144,20 @@ export function PostLayout({ children }: PostLayoutProps) {
 					>
 						<Comments />
 					</Suspense>
+				</ErrorBoundary>
+
+				{/* Webmentions — after comments */}
+				<ErrorBoundary>
+					<div className="not-prose">
+						<Webmentions />
+					</div>
+				</ErrorBoundary>
+
+				{/* Related posts — after webmentions */}
+				<ErrorBoundary>
+					<div className="not-prose">
+						<RelatedPosts />
+					</div>
 				</ErrorBoundary>
 			</article>
 		</ErrorBoundary>

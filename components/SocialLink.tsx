@@ -111,7 +111,7 @@ function adjustColorForMode(color: string, isDark: boolean) {
   return isDark ? darkModeAdjustment : lightModeAdjustment;
 }
 
-export default function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
+export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const isInternalLink = link.url.startsWith("/");
 

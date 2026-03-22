@@ -21,7 +21,7 @@ interface ParticleControlsProps {
   onDensityChange: (density: DensityLevel) => void;
 }
 
-export default function ParticleControls({
+export function ParticleControls({
   onConfigChange,
   onPause,
   onResume,

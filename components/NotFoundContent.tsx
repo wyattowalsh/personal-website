@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Home, BookOpen, ArrowLeft } from "lucide-react";
 
-export default function NotFoundContent() {
+export function NotFoundContent() {
   const pathname = usePathname();
   const isBlogPage = pathname.startsWith("/blog");
   const backLink = isBlogPage ? "/blog" : "/";

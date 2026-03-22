@@ -28,7 +28,7 @@ interface PostCardProps {
 	className?: string;
 }
 
-const PostCard = ({ post, className: _className }: PostCardProps) => {
+export const PostCard = ({ post, className: _className }: PostCardProps) => {
 	const {
 		slug,
 		title = "Untitled Post",
@@ -153,5 +153,3 @@ const PostCard = ({ post, className: _className }: PostCardProps) => {
 		</article>
 	);
 };
-
-export default PostCard;

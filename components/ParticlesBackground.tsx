@@ -8,14 +8,14 @@ import { motion } from "motion/react";
 import { type Container } from "@tsparticles/engine";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
-import ParticleControls, { type DensityLevel } from "./ParticleControls";
+import { ParticleControls, type DensityLevel } from "./ParticleControls";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
 interface ParticlesBackgroundProps {
   className?: string;
 }
 
-const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) => {
+export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) => {
   const [init, setInit] = useState(false);
   const { resolvedTheme } = useTheme();
   const [isPaused, setIsPaused] = useState(false);
@@ -86,7 +86,7 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
         containerRef.current.destroy();
       }
     };
-  }, [currentTheme]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- init once, theme changes handled below
 
   // Update theme effect
   useEffect(() => {
@@ -176,7 +176,7 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
               url={currentConfigUrl}
               particlesLoaded={particlesLoaded}
               options={{
-                fpsLimit: 60,
+                fpsLimit: 30,
                 pauseOnBlur: true,
                 pauseOnOutsideViewport: true,
                 particles: {
@@ -219,5 +219,3 @@ const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) =
     </div>
   );
 };
-
-export default ParticlesBackground;

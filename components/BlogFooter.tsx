@@ -151,7 +151,7 @@ const FeedFormatButton = ({ href, icon: Icon, format, description }: {
   );
 };
 
-const BlogFooter = () => {
+export const BlogFooter = () => {
   const prefersReducedMotion = useReducedMotion();
   const currentYear = new Date().getFullYear();
 
@@ -327,5 +327,3 @@ const BlogFooter = () => {
     </footer>
   );
 };
-
-export default BlogFooter;

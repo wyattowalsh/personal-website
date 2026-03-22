@@ -27,6 +27,9 @@ export function WebSiteJsonLd() {
     <script
       type="application/ld+json"
       dangerouslySetInnerHTML={{
+        // Escape '<' as '\u003c' to prevent script injection via JSON-LD content.
+        // Without this, a value containing "</script>" could prematurely close
+        // the JSON-LD block, allowing arbitrary script execution (XSS).
         __html: JSON.stringify(schema).replace(/</g, '\\u003c'),
       }}
     />

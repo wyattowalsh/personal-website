@@ -158,7 +158,7 @@ const BackgroundParticles = () => {
 	useEffect(() => {
 		// Generate random values only on client
 		setParticles(
-			Array.from({ length: 100 }, () => ({
+			Array.from({ length: 30 }, () => ({
 				width: Math.random() * 4 + 2,
 				height: Math.random() * 4 + 2,
 				top: Math.random() * 100,
@@ -202,7 +202,7 @@ const BackgroundParticles = () => {
 	);
 };
 
-const BlogTitle = () => {
+export const BlogTitle = () => {
 	const prefersReducedMotion = useReducedMotion();
 	const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
 	const [isVisible, setIsVisible] = useState(false);
@@ -304,5 +304,3 @@ const BlogTitle = () => {
 		</motion.div>
 	);
 };
-
-export default BlogTitle;

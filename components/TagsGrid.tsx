@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { motion, useMotionValue } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
@@ -13,7 +13,7 @@ interface TagsGridProps {
   tagCounts: Record<string, number>;
 }
 
-export default function TagsGrid({ tags, tagCounts }: TagsGridProps) {
+export function TagsGrid({ tags, tagCounts }: TagsGridProps) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 

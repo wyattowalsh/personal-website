@@ -2,7 +2,7 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import BlogTitle from "@/components/BlogTitle";
+import { BlogTitle } from "@/components/BlogTitle";
 
 interface BlogLayoutContentProps {
   children: React.ReactNode;

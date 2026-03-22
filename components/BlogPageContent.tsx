@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
-const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground"), { ssr: false });
-import BlogContent from "@/components/BlogContent";
+const ParticlesBackground = dynamic(() => import("@/components/ParticlesBackground").then(mod => mod.ParticlesBackground), { ssr: false });
+import { BlogContent } from "@/components/BlogContent";
 import type { PostMetadata } from "@/lib/types";
 
 interface BlogPageContentProps {
@@ -11,7 +11,7 @@ interface BlogPageContentProps {
   tags: string[];
 }
 
-export default function BlogPageContent({ posts, tags }: BlogPageContentProps) {
+export function BlogPageContent({ posts, tags }: BlogPageContentProps) {
   const [showParticles, setShowParticles] = useState(false);
   const PARTICLE_DEFER_MS = 5000;
 

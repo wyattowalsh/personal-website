@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import SearchBar from "@/components/SearchBar";
+import { SearchBar } from "@/components/SearchBar";
 import type { PostMetadata } from "@/lib/types";
 
 interface BlogContentProps {
@@ -7,7 +7,7 @@ interface BlogContentProps {
   tags: string[];
 }
 
-export default function BlogContent({ posts, tags }: BlogContentProps) {
+export function BlogContent({ posts, tags }: BlogContentProps) {
   return (
     <div className={cn(
       "w-full",

@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import PostCard from "./PostCard";
+import { PostCard } from "./PostCard";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -57,7 +57,7 @@ const getPostTags = (post: PostMetadata): string[] => {
   return post.tags || [];
 };
 
-const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 	const prefersReducedMotion = useReducedMotion();
 
 	// Sort tags case-insensitively but preserve original case for display
@@ -474,5 +474,3 @@ const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
 		</div>
 	);
 };
-
-export default SearchBar;

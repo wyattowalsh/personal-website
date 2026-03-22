@@ -1,6 +1,6 @@
 "use client";
 
-import SocialLink from "./SocialLink";
+import { SocialLink } from "./SocialLink";
 import { motion, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
@@ -61,7 +61,7 @@ export const links = [
 }));
 
 // Explicitly type the component as React.FC
-const Links: React.FC = () => {
+export const Links: React.FC = () => {
   const prefersReducedMotion = useReducedMotion();
 
   const containerVariants: Variants = {
@@ -146,5 +146,3 @@ const Links: React.FC = () => {
   );
 };
 
-// Keep default export
-export default Links;

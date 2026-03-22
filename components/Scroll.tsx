@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 
-const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
+export const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
   const [showButton, setShowButton] = useState(false);
   const [hasOverflow, setHasOverflow] = useState(false);
 
@@ -59,5 +59,3 @@ const CustomScrollbars = ({ children }: { children: React.ReactNode }) => {
     </div>
   );
 };
-
-export default CustomScrollbars;

@@ -8,7 +8,7 @@ import { motion } from "motion/react";
 import { ArrowLeft, ChevronLeft } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function BlogBackLink() {
+export function BlogBackLink() {
   const pathname = usePathname();
   const isBlogHome = pathname === "/blog";
   const showBackLink = pathname !== "/";

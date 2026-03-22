@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
@@ -22,6 +22,9 @@ export function GistEmbed({ id, file }: GistEmbedProps) {
   const gistPath = id.startsWith('http')
     ? id.replace(/^https?:\/\/gist\.github\.com\//, '')
     : id
+
+  // Validate gist path format to prevent injection into srcdoc HTML
+  const isValidGistPath = /^[\w\-]+\/[\w\-]+$/.test(gistPath)
 
   const fileParam = file ? `?file=${encodeURIComponent(file)}` : ''
 
@@ -154,6 +157,21 @@ export function GistEmbed({ id, file }: GistEmbedProps) {
     }, 15000)
     return () => clearTimeout(timeout)
   }, [loading])
+
+  if (!isValidGistPath) {
+    return (
+      <div
+        className={cn(
+          'my-4 rounded-xl border border-destructive/50 p-6 text-center',
+          'bg-destructive/10 text-destructive'
+        )}
+      >
+        <p className="text-sm">
+          Invalid gist ID format: expected <code>username/gistId</code>.
+        </p>
+      </div>
+    )
+  }
 
   if (error) {
     return (

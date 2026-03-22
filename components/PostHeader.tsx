@@ -174,7 +174,7 @@ const useSafePost = (pathname: string) => {
   return state;
 };
 
-export default function PostHeader() {
+export function PostHeader() {
   const pathname = usePathname();
   const [imageLoaded, setImageLoaded] = useState(false);
   const postData = useSafePost(pathname);

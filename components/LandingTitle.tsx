@@ -55,7 +55,7 @@ const WORDS = [
 
 const ANIMATION_INTERVAL = 3000;
 
-export default function LandingTitle() {
+export function LandingTitle() {
   const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [wordIndex, setWordIndex] = useState(0);

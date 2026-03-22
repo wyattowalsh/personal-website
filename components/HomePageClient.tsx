@@ -4,22 +4,22 @@ import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import Links from "@/components/Links";
-import LandingTitle from "@/components/LandingTitle";
-import PostCard from "@/components/PostCard";
+import { Links } from "@/components/Links";
+import { LandingTitle } from "@/components/LandingTitle";
+import { PostCard } from "@/components/PostCard";
 import { motion, useScroll, useTransform, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import type { PostMetadata } from "@/lib/types";
 import styles from "@/app/page.module.scss";
 
-const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground'), { ssr: false });
+const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground').then(mod => mod.ParticlesBackground), { ssr: false });
 
 interface HomePageClientProps {
   recentPosts: PostMetadata[];
 }
 
-export default function HomePageClient({ recentPosts }: HomePageClientProps) {
+export function HomePageClient({ recentPosts }: HomePageClientProps) {
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
   const [showParticles, setShowParticles] = useState(false);
@@ -91,14 +91,14 @@ export default function HomePageClient({ recentPosts }: HomePageClientProps) {
         </div>
       )}
 
-      <motion.div
-        className={cn(
-          "relative z-10 flex flex-col justify-center min-h-screen",
-          "px-4 sm:px-6 lg:px-8",
-          "py-12 sm:py-16 lg:py-20",
-          "max-w-7xl mx-auto w-full"
-        )}
-      >
+        <motion.div
+          className={cn(
+            "relative z-10 flex flex-col justify-start min-h-screen",
+            "px-4 sm:px-6 lg:px-8",
+            "pt-4 pb-12 sm:pt-6 sm:pb-16 lg:pt-8 lg:pb-20",
+            "max-w-7xl mx-auto w-full"
+          )}
+        >
         <motion.div
           className="flex flex-col items-center justify-center space-y-8"
         >
