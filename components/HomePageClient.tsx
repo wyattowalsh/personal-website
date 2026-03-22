@@ -41,30 +41,20 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
   const imageRotate = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [0, 0] : [0, -5]);
 
   // Enhanced animations
+  // Content starts visible — no hidden state that delays FCP/LCP
   const pageVariants: Variants = {
-    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.8,
-        ease: [0.6, -0.05, 0.01, 0.99],
-        staggerChildren: prefersReducedMotion ? 0 : 0.2
-      }
     }
   };
 
+  // Image starts visible (no hidden state) to avoid delaying LCP
   const imageContainerVariants: Variants = {
-    hidden: { scale: prefersReducedMotion ? 1 : 0.8, opacity: 0, rotate: prefersReducedMotion ? 0 : -10 },
     visible: {
       scale: 1,
       opacity: 1,
       rotate: 0,
-      transition: {
-        type: "spring",
-        duration: 1,
-        bounce: prefersReducedMotion ? 0 : 0.4
-      }
     },
     hover: prefersReducedMotion ? {} : {
       scale: 1.05,
@@ -136,25 +126,11 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
 
             <LandingTitle />
 
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.5, delay: 0.4 }
-                }
-              }}
-            >
-              <Links />
-            </motion.div>
+            <Links />
 
             {/* Latest Writing Section */}
             {recentPosts.length > 0 && (
-              <motion.section
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+              <section
                 className="w-full max-w-6xl mx-auto mt-12 px-4"
               >
                 <h2 className="text-2xl font-semibold mb-6 text-center bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
@@ -162,14 +138,9 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {recentPosts.map((post) => (
-                    <motion.div
-                      key={post.slug}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.1 }}
-                    >
+                    <div key={post.slug}>
                       <PostCard post={post} />
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
                 <Link
@@ -182,7 +153,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
                 >
                   View all posts →
                 </Link>
-              </motion.section>
+              </section>
             )}
         </motion.div>
       </motion.div>

@@ -125,7 +125,7 @@ export function LandingTitle() {
       </h1>
 
       {prefersReducedMotion ? (
-        <div className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2">
+        <div className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2 h-12 sm:h-14 md:h-16 flex items-center justify-center">
           <p
             className={cn(
               "mt-2 sm:mt-3",
@@ -145,7 +145,7 @@ export function LandingTitle() {
           <motion.div
             key={wordIndex}
             // Reduced gap between title and subtitle
-            className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2"
+            className="subtitle-container w-full max-w-[85vw] sm:max-w-2xl px-2 sm:px-0 mt-1 sm:mt-2 h-12 sm:h-14 md:h-16 flex items-center justify-center"
             aria-live="off"
           >
             <motion.p
