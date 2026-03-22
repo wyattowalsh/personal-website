@@ -2,7 +2,7 @@ import { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import localFont from "next/font/local";
 import "./tailwind.css";  // Tailwind v4 with config directive
-import "./globals.scss";  // Custom styles (no Tailwind directives)
+import "./globals.css";  // Custom styles (no Tailwind directives)
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { Header } from "@/components/Header";

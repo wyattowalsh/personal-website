@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
-import styles from '../app/page.module.scss';
+import styles from '../app/page.module.css';
 
 const WORDS = [
     "cybernetic architect",

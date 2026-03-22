@@ -16,9 +16,7 @@
 
 
 
-
-
-// Gradient animation
+/* Gradient animation */
 @keyframes titleGradient {
   0%, 100% {
     background-position: 0% 50%;
@@ -29,10 +27,6 @@
     filter: hue-rotate(15deg) brightness(1.1);
   }
 }
-
-
-
-
 
 
 
@@ -72,13 +66,13 @@
   width: 100%;
   margin: 0 auto;
   perspective: 1000px;
-  // Adjust max-width for different screen sizes
-  max-width: 160px; // Default for mobile
+  /* Adjust max-width for different screen sizes */
+  max-width: 160px; /* Default for mobile */
   @media (min-width: 640px) { max-width: 180px; }
   @media (min-width: 768px) { max-width: 200px; }
   @media (min-width: 1024px) { max-width: 220px; }
   @media (min-width: 1280px) { max-width: 240px; }
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -98,7 +92,7 @@
 
   .imageGlow {
     position: absolute;
-    // Adjust glow size based on container
+    /* Adjust glow size based on container */
     inset: -15%;
     background: radial-gradient(
       circle at center,
@@ -111,10 +105,10 @@
     z-index: -1;
   }
 
-  // Enhanced float animation for larger screens
+  /* Enhanced float animation for larger screens */
   @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
     animation: float 6s ease-in-out infinite;
-    
+
     &:hover {
       animation-play-state: paused;
     }
@@ -126,7 +120,7 @@
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   filter: brightness(1.05) contrast(1.05);
   transform-style: preserve-3d;
-  
+
   &:hover {
     filter: brightness(1.1) contrast(1.1);
     transform: scale(1.02) translateZ(20px);
@@ -136,7 +130,7 @@
 .enhancedSeparator {
   position: relative;
   overflow: hidden;
-  
+
   &::before {
     content: '';
     position: absolute;
@@ -165,34 +159,32 @@
   background-size: 300% 300%;
   background-image: linear-gradient(
     60deg,
-    #3b82f6 0%,    // blue-500
-    #8b5cf6 33%,   // purple-500
-    #ec4899 66%,   // pink-500
-    #3b82f6 100%   // back to blue-500
+    #3b82f6 0%,    /* blue-500 */
+    #8b5cf6 33%,   /* purple-500 */
+    #ec4899 66%,   /* pink-500 */
+    #3b82f6 100%   /* back to blue-500 */
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  
-  // Enhanced gradient animation
+
+  /* Enhanced gradient animation */
   animation: titleGradient 8s ease infinite;
-  
-  // Simpler hover without perspective
+
+  /* Simpler hover without perspective */
   &:hover {
     animation-play-state: paused;
     filter: brightness(1.2);
   }
 
-  // Dark mode adjustments
+  /* Dark mode adjustments */
   :global(.dark) & {
     background-image: linear-gradient(
       60deg,
-      #60a5fa 0%,    // blue-400
-      #a78bfa 33%,   // purple-400
-      #f472b6 66%,   // pink-400
-      #60a5fa 100%   // back to blue-400
+      #60a5fa 0%,    /* blue-400 */
+      #a78bfa 33%,   /* purple-400 */
+      #f472b6 66%,   /* pink-400 */
+      #60a5fa 100%   /* back to blue-400 */
     );
   }
 }
-
-// ...rest of existing code...

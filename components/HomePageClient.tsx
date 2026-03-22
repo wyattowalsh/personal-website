@@ -11,7 +11,7 @@ import { motion, useScroll, useTransform, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import type { PostMetadata } from "@/lib/types";
-import styles from "@/app/page.module.scss";
+import styles from "@/app/page.module.css";
 
 const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground').then(mod => mod.ParticlesBackground), { ssr: false });
 

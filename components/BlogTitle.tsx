@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
-import styles from '@/components/blogtitle.module.scss';
+import styles from '@/components/blogtitle.module.css';
 
 const icons = [
 	Code,
