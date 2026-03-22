@@ -1,0 +1,530 @@
+---
+title: "lib/server.ts"
+description: "Server-side API for accessing posts, tags, and search functionality via BackendService"
+---
+
+The `lib/server.ts` module provides the `BackendService` singleton for server components to access blog data. It handles preprocessing, caching, and type-safe access to all blog content.
+
+## Overview
+
+`BackendService` is the **primary API** for fetching blog data in server components. It automatically handles:
+- ✅ Preprocessing initialization
+- ✅ Caching
+- ✅ Error handling
+- ✅ Type safety
+
+**Key difference from `lib/client.ts`:**
+- `lib/server.ts` → Server components (direct BackendService access)
+- `lib/client.ts` → Client components (fetch() API calls)
+
+---
+
+## BackendService
+
+The main export is the `BackendService` class, accessed as a singleton. Always call `ensurePreprocessed()` before `getInstance()`:
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+await BackendService.ensurePreprocessed()
+const backend = BackendService.getInstance()
+```
+
+---
+
+## BackendService Post Methods
+
+Blog post operations.
+
+### getPost
+
+Fetch a single post by slug.
+
+```typescript
+async function getPost(slug: string): Promise<Post | null>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `slug` | `string` | The post slug (URL-safe identifier) |
+
+**Returns:** `Post | null`
+- Returns the full `Post` object if found
+- Returns `null` if the post doesn't exist
+
+**Usage:**
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const post = await backend.getPost(params.slug)
+
+  if (!post) {
+    notFound();
+  }
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+    </article>
+  );
+}
+```
+
+**Caching:**
+- Uses Map-based cache with 1-hour TTL
+- Cache key: `post:${slug}`
+
+---
+
+### getAllPosts
+
+Fetch all posts, sorted by creation date (newest first).
+
+```typescript
+async function getAllPosts(): Promise<Post[]>
+```
+
+**Returns:** `Post[]`
+- Array of all posts
+- Sorted by `created` date (descending)
+- Empty array if no posts exist
+
+**Usage:**
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export default async function BlogIndex() {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const posts = await backend.getAllPosts()
+
+  return (
+    <div>
+      <h1>All Posts ({posts.length})</h1>
+      {posts.map(post => (
+        <PostCard key={post.slug} post={post} />
+      ))}
+    </div>
+  );
+}
+```
+
+**Performance note:**
+- Returns full `Post` objects including content
+- For metadata-only listings, consider fetching and filtering manually
+- No built-in pagination (implement in component if needed)
+
+---
+
+### search
+
+Full-text search across posts.
+
+```typescript
+async function search(query: string): Promise<SearchResult<Post>[]>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `query` | `string` | Search query string |
+
+**Returns:** `SearchResult<Post>[]`
+- Array of search results with Fuse.js metadata
+- Sorted by relevance (best matches first)
+- Empty array if no matches
+
+**Search behavior:**
+- Searches across: `title`, `summary`, `content`, `tags`
+- Uses fuzzy matching (threshold: 0.3)
+- Includes match highlights and positions
+
+**Usage:**
+
+```typescript
+import { BackendService } from '@/lib/server'
+import type { SearchResult, Post } from '@/lib/types'
+
+export default async function SearchPage({
+  searchParams
+}: {
+  searchParams: { q: string }
+}) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const results = await backend.search(searchParams.q)
+
+  return (
+    <div>
+      <h1>Search Results: {searchParams.q}</h1>
+      <p>{results.length} posts found</p>
+
+      {results.map((result: SearchResult<Post>) => (
+        <SearchResult
+          key={result.item.slug}
+          post={result.item}
+          score={result.score}
+          matches={result.matches}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+**Caching:**
+- Uses Map-based cache with 1-hour TTL
+- Cache key: `search:${query}`
+
+**SearchResult structure:**
+```typescript
+{
+  item: Post,           // The matched post
+  score: 0.05,          // Lower is better (0 = perfect match)
+  matches: [
+    {
+      key: 'title',     // Which field matched
+      value: 'React Hooks',
+      indices: [[0, 4]] // Character positions
+    }
+  ]
+}
+```
+
+---
+
+### getPostsByTag
+
+Fetch all posts with a specific tag.
+
+```typescript
+async function getPostsByTag(tag: string): Promise<Post[]>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `tag` | `string` | Tag name (case-sensitive) |
+
+**Returns:** `Post[]`
+- Array of posts containing the tag
+- Sorted by `created` date (descending)
+- Empty array if tag not found
+
+**Usage:**
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export default async function TagPage({ params }: { params: { tag: string } }) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const posts = await backend.getPostsByTag(params.tag)
+  const allTags = await backend.getAllTags()
+
+  if (!allTags.includes(params.tag)) {
+    notFound();
+  }
+
+  return (
+    <div>
+      <h1>Posts tagged "{params.tag}"</h1>
+      {posts.map(post => <PostCard key={post.slug} post={post} />)}
+    </div>
+  );
+}
+```
+
+**Caching:**
+- Uses Map-based cache with 1-hour TTL
+- Cache key: `tag:${tag}`
+
+---
+
+### getAdjacentPosts
+
+Get the previous and next posts relative to a given post.
+
+```typescript
+async function getAdjacentPosts(slug: string): Promise<{
+  previous: AdjacentPost | null;
+  next: AdjacentPost | null;
+}>
+```
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `slug` | `string` | Current post slug |
+
+**Returns:** Object with `previous` and `next` properties
+- `previous`: Previous post (older) or `null` if this is the oldest
+- `next`: Next post (newer) or `null` if this is the newest
+
+**AdjacentPost type:**
+```typescript
+interface AdjacentPost {
+  slug: string;
+  title: string;
+}
+```
+
+**Usage:**
+
+```typescript
+import { BackendService } from '@/lib/server'
+import Link from 'next/link';
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const post = await backend.getPost(params.slug)
+  const { previous, next } = await backend.getAdjacentPosts(params.slug)
+
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      {/* ... post content ... */}
+
+      <nav className="post-navigation">
+        {previous && (
+          <Link href={`/blog/posts/${previous.slug}`}>
+            ← {previous.title}
+          </Link>
+        )}
+        {next && (
+          <Link href={`/blog/posts/${next.slug}`}>
+            {next.title} →
+          </Link>
+        )}
+      </nav>
+    </article>
+  );
+}
+```
+
+---
+
+## getAllTags
+
+Fetch all unique tags across all posts.
+
+```typescript
+async function getAllTags(): Promise<string[]>
+```
+
+**Returns:** `string[]`
+- Alphabetically sorted array of tag names
+- Empty array if no posts exist
+
+**Usage:**
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export default async function TagsPage() {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const tags = await backend.getAllTags()
+
+  return (
+    <div>
+      <h1>All Tags ({tags.length})</h1>
+      <ul>
+        {tags.map(tag => (
+          <li key={tag}>
+            <Link href={`/blog/tags/${tag}`}>{tag}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+**Note:** The tag list is extracted during preprocessing and cached in memory. Tags are case-sensitive.
+
+---
+
+## Implementation Details
+
+### Preprocessing
+
+All `BackendService` methods require `BackendService.ensurePreprocessed()` to be called first. This ensures:
+1. Posts are loaded from disk
+2. Search index is built
+3. Cache is warmed
+4. Tags are extracted
+
+Preprocessing happens **once** per server startup and is cached in memory.
+
+### Error Handling
+
+BackendService methods handle errors gracefully:
+- Missing posts return `null`
+- Empty results return `[]`
+- Errors are logged to console but don't crash the app
+
+For stricter error handling, check return values:
+
+```typescript
+await BackendService.ensurePreprocessed()
+const backend = BackendService.getInstance()
+const post = await backend.getPost(slug)
+if (!post) {
+  notFound(); // Next.js 404
+}
+```
+
+### Caching Strategy
+
+The `BackendService` uses a Map-based cache:
+- **TTL:** 1 hour (3600 seconds)
+- **Cache keys:**
+  - `post:${slug}`
+  - `search:${query}`
+  - `tag:${tag}`
+
+Cache is **in-memory** and resets on server restart.
+
+---
+
+## Server-Only
+
+**Warning:** `lib/server.ts` is **server-only**. It directly accesses the file system and internal BackendService.
+
+**Do NOT use in client components:**
+```typescript
+'use client'; // WRONG
+
+import { BackendService } from '@/lib/server' // Will fail at runtime
+```
+
+**For client components, use `lib/client.ts` instead:**
+```typescript
+'use client'; // Correct
+
+import { api } from '@/lib/client'; // Uses fetch() API
+```
+
+---
+
+## Type Safety
+
+All methods return fully-typed objects:
+
+```typescript
+import { BackendService } from '@/lib/server'
+import type { Post, SearchResult, AdjacentPost } from '@/lib/types'
+
+await BackendService.ensurePreprocessed()
+const backend = BackendService.getInstance()
+
+// TypeScript knows the exact return types
+const post: Post | null = await backend.getPost('my-slug')
+const posts: Post[] = await backend.getAllPosts()
+const results: SearchResult<Post>[] = await backend.search('query')
+const tags: string[] = await backend.getAllTags()
+const adjacent: { previous: AdjacentPost | null; next: AdjacentPost | null } =
+  await backend.getAdjacentPosts('slug')
+```
+
+---
+
+## Usage Patterns
+
+### Static Generation (Recommended)
+
+Generate pages at build time:
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export async function generateStaticParams() {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const posts = await backend.getAllPosts()
+  return posts.map(post => ({ slug: post.slug }));
+}
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const post = await backend.getPost(params.slug)
+  return <article>{/* ... */}</article>;
+}
+```
+
+### Dynamic Rendering
+
+For search or dynamic filters:
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export const dynamic = 'force-dynamic';
+
+export default async function SearchPage({ searchParams }: { searchParams: { q: string } }) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+  const results = await backend.search(searchParams.q)
+  return <SearchResults results={results} />;
+}
+```
+
+### Parallel Data Fetching
+
+Use Promise.all for multiple operations:
+
+```typescript
+import { BackendService } from '@/lib/server'
+
+export default async function PostPage({ params }: { params: { slug: string } }) {
+  await BackendService.ensurePreprocessed()
+  const backend = BackendService.getInstance()
+
+  const [post, adjacent, allTags] = await Promise.all([
+    backend.getPost(params.slug),
+    backend.getAdjacentPosts(params.slug),
+    backend.getAllTags()
+  ]);
+
+  return <Post post={post} adjacent={adjacent} tags={allTags} />;
+}
+```
+
+---
+
+## Summary
+
+`lib/server.ts` provides a **simple, type-safe, server-side API** for blog data via `BackendService`:
+
+| Method | Purpose | Returns |
+|--------|---------|---------|
+| `backend.getPost(slug)` | Get single post | `Post \| null` |
+| `backend.getAllPosts()` | Get all posts | `Post[]` |
+| `backend.search(query)` | Full-text search | `SearchResult<Post>[]` |
+| `backend.getPostsByTag(tag)` | Filter by tag | `Post[]` |
+| `backend.getAdjacentPosts(slug)` | Get previous/next | `{ previous, next }` |
+| `backend.getAllTags()` | Get all tags | `string[]` |
+
+**When to use:**
+- Server components
+- API route handlers
+- Static generation
+- Build scripts
+
+**When NOT to use:**
+- Client components (use `lib/client.ts` instead)
+- Browser-side code
