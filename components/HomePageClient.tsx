@@ -85,7 +85,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
           className={cn(
             "relative z-10 flex flex-col justify-start min-h-screen",
             "px-4 sm:px-6 lg:px-8",
-            "pt-4 pb-12 sm:pt-6 sm:pb-16 lg:pt-8 lg:pb-20",
+            "pb-12 sm:pb-16 lg:pb-20",
             "max-w-7xl mx-auto w-full"
           )}
         >
