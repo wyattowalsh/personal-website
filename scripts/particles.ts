@@ -300,8 +300,8 @@ const FullScreenSchema = z.union([
   })
 ]);
 
-// Update TsParticlesConfigSchema to match IOptions interface
-// Using passthrough() to allow unknown fields for Zod 4.x compatibility
+// TsParticlesConfigSchema matches IOptions interface
+// passthrough() allows unknown fields from newer tsparticles versions
 const TsParticlesConfigSchema = z.object({
   autoPlay: z.boolean().optional(),
   background: BackgroundSchema.optional(),
@@ -354,31 +354,21 @@ async function calculateFileHash(filePath: string): Promise<string> {
   return crypto.createHash('md5').update(content).digest('hex');
 }
 
-// Update validateParticleConfig function to handle more edge cases
-// Simplified validation for Zod 4.x compatibility
+// Validate particle config files against the full Zod schema
 async function validateParticleConfig(filePath: string): Promise<void> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const json = JSON.parse(content);
 
-    // Pre-validate mandatory fields only (skip full Zod schema for now due to Zod 4.x breaking changes)
-    const mandatoryFields = ['particles', 'background', 'interactivity'];
-    for (const field of mandatoryFields) {
-      if (!json[field]) {
-        throw new Error(`Missing mandatory field: ${field}`);
-      }
-    }
-
-    // Basic structure validation instead of full Zod schema
-    // This avoids Zod 4.x internal issues while still catching major config problems
-    if (typeof json.particles !== 'object') {
-      throw new Error('particles must be an object');
-    }
-    if (typeof json.background !== 'object') {
-      throw new Error('background must be an object');
-    }
-    if (typeof json.interactivity !== 'object') {
-      throw new Error('interactivity must be an object');
+    // Full Zod schema validation (two-argument z.record() and .passthrough() are v4-compatible)
+    const result = TsParticlesConfigSchema.safeParse(json);
+    if (!result.success) {
+      const issues = result.error.issues
+        .map((i) => `  - ${i.path.join('.')}: ${i.message}`)
+        .join('\n');
+      throw new Error(
+        `Schema validation failed for ${path.basename(filePath)}:\n${issues}`
+      );
     }
 
     // Additional validation for background image paths if present

@@ -5,7 +5,7 @@ import type { Config } from './types';
 
 // Export common validation schemas
 export const schemas = {
-  slug: z.object({ slug: z.string().min(1).max(200).regex(/^[a-zA-Z0-9_-]+$/, 'Invalid slug format') }),
+  slug: z.object({ slug: z.string().min(1).max(200).regex(/^[a-zA-Z0-9_-]+$/, { error: 'Invalid slug format' }) }),
   search: z.object({ query: z.string().min(1).max(100) }),
   tag: z.object({ tag: z.string().min(1).max(50) }),
 };

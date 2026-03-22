@@ -7,6 +7,7 @@ const rateLimiter = createRateLimiter({ max: 100, windowMs: 60_000, evictAt: 500
 
 const beaconSchema = z.object({
   visitorId: z.string().min(1).max(64),
+  // Zod v4 enforces RFC 4122 strictly; crypto.randomUUID() produces compliant v4 UUIDs
   sessionId: z.string().uuid(),
   event: z.enum([
     'page_view',

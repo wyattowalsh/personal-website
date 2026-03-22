@@ -15,7 +15,7 @@ import {
 } from '@/lib/admin-auth';
 
 const loginSchema = z.object({
-  password: z.string().min(1, 'Password is required'),
+  password: z.string().min(1, { error: 'Password is required' }),
 });
 
 export const POST = coreApi.middleware.withErrorHandler(
