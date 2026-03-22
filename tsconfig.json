@@ -34,16 +34,6 @@
     "allowJs": true,
     "forceConsistentCasingInFileNames": true
   },
-  "ts-node": {
-    "transpileOnly": true,
-    "require": [
-      "tsconfig-paths/register"
-    ],
-    "compilerOptions": {
-      "module": "CommonJS",
-      "moduleResolution": "Node"
-    }
-  },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
