@@ -17,10 +17,6 @@ export interface Config {
     postsPerPage: number;
     featuredLimit: number;
   };
-  cache: {
-    ttl: number;
-    maxSize: number;
-  };
 }
 
 export interface Post {

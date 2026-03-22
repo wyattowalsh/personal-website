@@ -1,3 +1,4 @@
+import 'server-only';
 import Fuse from 'fuse.js';
 import matter from 'gray-matter';
 import path from 'path';

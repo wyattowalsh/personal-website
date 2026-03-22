@@ -64,10 +64,6 @@ const defaultConfig: Config = {
     postsPerPage: 10,
     featuredLimit: 3
   },
-  cache: {
-    ttl: 3600000,
-    maxSize: 500
-  }
 };
 
 export function getDefaultMetadata() {

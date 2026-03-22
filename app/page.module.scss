@@ -1,4 +1,3 @@
-@use "variables.module.scss" as variables;
 @reference "./tailwind.css";
 
 
@@ -75,10 +74,10 @@
   perspective: 1000px;
   // Adjust max-width for different screen sizes
   max-width: 160px; // Default for mobile
-  @screen sm { max-width: 180px; }
-  @screen md { max-width: 200px; }
-  @screen lg { max-width: 220px; }
-  @screen xl { max-width: 240px; }
+  @media (min-width: 640px) { max-width: 180px; }
+  @media (min-width: 768px) { max-width: 200px; }
+  @media (min-width: 1024px) { max-width: 220px; }
+  @media (min-width: 1280px) { max-width: 240px; }
   
   &::before {
     content: '';

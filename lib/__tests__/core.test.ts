@@ -256,11 +256,10 @@ describe('api.middleware.validateRequest', () => {
 // getConfig / getDefaultMetadata
 // ---------------------------------------------------------------------------
 describe('getConfig', () => {
-  it('returns a config with site, blog, and cache sections', () => {
+  it('returns a config with site and blog sections', () => {
     const config = getConfig();
     expect(config).toHaveProperty('site');
     expect(config).toHaveProperty('blog');
-    expect(config).toHaveProperty('cache');
   });
 
   it('config.site has title, description, url, and author', () => {

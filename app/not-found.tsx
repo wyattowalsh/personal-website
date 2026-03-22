@@ -71,33 +71,6 @@ export default function NotFound() {
       )}
     >
       <ParticlesBackground />
-      {/* Animated background grid with perspective effect */}
-      <div 
-        className="absolute inset-0 overflow-hidden"
-        style={{
-          transform: isLoaded 
-            ? `perspective(1000px) rotateX(${mousePosition.y * 0.2}deg) rotateY(${mousePosition.x * 0.2}deg)`
-            : 'none',
-          transition: 'transform 0.3s ease-out',
-        }}
-      >
-        <div className={cn(
-          "cyber-grid",
-          "before:absolute before:inset-0",
-          "before:bg-gradient-to-b before:from-background before:to-transparent",
-          "before:opacity-50"
-        )} />
-        <div className="glitch-scanlines" />
-      </div>
-
-      {/* Enhanced noise overlay with gradient */}
-      <div className={cn(
-        "noise-overlay",
-        "mix-blend-overlay",
-        "after:absolute after:inset-0",
-        "after:bg-gradient-to-t after:from-background/80 after:to-transparent"
-      )} />
-
       {/* Floating particles effect */}
       <div className="absolute inset-0 overflow-hidden">
         {floatingParticles.map((particle, i) => (

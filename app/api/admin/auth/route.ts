@@ -10,7 +10,7 @@ import {
   createSessionToken,
   resolveAdminRateLimitKey,
   serializeAdminSessionCookie,
-  validateAdminRequestOrigin,
+  validateRequestOrigin,
   validateSessionToken,
 } from '@/lib/admin-auth';
 
@@ -20,7 +20,7 @@ const loginSchema = z.object({
 
 export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
-    if (!validateAdminRequestOrigin(request)) {
+    if (!validateRequestOrigin(request)) {
       throw new ApiError(403, 'Forbidden', undefined, 'FORBIDDEN_ORIGIN');
     }
 
