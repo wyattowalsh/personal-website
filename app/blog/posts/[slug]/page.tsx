@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { notFound } from 'next/navigation';
-import { MDXRemote } from 'next-mdx-remote/rsc';
+import { compileMDX } from 'next-mdx-remote/rsc';
 import { BackendService } from '@/lib/server';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -39,29 +39,29 @@ export default async function PostPage({
     notFound();
   }
 
-  // Strip YAML frontmatter before MDX compilation
-  const content = source.replace(/^---[\s\S]*?---\n*/, '');
+  const { content } = await compileMDX({
+    source,
+    components: mdxComponents,
+    options: {
+      parseFrontmatter: true,
+      mdxOptions: {
+        remarkPlugins: [
+          remarkGfm,
+          remarkMath,
+          [remarkMdxMathEnhanced, { component: 'Math' }],
+        ],
+        rehypePlugins: [
+          rehypeSlug,
+          [rehypePrismPlus, { ignoreMissing: true }],
+          rehypeCallouts,
+        ],
+      },
+    },
+  });
 
   return (
     <>
-      <MDXRemote
-        source={content}
-        components={mdxComponents}
-        options={{
-          mdxOptions: {
-            remarkPlugins: [
-              remarkGfm,
-              remarkMath,
-              [remarkMdxMathEnhanced, { component: 'Math' }],
-            ],
-            rehypePlugins: [
-              rehypeSlug,
-              [rehypePrismPlus, { ignoreMissing: true }],
-              rehypeCallouts,
-            ],
-          },
-        }}
-      />
+      {content}
       <ArticleTracker slug={slug} />
     </>
   );
