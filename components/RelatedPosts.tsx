@@ -129,7 +129,7 @@ function RelatedPostCard({ post }: { post: RelatedPost }) {
 					<div className="relative aspect-[16/10] w-full overflow-hidden">
 						{image ? (
 							isSvg ? (
-								/* eslint-disable-next-line @next/next/no-img-element */
+								/* eslint-disable-next-line @next/next/no-img-element -- post hero images use external URLs not compatible with next/image */
 								<img
 									src={image}
 									alt={title}

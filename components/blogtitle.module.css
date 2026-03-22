@@ -65,71 +65,7 @@
   color: var(--glitch-color3);
 }
 
-@keyframes glitch-anim-1 {
-  0% {
-    clip-path: polygon(0 2%, 100% 2%, 100% 3%, 0 3%);
-    transform: translate(-2px) skew(0.5deg);
-    filter: blur(0.5px);
-  }
-  20% {
-    clip-path: polygon(0 12%, 100% 12%, 100% 14%, 0 14%);
-    transform: translate(2px) skew(-0.5deg);
-    filter: blur(0.25px);
-  }
-  40% {
-    clip-path: polygon(0 8%, 100% 8%, 100% 9%, 0 9%);
-    transform: translate(-1px, 1px) skew(0.25deg);
-    filter: blur(0.75px);
-  }
-  60% {
-    clip-path: polygon(0 1%, 100% 1%, 100% 2%, 0 2%);
-    transform: translate(1px, -1px) skew(-0.25deg);
-    filter: blur(0.5px);
-  }
-  80% {
-    clip-path: polygon(0 15%, 100% 15%, 100% 16%, 0 16%);
-    transform: translate(2px) skew(0.5deg);
-    filter: blur(0.25px);
-  }
-  100% {
-    clip-path: polygon(0 10%, 100% 10%, 100% 11%, 0 11%);
-    transform: translate(0) skew(0);
-    filter: blur(0.5px);
-  }
-}
-
-@keyframes glitch-anim-2 {
-  0% {
-    clip-path: polygon(0 25%, 100% 25%, 100% 26%, 0 26%);
-    transform: translate(2px) skew(-0.5deg);
-    filter: blur(0.25px);
-  }
-  20% {
-    clip-path: polygon(0 30%, 100% 30%, 100% 31%, 0 31%);
-    transform: translate(-2px) skew(0.5deg);
-    filter: blur(0.5px);
-  }
-  40% {
-    clip-path: polygon(0 35%, 100% 35%, 100% 36%, 0 36%);
-    transform: translate(1px, -1px) skew(-0.25deg);
-    filter: blur(0.75px);
-  }
-  60% {
-    clip-path: polygon(0 40%, 100% 40%, 100% 41%, 0 41%);
-    transform: translate(-1px, 1px) skew(0.25deg);
-    filter: blur(0.5px);
-  }
-  80% {
-    clip-path: polygon(0 45%, 100% 45%, 100% 46%, 0 46%);
-    transform: translate(2px) skew(-0.5deg);
-    filter: blur(0.25px);
-  }
-  100% {
-    clip-path: polygon(0 50%, 100% 50%, 100% 51%, 0 51%);
-    transform: translate(0) skew(0);
-    filter: blur(0.5px);
-  }
-}
+/* glitch-anim-1 and glitch-anim-2 are defined later in this file (inset-based versions) */
 
 @keyframes glitch-anim-3 {
   0% {

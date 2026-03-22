@@ -152,7 +152,7 @@ export const api = {
       return validation.data;
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- withErrorHandler requires generic function signature
     withErrorHandler: <T extends (...args: any[]) => Promise<Response>>(handler: T): T =>
       (async (...args: any[]) => {
         const request = getRequestFromHandlerArgs(args);

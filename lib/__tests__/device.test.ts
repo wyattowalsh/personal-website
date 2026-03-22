@@ -53,5 +53,15 @@ describe('lib/device', () => {
 
       expect(typeof ctx.dpr).toBe('number');
     });
+
+    it('falls back to "unknown" when navigator.connection is undefined', async () => {
+      Object.defineProperty(navigator, 'connection', {
+        value: undefined,
+        configurable: true,
+      });
+      const { getDeviceContextSlim } = await freshImport();
+      const ctx = getDeviceContextSlim();
+      expect(ctx.connection).toBe('unknown');
+    });
   });
 });

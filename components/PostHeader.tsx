@@ -322,7 +322,7 @@ export function PostHeader() {
             onLoad={handleImageLoad}
           />
         ) : isSvg ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
+          /* eslint-disable-next-line @next/next/no-img-element -- post hero image uses external URL not compatible with next/image */
           <img
             src={imageSrc}
             alt={altText}
