@@ -1,0 +1,14 @@
+/* TEAM */
+Name: Wyatt Walsh
+Site: https://w4w.dev
+Twitter: @wyattowalsh
+GitHub: wyattowalsh
+Location: San Francisco, CA
+
+/* SITE */
+Standards: HTML5, CSS3, ES2024
+Framework: Next.js 16
+Styling: Tailwind CSS 4
+Components: shadcn/ui, Framer Motion
+Language: TypeScript 5
+Hosting: Vercel

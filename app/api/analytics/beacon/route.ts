@@ -1,42 +1,9 @@
 import { z } from 'zod';
 import { api as coreApi, ApiError } from '@/lib/core';
 import { createRateLimiter } from '@/lib/rate-limit';
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev';
-const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+import { resolveClientIp, validateRequestOrigin } from '@/lib/admin-auth';
 
 const rateLimiter = createRateLimiter({ max: 100, windowMs: 60_000, evictAt: 500 });
-
-/** Validate that the request originates from our own site */
-function checkOrigin(request: Request): boolean {
-  if (!IS_PRODUCTION) return true;
-
-  const origin = request.headers.get('origin');
-  const referer = request.headers.get('referer');
-
-  const siteHost = new URL(SITE_URL).host;
-
-  if (origin) {
-    try {
-      return new URL(origin).host === siteHost;
-    } catch {
-      return false;
-    }
-  }
-
-  if (referer) {
-    try {
-      return new URL(referer).host === siteHost;
-    } catch {
-      return false;
-    }
-  }
-
-  const secFetchSite = request.headers.get('sec-fetch-site');
-  if (secFetchSite === 'same-origin' || secFetchSite === 'none') return true;
-
-  return false;
-}
 
 const beaconSchema = z.object({
   visitorId: z.string().min(1).max(64),
@@ -96,25 +63,18 @@ export type BeaconPayload = z.infer<typeof beaconSchema>;
 
 export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
-    const ip = request.headers.get('x-real-ip')
-      ?? request.headers.get('x-forwarded-for')?.split(',')[0].trim()
-      ?? null;
+    const ip = resolveClientIp(request)
+      ?? (process.env.NODE_ENV !== 'production' ? '127.0.0.1' : null);
     if (!ip) {
-      return Response.json({ error: 'Forbidden' }, { status: 403 });
+      throw new ApiError(403, 'Forbidden');
     }
 
-    if (!checkOrigin(request)) {
-      return Response.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      );
+    if (!validateRequestOrigin(request)) {
+      throw new ApiError(403, 'Forbidden');
     }
 
     if (!rateLimiter.check(ip)) {
-      return Response.json(
-        { error: 'Too many requests' },
-        { status: 429, headers: { 'Retry-After': '60' } }
-      );
+      throw new ApiError(429, 'Too many requests');
     }
 
     let body: unknown;

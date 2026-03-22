@@ -1,7 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
-import { logger } from '../lib/core';
+import { logger } from '../lib/logger';
 import { z } from 'zod';
 
 // Define a schema for numbers or objects with min and max

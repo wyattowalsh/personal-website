@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { BackendService } from '../lib/server';
-import { logger, LogLevel } from '../lib/core';
+import { logger, LogLevel } from '../lib/logger';
 import type { PreprocessStats } from '../lib/types';
 import { generateParticleConfigs } from './particles';
 

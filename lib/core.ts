@@ -3,9 +3,6 @@ import * as Sentry from '@sentry/nextjs';
 import { z } from 'zod';
 import type { Config } from './types';
 
-// Re-export logger utilities for backward compatibility
-export { LogLevel, formatters, logger } from './logger';
-
 // Export common validation schemas
 export const schemas = {
   slug: z.object({ slug: z.string().min(1).max(200).regex(/^[a-zA-Z0-9_-]+$/, 'Invalid slug format') }),
@@ -104,7 +101,6 @@ class ConfigManager {
 }
 
 export const getConfig = () => ConfigManager.getInstance().getConfig();
-export const config = getConfig();
 
 const CORRELATION_ID_HEADER = 'x-correlation-id';
 const CORRELATION_ID_MAX_LENGTH = 128;
@@ -119,7 +115,9 @@ function getRequestFromHandlerArgs(args: unknown[]): Request | null {
 }
 
 function resolveCorrelationId(req: Request | null): string {
-  const inbound = req?.headers.get(CORRELATION_ID_HEADER)?.trim();
+  const inbound = req?.headers.get(CORRELATION_ID_HEADER)
+    ?.trim()
+    .replace(/[^\x20-\x7E]/g, '');
   if (inbound && inbound.length <= CORRELATION_ID_MAX_LENGTH) {
     return inbound;
   }

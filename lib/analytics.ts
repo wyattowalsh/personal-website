@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { track as vercelTrack } from '@vercel/analytics';
 import {

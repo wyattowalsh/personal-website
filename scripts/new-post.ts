@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import readline from 'readline';
 
-const POSTS_DIR = path.join(process.cwd(), 'app/blog/posts');
+const POSTS_DIR = path.join(process.cwd(), 'content/posts');
 
 function slugify(text: string): string {
   return text
@@ -78,7 +78,7 @@ async function createPost(meta: {
   caption?: string;
 }): Promise<string> {
   const postDir = path.join(POSTS_DIR, meta.slug);
-  const postFile = path.join(postDir, 'page.mdx');
+  const postFile = path.join(postDir, 'index.mdx');
   
   // Check if post already exists
   try {

@@ -196,15 +196,4 @@
   }
 }
 
-@keyframes titleGradient {
-  0%, 100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg) brightness(1);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(15deg) brightness(1.1);
-  }
-}
-
 // ...rest of existing code...

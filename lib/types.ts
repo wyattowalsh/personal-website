@@ -43,6 +43,8 @@ export interface Post {
     name: string;
     order: number;
   };
+  /** Cached numeric timestamp of `created`, set during preprocessing to avoid repeated Date parsing. */
+  createdTimestamp?: number;
 }
 
 export interface AdjacentPost {

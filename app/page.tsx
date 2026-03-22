@@ -1,5 +1,5 @@
 import { BackendService } from "@/lib/server";
-import HomePageClient from "@/components/HomePageClient";
+import { HomePageClient } from "@/components/HomePageClient";
 import { Metadata } from 'next';
 import { getConfig } from '@/lib/core';
 import { PersonJsonLd } from '@/components/PostSchema';

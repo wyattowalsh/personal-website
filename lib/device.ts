@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ---------- Types ----------
 
@@ -176,9 +176,6 @@ export function getVisitorId(): string {
 
   return cachedFingerprint;
 }
-
-/** @deprecated Use getVisitorId() instead. */
-export const getFingerprint = getVisitorId;
 
 // ---------- Returning visitor detection ----------
 

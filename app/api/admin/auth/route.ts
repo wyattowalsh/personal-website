@@ -2,9 +2,15 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { api as coreApi, ApiError } from '@/lib/core';
 import {
+  ADMIN_SESSION_COOKIE_MAX_AGE_SECONDS,
+  ADMIN_SESSION_COOKIE_NAME,
+  ADMIN_SESSION_LEGACY_PATH,
   checkRateLimit,
   validatePassword,
   createSessionToken,
+  resolveAdminRateLimitKey,
+  serializeAdminSessionCookie,
+  validateAdminRequestOrigin,
   validateSessionToken,
 } from '@/lib/admin-auth';
 
@@ -14,12 +20,12 @@ const loginSchema = z.object({
 
 export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
-    // HR-4: rate limit by IP
-    const ip =
-      request.headers.get('x-real-ip')
-      || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      || 'unknown';
-    if (!checkRateLimit(ip)) {
+    if (!validateAdminRequestOrigin(request)) {
+      throw new ApiError(403, 'Forbidden', undefined, 'FORBIDDEN_ORIGIN');
+    }
+
+    const rateLimitKey = resolveAdminRateLimitKey(request);
+    if (!checkRateLimit(rateLimitKey)) {
       throw new ApiError(429, 'Too many attempts', undefined, 'RATE_LIMITED');
     }
 
@@ -46,9 +52,13 @@ export const POST = coreApi.middleware.withErrorHandler(
 
     const token = createSessionToken(adminPassword);
     const response = Response.json({ success: true });
-    response.headers.set(
+    response.headers.append(
       'Set-Cookie',
-      `admin_session=${token}; HttpOnly; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}SameSite=Strict; Max-Age=${60 * 60 * 24}; Path=/admin`
+      serializeAdminSessionCookie(token, { maxAge: ADMIN_SESSION_COOKIE_MAX_AGE_SECONDS })
+    );
+    response.headers.append(
+      'Set-Cookie',
+      serializeAdminSessionCookie('', { maxAge: 0, path: ADMIN_SESSION_LEGACY_PATH })
     );
     return response;
   }
@@ -57,7 +67,7 @@ export const POST = coreApi.middleware.withErrorHandler(
 export const GET = coreApi.middleware.withErrorHandler(
   async () => {
     const cookieStore = await cookies();
-    const session = cookieStore.get('admin_session');
+    const session = cookieStore.get(ADMIN_SESSION_COOKIE_NAME);
     const adminPassword = process.env.ADMIN_PASSWORD ?? '';
     if (validateSessionToken(session?.value, adminPassword)) {
       return Response.json({ authenticated: true });

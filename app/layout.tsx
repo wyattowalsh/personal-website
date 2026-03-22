@@ -5,8 +5,8 @@ import "./tailwind.css";  // Tailwind v4 with config directive
 import "./globals.scss";  // Custom styles (no Tailwind directives)
 import "katex/dist/katex.min.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import ScrollIndicator from "@/components/ScrollIndicator";
-import Header from "@/components/Header";
+import { ScrollIndicator } from "@/components/ScrollIndicator";
+import { Header } from "@/components/Header";
 import { StrictMode } from "react";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
@@ -16,6 +16,7 @@ import { getDefaultMetadata, getConfig } from "@/lib/core";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { WebVitals } from "@/components/WebVitals";
+import { SessionTracker } from "@/components/SessionTracker";
 
 const monaspace = localFont({
 	src: "../public/fonts/MonaspaceArgonVarVF.woff2",
@@ -150,6 +151,7 @@ export default function RootLayout({
 					<Analytics />
 					<SpeedInsights />
 					<WebVitals />
+					<SessionTracker />
 				</body>
 			</html>
 		</StrictMode>

@@ -5,7 +5,7 @@ import fs from 'fs/promises';
 import { glob } from 'glob';
 import readingTime from 'reading-time';
 import { z } from 'zod';
-import { logger, formatters } from './core';
+import { logger, formatters } from './logger';
 import type { Post, PostMetadata, PreprocessStats } from './types';
 import { stripMdxSyntax } from './utils';
 import {
@@ -36,6 +36,7 @@ class BackendService {
   private tags: Set<string>;
   private preprocessed: boolean = false;
   private sortedPostsCache: Post[] | null = null;
+  private taggedPostsCache: Map<string, Post[]> = new Map();
 
   private constructor() {
     this.searchIndex = new Fuse([], {
@@ -54,6 +55,15 @@ class BackendService {
     return BackendService.instance;
   }
 
+  /**
+   * Ensures preprocessing has completed before any data access.
+   *
+   * Uses promise deduplication to prevent race conditions during concurrent
+   * cold starts: the promise is assigned atomically (synchronously) before
+   * any async work begins, so all concurrent callers receive the same
+   * in-flight promise rather than spawning duplicate preprocessing runs.
+   * On failure the promise is cleared so the next caller retries.
+   */
   public static ensurePreprocessed() {
     const instance = BackendService.getInstance();
 
@@ -97,18 +107,22 @@ class BackendService {
   }
 
   async getPostsByTag(tag: string): Promise<Post[]> {
-    return Array.from(this.posts.values())
+    const cached = this.taggedPostsCache.get(tag);
+    if (cached) return cached;
+    const result = Array.from(this.posts.values())
       .filter(post => post.tags.includes(tag))
-      .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+      .sort((a, b) => (b.createdTimestamp ?? 0) - (a.createdTimestamp ?? 0));
+    this.taggedPostsCache.set(tag, result);
+    return result;
   }
 
   async getAllPosts(): Promise<Post[]> {
     // Return cached sorted array if available
     if (this.sortedPostsCache) return this.sortedPostsCache;
 
-    // Sort and cache the result
+    // Sort and cache the result (uses cached timestamps from preprocessing)
     this.sortedPostsCache = Array.from(this.posts.values())
-      .sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+      .sort((a, b) => (b.createdTimestamp ?? 0) - (a.createdTimestamp ?? 0));
 
     return this.sortedPostsCache;
   }
@@ -173,6 +187,7 @@ class BackendService {
       this.posts.clear();
       this.tags.clear();
       this.sortedPostsCache = null;
+      this.taggedPostsCache.clear();
       logger.debug('Cleared all caches');
 
       // Update posts directory path and use glob
@@ -209,6 +224,7 @@ class BackendService {
             updated: validated.updated || validated.created,
             tags: validated.tags,
             series: validated.series,
+            createdTimestamp: new Date(validated.created).getTime(),
           };
 
           // Validate hero image exists

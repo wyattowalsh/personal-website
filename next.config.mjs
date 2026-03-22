@@ -1,5 +1,4 @@
 // next.config.mjs
-import createMDX from '@next/mdx'
 import withBundleAnalyzer from '@next/bundle-analyzer'
 
 const isDev = process.env.NODE_ENV !== 'production'
@@ -53,13 +52,14 @@ function buildCsp() {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  pageExtensions: ['js', 'jsx', 'ts', 'tsx'],
   poweredByHeader: false,
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
+      { protocol: 'https', hostname: 'webmention.io' },
     ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
@@ -101,28 +101,8 @@ const nextConfig = {
   },
 }
 
-// MDX configuration with string-based plugin names for Turbopack compatibility
-const withMdx = createMDX({
-  extension: /\.mdx?$/,
-  options: {
-    // Use string-based plugin names for Turbopack serialization
-    remarkPlugins: [
-      ['remark-frontmatter'],
-      ['remark-mdx-frontmatter'],
-      ['remark-gfm'],
-      ['remark-math'],
-      ['remark-mdx-math-enhanced', { component: 'Math' }],
-    ],
-    rehypePlugins: [
-      ['rehype-slug'],
-      ['rehype-prism-plus'],
-      ['rehype-callouts'],
-    ],
-  },
-})
-
 const bundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
-export default bundleAnalyzer(withMdx(nextConfig))
+export default bundleAnalyzer(nextConfig)

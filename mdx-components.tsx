@@ -5,6 +5,7 @@ import Link from "next/link";
 import { cn, isExternal } from "@/lib/utils";
 import { ExternalLink, Info, AlertCircle, Terminal as TerminalIcon } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
+import { HeadingLink } from "@/components/HeadingLink";
 
 import { Alert } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -13,10 +14,10 @@ import { Card } from "@/components/ui/card";
 import { Tooltip } from "@/components/ui/tooltip";
 
 import { GistEmbed } from "@/components/GistEmbed";
-import ClientSideLink from "@/components/ClientSideLink";
-import TagLink from "@/components/TagLink";
-import Math, { MathProps } from "@/components/Math";
-import Mermaid from "@/components/Mermaid";
+import { ClientSideLink } from "@/components/ClientSideLink";
+import { TagLink } from "@/components/TagLink";
+import { Math, type MathProps } from "@/components/Math";
+import { Mermaid } from "@/components/Mermaid";
 
 import { Route as NextRoute } from 'next';
 
@@ -87,8 +88,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </h1>
         ),
 
-        h2: ({ children }) => (
-            <h2 className={cn(
+        h2: ({ children, id, ...props }) => (
+            <h2 id={id} className={cn(
                 "scroll-m-20",
                 "text-2xl font-display font-semibold tracking-tight",
                 "sm:text-3xl md:text-4xl lg:text-5xl",
@@ -100,13 +101,14 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "hover:text-primary",
                 // Remove right padding since we're using flexbox
                 "flex items-center justify-between gap-4"
-            )}>
+            )} {...props}>
                 <span className="flex-1 min-w-0">{children}</span>
+                <HeadingLink id={id} />
             </h2>
         ),
 
-        h3: ({ children }) => (
-            <h3 className={cn(
+        h3: ({ children, id, ...props }) => (
+            <h3 id={id} className={cn(
                 "scroll-m-20",
                 "text-xl font-display font-semibold tracking-tight",
                 "sm:text-2xl md:text-3xl",
@@ -116,9 +118,26 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "hover:text-primary transition-colors duration-300",
                 // Remove right padding and update flex layout
                 "flex items-center justify-between gap-4"
-            )}>
+            )} {...props}>
                 <span className="flex-1 min-w-0">{children}</span>
+                <HeadingLink id={id} />
             </h3>
+        ),
+
+        h4: ({ children, id, ...props }) => (
+            <h4 id={id} className={cn(
+                "scroll-m-20",
+                "text-lg font-display font-semibold tracking-tight",
+                "sm:text-xl md:text-2xl",
+                "mt-6 mb-3",
+                "text-foreground",
+                "relative group",
+                "hover:text-primary transition-colors duration-300",
+                "flex items-center justify-between gap-4"
+            )} {...props}>
+                <span className="flex-1 min-w-0">{children}</span>
+                <HeadingLink id={id} />
+            </h4>
         ),
 
         p: ({ children }) => (

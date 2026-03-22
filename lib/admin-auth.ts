@@ -2,6 +2,74 @@ import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto';
 import { createRateLimiter } from './rate-limit';
 
 const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24h
+export const ADMIN_SESSION_COOKIE_NAME = 'admin_session';
+export const ADMIN_SESSION_COOKIE_MAX_AGE_SECONDS = TOKEN_EXPIRY_MS / 1000;
+export const ADMIN_SESSION_COOKIE_PATH = '/';
+export const ADMIN_SESSION_LEGACY_PATH = '/admin';
+
+interface AdminSessionCookieOptions {
+  maxAge: number;
+  path?: string;
+}
+
+export function serializeAdminSessionCookie(
+  value: string,
+  { maxAge, path = ADMIN_SESSION_COOKIE_PATH }: AdminSessionCookieOptions
+): string {
+  return `${ADMIN_SESSION_COOKIE_NAME}=${value}; HttpOnly; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}SameSite=Strict; Max-Age=${maxAge}; Path=${path}`;
+}
+
+const SITE_HOST = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev').host;
+
+/**
+ * Validate that a request originates from the same site.
+ * Used by admin auth routes and analytics beacon endpoint.
+ * Checks Origin header, Referer header, then Sec-Fetch-Site as fallback.
+ */
+export function validateRequestOrigin(request: Request): boolean {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('[security] Origin validation DISABLED (NODE_ENV !== "production")');
+    return true;
+  }
+
+  const origin = request.headers.get('origin');
+  const referer = request.headers.get('referer');
+
+  if (origin) {
+    try {
+      return new URL(origin).host === SITE_HOST;
+    } catch {
+      return false;
+    }
+  }
+
+  if (referer) {
+    try {
+      return new URL(referer).host === SITE_HOST;
+    } catch {
+      return false;
+    }
+  }
+
+  const secFetchSite = request.headers.get('sec-fetch-site');
+  return secFetchSite === 'same-origin' || secFetchSite === 'none';
+}
+
+/** @deprecated Use {@link validateRequestOrigin} instead. */
+export const validateAdminRequestOrigin = validateRequestOrigin;
+
+/** Extract client IP from proxy headers. Returns null if no IP found. */
+export function resolveClientIp(request: Request): string | null {
+  const realIp = request.headers.get('x-real-ip')?.trim();
+  if (realIp) return realIp;
+  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
+  if (forwarded) return forwarded;
+  return null;
+}
+
+export function resolveAdminRateLimitKey(request: Request): string {
+  return resolveClientIp(request) ?? 'unknown';
+}
 
 const rateLimiter = createRateLimiter({ max: 5, windowMs: 15 * 60 * 1000, evictAt: 1000 });
 
