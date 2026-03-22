@@ -41,6 +41,7 @@ const FloatingIcon = ({
 }) => {
 	const iconSize = 16;
 
+	/* eslint-disable react-hooks/purity -- intentional per-instance random init for animation */
 	const x = useMotionValue(
 		Math.random() * containerSize.width - containerSize.width / 2
 	);
@@ -54,6 +55,7 @@ const FloatingIcon = ({
 	});
 
 	const rotationZ = useMotionValue(Math.random() * 360);
+	/* eslint-enable react-hooks/purity */
 	const accumulatedTime = useRef(0);
 
 	useAnimationFrame((_, delta) => {
@@ -156,7 +158,8 @@ const BackgroundParticles = () => {
 	}>>([]);
 
 	useEffect(() => {
-		// Generate random values only on client
+		// Generate random values only on client to avoid hydration mismatch
+		// eslint-disable-next-line react-hooks/set-state-in-effect -- client-only random init
 		setParticles(
 			Array.from({ length: 30 }, () => ({
 				width: Math.random() * 4 + 2,

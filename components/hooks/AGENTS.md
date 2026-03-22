@@ -7,7 +7,6 @@
 | `useWindowSize` | `useWindowSize.ts` | Responsive window dimensions |
 | `useMousePosition` | `useMousePosition.ts` | Mouse cursor tracking |
 | `useReducedMotion` | `useReducedMotion.ts` | Respect prefers-reduced-motion |
-| `useToast` | `use-toast.ts` | Toast notification system |
 
 ## Usage
 
@@ -15,15 +14,10 @@
 'use client'
 import { useWindowSize } from '@/components/hooks/useWindowSize'
 import { useReducedMotion } from '@/components/hooks/useReducedMotion'
-import { useToast } from '@/components/hooks/use-toast'
 
 function Component() {
   const { width, height } = useWindowSize()
   const prefersReducedMotion = useReducedMotion()
-  const { toast } = useToast()
-  
-  // Show toast notification
-  toast({ title: 'Success', description: 'Action completed' })
 }
 ```
 

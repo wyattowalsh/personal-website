@@ -58,7 +58,7 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
 
   // Handle mounting and initialization
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- client mount guard for hydration
 
     const initEngine = async () => {
       try {
@@ -102,7 +102,7 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
 
     const theme = resolvedTheme as "light" | "dark";
     const newConfigUrl = getRandomConfigUrl(theme);
-    setCurrentConfigUrl(newConfigUrl);
+    setCurrentConfigUrl(newConfigUrl); // eslint-disable-line react-hooks/set-state-in-effect -- sync config on theme change
   }, [resolvedTheme, init, mounted]);
 
   const particlesLoaded = useCallback(async (container?: Container) => {

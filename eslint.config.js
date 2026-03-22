@@ -40,11 +40,8 @@ const config = [
       ...nextPlugin.configs["core-web-vitals"].rules,
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
-      // TODO: Enable these rules after fixing violations:
-      // - purity: BlogTitle.tsx calls impure functions during render
-      // - set-state-in-effect: not-found.tsx calls setState synchronously in useEffect
-      "react-hooks/purity": "off",
-      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/purity": "error",
+      "react-hooks/set-state-in-effect": "error",
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off",
       "@typescript-eslint/no-explicit-any": "warn",

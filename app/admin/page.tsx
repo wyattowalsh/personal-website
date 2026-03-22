@@ -49,7 +49,7 @@ export default async function AdminPage() {
   const lastPostDate = sortedPosts[0]?.created;
   const daysSinceLastPost = lastPostDate
     ? Math.floor(
-        (Date.now() - new Date(lastPostDate).getTime()) / (1000 * 60 * 60 * 24),
+        (Date.now() - new Date(lastPostDate).getTime()) / (1000 * 60 * 60 * 24), // eslint-disable-line react-hooks/purity -- server component, Date.now() is safe
       )
     : 0;
 

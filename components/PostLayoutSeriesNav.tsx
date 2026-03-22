@@ -38,7 +38,7 @@ export function PostLayoutSeriesNav() {
 
     // Cache hit — data already resolved
     if (cached && cached.promise === null) {
-      setSeriesData(cached.data);
+      setSeriesData(cached.data); // eslint-disable-line react-hooks/set-state-in-effect -- restore from module cache
       return;
     }
 

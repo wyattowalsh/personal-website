@@ -1,16 +1,15 @@
 ---
 title: "Custom Hooks"
-description: "Client-side React hooks for reduced motion detection, window sizing, mouse tracking, and toast notifications."
+description: "Client-side React hooks for reduced motion detection, window sizing, and mouse tracking."
 ---
 
 ## Overview
 
-The site provides **four custom React hooks** for common client-side interactions:
+The site provides **three custom React hooks** for common client-side interactions:
 
 - `useReducedMotion` — Detect user motion preferences
 - `useWindowSize` — Track viewport dimensions
 - `useMousePosition` — Track cursor coordinates
-- `useToast` — Display toast notifications (shadcn/ui wrapper)
 
 All hooks are **client-only** and must be imported from `@/components/hooks/`.
 
@@ -309,239 +308,6 @@ if (!isTouchDevice) {
 }
 ```
 
-## useToast
-
-Displays toast notifications using shadcn/ui's Toast component. This is a **wrapper around shadcn/ui's built-in toast system**, not a custom implementation.
-
-### Implementation
-
-**File:** `components/hooks/use-toast.ts`
-
-The hook manages global toast state using a reducer pattern:
-
-```typescript
-type ToasterToast = ToastProps & {
-  id: string
-  title?: React.ReactNode
-  description?: React.ReactNode
-  action?: ToastActionElement
-}
-
-export function useToast() {
-  const [state, setState] = React.useState<State>(memoryState)
-
-  React.useEffect(() => {
-    listeners.push(setState)
-    return () => {
-      const index = listeners.indexOf(setState)
-      if (index > -1) {
-        listeners.splice(index, 1)
-      }
-    }
-  }, [state])
-
-  return {
-    ...state,
-    toast,
-    dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
-  }
-}
-
-export function toast({ ...props }: Toast) {
-  const id = genId()
-
-  const update = (props: ToasterToast) =>
-    dispatch({
-      type: "UPDATE_TOAST",
-      toast: { ...props, id },
-    })
-
-  const dismiss = () => dispatch({ type: "DISMISS_TOAST", toastId: id })
-
-  dispatch({
-    type: "ADD_TOAST",
-    toast: {
-      ...props,
-      id,
-      open: true,
-      onOpenChange: (open) => {
-        if (!open) dismiss()
-      },
-    },
-  })
-
-  return { id, dismiss, update }
-}
-```
-
-### Usage
-
-```tsx
-'use client'
-
-import { useToast } from '@/components/hooks/use-toast'
-import { Button } from '@/components/ui/button'
-
-export function ToastExample() {
-  const { toast } = useToast()
-
-  return (
-    <Button
-      onClick={() => {
-        toast({
-          title: "Success!",
-          description: "Your changes have been saved.",
-        })
-      }}
-    >
-      Show Toast
-    </Button>
-  )
-}
-```
-
-### Toast Options
-
-```typescript
-toast({
-  title: "Notification Title",
-  description: "Optional description text",
-  variant: "default" | "destructive",
-  action: <ToastAction altText="Undo" onClick={handleUndo}>Undo</ToastAction>,
-  duration: 5000, // Auto-dismiss after 5s (default)
-})
-```
-
-### Return Value
-
-```typescript
-{
-  toasts: ToasterToast[];  // Current active toasts
-  toast: (props: Toast) => { id: string; dismiss: () => void; update: (props) => void };
-  dismiss: (toastId?: string) => void;
-}
-```
-
-### Methods
-
-#### `toast(props)`
-
-Display a new toast notification.
-
-**Returns:**
-
-```typescript
-{
-  id: string;           // Unique toast ID
-  dismiss: () => void;  // Dismiss this toast
-  update: (props: ToasterToast) => void;  // Update toast content
-}
-```
-
-**Example:**
-
-```tsx
-const { id, dismiss, update } = toast({
-  title: "Uploading...",
-  description: "Please wait",
-})
-
-// Later: update progress
-update({
-  title: "Upload complete!",
-  description: "File uploaded successfully",
-})
-
-// Or dismiss programmatically
-dismiss()
-```
-
-#### `dismiss(toastId?)`
-
-Dismiss a specific toast by ID, or all toasts if no ID provided.
-
-```tsx
-const { toast, dismiss } = useToast()
-
-// Show toast
-const { id } = toast({ title: "Hello" })
-
-// Dismiss specific toast
-dismiss(id)
-
-// Dismiss all toasts
-dismiss()
-```
-
-### Configuration
-
-**Toast limit:** Only 1 toast shown at a time (configurable in `use-toast.ts`):
-
-```typescript
-const TOAST_LIMIT = 1
-```
-
-**Auto-dismiss delay:**
-
-```typescript
-const TOAST_REMOVE_DELAY = 1000000 // 1000s (effectively permanent without explicit dismiss)
-```
-
-### Toast Variants
-
-#### Default
-
-```tsx
-toast({
-  title: "Notification",
-  description: "This is a default toast",
-})
-```
-
-#### Destructive (Error)
-
-```tsx
-toast({
-  variant: "destructive",
-  title: "Error",
-  description: "Something went wrong",
-})
-```
-
-#### With Action
-
-```tsx
-toast({
-  title: "Event scheduled",
-  description: "Your event has been created.",
-  action: (
-    <ToastAction altText="View event" onClick={() => router.push('/events')}>
-      View
-    </ToastAction>
-  ),
-})
-```
-
-### Global Toaster Component
-
-Render once in root layout to enable toasts app-wide:
-
-```tsx
-// app/layout.tsx
-import { Toaster } from '@/components/ui/toaster'
-
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <Toaster />
-      </body>
-    </html>
-  )
-}
-```
-
 ## Hook Import Patterns
 
 ### Individual Imports
@@ -550,7 +316,6 @@ export default function RootLayout({ children }) {
 import { useReducedMotion } from '@/components/hooks/useReducedMotion'
 import { useWindowSize } from '@/components/hooks/useWindowSize'
 import { useMousePosition } from '@/components/hooks/useMousePosition'
-import { useToast } from '@/components/hooks/use-toast'
 ```
 
 ### Barrel Exports (if added)
@@ -561,13 +326,12 @@ Create `components/hooks/index.ts`:
 export { useReducedMotion } from './useReducedMotion'
 export { useWindowSize } from './useWindowSize'
 export { useMousePosition } from './useMousePosition'
-export { useToast, toast } from './use-toast'
 ```
 
 Then import:
 
 ```typescript
-import { useReducedMotion, useWindowSize, useMousePosition, useToast } from '@/components/hooks'
+import { useReducedMotion, useWindowSize, useMousePosition } from '@/components/hooks'
 ```
 
 ## Common Patterns
@@ -625,41 +389,6 @@ export function AdaptiveLayout() {
 }
 ```
 
-### Toast with Async Actions
-
-```tsx
-'use client'
-
-import { useToast } from '@/components/hooks/use-toast'
-
-export function AsyncButton() {
-  const { toast } = useToast()
-
-  const handleClick = async () => {
-    const { id, update } = toast({
-      title: "Saving...",
-      description: "Please wait",
-    })
-
-    try {
-      await saveData()
-      update({
-        title: "Success!",
-        description: "Data saved successfully",
-      })
-    } catch (error) {
-      update({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to save data",
-      })
-    }
-  }
-
-  return <Button onClick={handleClick}>Save</Button>
-}
-```
-
 ## Best Practices
 
 1. **Always use `'use client'` directive** — These hooks access browser APIs (`window`, `document`)
@@ -682,10 +411,6 @@ export function AsyncButton() {
 **Problem:** `useMousePosition` causes performance issues
 
 - **Solution:** Throttle updates to ~60fps (`16ms` delay) or higher for less critical use cases
-
-**Problem:** Toasts not appearing
-
-- **Solution:** Ensure `<Toaster />` component is rendered in root layout
 
 **Problem:** `useReducedMotion` always returns `false`
 

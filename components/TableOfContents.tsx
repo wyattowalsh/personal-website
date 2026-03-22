@@ -28,7 +28,7 @@ export function TableOfContents() {
       level: parseInt(el.tagName.charAt(1), 10),
     }));
 
-    setHeadings(items);
+    setHeadings(items); // eslint-disable-line react-hooks/set-state-in-effect -- sync from DOM on mount
   }, []);
 
   // Set up Intersection Observer for scroll-spy

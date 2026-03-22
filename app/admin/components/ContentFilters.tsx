@@ -55,7 +55,7 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
   // Sync external filter reset back to local input
   useEffect(() => {
     if (filters.search !== searchInput) {
-      setSearchInput(filters.search);
+      setSearchInput(filters.search); // eslint-disable-line react-hooks/set-state-in-effect -- sync from prop
     }
   }, [filters.search, searchInput]);
 

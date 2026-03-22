@@ -17,7 +17,7 @@ export function TagsGrid({ tags, tagCounts }: TagsGridProps) {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => setMounted(true), []); // eslint-disable-line react-hooks/set-state-in-effect -- client mount guard for hydration
 
   return (
     <div

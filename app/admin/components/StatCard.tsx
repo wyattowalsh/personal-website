@@ -40,7 +40,7 @@ export function StatCard({ label, value, icon, description }: StatCardProps) {
 
   useEffect(() => {
     if (numeric === 0 || prefersReducedMotion) {
-      setDisplayValue(numeric);
+      setDisplayValue(numeric); // eslint-disable-line react-hooks/set-state-in-effect -- sync initial value
       return;
     }
 

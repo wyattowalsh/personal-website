@@ -43,7 +43,7 @@ export function Webmentions() {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       try {
-        setMentions(JSON.parse(cached));
+        setMentions(JSON.parse(cached)); // eslint-disable-line react-hooks/set-state-in-effect -- restore from sessionStorage cache
         setIsLoading(false);
         return;
       } catch { /* fall through to fetch */ }

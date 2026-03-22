@@ -14,7 +14,7 @@ export function DarkModeToggle() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- client mount guard for hydration
   }, []);
 
   if (!mounted) {

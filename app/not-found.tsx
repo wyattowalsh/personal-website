@@ -24,6 +24,7 @@ export default function NotFound() {
 
   useEffect(() => {
     // Generate floating particles only on client to avoid hydration mismatch
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- client-only random init
     setFloatingParticles(
       Array.from({ length: 20 }).map(() => ({
         left: `${Math.random() * 100}%`,

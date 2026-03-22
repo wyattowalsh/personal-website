@@ -10,7 +10,7 @@ export default function PrivacyPage() {
   const [optedOut, setOptedOut] = useState(false);
 
   useEffect(() => {
-    setOptedOut(getAnalyticsOptOut());
+    setOptedOut(getAnalyticsOptOut()); // eslint-disable-line react-hooks/set-state-in-effect -- sync from localStorage on mount
   }, []);
 
   const handleToggle = () => {

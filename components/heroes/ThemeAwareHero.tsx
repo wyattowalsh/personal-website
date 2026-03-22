@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useId, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 export interface ThemeColors {
@@ -180,10 +180,10 @@ export default function ThemeAwareHero({ config, className, onLoad }: ThemeAware
   const [mounted, setMounted] = useState(false);
 
   // Generate unique IDs to avoid conflicts if multiple heroes on page - must be before any early returns
-  const uid = useMemo(() => Math.random().toString(36).slice(2, 8), []);
+  const uid = useId().replace(/:/g, '');
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- client mount guard for hydration
     onLoad?.();
   }, [onLoad]);
 

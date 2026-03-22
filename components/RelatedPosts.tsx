@@ -28,7 +28,7 @@ export function RelatedPosts() {
 	useEffect(() => {
 		const slug = extractPostSlug(pathname);
 		if (!slug) {
-			setIsLoading(false);
+			setIsLoading(false); // eslint-disable-line react-hooks/set-state-in-effect -- early exit
 			return;
 		}
 

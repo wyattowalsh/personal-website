@@ -12,7 +12,6 @@
 | `Input` | `@/components/ui/input` | Form inputs |
 | `Tabs` | `@/components/ui/tabs` | Tab navigation |
 | `Tooltip` | `@/components/ui/tooltip` | Hover hints |
-| `Toast` | `@/components/ui/toast` | Notifications |
 | `Accordion` | `@/components/ui/accordion` | Collapsible sections |
 | `DropdownMenu` | `@/components/ui/dropdown-menu` | Menus |
 | `Select` | `@/components/ui/select` | Dropdowns |

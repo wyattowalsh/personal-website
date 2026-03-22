@@ -446,53 +446,6 @@ import { Badge } from '@/components/ui/badge';
 
 ---
 
-### Toast
-
-Toast notification system.
-
-**Files:**
-- `components/ui/toast.tsx` — Toast component
-- `components/ui/toaster.tsx` — Toast container
-
-**Usage:**
-
-```typescript
-import { Toaster } from '@/components/ui/toaster';
-import { useToast } from '@/components/ui/use-toast';
-
-// Add <Toaster /> to root layout
-export default function RootLayout({ children }) {
-  return (
-    <html>
-      <body>
-        {children}
-        <Toaster />
-      </body>
-    </html>
-  );
-}
-
-// Trigger toast in component
-export function MyComponent() {
-  const { toast } = useToast();
-
-  return (
-    <Button onClick={() => {
-      toast({
-        title: "Success!",
-        description: "Post published successfully.",
-      });
-    }}>
-      Publish
-    </Button>
-  );
-}
-```
-
-**Radix primitive:** `@radix-ui/react-toast`
-
----
-
 ### Tooltip
 
 Hover tooltip component.
@@ -634,7 +587,6 @@ import { Kaggle } from '@/components/icons/Kaggle';
 |-----------|------|-----------------|
 | Alert | `alert.tsx` | None |
 | Badge | `badge.tsx` | None |
-| Toast | `toast.tsx` / `toaster.tsx` | `@radix-ui/react-toast` |
 | Tooltip | `tooltip.tsx` | `@radix-ui/react-tooltip` |
 
 ### Special Components
@@ -738,7 +690,6 @@ Interactive components require `'use client'`:
 - Tabs (interactive)
 - Accordion (interactive)
 - Dropdown Menu (interactive)
-- Toast (interactive)
 - Tooltip (hover state)
 
 **Usage in server components:**
@@ -765,7 +716,7 @@ export function ClientButton() {
 
 ## Summary
 
-The project includes **16 UI primitives** and **2 custom icons**:
+The project includes **14 UI primitives** and **2 custom icons**:
 
 **Use these components for:**
 - ✅ Consistent design system

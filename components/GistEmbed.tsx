@@ -32,7 +32,7 @@ export function GistEmbed({ id, file }: GistEmbedProps) {
 
   // Reset loading state when theme changes so the skeleton reappears
   useEffect(() => {
-    setLoading(true)
+    setLoading(true) // eslint-disable-line react-hooks/set-state-in-effect -- reset on theme change
     setError(false)
   }, [resolvedTheme])
 

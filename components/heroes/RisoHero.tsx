@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useId, useMemo } from "react";
 import { cn } from "@/lib/utils";
 
 interface RisoColors {
@@ -88,10 +88,10 @@ export default function RisoHero({ className, onLoad }: RisoHeroProps) {
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  const uid = useMemo(() => Math.random().toString(36).slice(2, 8), []);
+  const uid = useId().replace(/:/g, '');
 
   useEffect(() => {
-    setMounted(true);
+    setMounted(true); // eslint-disable-line react-hooks/set-state-in-effect -- client mount guard for hydration
     onLoad?.();
   }, [onLoad]);
 
