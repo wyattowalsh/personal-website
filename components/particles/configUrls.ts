@@ -1,5 +1,5 @@
 // This file is auto-generated. Do not edit manually.
-// Last generated: 2026-03-21T11:11:41.081Z
+// Last generated: 2026-03-22T15:11:53.849Z
 
 type ParticleConfig = {
   url: string;
