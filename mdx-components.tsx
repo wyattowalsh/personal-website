@@ -3,7 +3,7 @@ import type { MDXComponents } from "mdx/types";
 import Image from "next/image";
 import Link from "next/link";
 import { cn, isExternal } from "@/lib/utils";
-import { ExternalLink, Info, AlertCircle, Terminal as TerminalIcon } from "lucide-react";
+import { ExternalLink, Info } from "lucide-react";
 import { CodeBlock } from "@/components/CodeBlock";
 import { HeadingLink } from "@/components/HeadingLink";
 
@@ -51,22 +51,13 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "[&_strong]:no-underline", // Add this
                 "[&_em]:no-underline",     // Add this
                 "prose-strong:no-underline prose-em:no-underline", // Add this
-                // Add styles for heading link positioning
+                // Heading layout styles
                 "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:relative",
-                "[&_.anchor-link]:absolute [&_.anchor-link]:right-0",
-                "[&_.anchor-link]:top-1/2 [&_.anchor-link]:-translate-y-1/2",
-                "[&_.anchor-link]:opacity-0 [&_:hover_.anchor-link]:opacity-100",
-                "[&_.anchor-link]:transition-opacity [&_.anchor-link]:duration-200",
-                // Update heading link styles
                 "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:w-full",
                 "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:flex",
                 "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:items-center",
                 "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:justify-between",
-                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:gap-4",
-                // Update anchor link styles
-                "[&_.anchor-link]:static",
-                "[&_.anchor-link]:transform-none",
-                "[&_.anchor-link]:flex-shrink-0"
+                "[&_h1,&_h2,&_h3,&_h4,&_h5,&_h6]:gap-4"
             )}>
                 <article className="relative w-full max-w-none">
                     {children}
@@ -74,17 +65,20 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
             </div>
         ),
 
-        h1: ({ children }) => (
-            <h1 className={cn(
+        h1: ({ children, id, ...props }) => (
+            <h1 id={id} className={cn(
+                "scroll-m-20",
                 "sm:text-4xl md:text-5xl lg:text-6xl",
                 "mt-8 mb-4",
                 "text-foreground",
                 "pb-4",
                 "bg-clip-text bg-gradient-to-r from-primary via-primary-80 to-primary",
                 "hover:text-transparent transition-colors duration-300",
-                "relative"
-            )}>
-                {children}
+                "relative group",
+                "flex items-center justify-between gap-4"
+            )} {...props}>
+                <span className="flex-1 min-w-0">{children}</span>
+                <HeadingLink id={id} />
             </h1>
         ),
 
@@ -145,14 +139,8 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 "leading-7 [&:not(:first-child)]:mt-6",
                 "text-base sm:text-lg",
                 "text-muted-foreground",
-                "relative group",
-                "transition-all duration-300",
-                "hover:text-foreground",
-                "after:content-[''] after:absolute after:bottom-0 after:left-0",
-                "after:w-full after:h-[1px] after:bg-primary-10",
-                "after:transform after:scale-x-0",
-                "after:transition-transform after:duration-500",
-                "group-hover:after:scale-x-100"
+                "transition-colors duration-300",
+                "hover:text-foreground"
             )}>
                 {children}
             </p>
@@ -358,48 +346,6 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
                 <GistEmbed id={id || url || ''} file={file} />
             </div>
         ),
-
-        // Add specialized note/warning blocks
-        Note: ({ children, type = "info" }) => {
-            const icons = {
-                info: Info,
-                warning: AlertCircle,
-                terminal: TerminalIcon,
-            };
-            const Icon = icons[type as keyof typeof icons];
-            
-            const styles = {
-                info: "border-blue-500-30 bg-blue-500/5 dark:border-blue-500-20 dark:bg-blue-500-10",
-                warning: "border-yellow-500-30 bg-yellow-500/5 dark:border-yellow-500-20 dark:bg-yellow-500-10",
-                terminal: "border-green-500-30 bg-green-500/5 dark:border-green-500-20 dark:bg-green-500-10",
-            };
-            
-            return (
-                <div className={cn(
-                    "my-6 p-4 rounded-xl",
-                    "border-2",
-                    styles[type as keyof typeof styles],
-                    "transition-all duration-300",
-                    "hover:shadow-lg dark:hover:shadow-primary-10",
-                    "relative overflow-hidden group",
-                    "before:content-[''] before:absolute before:inset-0",
-                    "before:bg-gradient-to-r before:from-primary/5 before:to-transparent",
-                    "before:opacity-0 hover:before:opacity-100",
-                    "before:transition-opacity before:duration-300"
-                )}>
-                    <div className="flex items-start gap-4 relative z-10">
-                        <Icon className={cn(
-                            "w-5 h-5 mt-1 flex-shrink-0",
-                            "transition-transform duration-300 group-hover:scale-110",
-                            type === "info" && "text-blue-500",
-                            type === "warning" && "text-yellow-500",
-                            type === "terminal" && "text-green-500"
-                        )} />
-                        <div className="prose-sm">{children}</div>
-                    </div>
-                </div>
-            );
-        },
 
         // Add collapsible sections
         Accordion: (props) => (
