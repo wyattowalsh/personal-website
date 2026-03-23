@@ -69,7 +69,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
       animate="visible"
       variants={pageVariants}
       className={cn(
-        "relative min-h-screen overflow-hidden",
+        "relative min-h-screen overflow-hidden -mt-14 sm:-mt-16",
         "bg-gradient-to-b from-background/50 via-background/50 to-background/50",
         "dark:from-background/50 dark:via-background/50 dark:to-background/50",
         styles.mainContainer
