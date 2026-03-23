@@ -83,9 +83,9 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
 
         <motion.div
           className={cn(
-            "relative z-10 flex flex-col justify-start min-h-screen",
+            "relative z-10 flex flex-col justify-center min-h-screen",
             "px-4 sm:px-6 lg:px-8",
-            "pb-12 sm:pb-16 lg:pb-20",
+            "pt-20 sm:pt-24 pb-12 sm:pb-16 lg:pb-20",
             "max-w-7xl mx-auto w-full"
           )}
         >
