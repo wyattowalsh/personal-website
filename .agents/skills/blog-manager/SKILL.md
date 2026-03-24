@@ -30,6 +30,12 @@ hooks:
 
 Classify user intent, route to the correct blog agent, and coordinate multi-stage pipelines with user checkpoints. This skill never writes post content — it orchestrates.
 
+## Skill Source of Truth
+
+- Canonical portable source: `.agents/skills/blog-manager/`
+- Runtime adapter: `.claude/skills/blog-manager` should remain a thin runtime-facing alias to the canonical source, not a fork
+- Future host packaging (including `.github`) should be a thin overlay that points back to or copies from `.agents/skills/blog-manager/` instead of becoming another independently maintained copy
+
 ## Intent Classification
 
 Auto-infer the mode from `$ARGUMENTS`. No explicit mode keyword required.

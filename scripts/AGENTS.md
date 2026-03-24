@@ -20,12 +20,12 @@ pnpm new-post
 pnpm new-post --title "My Post" --summary "Description" --tags "Tag1,Tag2"
 ```
 
-Creates: `app/blog/posts/{slug}/page.mdx`
+Creates: `content/posts/{slug}/index.mdx`
 
 ## index.ts (Preprocessing)
 
 Runs automatically before `dev` and `build`:
-- Scans `app/blog/posts/` for MDX files
+- Scans `content/posts/**/index.mdx` for MDX files
 - Parses frontmatter with gray-matter
 - Builds search index (Fuse.js)
 - Generates particle configurations

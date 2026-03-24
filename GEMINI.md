@@ -15,8 +15,9 @@
 - `@/` path aliases for all imports
 
 **Key entry points:**
-- `lib/services.ts` — Simplified data API
-- `lib/client.ts` — Type-safe API client
+- `content/posts/{slug}/index.mdx` — Authored blog post source
+- `lib/server.ts` — `BackendService` for blog data and search
+- `lib/metadata.ts` — SEO metadata + structured data helpers
 - `lib/utils.ts` — cn(), formatDate helpers
 - `app/globals.scss` — Theme CSS variables
 

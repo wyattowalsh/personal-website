@@ -9,7 +9,7 @@ app/
 ├── globals.scss          # Global styles, Tailwind layers
 ├── variables.module.scss # Theme CSS variables (light/dark)
 ├── blog/                 # Blog section
-│   ├── posts/{slug}/     # Individual posts (page.mdx)
+│   ├── posts/[slug]/     # Shared post route (layout.tsx + page.tsx)
 │   └── tags/[tag]/       # Tag filtering
 ├── api/                  # API routes
 └── feed.*/               # RSS/Atom/JSON feeds
@@ -26,16 +26,17 @@ app/
 ## Data Fetching
 
 ```typescript
-// Server Component (default) — use services API
-import { services } from '@/lib/services'
+// Server Component (default) — use BackendService for blog data
+import { BackendService } from '@/lib/server'
 
 export default async function Page() {
-  const data = await services.posts.getAll()
-  return <Component data={data} />
+  await BackendService.ensurePreprocessed()
+  const posts = await BackendService.getInstance().getAllPosts()
+  return <Component data={posts} />
 }
 ```
 
-See [lib/AGENTS.md](../lib/AGENTS.md) for full `services` API.
+See [lib/AGENTS.md](../lib/AGENTS.md) for the full `BackendService` API.
 
 ## Client Components
 
@@ -47,9 +48,12 @@ See [lib/AGENTS.md](../lib/AGENTS.md) for full `services` API.
 
 ## MDX Posts
 
-Location: `blog/posts/{slug}/page.mdx`
+Location: `content/posts/{slug}/index.mdx`
 
 - Frontmatter required (title, summary, tags, created, updated)
+- `app/blog/posts/[slug]/page.tsx` renders that MDX file
+- `app/blog/posts/[slug]/layout.tsx` generates metadata and JSON-LD
+- Do not create per-post `page.mdx` files under `app/blog/posts/`
 - Use `@/` imports, never relative
 - Images reference `/public/` as `/filename.svg`
 

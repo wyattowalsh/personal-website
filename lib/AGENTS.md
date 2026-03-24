@@ -5,11 +5,12 @@
 | File | Purpose | Key Exports |
 |------|---------|-------------|
 | `server.ts` | Backend singleton | `BackendService` |
-| `client.ts` | Browser API client | `api` |
-| `core.ts` | Types, schemas, logger | `Post`, `ApiError`, `logger`, `schemas` |
-| `metadata.ts` | SEO metadata | `generatePostMetadata()`, `generatePostStructuredData()` |
+| `core.ts` | Config, API schemas, error helpers | `getConfig()`, `ApiError`, `api`, `schemas` |
+| `metadata.ts` | SEO metadata + post structured data | `generatePostMetadata()`, `generatePostStructuredData()` |
 | `schema.ts` | JSON-LD generators | `generateArticleSchema()`, `generateBreadcrumbSchema()` |
+| `types.ts` | Shared content/config types | `Post`, `PostMetadata`, `Config` |
 | `utils.ts` | Helpers | `cn()`, `formatDate()`, `slugify()` |
+| `logger.ts` | Structured server logger | `logger`, `formatters` |
 
 ## BackendService (Primary API)
 
@@ -29,17 +30,19 @@ const adjacent = await backend.getAdjacentPosts(slug)  // { previous, next }
 const tags = await backend.getAllTags()
 ```
 
-Features: LRU cache (50 items, 1hr TTL), Fuse.js search
+Features: promise-deduplicated preprocessing, cached post/tag lookups, Fuse.js search
 
 ## Metadata & SEO (metadata.ts)
 
 ```typescript
 import { generatePostMetadata, generatePostStructuredData } from '@/lib/metadata'
 
-// In page.tsx or generateMetadata()
-export const metadata = generatePostMetadata({ post, slug })
+// In app/blog/posts/[slug]/layout.tsx
+export async function generateMetadata() {
+  return generatePostMetadata({ post, slug })
+}
 
-// For JSON-LD script tag
+// For the shared JSON-LD script tag in layout code
 const structuredData = generatePostStructuredData(post, slug)
 ```
 

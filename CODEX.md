@@ -26,7 +26,9 @@ pnpm new-post     # Create blog post
 - Server components by default, `'use client'` when needed
 
 **Key entry points:**
-- `lib/services.ts` — `services.posts.*`, `services.tags.*`
+- `content/posts/{slug}/index.mdx` — Authored blog post source
+- `lib/server.ts` — `BackendService` for posts, tags, and search
+- `lib/metadata.ts` — Post metadata + structured data helpers
 - `lib/utils.ts` — cn(), formatDate
 - `components/ui/` — Button, Card, etc.
 

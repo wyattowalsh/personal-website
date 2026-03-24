@@ -7,10 +7,9 @@ blog/
 ├── layout.tsx            # Blog layout wrapper
 ├── page.tsx              # Blog index (post list)
 ├── posts/
-│   ├── layout.tsx        # Post layout (MathProvider, Suspense)
-│   ├── metadata.tsx      # Shared metadata generation
-│   └── {slug}/
-│       └── page.mdx      # Individual blog post
+│   └── [slug]/
+│       ├── layout.tsx    # Shared metadata + JSON-LD from frontmatter
+│       └── page.tsx      # Compiles content/posts/{slug}/index.mdx
 └── tags/
     └── [tag]/
         └── page.tsx      # Posts filtered by tag
@@ -23,6 +22,15 @@ pnpm new-post
 # or
 pnpm new-post --title "Title" --tags "A,B"
 ```
+
+Creates `content/posts/{slug}/index.mdx`.
+
+## Source of Truth
+
+- Author post content in `content/posts/{slug}/index.mdx`.
+- `app/blog/posts/[slug]/page.tsx` reads and compiles that MDX file.
+- `app/blog/posts/[slug]/layout.tsx` generates page metadata and injects structured data from frontmatter.
+- Do not create or edit per-post route files under `app/blog/posts/`.
 
 ## MDX Frontmatter
 
@@ -44,6 +52,7 @@ updated: "2026-01-15"         # ISO date
 - Wrap LaTeX in `<Math>` component
 - Code blocks get syntax highlighting automatically
 - Use rehype-callouts for admonitions: `> [!NOTE]`
+- Do not add `export const metadata`, `ArticleJsonLd`, or manual JSON-LD `<script>` tags inside posts
 
 ## Available MDX Components
 
