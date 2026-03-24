@@ -1,417 +1,220 @@
 ---
 title: "Custom Hooks"
-description: "Client-side React hooks for reduced motion detection, window sizing, and mouse tracking."
+description: "Client-side hooks used for motion preferences, viewport sizing, and reading-progress analytics."
 ---
 
-## Overview
+The site currently exposes three custom hooks under `components/hooks/`:
 
-The site provides **three custom React hooks** for common client-side interactions:
+- `useReducedMotion`
+- `useWindowSize`
+- `useReadingProgress`
 
-- `useReducedMotion` — Detect user motion preferences
-- `useWindowSize` — Track viewport dimensions
-- `useMousePosition` — Track cursor coordinates
+All three are browser-facing hooks and should be used from client components.
 
-All hooks are **client-only** and must be imported from `@/components/hooks/`.
-
-## useReducedMotion
-
-Detects the user's `prefers-reduced-motion` system setting and updates reactively.
-
-### Implementation
+## `useReducedMotion`
 
 **File:** `components/hooks/useReducedMotion.ts`
 
+This hook tracks the user's `prefers-reduced-motion` media query by using `useSyncExternalStore`.
+
 ```typescript
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from "react";
+
+const query = "(prefers-reduced-motion: reduce)";
+
+function subscribe(callback: () => void) {
+  const mq = window.matchMedia(query);
+  mq.addEventListener("change", callback);
+  return () => mq.removeEventListener("change", callback);
+}
+
+function getSnapshot() {
+  return window.matchMedia(query).matches;
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 export function useReducedMotion(): boolean {
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setPrefersReducedMotion(mq.matches);
-
-    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-
-    return () => mq.removeEventListener('change', handler);
-  }, []);
-
-  return prefersReducedMotion;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }
 ```
+
+### Why this implementation matters
+
+- React gets a stable subscription model instead of an ad hoc `useEffect`/`useState` pair
+- the server snapshot is explicit (`false`)
+- updates stay in sync with media-query changes
 
 ### Usage
 
 ```tsx
-'use client'
+"use client";
 
-import { useReducedMotion } from '@/components/hooks/useReducedMotion'
-import { motion } from 'motion/react'
+import { motion } from "motion/react";
+import { useReducedMotion } from "@/components/hooks/useReducedMotion";
 
 export function AnimatedComponent() {
-  const prefersReducedMotion = useReducedMotion()
+  const prefersReducedMotion = useReducedMotion();
 
   return (
     <motion.div
       animate={{ opacity: 1 }}
-      transition={{
-        duration: prefersReducedMotion ? 0.01 : 0.5
-      }}
+      transition={{ duration: prefersReducedMotion ? 0.01 : 0.5 }}
     >
       Content
     </motion.div>
-  )
+  );
 }
 ```
 
-### Return Value
-
-| Type | Description |
-|------|-------------|
-| `boolean` | `true` if user prefers reduced motion, `false` otherwise |
-
-### Behavior
-
-1. **Initial state:** `false` (default)
-2. **On mount:** Reads `prefers-reduced-motion` media query
-3. **Reactive:** Listens for changes to system preference
-4. **Cleanup:** Removes event listener on unmount
-
-### Accessibility
-
-Use this hook to **respect user preferences** by:
-
-- Disabling or minimizing animations when `true`
-- Reducing transition durations to near-instant (`0.01s`)
-- Skipping parallax/scroll-based effects
-
-**Example:**
-
-```tsx
-<motion.button
-  whileHover={prefersReducedMotion ? undefined : { scale: 1.05 }}
-  whileTap={prefersReducedMotion ? undefined : { scale: 0.95 }}
->
-  Click me
-</motion.button>
-```
-
-## useWindowSize
-
-Tracks the browser window dimensions and updates on resize.
-
-### Implementation
+## `useWindowSize`
 
 **File:** `components/hooks/useWindowSize.ts`
 
+This hook tracks the viewport size with an SSR-safe initial state and a built-in debounce.
+
 ```typescript
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from "react";
+
+const DEBOUNCE_MS = 300;
 
 export const useWindowSize = () => {
-  const [size, setSize] = useState({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
+  const [size, setSize] = useState(() => ({
+    width: typeof window !== "undefined" ? window.innerWidth : 0,
+    height: typeof window !== "undefined" ? window.innerHeight : 0,
+  }));
+  const timerId = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
-      setSize({
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
+      if (timerId.current !== null) clearTimeout(timerId.current);
+
+      timerId.current = setTimeout(() => {
+        setSize({
+          width: window.innerWidth,
+          height: window.innerHeight,
+        });
+        timerId.current = null;
+      }, DEBOUNCE_MS);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      if (timerId.current !== null) clearTimeout(timerId.current);
+    };
   }, []);
 
   return size;
 };
 ```
 
+### Current behavior
+
+- initial server-safe fallback is `{ width: 0, height: 0 }`
+- resize updates are debounced by `300ms`
+- pending timers are cleaned up on unmount
+
 ### Usage
 
 ```tsx
-'use client'
+"use client";
 
-import { useWindowSize } from '@/components/hooks/useWindowSize'
+import { useWindowSize } from "@/components/hooks/useWindowSize";
 
 export function ResponsiveComponent() {
-  const { width, height } = useWindowSize()
+  const { width, height } = useWindowSize();
 
   return (
     <div>
-      <p>Window: {width}px × {height}px</p>
-      {width < 768 && <MobileView />}
-      {width >= 768 && <DesktopView />}
+      <p>
+        Window: {width}px × {height}px
+      </p>
+      {width < 768 ? <MobileView /> : <DesktopView />}
     </div>
-  )
+  );
 }
 ```
 
-### Return Value
+## `useReadingProgress`
+
+**File:** `components/hooks/useReadingProgress.ts`
+
+Tracks reading milestones for blog posts and sends analytics events at `25%`, `50%`, `75%`, and `100%`.
 
 ```typescript
-{
-  width: number;   // window.innerWidth in pixels
-  height: number;  // window.innerHeight in pixels
-}
-```
-
-### Use Cases
-
-- **Responsive rendering:** Show/hide components based on viewport
-- **Canvas sizing:** Adjust canvas element dimensions
-- **Layout calculations:** Position floating elements
-- **Breakpoint detection:** Trigger JS logic at specific widths
-
-### Performance Considerations
-
-**Throttling:** For high-frequency updates, consider throttling the resize handler:
-
-```typescript
-import { throttle } from 'lodash'
-
-const handleResize = throttle(() => {
-  setSize({
-    width: window.innerWidth,
-    height: window.innerHeight,
-  });
-}, 200); // Update max every 200ms
-```
-
-**Alternative:** Use CSS media queries or Tailwind breakpoints instead of JS for simple responsive layouts.
-
-## useMousePosition
-
-Tracks the current mouse cursor coordinates relative to the viewport.
-
-### Implementation
-
-**File:** `components/hooks/useMousePosition.ts`
-
-```typescript
-import { useState, useEffect } from 'react';
-
-export const useMousePosition = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+export function useReadingProgress(slug: string) {
+  const firedRef = useRef(new Set<number>());
+  const rafId = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      setPosition({ x: event.clientX, y: event.clientY });
+    firedRef.current = new Set<number>();
+    const fired = firedRef.current;
+
+    function onScroll() {
+      if (rafId.current !== null) return;
+
+      rafId.current = requestAnimationFrame(() => {
+        rafId.current = null;
+
+        const docHeight =
+          document.documentElement.scrollHeight -
+          document.documentElement.clientHeight;
+        if (docHeight <= 0) return;
+
+        const percent = Math.round((window.scrollY / docHeight) * 100);
+
+        for (const milestone of [25, 50, 75, 100] as const) {
+          if (percent >= milestone && !fired.has(milestone)) {
+            fired.add(milestone);
+            track("reading_progress", { slug, milestone, percent });
+          }
+        }
+      });
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  return position;
-};
-```
-
-### Usage
-
-```tsx
-'use client'
-
-import { useMousePosition } from '@/components/hooks/useMousePosition'
-
-export function FollowCursor() {
-  const { x, y } = useMousePosition()
-
-  return (
-    <div
-      style={{
-        position: 'fixed',
-        left: x,
-        top: y,
-        transform: 'translate(-50%, -50%)',
-        pointerEvents: 'none',
-      }}
-      className="w-4 h-4 bg-primary rounded-full"
-    />
-  )
+  }, [slug]);
 }
 ```
 
-### Return Value
+### Behavior
+
+- fires each milestone once per page load
+- resets when `slug` changes
+- throttles work with `requestAnimationFrame`
+- uses a passive scroll listener
+
+## Import Patterns
 
 ```typescript
-{
-  x: number;  // Mouse X position in pixels (from left edge)
-  y: number;  // Mouse Y position in pixels (from top edge)
-}
+import { useReducedMotion } from "@/components/hooks/useReducedMotion";
+import { useWindowSize } from "@/components/hooks/useWindowSize";
+import { useReadingProgress } from "@/components/hooks/useReadingProgress";
 ```
 
-### Use Cases
-
-- **Custom cursors:** Render custom cursor graphics that follow the mouse
-- **Parallax effects:** Move background elements based on mouse position
-- **Hover effects:** Calculate distance to elements for proximity-based animations
-- **Interactive canvas:** Track mouse for drawing/painting apps
-
-### Example: Proximity-Based Glow
-
-```tsx
-'use client'
-
-import { useMousePosition } from '@/components/hooks/useMousePosition'
-import { useRef } from 'react'
-
-export function GlowCard() {
-  const { x, y } = useMousePosition()
-  const cardRef = useRef<HTMLDivElement>(null)
-
-  // Calculate distance from mouse to card center
-  const rect = cardRef.current?.getBoundingClientRect()
-  const cardCenterX = (rect?.left || 0) + (rect?.width || 0) / 2
-  const cardCenterY = (rect?.top || 0) + (rect?.height || 0) / 2
-  const distance = Math.sqrt(
-    Math.pow(x - cardCenterX, 2) + Math.pow(y - cardCenterY, 2)
-  )
-
-  const glowIntensity = Math.max(0, 1 - distance / 500)
-
-  return (
-    <div
-      ref={cardRef}
-      style={{
-        boxShadow: `0 0 ${glowIntensity * 50}px rgba(59, 130, 246, ${glowIntensity})`,
-      }}
-    >
-      Card content
-    </div>
-  )
-}
-```
-
-### Performance Considerations
-
-**Throttling:** Mouse move events fire very frequently. For non-critical use cases, throttle updates:
-
-```typescript
-import { throttle } from 'lodash'
-
-const handleMouseMove = throttle((event: MouseEvent) => {
-  setPosition({ x: event.clientX, y: event.clientY });
-}, 16); // ~60fps
-```
-
-**Mobile:** Mouse position is meaningless on touch devices. Consider combining with touch events or feature detection:
-
-```typescript
-const isTouchDevice = 'ontouchstart' in window
-
-if (!isTouchDevice) {
-  window.addEventListener('mousemove', handleMouseMove)
-}
-```
-
-## Hook Import Patterns
-
-### Individual Imports
-
-```typescript
-import { useReducedMotion } from '@/components/hooks/useReducedMotion'
-import { useWindowSize } from '@/components/hooks/useWindowSize'
-import { useMousePosition } from '@/components/hooks/useMousePosition'
-```
-
-### Barrel Exports (if added)
-
-Create `components/hooks/index.ts`:
-
-```typescript
-export { useReducedMotion } from './useReducedMotion'
-export { useWindowSize } from './useWindowSize'
-export { useMousePosition } from './useMousePosition'
-```
-
-Then import:
-
-```typescript
-import { useReducedMotion, useWindowSize, useMousePosition } from '@/components/hooks'
-```
-
-## Common Patterns
-
-### Combining Hooks
-
-```tsx
-'use client'
-
-import { useReducedMotion } from '@/components/hooks/useReducedMotion'
-import { useWindowSize } from '@/components/hooks/useWindowSize'
-import { useMousePosition } from '@/components/hooks/useMousePosition'
-
-export function InteractiveBackground() {
-  const prefersReducedMotion = useReducedMotion()
-  const { width, height } = useWindowSize()
-  const { x, y } = useMousePosition()
-
-  // Skip animations if reduced motion
-  if (prefersReducedMotion) {
-    return <StaticBackground />
-  }
-
-  // Calculate parallax offset based on mouse position
-  const offsetX = (x / width - 0.5) * 50
-  const offsetY = (y / height - 0.5) * 50
-
-  return (
-    <div
-      style={{
-        transform: `translate(${offsetX}px, ${offsetY}px)`,
-        transition: 'transform 0.2s ease-out',
-      }}
-    >
-      Background content
-    </div>
-  )
-}
-```
-
-### Conditional Rendering
-
-```tsx
-'use client'
-
-import { useWindowSize } from '@/components/hooks/useWindowSize'
-
-export function AdaptiveLayout() {
-  const { width } = useWindowSize()
-
-  // Custom breakpoint logic
-  if (width < 640) return <MobileLayout />
-  if (width < 1024) return <TabletLayout />
-  return <DesktopLayout />
-}
-```
+There is no barrel export in `components/hooks/` right now, so import directly from each file.
 
 ## Best Practices
 
-1. **Always use `'use client'` directive** — These hooks access browser APIs (`window`, `document`)
-2. **Respect reduced motion** — Never ignore `useReducedMotion()` when adding animations
-3. **Throttle high-frequency events** — Use throttle/debounce for `resize` and `mousemove` handlers
-4. **Cleanup listeners** — Return cleanup functions from `useEffect` to prevent memory leaks
-5. **Provide fallbacks** — Handle initial state before hooks return actual values
-6. **Check browser support** — Feature-detect before using mouse position on touch devices
+1. Add `"use client"` to any component that calls these hooks
+2. Respect `useReducedMotion()` whenever you introduce animation
+3. Remember that `useWindowSize()` starts at `0x0` during SSR
+4. Prefer CSS breakpoints over JS sizing when layout alone is enough
+5. Use `useReadingProgress()` for analytics side effects, not rendering state
 
 ## Troubleshooting
 
-**Problem:** Hook causes hydration mismatch
+### `useWindowSize()` looks stale
 
-- **Solution:** Ensure hook is only used in client components (`'use client'`)
+That may be the `300ms` debounce doing its job. If you need frame-level resize behavior, this hook is probably the wrong tool.
 
-**Problem:** `useWindowSize` returns stale values
+### `useReducedMotion()` always returns `false`
 
-- **Solution:** Verify `resize` event listener is properly attached and not throttled too aggressively
-
-**Problem:** `useMousePosition` causes performance issues
-
-- **Solution:** Throttle updates to ~60fps (`16ms` delay) or higher for less critical use cases
-
-**Problem:** `useReducedMotion` always returns `false`
-
-- **Solution:** Test by enabling reduced motion in OS settings (macOS: System Preferences → Accessibility → Display → Reduce motion)
+Check the OS/browser reduced-motion preference first. The server snapshot is intentionally `false`, and the real value is read in the browser.

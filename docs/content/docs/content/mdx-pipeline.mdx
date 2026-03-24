@@ -1,229 +1,172 @@
 ---
 title: "MDX Pipeline"
-description: "Comprehensive overview of the MDX processing pipeline with remark and rehype plugins"
+description: "How blog post MDX is loaded, parsed, transformed, and rendered in the main site."
 ---
 
-The website features one of the most extensive and well-configured MDX pipelines possible, transforming simple markdown files into rich, interactive, and technical content. Blog posts are written in MDX (Markdown + JSX) and processed through a sophisticated plugin chain that enhances content with syntax highlighting, mathematical rendering, GitHub Flavored Markdown, and more.
+The blog does **not** use `@next/mdx` page compilation in `next.config.mjs`. Instead, each post is read from `content/posts/{slug}/index.mdx` and compiled in the blog post route with `next-mdx-remote/rsc`.
 
-## Pipeline Architecture
+## Where MDX Is Processed
 
-The MDX processing pipeline is configured in `next.config.mjs` using `@next/mdx` and consists of two main stages:
+The runtime pipeline lives in `app/blog/posts/[slug]/page.tsx`:
 
-1. **Remark plugins** — Process the Markdown AST (Abstract Syntax Tree) before conversion to JSX
-2. **Rehype plugins** — Process the HTML/JSX AST after conversion
-
-### Configuration
-
-```javascript
-const withMdx = createMDX({
-  extension: /\.mdx?$/,
+```tsx
+const { content } = await compileMDX({
+  source,
+  components: mdxComponents,
   options: {
-    remarkPlugins: [
-      ['remark-frontmatter'],
-      ['remark-mdx-frontmatter'],
-      ['remark-gfm'],
-      ['remark-math'],
-      ['remark-mdx-math-enhanced', { component: 'Math' }],
-    ],
-    rehypePlugins: [
-      ['rehype-slug'],
-      ['rehype-prism-plus'],
-    ],
+    parseFrontmatter: true,
+    mdxOptions: {
+      remarkPlugins: [
+        remarkGfm,
+        remarkMath,
+        [remarkMdxMathEnhanced, { component: "Math" }],
+      ],
+      rehypePlugins: [
+        rehypeSlug,
+        [rehypePrismPlus, { ignoreMissing: true }],
+        rehypeCallouts,
+      ],
+    },
   },
-})
+});
 ```
 
-## Remark Plugins (Markdown Processing)
+`next.config.mjs` intentionally keeps `pageExtensions` to `js`, `jsx`, `ts`, and `tsx`, so `.mdx` files are not treated as route files.
 
-Remark plugins operate on the Markdown AST before it's converted to JSX. They enrich the content, extract metadata, and transform syntax.
+## End-to-End Flow
 
-### remark-frontmatter
-
-Parses YAML frontmatter blocks at the top of MDX files.
-
-```yaml
----
-title: "My Post"
-tags: ["React", "TypeScript"]
-created: "2024-12-01"
----
+```text
+content/posts/{slug}/index.mdx
+        │
+        ├─ read from disk in app/blog/posts/[slug]/page.tsx
+        ├─ compileMDX(..., parseFrontmatter: true)
+        ├─ remark transforms markdown/MDX syntax
+        ├─ rehype transforms generated HTML AST
+        ├─ mdx-components.tsx maps elements/components
+        └─ rendered React content + <ArticleTracker />
 ```
 
-### remark-mdx-frontmatter
+## Frontmatter Handling
 
-Exports frontmatter as JavaScript variables, making metadata available to the MDX runtime. This enables three-way metadata sync between:
-- YAML frontmatter
-- Next.js `Metadata` export
-- `ArticleJsonLd` structured data
+There are two separate frontmatter paths in this codebase:
 
-### remark-gfm (GitHub Flavored Markdown)
+### Render-time frontmatter parsing
 
-Adds support for GitHub-style Markdown extensions:
-- **Tables** with alignment
-- **Strikethrough** (`~~text~~`)
-- **Task lists** (`- [ ] Todo`)
-- **Autolinks** (URLs become clickable)
-- **Footnotes**
+`compileMDX({ parseFrontmatter: true })` reads frontmatter so the MDX compiler can safely process the file content.
 
-Example:
+### Backend indexing and metadata parsing
 
-```markdown
-| Feature | Supported |
-|---------|-----------|
-| Tables  | ✅        |
-| ~~Old~~ | ✅        |
+`BackendService` in `lib/server.ts` separately reads the same file with `gray-matter`, validates frontmatter with Zod, and stores the parsed result for:
 
-- [x] Completed task
-- [ ] Pending task
-```
+- post listings
+- tags
+- search
+- feed generation
+- route metadata generation
 
-### remark-math
+That means frontmatter is shared, but parsing is done in two different places for two different jobs.
 
-Detects LaTeX math syntax in Markdown and marks it for processing by rehype-katex. Supports both inline and display math:
+## Remark Plugins
 
-- **Inline**: `$E = mc^2$`
-- **Display**: `$$\int_0^\infty e^{-x^2} dx = \frac{\sqrt{\pi}}{2}$$`
+These run before the Markdown/MDX tree becomes HTML.
 
-### remark-mdx-math-enhanced
+### `remark-gfm`
 
-Custom plugin that transforms math blocks into `<Math>` component calls with proper props for equation numbering and labeling. Configured with `{ component: 'Math' }` to use the site's custom Math component.
+Adds GitHub Flavored Markdown support such as:
 
-## Rehype Plugins (HTML/JSX Processing)
+- tables
+- task lists
+- autolinks
+- strikethrough
+- footnotes
 
-Rehype plugins operate on the HTML/JSX AST after Markdown has been converted. They add functionality to the rendered output.
+### `remark-math`
 
-### rehype-slug
+Detects inline and display LaTeX syntax.
 
-Automatically adds `id` attributes to all heading elements (`<h1>` through `<h6>`), enabling:
-- Deep linking to sections
-- Table of contents generation
-- Anchor navigation
+### `remark-mdx-math-enhanced`
 
-Example output:
+Transforms math nodes into the project's `<Math>` component shape so equations can use the site's custom math rendering and numbering behavior.
 
-```html
-<h2 id="my-section">My Section</h2>
-```
+## Rehype Plugins
 
-### rehype-prism-plus
+These run after Markdown has been converted into HTML/JSX AST nodes.
 
-Enhanced syntax highlighting for code blocks using PrismJS with additional features:
-- **Language detection** from code fence info strings
-- **Line highlighting** support
-- **Line numbers** (optional)
-- **Diff highlighting** for code changes
-- **Theme-aware** highlighting that respects dark/light mode
+### `rehype-slug`
 
-Supports 100+ languages including JavaScript, TypeScript, Python, Rust, Go, SQL, Bash, and more.
+Adds IDs to headings for deep linking and heading-link UI.
 
-Example:
+### `rehype-prism-plus`
 
-````markdown
-```typescript
-function greet(name: string): string {
-  return `Hello, ${name}!`;
-}
-```
-````
+Applies Prism-based syntax highlighting to fenced code blocks.
 
-### rehype-autolink-headings
+This route config passes `{ ignoreMissing: true }`, which keeps rendering from crashing when Prism does not recognize a language.
 
-Adds clickable anchor links to headings, making it easy for readers to share links to specific sections. Links are styled and positioned via CSS.
+### `rehype-callouts`
+
+Transforms supported blockquote/callout patterns into richer callout markup used by the content styles.
 
 ## Component Registry
 
-After the plugin pipeline processes MDX, the `mdx-components.tsx` file maps HTML elements and custom components into React components. This enables:
+After the plugin chain, the content is rendered through `mdx-components.tsx`.
 
-1. **Element overrides** — Replace default HTML elements (`<h1>`, `<code>`, `<img>`) with styled React components
-2. **Custom components** — Register MDX-specific components like `<Math>`, `<Mermaid>`, `<Chart>`, etc.
-3. **No imports required** — All components are globally available in MDX files
+That registry is responsible for:
 
-See [MDX Components](/docs/content/mdx-components) for the complete component reference.
+- replacing standard HTML elements with styled site components
+- exposing custom components such as `<Callout>`, `<Math>`, `<Mermaid>`, and `<Gist>`
+- exposing selected UI primitives to MDX without local imports
 
-## Content Transformation Flow
+See [MDX Components](/docs/content/mdx-components) for the component surface.
 
-```
-┌─────────────────┐
-│  page.mdx       │
-│  (raw Markdown) │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│  Remark Plugins         │
-│  • Parse frontmatter    │
-│  • GFM extensions       │
-│  • Math detection       │
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│  MDX → JSX Conversion   │
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│  Rehype Plugins         │
-│  • Add heading IDs      │
-│  • Syntax highlighting  │
-│  • Autolink headings    │
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│  Component Registry     │
-│  (mdx-components.tsx)   │
-└────────┬────────────────┘
-         │
-         ▼
-┌─────────────────────────┐
-│  Rendered React Page    │
-└─────────────────────────┘
+## Math and Diagram Notes
+
+### Math
+
+Math support is a collaboration between:
+
+- `remark-math`
+- `remark-mdx-math-enhanced`
+- the `Math` component
+- KaTeX styling in `app/globals.css`
+
+### Mermaid
+
+Mermaid is not part of the compiler plugin chain. Instead, the `Mermaid` component lazy-loads the `mermaid` package on the client with:
+
+```tsx
+const mermaid = (await import("mermaid")).default;
 ```
 
-## Performance Optimizations
+That keeps the heavy diagram runtime out of pages that never render Mermaid content.
 
-### Build-Time Processing
+## Caching and Performance
 
-All MDX processing happens at build time (not runtime), ensuring:
-- **Zero client-side overhead** for Markdown parsing
-- **Static HTML generation** for instant page loads
-- **Optimized bundle sizes** — only used components are included
+### What is cached
 
-### Caching
+`BackendService` caches:
 
-The `BackendService` singleton in `lib/server.ts` provides LRU caching for processed MDX content, avoiding redundant file reads and parsing during development.
+- parsed posts
+- sorted post lists
+- tagged post lists
+- the Fuse search index
 
-### Code Splitting
+### What is not cached here
 
-MDX components use dynamic imports and React Suspense where appropriate, ensuring large dependencies (like Mermaid.js for diagrams) are only loaded when needed.
+The docs should not imply that rendered MDX output is cached by `BackendService`. Its cache is for backend post metadata and search structures, not the compiled React result from `compileMDX()`.
 
-## Adding New Plugins
+## Changing the Pipeline
 
-To add a new remark or rehype plugin:
+If you need to add or remove MDX plugins, update `app/blog/posts/[slug]/page.tsx`, not `next.config.mjs`.
 
-1. Install the plugin:
+After pipeline changes:
 
-```bash
-pnpm add remark-plugin-name
-# or
-pnpm add rehype-plugin-name
-```
-
-2. Add to `next.config.mjs`:
-
-```javascript
-remarkPlugins: [
-  ['remark-frontmatter'],
-  ['remark-gfm'],
-  ['remark-plugin-name', { options }], // Add here
-],
-```
-
-3. Restart the dev server for the config change to take effect.
+1. run `pnpm dev` and open a real post
+2. test the content features you changed
+3. run `pnpm test`
+4. run `pnpm build`
 
 ## Related Documentation
 
-- [MDX Components](/docs/content/mdx-components) — Full component reference
-- [Math and Diagrams](/docs/content/math-and-diagrams) — LaTeX and Mermaid support
-- [Blog Authoring](/docs/content/blog-authoring) — Writing and publishing posts
+- [Blog Authoring](/docs/content/blog-authoring)
+- [MDX Components](/docs/content/mdx-components)
+- [Math and Diagrams](/docs/content/math-and-diagrams)

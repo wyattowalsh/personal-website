@@ -17,10 +17,10 @@ export function BlogLayoutContent({ children }: BlogLayoutContentProps) {
   return (
     <>
       {!isPostPage && (
-        <>
+        <div className="-mt-14 sm:-mt-16 pt-16 sm:pt-20">
           <BlogTitle />
           <hr className="border-border my-4" />
-        </>
+        </div>
       )}
       {children}
     </>

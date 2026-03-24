@@ -45,6 +45,7 @@
       "items": [
         "reference/lib-core",
         "reference/lib-services",
+        "reference/lib-server",
         "reference/lib-client",
         "reference/lib-utils",
         "reference/ui-primitives"

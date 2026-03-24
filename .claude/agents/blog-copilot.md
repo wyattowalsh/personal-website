@@ -122,7 +122,7 @@ Use this slug rule unless the caller already supplied one: lowercase, replace no
 Before every worker dispatch:
 
 1. Read `.agents/skills/blog-manager/references/agent-dispatch.md`.
-2. Paste the correction block from that file verbatim into the worker prompt.
+2. If the prompt, runtime layer, or prior artifacts drift from repo truth, paste the correction block from that file into the worker prompt.
 3. Fill every field in the shared context template from that file. Use `none` for unknown or not applicable values.
 4. Pass the real repo paths:
    - `existing_post_path`: absolute `content/posts/{slug}/index.mdx` or `none`

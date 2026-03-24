@@ -3,39 +3,60 @@ title: Frontend & Component Model
 description: An analysis of the frontend architecture, focusing on resilience, composition, and key components.
 ---
 
-The frontend architecture is defined by **resilience, composition, and a commitment to a unique, highly interactive user experience.**
+The frontend architecture is defined by **composition, progressive enhancement, and motion-aware interactivity**. The site leans heavily on small focused components, then layers in animation, particles, and route-specific shells only where they improve the experience.
 
 ### Component Philosophy: Composition & Resilience
 
 - **Composition over Inheritance**: The UI is built from small, reusable components. `shadcn/ui` provides the base, which is then extended with custom application-specific components. This promotes reusability and maintainability.
 
-- **Resilience by Default**: The application makes extensive and expert use of React's core resilience features. This is a hallmark of a production-ready application.
-  - **`Suspense`**: Data-fetching components (`PostHeader`, `Comments`, `PostPagination`) are wrapped in `<Suspense>`, showing an elegant `LoadingSpinner` fallback. This prevents UI jank and blank screens during data loading.
-  - **`ErrorBoundary`**: The application uses error boundaries at multiple levels (page and component) to prevent a single component failure from crashing the entire application.
+- **Resilience by Default**: Interactive surfaces are wrapped so that failure or slow data does not collapse the whole page.
+  - **`Suspense`**: The blog post shell uses `<Suspense>` around async regions such as `PostHeader`, `TableOfContents`, `PostPagination`, and `Comments`, with `LoadingSpinner` fallbacks where appropriate.
+  - **`ErrorBoundary`**: `PostLayout` places component-level error boundaries around the header, navigation, comments, related posts, and other secondary surfaces so the article body can still render if one region fails.
+  - **Reduced-motion aware UI**: The landing page, particle controls, and animated title all check the shared `useReducedMotion` hook and fall back to calmer rendering when motion should be minimized.
 
 ### Key Layouts & Page Structures
 
-**Source:** `app/blog/`, `app/layout.tsx`
+**Source:** `app/layout.tsx`, `app/page.tsx`, `app/blog/`, `components/Header.tsx`, `components/BlogLayoutContent.tsx`, `components/LandingTitle.tsx`
 
 The Next.js App Router is used to its full potential, creating a clear hierarchy of layouts with progressive enhancement:
 
 #### Root Layout (`app/layout.tsx`)
 The outermost layout establishes the foundation for the entire application:
 
-- **Font Loading**: Configures Google Fonts (Fira Code for code, Montserrat for display) with CSS variables
+- **Font Loading**: Loads a local `Monaspace` subset for code-heavy surfaces and Google `Bricolage Grotesque` for display typography
 - **Theme Provider**: Wraps the app in `next-themes` for dark/light mode support with system detection
 - **Tooltip Provider**: Establishes global tooltip context from Radix UI
-- **Metadata**: Sets base OpenGraph and Twitter Card metadata
+- **Accessibility**: Adds a skip link and keeps the main content region anchored under a fixed header
+- **Metadata**: Sets base OpenGraph, Twitter Card, canonical, and feed autodiscovery metadata
 - **Viewport**: Configures responsive viewport with theme color support
-- **Analytics**: Integrates Google Tag Manager and Google Analytics
+- **Analytics**: Conditionally integrates Google Tag Manager and Google Analytics, and always mounts Vercel Analytics and Speed Insights
 - **Structured Data**: Includes WebSite JSON-LD schema for SEO
-- **Global Components**: Renders Header and ScrollIndicator at root level
+- **Global Components**: Renders a fixed `Header` and `ScrollIndicator` at the root level
+
+#### Header Shell (`components/Header.tsx`)
+The global header is intentionally minimal:
+
+- Shows a `BlogBackLink` on the left and the theme toggle on the right
+- Stays **transparent on `/` and `/blog`** so the landing page and blog index can breathe
+- Switches to a **blurred, bordered surface on deeper routes** to improve contrast and reinforce navigation context
 
 #### Blog Root Layout (`app/blog/layout.tsx`)
-Provides consistent structure for all blog-related pages (if present).
+The blog section has its own shell on top of the root layout:
+
+- Runs `ScrollReset` on navigation
+- Wraps content in a centered `main` container with route-specific top padding
+- Delegates title treatment to `BlogLayoutContent`
+- Appends `BlogFooter` after the page content
+
+#### Blog Layout Content (`components/BlogLayoutContent.tsx`)
+This client wrapper decides whether the blog title chrome should render:
+
+- Uses `usePathname()` to detect whether the current route is an individual post (`/blog/posts/[slug]`)
+- Renders `BlogTitle` plus a separator on blog index/tag/archive-style pages
+- Suppresses that title block on individual posts so the post header owns the top of the page
 
 #### Blog Posts Layout (`app/blog/posts/layout.tsx`)
-A specialized client component layout for individual post pages:
+The post-specific layout wrapper for individual post pages:
 
 - **MathProvider**: Wraps posts in equation numbering context for LaTeX math
 - **Suspense**: Provides loading fallback with LoadingSpinner
@@ -51,13 +72,35 @@ A specialized client component layout for individual post pages:
   )}
   ```
 
+### Home Page Experience
+
+**Source:** `app/page.tsx`, `app/page.module.css`, `components/LandingTitle.tsx`, `components/ParticlesBackground.tsx`, `components/ParticleControls.tsx`, `components/particles/configUrls.ts`
+
+The home page is split cleanly between server data loading and client-side enhancement:
+
+- **Server-first data loading**: `app/page.tsx` fetches and trims the three most recent posts with `BackendService`, then passes them into `HomePageClient`
+- **Idle-loaded particles**: `HomePageClient` delays mounting `ParticlesBackground` with `requestIdleCallback` (or a timeout fallback) so the hero image and title are not competing with particles during early paint
+- **Scroll-linked motion**: The profile image scales, fades, and rotates slightly based on `scrollYProgress`, while still respecting reduced-motion preferences
+- **Animated hero title**: `LandingTitle` starts from a deterministic initial render, shuffles its theme list after mount, and cycles through multiple typography/effect combinations without introducing hydration instability
+- **CSS-assisted visual effects**: `app/page.module.css` owns the rotating border glow, animated title gradient, and the larger subtitle effect library used by `LandingTitle`
+- **Recent content surfaced immediately**: The landing page now includes a `Latest Writing` grid backed by the same `PostCard` component used elsewhere in the blog
+
+### Particle System Integration
+
+The particle background is treated as a progressive enhancement rather than core content:
+
+- `ParticlesBackground` initializes the `@tsparticles` engine only after mount and defers heavy setup until idle time
+- If initialization fails, or if reduced motion is preferred, the UI falls back to a static gradient background
+- `ParticleControls` lets readers switch **density** (`full`, `reduced`, `off`), swap presets, pause/resume, and refresh the current effect
+- `components/particles/configUrls.ts` is generated data that currently exposes **five light presets** and **five dark presets**, which are enumerated by the controls and sampled for theme changes / refreshes
+
 ### MDX Component Registry (`mdx-components.tsx`)
 
 **Source:** `mdx-components.tsx`
 
-The project uses a **central MDX component registry** via the `useMDXComponents` function. This is the single source of truth for all components available in MDX files.
+The project uses a **central MDX component registry** via the `useMDXComponents` function. This is the single source of truth for the MDX overrides and helper components available in content files.
 
-The registry provides 50+ components organized into categories:
+The registry provides ~30 components organized into categories:
 
 #### Base HTML Overrides
 - `h1`, `h2`, `h3`: Enhanced headings with hover effects, gradients, and anchor link support
@@ -86,13 +129,6 @@ The registry provides 50+ components organized into categories:
 - `Math`, `math-display`, `math-inline`: KaTeX math rendering with equation numbering
 - `Mermaid`: Diagram rendering
 
-#### MDX Component Library (50+ components)
-See [MDX Components](/docs/content/mdx-components) for the full library including:
-- Interactive components: `Chart`, `Timeline`, `Comparison`, `ImageGallery`, `VideoEmbed`, `Terminal`, `Diff`
-- Data components: `APIReference`, `PropTable`, `FileTree`, `PackageInstall`
-- Engagement components: `Quiz`, `Spoiler`, `Bookmark`, `Newsletter`
-- Layout components: `Columns`, `Split`, `Aside`, `Figure`, `Steps`
-
 #### Specialized Components
 - `RisoModuleMatrix`, `RisoSaaSStack`, `RisoSampleVariants`: Custom components for the Riso template showcase
 
@@ -120,6 +156,7 @@ These provide a solid foundation of accessible, unstyled components that are the
 
 ### Analysis of High-Impact Components
 
-- **`PostCard.tsx`**: An effective preview card for blog posts, combining an optimized Next.js `Image` with a gradient overlay for text readability and interactive, clickable tags.
-- **`NotFoundContent.tsx`**: A best-in-class 404 page that turns an error state into a positive, on-brand experience with contextual messaging and signature glitch animations.
-- **`BlogBackLink.tsx`**: A masterclass in responsive design, intelligently adapting from a fixed, thumb-friendly icon on mobile to a static button on desktop, all while being context-aware of its navigation target.
+- **`LandingTitle.tsx`**: The centerpiece of the homepage hero. It combines `motion/react`, theme-aware gradients, icon choreography, and multiple text render modes while still keeping the first render deterministic.
+- **`Header.tsx`**: A tiny but important routing shell that changes its visual treatment based on pathname, keeping the landing page open and immersive while giving subpages a clearer navigation frame.
+- **`ParticlesBackground.tsx` + `ParticleControls.tsx`**: A good example of progressive enhancement. The system is theme-aware, user-controllable, and explicitly designed to stand down when performance or accessibility constraints call for it.
+- **`BlogLayoutContent.tsx`**: A small routing-aware component that keeps the blog index chrome and individual post chrome from fighting each other.

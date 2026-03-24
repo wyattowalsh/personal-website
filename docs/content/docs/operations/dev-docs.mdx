@@ -1,599 +1,236 @@
 ---
 title: Dev Docs
-description: The Fumadocs documentation site architecture, rendering pipeline, search API, and how to add new pages.
+description: The Fumadocs docs app in `docs/`, including source loading, page rendering, and day-to-day maintenance.
 icon: fa/FaBook
 ---
 
 ## Overview
 
-This documentation site is a separate Next.js application built with **Fumadocs**, a beautiful documentation framework that compiles MDX at build time and provides a rich navigation and search experience.
+The developer docs live in the separate `docs/` workspace. It is its own Next.js app, built with **Fumadocs**, and it reads MDX content from `docs/content/docs/`.
 
 ## Tech Stack
 
-The docs site is a minimal Next.js app in the `docs/` subdirectory of the monorepo.
+These versions come from `docs/package.json` in the current repo snapshot.
 
 | Dependency | Version | Purpose |
 | :--- | :--- | :--- |
-| `next` | 15.3.3 | React framework |
-| `fumadocs-core` | 15.5.3 | Core documentation APIs (loader, source, search) |
-| `fumadocs-mdx` | 11.6.9 | MDX compilation and file system source |
-| `fumadocs-ui` | 15.5.3 | UI components (DocsLayout, CodeBlock, Search) |
-| `react` | 19.1.0 | UI library |
-| `tailwindcss` | 4.1.10 | Styling framework |
-| `lucide-react` | 0.516.0 | Icon library |
-| `react-icons` | 5.5.0 | Additional icons (used in navigation) |
-| `motion` | 12.18.1 | Animations (Framer Motion) |
+| `next` | `15.5.10` | Docs app framework |
+| `fumadocs-core` | `15.5.3` | Source loader and page tree APIs |
+| `fumadocs-mdx` | `11.6.9` | MDX source compilation |
+| `fumadocs-ui` | `15.5.3` | Layout and page UI |
+| `react` | `19.1.0` | UI runtime |
+| `tailwindcss` | `4.2.1` | Styling |
+| `lucide-react` | `0.516.0` | Icons used by the docs UI |
+| `react-icons` | `5.5.0` | Navigation icon loading from metadata |
+| `motion` | `12.18.1` | Animation support |
 
-See `docs/package.json` for the full dependency list.
+## File Layout
 
-## Architecture
-
-### File Structure
-
-```
+```text
 docs/
-├── app/                        # Next.js App Router
-│   ├── layout.tsx              # Root layout
-│   ├── layout.config.tsx       # Shared layout config (nav, links)
+├── app/
+│   ├── layout.tsx
+│   ├── layout.config.tsx
 │   └── docs/
-│       ├── layout.tsx          # DocsLayout wrapper
-│       └── [[...slug]]/
-│           └── page.tsx        # Catch-all route for all doc pages
-├── content/docs/               # MDX source files
-│   ├── index.mdx               # /docs (home)
-│   ├── architecture/
-│   │   ├── meta.json           # Folder metadata (icon, title)
-│   │   ├── index.mdx           # /docs/architecture
-│   │   ├── overview.mdx        # /docs/architecture/overview
-│   │   └── ...
-│   ├── content/
-│   ├── features/
-│   ├── operations/
-│   └── reference/
-├── lib/
-│   └── source.ts               # Fumadocs source loader
-├── public/
-│   └── img/logo.png            # Site logo
-├── source.config.ts            # Fumadocs MDX config
-└── package.json                # Docs-specific dependencies
+│       ├── layout.tsx
+│       └── [[...slug]]/page.tsx
+├── content/docs/
+├── lib/source.ts
+├── source.config.ts
+└── package.json
 ```
 
-### Navigation Structure
+## Content Source
 
-Navigation is derived from the file system:
+`docs/source.config.ts` defines the MDX source:
 
-- **Folders** — create tabs (Architecture, Content, Features, etc.)
-- **Files** — create pages within tabs
-- **meta.json** — configures folder display (icon, title, order)
+```ts
+import { defineDocs } from "fumadocs-mdx/config";
 
-**Example `meta.json`:**
-
-```json
-{
-  "title": "Architecture",
-  "icon": "fa/FaCode",
-  "pages": ["index", "overview", "backend", "frontend", "build-process", "api-routes"]
-}
+export const { docs, meta } = defineDocs({});
 ```
 
-## Fumadocs Pipeline
+Fumadocs turns that into the generated `@/.source` module used by the app.
 
-### 1. MDX Compilation
+## Source Loader
 
-At build time, Fumadocs compiles all `.mdx` files in `content/docs/` to JavaScript modules.
+`docs/lib/source.ts` wires Fumadocs into a typed source API:
 
-**Configuration:** `docs/source.config.ts`
-
-```typescript
-import { defineDocs } from 'fumadocs-mdx/config';
-
-export const { docs, meta } = defineDocs({
-  // Optionally, you can configure the root directory
-  // rootDir: 'content/docs'
+```ts
+export const source = loader({
+  baseUrl: "/docs",
+  source: createMDXSource(docs, meta),
+  icon(icon) {
+    // resolves strings like "fa/FaBook" through react-icons
+  },
 });
 ```
 
-This generates:
+Key behaviors:
 
-- `@/.source` — virtual module with compiled docs and metadata
-- Type definitions for all pages
-- Search index JSON
+- `baseUrl: "/docs"` fixes the route prefix
+- pages and folder metadata are loaded from the generated MDX source
+- icon strings from frontmatter and `meta.json` are converted into React elements
 
-**Build command:**
+## Rendering a Docs Page
 
-```bash
-pnpm --filter docs build
-```
+The live docs route uses `DocsPage` and injects MDX components like this:
 
-The `postinstall` script (`pnpm postinstall`) runs `fumadocs-mdx` to generate the source.
+```tsx
+import { source } from "@/lib/source";
+import {
+  DocsPage,
+  DocsBody,
+  DocsDescription,
+  DocsTitle,
+} from "fumadocs-ui/page";
+import { createRelativeLink } from "fumadocs-ui/mdx";
+import { getMDXComponents } from "@/mdx-components";
 
-### 2. Source Loader
-
-The source loader (`lib/source.ts`) creates a typed API for accessing docs and metadata.
-
-**Key features:**
-
-- **URL assignment** — maps file paths to URLs (`baseUrl: '/docs'`)
-- **Icon rendering** — converts icon strings (e.g., `fa/FaCode`) to React components
-- **Type safety** — full TypeScript inference for page metadata
-
-**Icon resolution:**
-
-The `icon()` function dynamically imports icons from `react-icons`:
-
-```typescript
-icon(icon) {
-  if (!icon) return;
-
-  const [set, name] = icon.split('/');
-
-  // Example: "fa/FaCode" → require('react-icons/fa').FaCode
-  switch (set) {
-    case 'fa':
-      lib = require('react-icons/fa');
-      break;
-    // ... 20+ icon sets
-  }
-
-  const Component = lib[name];
-  return createElement(Component);
-}
-```
-
-**Supported icon sets:**
-
-- `ai` — Ant Design Icons
-- `bi` — BoxIcons
-- `bs` — Bootstrap Icons
-- `fa` — Font Awesome
-- `fi` — Feather Icons
-- `hi` — Heroicons v1
-- `hi2` — Heroicons v2
-- `io` — Ionicons v4
-- `io5` — Ionicons v5
-- `md` — Material Design Icons
-- `ri` — Remix Icon
-- `si` — Simple Icons
-- `tb` — Tabler Icons
-- ... and more (see `lib/source.ts:26-111` for full list)
-
-### 3. Rendering
-
-The catch-all route (`app/docs/[[...slug]]/page.tsx`) renders pages using the source loader:
-
-```typescript
-import { source } from '@/lib/source';
-import { notFound } from 'next/navigation';
-
-export default async function Page({ params }: { params: { slug?: string[] } }) {
+export default async function Page(props: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const params = await props.params;
   const page = source.getPage(params.slug);
-
   if (!page) notFound();
 
-  const MDX = page.data.body;
+  const MDXContent = page.data.body;
 
   return (
-    <DocsBody>
+    <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
-      <MDX />
-    </DocsBody>
+      <DocsBody>
+        <MDXContent
+          components={getMDXComponents({
+            a: createRelativeLink(source, page),
+          })}
+        />
+      </DocsBody>
+    </DocsPage>
   );
 }
 ```
 
-**Key APIs:**
+Important details:
 
-- `source.getPage(slug)` — retrieves page data by slug
-- `source.getPages()` — lists all pages (for sitemap generation)
-- `source.pageTree` — hierarchical navigation tree
+- the page component uses `source.getPage()`
+- `DocsPage` receives `toc` and `full`
+- relative MDX links are resolved with `createRelativeLink(source, page)`
 
-### 4. Layout Configuration
+## Docs Layout
 
-Shared layout options are defined in `app/layout.config.tsx`:
-
-```typescript
-export const baseOptions: BaseLayoutProps = {
-  nav: {
-    title: (
-      <>
-        <Image src="/img/logo.png" alt="Logo" width={35} height={35} />
-        <code>personal-website</code> Dev Docs
-      </>
-    ),
-  },
-  links: [],
-  githubUrl: "https://github.com/wyattowalsh/personal-website",
-};
-```
-
-This is used by both the root layout and the docs layout for consistent navigation.
-
-## Search API
-
-Fumadocs generates a search index at build time and exposes it via a built-in search API.
-
-### How It Works
-
-1. **Index generation** — `fumadocs-mdx` extracts headings and content from all MDX files
-2. **JSON output** — search index is written to `.next/static/chunks/`
-3. **Client-side search** — `fumadocs-ui` provides a `<SearchDialog>` component with fuzzy search
-
-### Using Search
-
-The search dialog is automatically included in `DocsLayout`:
+The docs layout imports from `fumadocs-ui/layouts/docs`:
 
 ```tsx
-import { DocsLayout } from 'fumadocs-ui/layout';
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <DocsLayout tree={source.pageTree} {...baseOptions}>
-      {children}
-    </DocsLayout>
-  );
-}
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
 ```
 
-**Search shortcuts:**
+That import path matters; `fumadocs-ui/layout` is not what this repo uses.
 
-- **Open search** — `Cmd+K` (Mac) or `Ctrl+K` (Windows/Linux)
-- **Navigate results** — Arrow keys
-- **Select result** — Enter
+## Navigation and Ordering
 
-### Customizing Search
+Navigation is filesystem-driven:
 
-To customize search behavior, override the search component:
+- folders become sections
+- `.mdx` files become pages
+- `meta.json` controls titles, icons, and ordering
 
-```tsx
-import { DocsLayout } from 'fumadocs-ui/layout';
-import { SearchDialog } from 'fumadocs-ui/components/dialog/search-dialog';
-
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <DocsLayout
-      tree={source.pageTree}
-      {...baseOptions}
-      searchDialog={<SearchDialog placeholder="Search docs..." />}
-    >
-      {children}
-    </DocsLayout>
-  );
-}
-```
-
-## Adding New Pages
-
-### 1. Create MDX File
-
-Add a new `.mdx` file in `content/docs/`:
-
-```mdx
----
-title: New Page
-description: Description of the new page.
-icon: fa/FaFile
----
-
-## Heading
-
-Content here...
-```
-
-**Frontmatter fields:**
-
-- `title` — page title (required)
-- `description` — meta description (required)
-- `icon` — navigation icon (optional, format: `set/IconName`)
-
-### 2. Update meta.json
-
-If adding a page to a folder, update the folder's `meta.json`:
+Example:
 
 ```json
 {
   "title": "Architecture",
   "icon": "fa/FaCode",
-  "pages": ["index", "overview", "new-page"]
+  "pages": ["overview", "backend", "frontend"]
 }
 ```
 
-The `pages` array controls the order of pages in the sidebar.
+## Search and Page Tree
 
-### 3. Rebuild
+The app relies on Fumadocs' generated source and `DocsLayout`/page components. In practice, the important APIs are:
 
-Fumadocs automatically detects new files on rebuild:
+- `source.getPage(slug)`
+- `source.generateParams()`
+- `source.pageTree`
 
-```bash
-pnpm --filter docs dev
-```
+The exact search internals are Fumadocs-owned, so when in doubt, treat the local source loader and page wiring as the code you maintain here.
 
-The new page is now accessible at `/docs/{folder}/{slug}`.
+## Adding or Updating a Page
 
-### 4. Add Cross-References
+1. Create or edit an `.mdx` file under `docs/content/docs/`
+2. Keep frontmatter simple and accurate
+3. Update the folder's `meta.json` if ordering needs to change
+4. Run the docs app locally
 
-Link to the new page from other docs:
+Minimal frontmatter:
 
-```mdx
-See [New Page](/docs/architecture/new-page) for details.
-```
-
-Fumadocs validates internal links at build time via `remark-validate-links`.
-
-## Adding New Tabs
-
-To add a new top-level tab (e.g., "API Reference"):
-
-### 1. Create Folder
-
-```bash
-mkdir -p content/docs/reference
-```
-
-### 2. Add meta.json
-
-```json
-{
-  "title": "Reference",
-  "icon": "fa/FaBook"
-}
-```
-
-### 3. Add Index Page
-
-```mdx
+```yaml
 ---
-title: API Reference
-description: Detailed API documentation for all modules.
-icon: fa/FaBook
+title: My Page
+description: What this page is for.
+icon: fa/FaFile
 ---
-
-## API Reference
-
-Browse the API documentation...
 ```
 
-### 4. Rebuild
+## Local Development
+
+### Start the docs app
 
 ```bash
 pnpm --filter docs dev
 ```
 
-The new tab appears in the navigation automatically.
-
-## Local Development Workflow
-
-### 1. Start Docs Server
-
-```bash
-pnpm --filter docs dev
-```
-
-Runs on `http://localhost:3000/docs` (uses Turbopack for fast rebuilds).
-
-### 2. Edit MDX Files
-
-Make changes to `content/docs/*.mdx` — hot reload is enabled.
-
-### 3. Check Build
-
-Ensure no build errors:
+### Build the docs app
 
 ```bash
 pnpm --filter docs build
 ```
 
-### 4. Preview Production
+### Start the production docs app
 
 ```bash
 pnpm --filter docs start
 ```
 
-## Deployment
-
-The docs site can be deployed separately from the main site.
-
-### Option 1: Deploy with Main Site
-
-The docs are built automatically as part of the monorepo:
-
-```bash
-pnpm build
-```
-
-Both the main site and docs are built and deployed together.
-
-### Option 2: Deploy Docs Independently
-
-Create a separate Vercel project:
-
-1. Point to the `docs/` subdirectory
-2. Set build command: `pnpm build`
-3. Set output directory: `.next`
-4. Deploy
-
-## Fumadocs Features
-
-### Built-in Components
-
-Fumadocs UI provides several built-in components:
-
-- `<Accordion>` — collapsible sections
-- `<Tabs>` — tabbed content
-- `<Callout>` — info/warning/error boxes
-- `<CodeBlock>` — syntax-highlighted code (uses Shiki)
-- `<Steps>` — numbered step lists
-- `<Card>` — link cards
-
-**Example usage:**
-
-```mdx
-<Callout type="info">
-  This is an info callout.
-</Callout>
-```
-
-### Code Syntax Highlighting
-
-Code blocks are automatically syntax-highlighted:
-
-````mdx
-```typescript
-const foo: string = "bar";
-```
-````
-
-**Supported languages:** 100+ via Shiki (TypeScript, JavaScript, Python, Rust, Go, etc.)
-
-### Table of Contents
-
-The table of contents is auto-generated from headings (`##`, `###`, etc.) and displayed in the right sidebar.
-
-**Customizing:**
-
-Set `toc: false` in frontmatter to disable:
-
-```yaml
----
-title: Page Title
-toc: false
----
-```
-
-### Breadcrumbs
-
-Breadcrumbs are automatically generated from the page tree:
-
-```
-Home > Architecture > Backend
-```
-
-### Dark Mode
-
-Dark mode is controlled by `next-themes` and syncs with the main site.
-
-## Troubleshooting
-
-### Page Not Found
-
-**Issue:** New page returns 404
-
-**Cause:** File not included in `meta.json` or Fumadocs cache is stale
-
-**Solution:**
-
-1. Add page to `meta.json`
-2. Run `pnpm --filter docs postinstall` to regenerate source
-3. Restart dev server
-
-### Icon Not Rendering
-
-**Issue:** Icon shows as blank in navigation
-
-**Cause:** Invalid icon format or icon not found in `react-icons`
-
-**Solution:**
-
-1. Check icon format: `set/IconName` (e.g., `fa/FaCode`)
-2. Verify icon exists: https://react-icons.github.io/react-icons/
-3. Ensure icon set is imported in `lib/source.ts`
-
-### Search Not Working
-
-**Issue:** Search returns no results
-
-**Cause:** Search index not built or corrupted
-
-**Solution:**
-
-```bash
-rm -rf .next
-pnpm --filter docs build
-```
-
-### Build Errors
-
-**Issue:** `Module not found: Can't resolve '@/.source'`
-
-**Cause:** Fumadocs MDX plugin not run
-
-**Solution:**
+### Regenerate the Fumadocs source module
 
 ```bash
 pnpm --filter docs postinstall
 ```
 
-This runs `fumadocs-mdx` to generate the source module.
+That runs `fumadocs-mdx`.
 
-## Advanced Customization
+## Build and Deployment Notes
 
-### Custom Search Backend
+The docs app is a separate workspace.
 
-To use a custom search backend (e.g., Algolia):
+- `pnpm build` at the repo root builds the **main site**
+- `pnpm --filter docs build` builds the **docs app**
 
-```typescript
-import { DocsLayout } from 'fumadocs-ui/layout';
-import { AlgoliaSearch } from 'fumadocs-ui/components/dialog/algolia-search';
+Do not assume the root build automatically covers the docs workspace.
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <DocsLayout
-      tree={source.pageTree}
-      {...baseOptions}
-      searchDialog={<AlgoliaSearch appId="..." apiKey="..." indexName="..." />}
-    >
-      {children}
-    </DocsLayout>
-  );
-}
+## Troubleshooting
+
+### `@/.source` cannot be resolved
+
+Run:
+
+```bash
+pnpm --filter docs postinstall
 ```
 
-### Custom MDX Components
+### New page does not show up
 
-Override default MDX components in `mdx-components.tsx`:
+- check the file path under `docs/content/docs/`
+- verify any relevant `meta.json` ordering
+- restart the docs dev server if the generated source is stale
 
-```typescript
-import type { MDXComponents } from 'mdx/types';
-import { CustomCodeBlock } from '@/components/CustomCodeBlock';
+### Icon is blank
 
-export function useMDXComponents(components: MDXComponents): MDXComponents {
-  return {
-    ...components,
-    pre: CustomCodeBlock,
-  };
-}
-```
+Check that the icon string uses `set/IconName` format and that the icon set is supported in `docs/lib/source.ts`.
 
-### Custom Theme
+## Related Documentation
 
-Fumadocs uses Tailwind CSS — customize via your Tailwind config:
-
-```typescript
-import type { Config } from 'tailwindcss';
-import { createPreset } from 'fumadocs-ui/tailwind-plugin';
-
-const config: Config = {
-  presets: [createPreset()],
-  theme: {
-    extend: {
-      colors: {
-        primary: '#ff0000',
-      },
-    },
-  },
-};
-
-export default config;
-```
-
-## Related
-
-- [Operations > Scripts and Tooling](/docs/operations/scripts-and-tooling) — build pipeline
-- [Operations > Deployment](/docs/operations/deployment) — deployment guide
-- [Architecture > Build Process](/docs/architecture/build-process) — full build flow
-
-## External Resources
-
-- **Fumadocs Documentation:** [fumadocs.dev](https://fumadocs.dev)
-- **Fumadocs GitHub:** [github.com/fuma-nama/fumadocs](https://github.com/fuma-nama/fumadocs)
-- **react-icons Gallery:** [react-icons.github.io/react-icons](https://react-icons.github.io/react-icons/)
+- [Operations > Scripts and Tooling](/docs/operations/scripts-and-tooling)
+- [Operations > Deployment](/docs/operations/deployment)

@@ -243,11 +243,55 @@ const canonicalSkillChecks: FileAssertions[] = [
         snippet: '- Search rebuild: `pnpm preprocess`',
         reason: 'current rebuild contract'
       },
+      {
+        snippet:
+          '| blog-writer | `blog-writer` | outline-only, draft, short, edit | `.cache/blog-drafts/{slug}/outline.md`, `.cache/blog-drafts/{slug}/draft.mdx`, `.cache/blog-drafts/{slug}/review.md` |',
+        reason: 'writer roster aligned to outline-only and outline.md ownership'
+      },
+      {
+        snippet:
+          'Use the correction block from `references/agent-dispatch.md` as a repo-truth fallback when a dispatch prompt, runtime layer, or prior artifact drifts from repo truth.',
+        reason: 'correction block treated as a fallback guard'
+      },
+      {
+        snippet: 'Do not duplicate the full block here; `references/agent-dispatch.md` owns the canonical fallback text.',
+        reason: 'correction block text staying single-sourced'
+      },
+    ],
+    mustExclude: [
+      {
+        snippet: '### Agent Dispatch Correction (MANDATORY)',
+        reason: 'mandatory correction-block heading'
+      },
+      {
+        snippet:
+          'The blog agents contain outdated authoring and metadata patterns. Include this correction block in **every** agent dispatch prompt.',
+        reason: 'blanket stale-worker claim'
+      },
+      {
+        snippet:
+          '| blog-writer | `blog-writer` | draft, outline, edit, short | `.cache/blog-drafts/{slug}/draft.mdx`, `review.md` |',
+        reason: 'stale writer roster row'
+      },
     ],
   },
   {
     path: '.agents/skills/blog-manager/references/agent-dispatch.md',
     mustInclude: [
+      {
+        snippet:
+          'Worker prompts are aligned today. Paste this block only when the current prompt, prior artifact, or runtime layer conflicts with repo truth.',
+        reason: 'conditional correction-block usage'
+      },
+      {
+        snippet:
+          'If the incoming task already matches repo truth, skip the block and use the shared context template below on its own.',
+        reason: 'context template standing alone when no drift exists'
+      },
+      {
+        snippet: 'REPO-TRUTH FALLBACK:',
+        reason: 'fallback block label'
+      },
       {
         snippet: 'Authored posts live at `content/posts/{slug}/index.mdx`.',
         reason: 'authored post destination correction'
@@ -267,6 +311,28 @@ const canonicalSkillChecks: FileAssertions[] = [
       {
         snippet: '- Search rebuild: `pnpm preprocess`',
         reason: 'current rebuild command'
+      },
+      {
+        snippet: '├── outline.md     # Written by blog-writer (outline-only / draft planning)',
+        reason: 'outline-only handoff label'
+      },
+    ],
+    mustExclude: [
+      {
+        snippet: 'It corrects stale agent definitions to the actual repo workflow.',
+        reason: 'blanket stale-agent framing'
+      },
+      {
+        snippet: 'Include this verbatim in **every** dispatch prompt.',
+        reason: 'mandatory correction-block usage'
+      },
+      {
+        snippet: 'IMPORTANT OVERRIDE:',
+        reason: 'heavy override label'
+      },
+      {
+        snippet: '├── outline.md     # Written by blog-writer (outline/draft modes)',
+        reason: 'stale outline mode label'
       },
     ],
   },
@@ -289,18 +355,30 @@ const canonicalSkillChecks: FileAssertions[] = [
         snippet: '- **Allowed edits:** create or update `content/posts/{slug}/index.mdx`, adjust frontmatter/body in that file, and run `pnpm lint && pnpm typecheck` plus `pnpm preprocess` when publishing.',
         reason: 'publisher publish contract'
       },
+      {
+        snippet: '- `outline.md` belongs to `blog-writer` and is the outline-only / draft-planning handoff artifact.',
+        reason: 'outline artifact ownership'
+      },
     ],
   },
   {
     path: '.agents/skills/blog-manager/references/validation-checklist.md',
     mustInclude: [
       {
+        snippet: 'Use these to catch repo-truth drift in prompts, hooks, runtime packaging, or prior artifacts.',
+        reason: 'conditional drift framing'
+      },
+      {
         snippet: 'The next worker is targeting `content/posts/{slug}/index.mdx`, not a legacy `app/blog/posts/{slug}/page.mdx` path',
         reason: 'legacy authored-path correction'
       },
       {
-        snippet: 'The prompt explicitly says: real post path, no `ArticleJsonLd`, no `export const metadata`, and final publish target',
-        reason: 'dispatch correction checklist'
+        snippet: '| Apply the correction block only when needed |',
+        reason: 'conditional dispatch correction checklist'
+      },
+      {
+        snippet: 'Either the dispatch context already matches repo truth, or the fallback block is present to override drift',
+        reason: 'fallback only when needed pass condition'
       },
       {
         snippet: 'The post satisfies the actual parser contract in `lib/server.ts` and will preprocess successfully',
@@ -313,6 +391,16 @@ const canonicalSkillChecks: FileAssertions[] = [
       {
         snippet: '| Search data is rebuilt after publish | `pnpm preprocess` |',
         reason: 'publish rebuild checklist'
+      },
+    ],
+    mustExclude: [
+      {
+        snippet: 'Use these even if hooks are stale or only cover legacy paths.',
+        reason: 'blanket stale-hook claim'
+      },
+      {
+        snippet: '| Paste the correction block |',
+        reason: 'mandatory correction-block checklist row'
       },
     ],
   },
@@ -607,8 +695,8 @@ const runtimeAgentAlignmentChecks: FileAssertions[] = [
         reason: 'copilot wrapper staying thin and repo-grounded'
       },
       {
-        snippet: 'Paste the correction block from that file verbatim into the worker prompt.',
-        reason: 'copilot wrapper forwarding the correction block'
+        snippet: 'If the prompt, runtime layer, or prior artifacts drift from repo truth, paste the correction block from that file into the worker prompt.',
+        reason: 'copilot wrapper applying the correction block only when drift exists'
       },
       {
         snippet: '- `approved_draft_path`: absolute `.cache/blog-drafts/{slug}/draft.mdx` or `none`',
@@ -621,6 +709,12 @@ const runtimeAgentAlignmentChecks: FileAssertions[] = [
       {
         snippet: 'Do not restate detailed authoring rules, component inventories, or validation folklore in your own prompt when the shared refs already cover them.',
         reason: 'copilot wrapper avoiding duplicated stale instructions'
+      },
+    ],
+    mustExclude: [
+      {
+        snippet: 'Paste the correction block from that file verbatim into the worker prompt.',
+        reason: 'copilot wrapper mandating the correction block for every dispatch'
       },
     ],
   },

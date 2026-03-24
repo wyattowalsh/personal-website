@@ -35,7 +35,7 @@ Stage-level contracts for the blog-manager pipeline. Use these rules when agent 
 - **Inputs:** slug, topic, audience, constraints, mode, optional `research.md`, optional `outline.md`, optional existing draft, and `existing_post_path` when revising a published post.
 - **Reads:** `.cache/blog-drafts/{slug}/research.md`, `.cache/blog-drafts/{slug}/outline.md`, `.cache/blog-drafts/{slug}/draft.mdx`, and `content/posts/{slug}/index.mdx` when editing an existing post.
 - **Outputs / handoff:**
-  - outline work -> `.cache/blog-drafts/{slug}/outline.md`
+  - outline-only / draft planning -> `.cache/blog-drafts/{slug}/outline.md`
   - draft / short / staged revision -> `.cache/blog-drafts/{slug}/draft.mdx`
   - edit summary -> `.cache/blog-drafts/{slug}/review.md`
 - **Allowed edits:** files inside `.cache/blog-drafts/{slug}/` only.
@@ -57,6 +57,7 @@ Stage-level contracts for the blog-manager pipeline. Use these rules when agent 
 ## Artifact Ownership
 
 - `research.md` belongs to `blog-researcher` and is the research handoff to `blog-writer`.
+- `outline.md` belongs to `blog-writer` and is the outline-only / draft-planning handoff artifact.
 - `draft.mdx` belongs to `blog-writer` until approval, then becomes the publish source for `blog-publisher` in new-post and approved-update flows.
 - `review.md` belongs to `blog-writer` and is a human-readable delta summary, not the publish source of truth.
 - `content/posts/{slug}/index.mdx` is the final authored artifact and should only be written by `blog-publisher` in publish/SEO flows.

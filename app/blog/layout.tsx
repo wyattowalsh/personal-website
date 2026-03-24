@@ -31,7 +31,7 @@ export default function BlogRootLayout({
       <ScrollReset />
       <main className={cn(
         "container mx-auto flex-grow",
-        "pt-8 sm:pt-12 md:pt-16"
+        "pt-4 sm:pt-6 md:pt-8"
       )}>
         <BlogLayoutContent>
           {children}

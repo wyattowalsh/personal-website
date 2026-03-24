@@ -14,7 +14,6 @@
 [![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![LaTeX](https://img.shields.io/badge/latex-%23008080.svg?style=for-the-badge&logo=latex&logoColor=white)](https://www.latex-project.org)
 
-[![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)](https://sass-lang.com)
 [![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 
 [![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com)
@@ -46,7 +45,6 @@
     <img src="https://img.shields.io/badge/latex-%23008080.svg?style=for-the-badge&logo=latex&logoColor=white" alt="LaTeX">
     
     <!-- Styling -->
-    <img src="https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white" alt="SASS">
     <img src="https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS">
     
     <!-- Tools -->
@@ -107,7 +105,6 @@
 - **[React](https://react.dev/)**: A JavaScript library for building user interfaces.  
 - **[shadcn/ui](https://ui.shadcn.com/)**: A modular set of pre-built UI components for React applications.  
 - **[Tailwind CSS](https://tailwindcss.com/)**: A utility-first CSS framework for creating custom designs without writing custom CSS.  
-- **[SCSS](https://sass-lang.com/)**: A CSS preprocessor with features like variables and mixins.  
 - **[MDX](https://mdxjs.com/)**: A format that combines Markdown and JSX for seamless component rendering.  
 
 <details>
@@ -121,7 +118,6 @@
 | [React](https://react.dev/)                            | UI library                  | A popular JavaScript library for building user interfaces. | [Getting Started](https://react.dev/learn) |
 | [shadcn/ui](https://ui.shadcn.com/)                    | UI components               | A set of pre-built UI components for React applications, offering a modular approach to design. | [Components](https://ui.shadcn.com/components) |
 | [Tailwind CSS](https://tailwindcss.com/)               | CSS framework               | A utility-first CSS framework for creating custom designs without writing custom CSS. | [Documentation](https://tailwindcss.com/docs) |
-| [SCSS](https://sass-lang.com/)                         | CSS preprocessor            | A CSS preprocessor that adds features like variables, nested rules, and mixins to standard CSS. | [Guide](https://sass-lang.com/guide) |
 | [MDX](https://mdxjs.com/)                              | Markdown for JSX            | A format for writing JSX and Markdown together, allowing seamless component rendering within Markdown files. | [Getting Started](https://mdxjs.com/getting-started/) |
 | [Framer Motion](https://www.framer.com/motion/)        | Animations                  | A library for creating animations and interactions in React applications. | [API Reference](https://www.framer.com/motion/api/) |
 | [React Scroll](https://github.com/fisshy/react-scroll) | Scrolling library           | React components for smooth scrolling within a page. | [GitHub Repository](https://github.com/fisshy/react-scroll) |
@@ -182,7 +178,6 @@
 | [Clsx](https://github.com/lukeed/clsx)                 | Utility                    | A tiny utility for constructing className strings conditionally. | [GitHub Repository](https://github.com/lukeed/clsx) |
 | [Class Variance Authority](https://github.com/joe-bell/cva) | Utility                 | Manage complex className logic. | [GitHub Repository](https://github.com/joe-bell/cva) |
 | [Usehooks-ts](https://usehooks-ts.com/)                | React hooks                 | A collection of React hooks ready to use. | [Documentation](https://usehooks-ts.com/) |
-| [Sass Loader](https://webpack.js.org/loaders/sass-loader/) | Webpack loader          | Loads and compiles Sass/SCSS files. | [Documentation](https://webpack.js.org/loaders/sass-loader/) |
 | [PostCSS](https://postcss.org/)                        | CSS tool                    | A tool for transforming CSS with JavaScript. | [Documentation](https://postcss.org/) |
 | [Autoprefixer](https://github.com/postcss/autoprefixer) | CSS tool                 | Parse CSS and add vendor prefixes. | [GitHub Repository](https://github.com/postcss/autoprefixer) |
 | [Tailwind Merge](https://github.com/dcastil/tailwind-merge) | Utility                | Merge Tailwind CSS classes without conflicts. | [GitHub Repository](https://github.com/dcastil/tailwind-merge) |

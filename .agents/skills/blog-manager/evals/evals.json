@@ -9,7 +9,7 @@
       "Auto-infers compose mode from a new topic string",
       "Generates slug `building-mcp-servers-with-typescript` consistent with `scripts/new-post.ts`",
       "Starts the compose pipeline for a new post that will publish to `content/posts/{slug}/index.mdx`",
-      "Dispatches `blog-researcher` with the correction block"
+      "Dispatches `blog-researcher` with shared context from `references/agent-dispatch.md`"
     ]
   },
   {
@@ -36,7 +36,7 @@
       "Matches existing slug `proxywhirl` from `content/posts/proxywhirl/index.mdx`",
       "Auto-infers update mode",
       "Reads the existing post from `content/posts/proxywhirl/index.mdx`",
-      "Dispatches `blog-writer` in edit mode with the correction block"
+      "Dispatches `blog-writer` in edit mode with shared context from `references/agent-dispatch.md`"
     ]
   },
   {
@@ -113,7 +113,7 @@
       "Detects URL input and routes to compose mode",
       "Fetches the URL before dispatching research",
       "Treats fetched page or repository content as research input rather than final post content",
-      "Dispatches `blog-researcher` with the correction block"
+      "Dispatches `blog-researcher` with shared context from `references/agent-dispatch.md`"
     ]
   },
   {
@@ -126,7 +126,7 @@
       "Routes to compose mode",
       "Overrides the request to add `export const metadata` or `ArticleJsonLd` to the post",
       "Keeps published MDX limited to YAML frontmatter + content at `content/posts/{slug}/index.mdx`",
-      "Includes the correction block in agent dispatches"
+      "Applies the correction block in worker dispatches because the request conflicts with repo truth"
     ]
   },
   {
@@ -140,7 +140,7 @@
       "Ignores the stale instruction about three-way metadata sync",
       "Keeps published MDX limited to YAML frontmatter + content at `content/posts/{slug}/index.mdx`",
       "Does not add `export const metadata`, `ArticleJsonLd`, or hand-written JSON-LD script blocks",
-      "Includes the correction block in agent dispatches"
+      "Applies the correction block in worker dispatches because the request conflicts with repo truth"
     ]
   },
   {

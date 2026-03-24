@@ -1,6 +1,6 @@
 # Agent Dispatch Reference
 
-Use this file whenever `blog-manager` or `blog-copilot` dispatches a blog worker. It corrects stale agent definitions to the actual repo workflow.
+Use this file whenever `blog-manager` or `blog-copilot` dispatches a blog worker. It provides repo-truth fallback guidance when prompts, artifacts, or runtime packaging drift from the actual repo workflow.
 
 ## Contents
 
@@ -13,10 +13,12 @@ Use this file whenever `blog-manager` or `blog-copilot` dispatches a blog worker
 
 ## Correction Block
 
-Include this verbatim in **every** dispatch prompt.
+Worker prompts are aligned today. Paste this block only when the current prompt, prior artifact, or runtime layer conflicts with repo truth.
+
+Typical drift signals are legacy `app/blog/posts/{slug}/page.mdx`, manual metadata wiring, or "three-way metadata sync" instructions. If the incoming task already matches repo truth, skip the block and use the shared context template below on its own.
 
 ```text
-IMPORTANT OVERRIDE:
+REPO-TRUTH FALLBACK:
 - Authored posts live at `content/posts/{slug}/index.mdx`. Never create or edit per-post files under `app/blog/posts/`; `app/blog/posts/[slug]/page.tsx` and `app/blog/posts/[slug]/layout.tsx` are shared route files.
 - `pnpm new-post --title "X" --tags "A,B"` scaffolds `content/posts/{slug}/index.mdx`.
 - Do NOT add `import { ArticleJsonLd } from '@/components/PostSchema'`; `components/PostSchema.tsx` does not export `ArticleJsonLd`.
@@ -71,7 +73,7 @@ The draft directory is the only inter-agent handoff for slug-based work.
 ```text
 .cache/blog-drafts/{slug}/
 ├── research.md    # Written by blog-researcher
-├── outline.md     # Written by blog-writer (outline/draft modes)
+├── outline.md     # Written by blog-writer (outline-only / draft planning)
 ├── draft.mdx      # Written by blog-writer; consumed by blog-publisher
 └── review.md      # Written by blog-writer for edit/update diffs
 ```

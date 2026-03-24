@@ -1,396 +1,190 @@
 ---
 title: "Styling & Theming"
-description: "The hybrid Tailwind CSS + SCSS styling architecture with comprehensive theme system and 30+ custom animations."
+description: "Tailwind CSS v4, global CSS variables, and the runtime theme setup used by the main site."
 ---
 
-## Overview
+The main site uses **Tailwind CSS v4** with a CSS-first setup:
 
-The website uses a sophisticated hybrid styling engine combining **Tailwind CSS v4** for utility-first development with **SCSS** for complex theming, custom animations, and component-specific styles. This approach provides the rapid development benefits of Tailwind while maintaining the power and flexibility of SCSS for advanced styling needs.
+- `app/tailwind.css` defines theme tokens and animation utilities with `@theme`
+- `app/globals.css` defines the underlying CSS variables and global styles
+- `next-themes` provides dark-mode switching at runtime
 
-## Architecture
-
-### Core Files
+## Core Files
 
 | File | Purpose |
 |------|---------|
-| `tailwind.config.js` | Tailwind configuration: custom colors, animations, typography |
-| `app/globals.scss` | Global styles: CSS variables, layers, prose styling, animations |
-| `app/variables.module.scss` | SCSS variables and theme mixins |
-| `lib/utils.ts` | `cn()` utility for className composition |
+| `app/tailwind.css` | Tailwind v4 entry point, `@theme` tokens, animation names, keyframes |
+| `app/globals.css` | Root theme variables, prose styles, math styles, global utilities, reduced-motion rules |
+| `app/layout.tsx` | Mounts the root `ThemeProvider` |
+| `lib/utils.ts` | `cn()` helper for composing class names |
 
-### Styling Philosophy
+## Styling Model
 
-1. **Tailwind for layout and utilities** — Use Tailwind classes for spacing, layout, typography, and common patterns
-2. **SCSS for theming** — CSS custom properties defined in SCSS control colors, shadows, and theme-specific values
-3. **Component modules for complex styles** — Individual SCSS modules (e.g., `blogtitle.module.scss`) for advanced component-specific styling
+The project intentionally splits responsibilities:
 
-## Theming System
+1. **Tailwind utilities** for layout, spacing, typography, and responsive behavior
+2. **CSS custom properties** for themeable values shared across light and dark mode
+3. **Global CSS rules** for prose, math, code blocks, and other content-heavy surfaces
 
-### CSS Custom Properties
+## Theme Tokens
 
-The site uses a comprehensive HSL-based color system defined in `app/globals.scss`:
+`app/globals.css` defines the actual values under `:root` and `.dark`.
 
-```scss
-:root {
-  --background: 0 0% 100%;
-  --foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --accent: 210 40% 96.1%;
-  --muted: 210 40% 96.1%;
-  --border: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
-  --radius: 0.5rem;
-  /* Selection colors */
-  --selection-bg: 222.2 47.4% 11.2%;
-  --selection-text: 210 40% 98%;
-  --gradient-heading: linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #ec4899 100%);
-}
+### Core color tokens
 
-.dark {
-  --background: 222.2 84% 4.9%;
-  --foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  /* ... dark mode overrides */
-}
-```
+- `--background`
+- `--foreground`
+- `--card`, `--card-foreground`
+- `--popover`, `--popover-foreground`
+- `--primary`, `--primary-foreground`, `--primary-light`
+- `--secondary`, `--secondary-foreground`
+- `--muted`, `--muted-foreground`
+- `--accent`, `--accent-foreground`
+- `--destructive`, `--destructive-foreground`
+- `--border`, `--input`, `--ring`
 
-All values use HSL format for better color manipulation and are consumed via Tailwind's `hsl(var(--variable))` pattern.
+### Non-color tokens that matter in practice
 
-### SCSS Theme Mixins
+- `--radius`
+- `--shadow-glow`
+- `--shadow-soft`
+- `--selection-bg`, `--selection-text`
+- `--selection-heading-bg`, `--selection-heading-text`
+- `--gradient-heading`
+- `--gradient-start`, `--gradient-mid`, `--gradient-end`
+- `--math-text-color`
+- `--math-inline-bg`
+- `--math-display-bg`
+- `--math-index-color`
+- `--font-code`
+- `--duration-fast`, `--duration-normal`, `--duration-slow`
+- `--chart-1` through `--chart-5`
 
-`app/variables.module.scss` defines mixins for light and dark themes:
+Those variables are part of the real theme surface today, not just incidental extras.
 
-```scss
-@mixin light {
-  --primary-rgb: 59, 130, 246;
-  --primary: rgb(var(--primary-rgb));
-  --background: hsl(198 100% 95%);
-  --foreground: hsl(198 5% 0%);
-  --landing-title-gradient-light: #{$landing-title-gradient-light};
-}
+## Tailwind v4 `@theme` Mapping
 
-@mixin dark {
-  --primary-rgb: 129, 140, 248;
-  --primary: rgb(var(--primary-rgb));
-  --background: hsl(198 5% 5%);
-  --foreground: hsl(198 100% 90%);
-  --landing-title-gradient-dark: #{$landing-title-gradient-dark};
-}
-```
+`app/tailwind.css` maps the CSS variables into Tailwind tokens:
 
-Font family variables:
-
-```scss
-$font-sans: 'Montserrat', sans-serif;
-$font-display: 'Oswald', sans-serif;
-$font-code: 'Fira Code', monospace;
-```
-
-## Tailwind Configuration
-
-### Extended Colors
-
-Tailwind's theme extends the CSS variables from globals.scss:
-
-```javascript
-colors: {
-  background: "hsl(var(--background))",
-  foreground: "hsl(var(--foreground))",
-  primary: {
-    DEFAULT: "hsl(var(--primary))",
-    foreground: "hsl(var(--primary-foreground))",
-  },
-  secondary: { DEFAULT: "hsl(var(--secondary))", ... },
-  destructive: { DEFAULT: "hsl(var(--destructive))", ... },
-  muted: { DEFAULT: "hsl(var(--muted))", ... },
-  accent: { DEFAULT: "hsl(var(--accent))", ... },
-  popover: { DEFAULT: "hsl(var(--popover))", ... },
-  card: { DEFAULT: "hsl(var(--card))", ... },
+```css
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-accent: hsl(var(--accent));
+  --color-card: hsl(var(--card));
+  --radius-lg: var(--radius);
+  --shadow-glow: var(--shadow-glow);
 }
 ```
 
-### Font Families
+This replaces the old `tailwind.config.js`-style theme extension pattern.
 
-```javascript
-fontFamily: {
-  sans: ['Montserrat', 'sans-serif'],
-  display: ['Oswald', 'sans-serif'],
-  mono: ['Fira Code', 'monospace'],
+## Fonts
+
+The theme currently exposes:
+
+```css
+@theme {
+  --font-sans: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
+  --font-display: var(--font-bricolage), "Bricolage Grotesque", sans-serif;
+  --font-mono: var(--font-monaspace), "Monaspace Argon", monospace;
 }
 ```
 
-### Custom Animations
+`app/globals.css` also defines `--font-code` for inline and block code styling.
 
-15+ custom keyframe animations defined in Tailwind config:
+## Animations
 
-```javascript
-keyframes: {
-  fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
-  float: {
-    '0%, 100%': { transform: 'translateY(0)' },
-    '50%': { transform: 'translateY(-10px)' }
-  },
-  "accordion-down": {
-    from: { height: "0" },
-    to: { height: "var(--radix-accordion-content-height)" },
-  },
-  "accordion-up": {
-    from: { height: "var(--radix-accordion-content-height)" },
-    to: { height: "0" },
-  },
-},
-animation: {
-  fadeIn: 'fadeIn 1s forwards',
-  float: 'float 4s ease-in-out infinite',
-  "accordion-down": "accordion-down 0.2s ease-out",
-  "accordion-up": "accordion-up 0.2s ease-out",
-}
-```
+The site has a set of custom animation tokens in `app/tailwind.css`, including:
 
-### Custom Box Shadows
+- `fade-in`
+- `float`
+- `pulse`
+- `accordion-down`
+- `accordion-up`
+- `glow-pulse`
+- `slide-down-in`
+- `slide-up-in`
+- `shimmer`
+- `handle-glow`
 
-```javascript
-boxShadow: {
-  glow: 'var(--shadow-glow)',
-  soft: 'var(--shadow-soft)',
-}
-```
+So the accurate claim is **multiple custom animations**, not a hard-coded "30+ animations".
 
-### Border Radius
+## Global CSS Responsibilities
 
-```javascript
-borderRadius: {
-  xl: 'var(--radius)',
-  lg: "var(--radius)",
-  md: "calc(var(--radius) - 2px)",
-  sm: "calc(var(--radius) - 4px)",
-}
-```
+`app/globals.css` carries a lot of the real UI behavior:
 
-## Global Styles (globals.scss)
+- prose defaults
+- inline code and fenced code styling
+- KaTeX/math presentation
+- selection colors
+- heading/link behavior
+- reduced-motion handling
+- custom utility-like classes such as gradient text helpers
 
-### Tailwind Layers
+Because this is a content-heavy site, `globals.css` is part of the design system, not just a reset file.
 
-The file uses Tailwind's `@layer` directive to organize styles:
+## Dark Mode Runtime
 
-```scss
-@layer base {
-  /* Root CSS variables, body styles, typography */
-}
-
-@layer components {
-  /* Reusable component classes */
-}
-
-@layer utilities {
-  /* Custom utility classes */
-}
-```
-
-### Prose Styling
-
-Rich typography for blog content using the `@tailwindcss/typography` plugin:
-
-```scss
-.prose {
-  @apply mx-auto;
-  color: var(--foreground);
-
-  :first-child {
-    margin-top: 0;
-    padding-top: 0;
-  }
-}
-```
-
-Responsive prose container:
-
-```scss
-.prose {
-  @apply w-full max-w-5xl mx-auto;
-  @apply px-4 sm:px-6 lg:px-8;
-
-  @screen xl {
-    font-size: calc(14px + 0.2vw);
-    line-height: 1.75;
-  }
-}
-```
-
-### Code Blocks
-
-Inline and block code styling:
-
-```scss
-code {
-  @apply bg-muted text-accent-foreground px-1.5 py-0.5 rounded;
-
-  &:not(pre code) {
-    font-family: var(--font-code);
-    font-weight: 500;
-    font-size: 0.9em;
-  }
-}
-
-pre {
-  @apply bg-card text-card-foreground p-4 rounded-lg overflow-x-auto;
-}
-```
-
-### Math Display
-
-Custom styles for KaTeX math rendering:
-
-```scss
-.math-display {
-  @apply relative my-8 px-8 py-6;
-  @apply rounded-xl border border-border;
-  @apply bg-muted/95 dark:bg-muted/80;
-  @apply shadow-md hover:shadow-lg;
-  @apply transition-all duration-300;
-
-  .equation-number {
-    @apply absolute right-3 bottom-2;
-    @apply text-sm font-medium px-2 py-1 rounded-md;
-    @apply cursor-pointer select-none;
-  }
-}
-```
-
-### Heading Anchor Links
-
-Auto-generated heading anchors with hover effects:
-
-```scss
-h1, h2, h3, h4, h5, h6 {
-  @apply scroll-mt-20 relative;
-
-  .anchor {
-    @apply absolute -left-8 top-1/2 -translate-y-1/2;
-    @apply opacity-0 invisible;
-    @apply transition-all duration-300 ease-out;
-
-    .anchor-icon {
-      @apply block text-muted-foreground opacity-50;
-      @apply transition-all duration-300;
-      @apply transform scale-75;
-      @apply hover:scale-100 hover:text-primary hover:opacity-100;
-    }
-  }
-
-  &:hover .anchor {
-    @apply opacity-100 visible;
-  }
-}
-```
-
-### Advanced Cyberpunk Components
-
-Component-layer classes for signature visual effects:
-
-```scss
-@layer components {
-  .cyber-grid {
-    background-image:
-      linear-gradient(var(--cyber-grid-color) 1px, transparent 1px),
-      linear-gradient(90deg, var(--cyber-grid-color) 1px, transparent 1px);
-    background-size: var(--cyber-grid-size) var(--cyber-grid-size);
-    animation: grid-flow 20s linear infinite;
-  }
-
-  .glitch-text {
-    position: relative;
-    animation: glitch-text 3s infinite;
-
-    &::before, &::after {
-      content: attr(data-text);
-      position: absolute;
-      animation: glitch-anim 3s infinite linear alternate-reverse;
-    }
-  }
-}
-```
-
-### Utility Classes
-
-Custom utilities for common patterns:
-
-```scss
-@layer utilities {
-  .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r;
-    &.primary {
-      @apply from-blue-500 via-blue-600 to-blue-700
-             dark:from-blue-400 dark:via-blue-500 dark:to-blue-600;
-    }
-  }
-
-  .hover-lift {
-    @apply transition-transform duration-300 ease-out;
-    &:hover { @apply -translate-y-1; }
-  }
-
-  .glow {
-    @apply relative;
-    &::after {
-      @apply content-[''] absolute inset-0 z-[-1];
-      @apply bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20;
-      @apply blur-xl opacity-0 transition-opacity duration-300;
-    }
-    &:hover::after { @apply opacity-100; }
-  }
-}
-```
-
-## The `cn()` Utility
-
-From `lib/utils.ts`, the `cn()` function merges Tailwind classes intelligently:
-
-```typescript
-import { type ClassValue, clsx } from "clsx";
-import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-```
-
-**Usage:**
+Dark mode is provided by `next-themes` in `app/layout.tsx`:
 
 ```tsx
-import { cn } from '@/lib/utils'
-
-<div className={cn(
-  'base-class',
-  condition && 'conditional-class',
-  'override-class'
-)} />
+<ThemeProvider
+  attribute="class"
+  defaultTheme="system"
+  enableSystem
+  disableTransitionOnChange
+>
+  {children}
+</ThemeProvider>
 ```
 
-`clsx` handles conditionals and arrays, `twMerge` ensures Tailwind class conflicts are resolved (e.g., `p-4` and `p-6` → only `p-6` applies).
+### Important details
 
-## Dark Mode Support
+- the root provider uses the `class` attribute strategy
+- the default theme is the user's system preference
+- theme transitions are suppressed during flips with `disableTransitionOnChange`
 
-Theme switching via `next-themes`:
+### Reading the active theme
+
+Client components can read the active theme with `useTheme()`:
 
 ```tsx
-import { useTheme } from 'next-themes'
+import { useTheme } from "next-themes";
 
-const { theme, setTheme, resolvedTheme } = useTheme()
+const { theme, setTheme, resolvedTheme } = useTheme();
 ```
 
-- CSS variables update automatically when `.dark` class is toggled on `<html>`
-- Server components use `resolvedTheme` to avoid hydration mismatches
-- All colors, shadows, and gradients respect theme changes
+`resolvedTheme` is a **client-side** value. The docs should not imply that server components directly read it.
 
-## Responsive Design
+One concrete example is `components/Mermaid.tsx`, which switches Mermaid's runtime theme based on `resolvedTheme`.
 
-Breakpoints follow Tailwind defaults:
+## `cn()` Utility
 
-| Breakpoint | Min Width |
+Use `cn()` from `lib/utils.ts` when composing class names:
+
+```tsx
+import { cn } from "@/lib/utils";
+
+<div
+  className={cn(
+    "rounded-lg border",
+    isActive && "border-primary text-primary",
+    compact ? "p-3" : "p-6"
+  )}
+/>
+```
+
+It combines `clsx` for conditional logic and `tailwind-merge` for conflict resolution.
+
+## Responsive Styling
+
+The project uses Tailwind's standard breakpoints:
+
+| Breakpoint | Min width |
 |------------|-----------|
 | `sm` | 640px |
 | `md` | 768px |
@@ -398,23 +192,15 @@ Breakpoints follow Tailwind defaults:
 | `xl` | 1280px |
 | `2xl` | 1536px |
 
-Example responsive heading:
-
-```scss
-h1 {
-  @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
-  @apply leading-tight sm:leading-tight md:leading-tight;
-  @apply mb-4 sm:mb-6 md:mb-8;
-}
-```
+Prefer CSS and utility breakpoints over JS viewport logic unless runtime measurement is genuinely required.
 
 ## Accessibility
 
-### Reduced Motion
+### Reduced motion
 
-All animations respect user preferences:
+`app/globals.css` includes a global `prefers-reduced-motion` override:
 
-```scss
+```css
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -427,54 +213,20 @@ All animations respect user preferences:
 }
 ```
 
-### Focus Styles
+### Focus styles
 
-Consistent focus rings across interactive elements:
+Interactive components consistently rely on focus-visible ring patterns using `ring`, `ring-offset`, and related Tailwind utilities.
 
-```scss
-.focus-visible:outline-none
-.focus-visible:ring-2
-.focus-visible:ring-ring
-.focus-visible:ring-offset-2
-```
+## Practical Guidance
 
-## Best Practices
+1. Reach for Tailwind utilities first
+2. Put reusable theme values in CSS variables, not hard-coded colors
+3. Treat `globals.css` as the home for cross-cutting content styles
+4. Keep theme-dependent logic in client components when it needs `resolvedTheme`
+5. Use `cn()` instead of string concatenation for conditional Tailwind classes
 
-1. **Always use `cn()` for className composition** — Never manually concatenate class strings
-2. **Prefer Tailwind utilities** — Only use SCSS when Tailwind can't express the style
-3. **Use CSS variables for themeable values** — Never hardcode colors or theme-specific values
-4. **Keep component SCSS modules minimal** — Extract reusable patterns to `@layer components` in globals.scss
-5. **Respect the cascade** — Use `@layer` to control specificity and avoid `!important`
+## Related Documentation
 
-## Common Patterns
-
-### Conditional Classes
-
-```tsx
-<div className={cn(
-  'base-styles',
-  variant === 'primary' && 'bg-primary text-primary-foreground',
-  variant === 'secondary' && 'bg-secondary text-secondary-foreground',
-  disabled && 'opacity-50 cursor-not-allowed'
-)} />
-```
-
-### Responsive Utility Stacks
-
-```tsx
-<div className={cn(
-  'text-sm sm:text-base md:text-lg lg:text-xl',
-  'p-2 sm:p-4 md:p-6',
-  'flex flex-col sm:flex-row'
-)} />
-```
-
-### Theme-Aware Backgrounds
-
-```tsx
-<div className={cn(
-  'bg-background dark:bg-gray-900',
-  'text-foreground dark:text-gray-100',
-  'border border-border dark:border-gray-700'
-)} />
-```
+- [UI Primitives](/docs/reference/ui-primitives)
+- [Custom Hooks](/docs/features/hooks)
+- [MDX Components](/docs/content/mdx-components)

@@ -1,0 +1,1 @@
+Before considering a code task complete, run pnpm lint && pnpm typecheck && pnpm test; for production-sensitive changes also run pnpm build. Avoid touching .env*, node_modules/, .next/, or pnpm-lock.yaml. Reuse existing patterns/helpers, keep type safety, and prefer precise changes that do not disturb unrelated dirty worktree files.

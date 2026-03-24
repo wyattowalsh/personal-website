@@ -1,74 +1,68 @@
 ---
 title: "MDX Components"
-description: "Complete reference for all MDX components available in blog posts"
+description: "What blog-post MDX can use without imports, and what each registered component actually does."
 ---
 
-All MDX components are auto-registered via `mdx-components.tsx` and available globally in blog posts without imports. The component system is organized into four categories: built-in HTML element overrides, utility components, interactive components, and layout components.
+Blog posts are rendered with the component registry in `mdx-components.tsx`. Everything listed here is available globally inside `content/posts/**/index.mdx` without local imports.
 
 ## Built-In Element Overrides
 
-These components replace standard HTML elements with enhanced, styled versions.
+These replace standard HTML output from Markdown with project-styled React components.
 
-### Headings (h1, h2, h3)
+### Headings (`h1`-`h4`)
 
-Headings are automatically enhanced with:
-- Gradient hover effects
-- Responsive font sizing
-- Anchor link support (via rehype-slug)
-- Flexbox layout for proper alignment
+Headings are wrapped with site typography styles and a `HeadingLink` affordance for copying deep links.
+
+- gradient/hover treatment on larger headings
+- consistent spacing
+- slug-based anchors from `rehype-slug`
 
 ```mdx
-## This is an H2 heading
-### This is an H3 heading
+## A heading with a link target
 ```
 
-### Paragraphs (p)
+### Paragraphs (`p`)
 
-Styled paragraphs with:
-- Subtle hover underline animation
-- Responsive text sizing
-- Proper vertical spacing
+Paragraphs use the site's prose sizing, spacing, and muted-to-foreground hover treatment.
 
-### Code Blocks (pre, code)
+### Code (`pre`, `code`)
 
-Code blocks use the `CodeBlock` component with:
-- Syntax highlighting via rehype-prism-plus
-- Copy-to-clipboard button
-- Language badge
-- Line numbers (optional)
-- Theme-aware colors
+Fenced blocks render through `CodeBlock`.
 
-Inline code is styled with rounded background and monospace font.
+Current behavior:
+
+- syntax highlighting from `rehype-prism-plus`
+- copy-to-clipboard button
+- theme-aware block styling
+
+Not currently provided by `CodeBlock`:
+
+- visible language badges
+- a dedicated line-number UI
 
 ````mdx
 ```typescript
 const greeting = "Hello, world!";
 ```
 
-Inline `code` also works.
+Inline `code` is styled separately.
 ````
 
-### Images (img)
+### Images (`img`)
 
-Images are enhanced with:
-- Next.js Image optimization (AVIF/WebP)
-- Rounded corners and shadows
-- Hover zoom effect
-- Optional caption overlay from alt text
-- Blur placeholder
+Markdown images are upgraded to `next/image` with fixed render dimensions, hover treatment, and an optional caption overlay derived from the `alt` text.
 
 ```mdx
-![Alt text describing image](/image.png)
+![Alt text describing the image](/image.png)
 ```
 
-### Links (a)
+### Links (`a`)
 
-Automatic link enhancement:
-- Internal links use Next.js `<Link>` for client-side navigation
-- External links open in new tab with security attributes
-- Anchor links for same-page navigation
-- External link icon indicator
-- Animated underline on hover
+Standard Markdown links are handled by the `a` override in `mdx-components.tsx`.
+
+- same-page anchors stay as normal `<a>` tags
+- external links open in a new tab and get an icon
+- internal links render through Next.js `<Link>`
 
 ```mdx
 [Internal link](/blog/posts/example)
@@ -76,102 +70,68 @@ Automatic link enhancement:
 [Anchor link](#section-id)
 ```
 
-### Tables (table)
+### Tables (`table`)
 
-Tables receive comprehensive styling:
-- Rounded borders and shadows
-- Hover row highlighting
-- Horizontal scroll for overflow
-- Sticky headers (optional)
-- Alternating row colors
+Tables are wrapped in a horizontally scrollable, styled container.
 
-```mdx
-| Column 1 | Column 2 |
-|----------|----------|
-| Data     | Data     |
-```
+## Custom MDX Components
 
-## Utility Components
+### `<Callout>`
 
-### Note
+Semantic callout box with built-in visual variants.
 
-Callout boxes for info, warnings, or terminal output.
+**Props**
 
-**Props:**
-- `type` — `"info"` | `"warning"` | `"terminal"` (default: `"info"`)
-- `children` — Content
-
-```mdx
-<Note type="info">
-This is an informational note.
-</Note>
-
-<Note type="warning">
-⚠️ This is a warning.
-</Note>
-```
-
-### Callout
-
-Enhanced callout with custom icons and types.
-
-**Props:**
-- `type` — `"default"` | `"info"` | `"warning"` | `"error"` | `"success"`
-- `icon` — Lucide icon component (optional)
-- `children` — Content
+- `type` — `"default" | "info" | "warning" | "error" | "success"`
+- `icon` — optional Lucide icon component
+- `children`
 
 ```mdx
 <Callout type="success">
-✅ Operation completed successfully!
+Deployment completed successfully.
 </Callout>
 ```
 
-### Details
+### `<Details>`
 
-Collapsible accordion-style details/summary.
+Collapsible disclosure using native `<details>/<summary>`.
 
-**Props:**
-- `summary` — Summary text (required)
-- `children` — Hidden content
+**Props**
+
+- `summary` — required summary label
+- `children`
 
 ```mdx
-<Details summary="Click to expand">
-Hidden content goes here.
+<Details summary="Why does this work?">
+The long explanation goes here.
 </Details>
 ```
 
-### CodeFilename
+### `<CodeFilename>`
 
-Displays a filename header above code blocks.
+Displays a filename strip above a code block.
 
 ````mdx
 <CodeFilename>src/components/Example.tsx</CodeFilename>
-```typescript
+```tsx
 export function Example() {
   return <div>Hello</div>;
 }
 ```
 ````
 
-### ScrollableCode
+### `<ScrollableCode>`
 
-Wraps code in a scrollable container with max height.
+Wraps content in `ScrollArea` with a configurable max height.
 
-**Props:**
-- `maxHeight` — CSS height value (default: `"400px"`)
-- `children` — Code content
+**Props**
 
-````mdx
-<ScrollableCode maxHeight="300px">
-```javascript
-// Long code that needs scrolling...
-```
-</ScrollableCode>
-````
+- `maxHeight` — CSS value, default `"400px"`
+- `children`
 
-### ExternalLink
+### `<ExternalLink>`
 
-Explicit external link with icon.
+Explicit external CTA-style link component.
 
 ```mdx
 <ExternalLink href="https://example.com">
@@ -179,171 +139,42 @@ Visit Example
 </ExternalLink>
 ```
 
-## Interactive Components
+### `<ClientSideLink>`
 
-### Chart
+Despite the name, this is currently a styled anchor helper implemented with a plain `<a>` tag in `components/ClientSideLink.tsx`.
 
-Data visualization using Recharts.
-
-**Props:**
-- `type` — `"line"` | `"bar"` | `"pie"` | `"area"` | `"radar"`
-- `data` — Array of data objects
-- `dataKeys` — Array of keys to plot
-- `xAxisKey` — Key for x-axis (default: `"name"`)
-- `title` — Chart title
-- `height` — Height in pixels (default: `300`)
-- `colors` — Array of color strings
-- `showGrid` — Show grid lines (default: `true`)
-- `showLegend` — Show legend (default: `true`)
-- `showTooltip` — Show tooltip on hover (default: `true`)
-- `stacked` — Stack bars/areas (default: `false`)
+Use it when you want the component explicitly, but prefer normal Markdown links for most internal navigation.
 
 ```mdx
-<Chart
-  type="line"
-  data={[
-    { name: 'Jan', value: 100 },
-    { name: 'Feb', value: 120 },
-  ]}
-  dataKeys={['value']}
-  title="Monthly Growth"
-/>
+<ClientSideLink href="/blog/posts/example">
+Read this post
+</ClientSideLink>
 ```
 
-### Timeline
+### `<TagLink>`
 
-Vertical timeline with status indicators.
-
-**Props:**
-- `items` — Array of timeline items
-  - `date` — Date string
-  - `title` — Event title
-  - `description` — Event description (optional)
-  - `status` — `"completed"` | `"current"` | `"upcoming"`
-  - `icon` — Icon name (optional)
-  - `tags` — Array of tag strings (optional)
-- `title` — Timeline title
-- `className` — Additional CSS classes
+Renders a linked blog tag badge.
 
 ```mdx
-<Timeline
-  items={[
-    {
-      date: '2024-01',
-      title: 'Project Launch',
-      status: 'completed',
-      icon: 'rocket'
-    },
-    {
-      date: '2024-02',
-      title: 'Feature Development',
-      status: 'current'
-    }
-  ]}
-/>
+<TagLink tag="TypeScript" />
 ```
 
-### Comparison & ComparisonCard
+### `<Gist>`
 
-Side-by-side comparisons.
-
-**Comparison Props:**
-- `leftTitle` — Left column title
-- `rightTitle` — Right column title
-- `items` — Array of `{ label, left, right }`
-  - Values can be boolean (renders ✓/✗), string, or ReactNode
-- `leftHighlight` — Highlight left column (default: `false`)
-- `rightHighlight` — Highlight right column (default: `false`)
-
-**ComparisonCard Props:**
-- `title` — Card title
-- `price` — Price string (optional)
-- `features` — Array of feature strings
-- `pros` — Array of pro strings
-- `cons` — Array of con strings
-- `highlighted` — Apply highlighted styling
-- `badge` — Badge text (optional)
+Embeds a GitHub Gist through `GistEmbed`.
 
 ```mdx
-<Comparison
-  leftTitle="Option A"
-  rightTitle="Option B"
-  items={[
-    { label: 'Speed', left: true, right: false },
-    { label: 'Cost', left: '$10', right: '$5' }
-  ]}
-  rightHighlight
-/>
+<Gist id="abc123def456" />
+<Gist url="https://gist.github.com/user/abc123def456" file="example.ts" />
 ```
 
-### VideoEmbed
+### `<Separator>`
 
-Embedded YouTube or Vimeo videos with lazy loading.
+Decorative separator with a centered logo treatment.
 
-**Props:**
-- `url` — YouTube or Vimeo URL
-- `title` — Video title
-- `poster` — Custom poster image URL (optional)
-- `aspectRatio` — `"16:9"` | `"4:3"` | `"1:1"` | `"9:16"` (default: `"16:9"`)
-- `autoplay` — Auto-play video (default: `false`)
-- `muted` — Mute video (default: `false`)
-- `loop` — Loop video (default: `false`)
+### `<Math>`
 
-```mdx
-<VideoEmbed
-  url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-  title="Example Video"
-  aspectRatio="16:9"
-/>
-```
-
-### Terminal
-
-Animated terminal with typing effects.
-
-**Props:**
-- `lines` — Array of line objects:
-  - `text` — Line text
-  - `type` — `"command"` | `"output"` | `"error"` | `"success"` | `"comment"`
-  - `delay` — Delay before line (ms)
-  - `typing` — Enable typing animation (default: `true` for commands)
-- `title` — Terminal title (default: `"Terminal"`)
-- `prompt` — Prompt character (default: `"$"`)
-- `typingSpeed` — Typing speed in ms/char (default: `30`)
-- `autoPlay` — Auto-start animation (default: `true`)
-- `loop` — Loop animation (default: `false`)
-
-```mdx
-<Terminal
-  lines={[
-    { text: 'npm install', type: 'command' },
-    { text: 'Installing dependencies...', type: 'output' },
-    { text: '✓ Done!', type: 'success' }
-  ]}
-/>
-```
-
-### Diff
-
-Side-by-side code diff viewer.
-
-**Props:**
-- `oldCode` — Code before changes
-- `newCode` — Code after changes
-- `language` — Syntax highlighting language
-- `filename` — Diff filename (optional)
-- `showLineNumbers` — Show line numbers (default: `true`)
-- `className` — Additional CSS classes (optional)
-
-### Math
-
-LaTeX math rendering with KaTeX. See [Math and Diagrams](/docs/content/math-and-diagrams) for details.
-
-**Props:**
-- `display` — Display mode (block) vs inline (default: `false`)
-- `label` — Equation label/anchor
-- `number` — Equation number (auto-generated if not provided)
-- `options` — KaTeX options object (optional)
+Renders KaTeX-backed math. The registry also handles `math`, `math-inline`, and `math-display` names generated by the MDX math pipeline.
 
 ```mdx
 <Math display>
@@ -351,277 +182,66 @@ LaTeX math rendering with KaTeX. See [Math and Diagrams](/docs/content/math-and-
 </Math>
 ```
 
-### Mermaid
+### `<Mermaid>`
 
-Interactive diagram rendering. See [Math and Diagrams](/docs/content/math-and-diagrams) for details.
-
-**Props:**
-- `chart` — Mermaid diagram definition
-- `title` — Diagram title
-- `className` — Additional CSS classes
+Client-side Mermaid renderer with zoom/pan/fullscreen controls. Mermaid itself is lazy-loaded in the browser.
 
 ```mdx
 <Mermaid chart={`
-  graph LR
-    A --> B
-    B --> C
+graph LR
+  A --> B
+  B --> C
 `} />
 ```
 
-## Data & Code Components
+## UI Primitives Available in MDX
 
-### APIReference
+The registry also exposes a subset of `components/ui/` primitives:
 
-API endpoint documentation.
+- `<Alert>`
+- `<Badge>`
+- `<Button>`
+- `<Card>` — wrapped with additional spacing and dark-mode classes
+- `<Tooltip>` — **root only**
+- `<Accordion>`, `<AccordionItem>`, `<AccordionTrigger>`, `<AccordionContent>`
+- `<Tabs>`, `<TabsList>`, `<TabsTrigger>`, `<TabsContent>`
 
-**Props:**
-- `method` — HTTP method (`"GET"`, `"POST"`, etc.)
-- `endpoint` — API endpoint path
-- `title` — Endpoint title
-- `description` — Endpoint description
-- `parameters` — Array of `{ name, type, required, description, default }`
-- `headers` — Array of header objects
-- `requestBody` — `{ type, example }` object
-- `response` — `{ status, description, example }` object
-- `authentication` — Auth type string
+### Important limitations
 
-```mdx
-<APIReference
-  method="POST"
-  endpoint="/api/posts"
-  title="Create Post"
-  parameters={[
-    { name: 'title', type: 'string', required: true }
-  ]}
-/>
-```
+- `AlertTitle` and `AlertDescription` are **not** registered in MDX
+- `CardHeader`, `CardTitle`, and `CardContent` are **not** registered in MDX
+- `TooltipProvider`, `TooltipTrigger`, and `TooltipContent` are **not** registered in MDX
 
-### PropTable
+That means `<Tooltip>` is technically available, but not especially useful on its own in MDX today.
 
-Component prop documentation table.
+For the full component APIs outside MDX, see [UI Primitives](/docs/reference/ui-primitives).
 
-**Props:**
-- `props` — Array of `{ name, type, required, default, description }`
+## Registry Shape
 
-### FileTree
-
-Visual file tree representation.
-
-**Props:**
-- `files` — Array of file path strings
-- `expanded` — Array of expanded directory paths
-
-### PackageInstall
-
-Package installation commands for multiple package managers.
-
-**Props:**
-- `package` — Package name(s)
-- `dev` — Install as dev dependency (default: `false`)
-
-```mdx
-<PackageInstall package="react react-dom" />
-```
-
-## Engagement Components
-
-### Quiz
-
-Interactive quiz with multiple choice questions.
-
-**Props:**
-- `questions` — Array of question objects:
-  - `question` — Question text
-  - `options` — Array of option strings
-  - `correct` — Index of correct answer
-  - `explanation` — Explanation text (optional)
-
-### Spoiler & InlineSpoiler
-
-Hidden content that reveals on click.
-
-```mdx
-<Spoiler title="Click to reveal">
-Hidden spoiler content
-</Spoiler>
-
-This is <InlineSpoiler>hidden inline text</InlineSpoiler>.
-```
-
-### Bookmark & BookmarkGrid
-
-External link bookmarks with previews.
-
-**Bookmark Props:**
-- `url` — Bookmark URL
-- `title` — Link title
-- `description` — Description text
-- `image` — Preview image URL
-- `tags` — Array of tag strings
-
-**BookmarkGrid:**
-- `children` — Bookmark components
-
-```mdx
-<BookmarkGrid>
-  <Bookmark
-    url="https://example.com"
-    title="Example Site"
-    description="A great resource"
-  />
-</BookmarkGrid>
-```
-
-### Newsletter
-
-Newsletter signup form.
-
-**Props:**
-- `title` — Form title
-- `description` — Form description
-- `buttonText` — Submit button text
-
-## Layout Components
-
-### Columns & Column
-
-Multi-column layouts.
-
-**Columns Props:**
-- `count` — Number of columns: `2` | `3` | `4` (default: `2`)
-- `gap` — Gap size: `"sm"` | `"md"` | `"lg"` (default: `"md"`)
-- `align` — Vertical alignment: `"start"` | `"center"` | `"end"` | `"stretch"`
-- `divider` — Show vertical dividers (default: `false`)
-
-**Column Props:**
-- `sticky` — Enable sticky positioning (default: `false`)
-
-```mdx
-<Columns count={3} gap="lg">
-  <Column>First column</Column>
-  <Column sticky>Sticky second column</Column>
-  <Column>Third column</Column>
-</Columns>
-```
-
-### Split
-
-50/50 split layout.
-
-**Props:**
-- `reverse` — Reverse column order on mobile (default: `false`)
-- `gap` — Gap size (default: `"md"`)
-- `align` — Vertical alignment (default: `"center"`)
-
-```mdx
-<Split>
-  <div>Left content</div>
-  <div>Right content</div>
-</Split>
-```
-
-### Aside & InlineAside
-
-Sidebar content.
-
-**Aside Props:**
-- `title` — Aside title
-- `position` — `"left"` | `"right"` (default: `"right"`)
-- `sticky` — Enable sticky positioning
-
-```mdx
-<Aside title="Related Info" position="right">
-Additional context here.
-</Aside>
-```
-
-### Figure & FigureGroup
-
-Captioned figures.
-
-**Figure Props:**
-- `caption` — Figure caption
-- `alt` — Alt text
-- `src` — Image source
-
-**FigureGroup Props:**
-- `caption` — Group caption
-- `columns` — Number of columns
-
-```mdx
-<Figure
-  src="/diagram.png"
-  alt="Architecture diagram"
-  caption="System architecture overview"
-/>
-
-<FigureGroup caption="Comparison" columns={2}>
-  <Figure src="/before.png" alt="Before" />
-  <Figure src="/after.png" alt="After" />
-</FigureGroup>
-```
-
-### Steps & Step
-
-Step-by-step instructions.
-
-**Steps Props:**
-- `steps` — Array of step objects (or use `<Step>` children)
-- `variant` — `"numbered"` | `"check"` | `"arrow"` (default: `"numbered"`)
-
-**Step Props:**
-- `title` — Step title
-- `number` — Step number (optional)
-- `completed` — Completion status (default: `false`)
-
-```mdx
-<Steps>
-  <Step number={1} title="Install dependencies">
-    Run `pnpm install` to install all dependencies.
-  </Step>
-  <Step number={2} title="Start dev server">
-    Run `pnpm dev` to start the development server.
-  </Step>
-</Steps>
-```
-
-## UI Primitives
-
-shadcn/ui components are also available:
-
-- `<Alert>` — Alert boxes
-- `<Badge>` — Status badges
-- `<Button>` — Buttons
-- `<Card>` — Cards
-- `<Separator>` — Horizontal dividers
-- `<Tooltip>` — Tooltips
-- `<Accordion>`, `<AccordionItem>`, `<AccordionTrigger>`, `<AccordionContent>` — Accordions
-- `<Tabs>`, `<TabsList>`, `<TabsTrigger>`, `<TabsContent>` — Tabs
-- `<ScrollArea>` — Scrollable containers
-
-See [UI Primitives](/docs/reference/ui-primitives) for full documentation.
-
-## Component Registry Implementation
-
-The `mdx-components.tsx` file exports a `useMDXComponents` function that returns a mapping of component names to React components. This is the mechanism that makes all these components available without imports:
+At a high level, `useMDXComponents()` returns:
 
 ```typescript
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    // Element overrides
-    h1: ({ children }) => <h1 ...>{children}</h1>,
-    code: ({ children }) => <code ...>{children}</code>,
-
-    // Custom components
+    h1: ...,
+    pre: ({ children }) => <CodeBlock>{children}</CodeBlock>,
+    a: ({ href, children }) => /* anchor / external / internal handling */,
+    Callout,
+    Details,
     Math,
     Mermaid,
-    Chart,
-    Timeline,
-    // ... all other components
-
+    Gist,
+    ExternalLink,
+    ClientSideLink,
+    TagLink,
+    // selected ui primitives...
     ...components,
   };
 }
 ```
 
-This function is automatically called by the MDX runtime when rendering MDX pages.
+## Related Documentation
+
+- [MDX Pipeline](/docs/content/mdx-pipeline)
+- [Math and Diagrams](/docs/content/math-and-diagrams)
+- [UI Primitives](/docs/reference/ui-primitives)

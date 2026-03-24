@@ -1,6 +1,6 @@
 # Validation Checklist
 
-Portable checks to run before dispatching a worker and before final publish. Use these even if hooks are stale or only cover legacy paths.
+Portable checks to run before dispatching a worker and before final publish. Use these to catch repo-truth drift in prompts, hooks, runtime packaging, or prior artifacts.
 
 ## Pre-Dispatch Checks
 
@@ -10,7 +10,7 @@ Portable checks to run before dispatching a worker and before final publish. Use
 | Match the worker to the stage | Compare the requested mode with `worker-contracts.md` | Exactly one worker owns the next step |
 | Prepare the handoff directory | `mkdir -p .cache/blog-drafts/{slug}` | The slug-scoped handoff directory exists before the worker writes |
 | Check stage prerequisites | Research: topic/seed is present. Draft/edit: `research.md` or an existing post is available. Publish: `test -f .cache/blog-drafts/{slug}/draft.mdx` | The worker has the minimum inputs required for its stage |
-| Paste the correction block | Copy the override block from `agent-dispatch.md` into the prompt | The prompt explicitly says: real post path, no `ArticleJsonLd`, no `export const metadata`, and final publish target |
+| Apply the correction block only when needed | If the prompt or prior artifacts mention legacy `app/blog/posts/{slug}/page.mdx`, `ArticleJsonLd`, `export const metadata`, or "three-way metadata sync", copy the fallback block from `agent-dispatch.md`; otherwise use the shared context template on its own | Either the dispatch context already matches repo truth, or the fallback block is present to override drift |
 
 ---
 

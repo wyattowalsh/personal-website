@@ -6,19 +6,19 @@ icon: fa/FaRocket
 
 ## **Introduction**
 
-This documentation provides a comprehensive architectural analysis of the `w4w.dev` personal website, a project that demonstrates an **enterprise-grade, production-ready** implementation of a modern web application.
+This documentation is a working map of the `w4w.dev` codebase: the main Next.js application, its blog/content pipeline, and the separate Fumadocs workspace that documents it.
 
-Far more than a simple portfolio, this project functions as a sophisticated showcase of advanced software architecture. It features a powerful MDX-based content pipeline with an extensive component system, a highly interactive and aesthetically unique frontend, a secure and performant API layer, and a robust build system.
+Far more than a simple portfolio, the repository combines a content-heavy personal site, a blog with MDX authoring, search and feeds, and a deliberately polished frontend with motion, themed particles, and route-specific UI shells.
 
 **Key Architectural Pillars:**
-- **Technology**: Next.js 16.1.1, React 19.2.3, TypeScript 5, Tailwind CSS 4.1.18, SCSS, Framer Motion, TSParticles, Zod 4.2.1.
-- **Build**: ESLint 9 flat config, Storybook 10.1.10, pnpm workspace monorepo (main app + docs).
-- **Backend**: A robust, singleton-based service layer with an integrated LRU cache, Fuse.js search, and a content preprocessing pipeline.
-- **API**: A secure, granular, and performant API leveraging Zod for validation and a robust middleware pattern.
-- **Content**: A sophisticated MDX pipeline with over 35 remark/rehype plugins, enabling rich, technical content with first-class support for LaTeX mathematics via KaTeX and Mermaid diagrams.
-- **Frontend**: A resilient component model using `Suspense` and `ErrorBoundary`, featuring a unique "cyberpunk" aesthetic driven by advanced animation and styling techniques.
-- **Components**: Extensive MDX component library (50+ custom components) and specialized hero system for post headers.
-- **Quality**: Meticulously organized, strongly typed, and demonstrative of modern best practices, with Storybook-driven component development.
+- **Technology**: Next.js 16, React 19, TypeScript 5, Tailwind CSS 4, `motion/react`, TSParticles, Zod, and Fumadocs.
+- **Repository Shape**: pnpm workspace monorepo with the main app at the root and a separate docs app in `docs/`.
+- **Backend/Data**: A singleton `BackendService` preprocesses MDX posts, builds search indexes, and serves route-level data needs.
+- **API**: Route handlers use shared validation and error middleware from `lib/core.ts`, including correlation IDs and Sentry-aware failure handling.
+- **Content**: Blog posts live in `content/posts/` and support MDX, KaTeX-powered math, Mermaid diagrams, tags, and generated feeds.
+- **Frontend**: The app uses route-aware layouts, a fixed adaptive header, an animated landing title, and theme-aware particle backgrounds with reduced-motion fallbacks.
+- **Components**: A central MDX component registry and `shadcn/ui` primitives provide the building blocks for rich content and interactive UI.
+- **Quality**: Strong typing, preprocessing scripts, ESLint flat config, and Vitest tests keep the codebase disciplined.
 
 ## **Documentation Structure**
 
@@ -33,6 +33,7 @@ This documentation is organized into five comprehensive tabs:
 ## **Quick Links**
 
 - **Getting Started**: See [Build Process](/docs/architecture/build-process) for setup instructions
+- **Frontend Shell**: Start with [Frontend & Component Model](/docs/architecture/frontend) for the current layout and homepage/UI architecture
 - **Writing Content**: Check [Blog Authoring](/docs/content/blog-authoring) for post creation workflow
 - **Component Library**: Explore [MDX Components](/docs/content/mdx-components) for available components
 - **API Layer**: Review [API Routes](/docs/architecture/api-routes) for endpoint documentation

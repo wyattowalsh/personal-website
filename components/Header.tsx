@@ -8,13 +8,13 @@ import { cn } from "@/lib/utils";
 
 export function Header() {
 	const pathname = usePathname();
-	const isHome = pathname === "/";
+	const isTransparent = pathname === "/" || pathname === "/blog";
 
 	return (
 		<header
 			className={cn(
 				"fixed top-0 left-0 w-full flex justify-between items-center px-4 py-2.5 sm:px-6 sm:py-3 md:px-8 md:py-3 lg:px-10 lg:py-3 z-50",
-				isHome
+				isTransparent
 					? "bg-transparent"
 					: "bg-background/80 backdrop-blur-md border-b border-border/40"
 			)}

@@ -5,9 +5,16 @@ description: The high-level architectural philosophy and structure of the projec
 
 ## Architectural Philosophy
 
-The architecture is guided by principles of **modularity, separation of concerns, and resilience**. A clear distinction is maintained between the server-side business logic, the client-side rendering layer, and the content itself.
+The codebase is organized around a simple idea: **keep content, runtime concerns, and presentation separate enough that each can evolve without dragging the others around**.
 
-This approach leads to a more maintainable, scalable, and robust application.
+In practice that means:
+
+- Next.js App Router handles routing, layouts, metadata, and API boundaries
+- `lib/` owns shared configuration, validation, metadata helpers, preprocessing, and backend-facing logic
+- `content/posts/` remains the source of truth for published writing
+- `docs/` is a separate Fumadocs workspace that documents the app without being tangled into the main runtime
+
+That split keeps the site maintainable while still allowing rich client-side UI on the homepage and blog surfaces.
 
 ## Monorepo Structure
 
@@ -24,65 +31,71 @@ This structure allows the documentation to live alongside the main application w
 
 ## High-Level Directory Structure
 
-The project follows a logical, feature-oriented structure that aligns with Next.js App Router conventions.
+The repository is feature-oriented, but the major boundaries are now clearer if you read it as **app runtime + shared libraries + content + docs workspace**.
 
 ```bash
 personal-website/
-├── app/                  # Next.js App Router: Routing, Layouts, Pages, API
-│   ├── api/              # Secure, granular API endpoints
-│   ├── blog/             # Blog pages and layouts
-│   │   └── posts/        # Individual blog posts (page.mdx files)
-│   └── (core)/           # Core pages (home), feeds, etc.
-├── components/           # Reusable React components (UI, features, hooks)
-│   ├── ui/               # Base UI components (from shadcn/ui)
-│   ├── mdx/              # Custom MDX components (40+ components)
-│   ├── heroes/           # Hero components for blog post headers
-│   ├── icons/            # Icon components
-│   ├── particles/        # Particle animation configurations
-│   └── hooks/            # Custom React hooks
-├── lib/                  # Core application logic (three-layer architecture)
-│   ├── core.ts           # Layer 1: Types, schemas (Zod), errors, logger
-│   ├── server.ts         # Layer 2: BackendService singleton, data access
-│   ├── services.ts       # Layer 3: Simplified API wrapper
-│   ├── client.ts         # Type-safe client-side API fetcher
-│   ├── metadata.ts       # SEO metadata generators
-│   └── utils.ts          # Utility functions (cn, formatDate, etc.)
-├── public/               # Static assets (images, fonts, particle configs)
-├── scripts/              # Node.js-based build & automation scripts
-└── docs/                 # Fumadocs documentation workspace
-    ├── content/docs/     # Documentation MDX files
-    └── package.json      # Separate dependencies for docs site
+├── app/                     # Main Next.js app routes, layouts, metadata, API handlers
+│   ├── api/                 # HTTP endpoints used by the site and admin surfaces
+│   ├── admin/               # Admin UI routes
+│   ├── blog/                # Blog index, tags, archive, and post routes
+│   ├── layout.tsx           # Global shell, providers, metadata, analytics
+│   └── page.tsx             # Home page entry point
+├── components/              # Reusable React components and client-side UI building blocks
+│   ├── hooks/               # Shared hooks such as reduced-motion handling
+│   ├── particles/           # Generated particle preset manifest + helpers
+│   └── ui/                  # Base shadcn/ui primitives
+├── content/
+│   └── posts/               # MDX blog posts (one directory per slug)
+├── lib/                     # Shared runtime code for config, metadata, content processing, feeds, etc.
+│   ├── core.ts              # Config, validation schemas, API middleware, ApiError
+│   ├── server.ts            # BackendService singleton and post preprocessing/search
+│   ├── metadata.ts          # Metadata builders for pages and posts
+│   ├── feed.ts              # RSS/Atom/JSON feed helpers
+│   ├── schema.ts            # Shared structured-data helpers/schemas
+│   └── utils.ts             # Small shared utilities (`cn`, formatting, MDX stripping)
+├── public/                  # Static assets: images, fonts, particle JSON, favicons
+├── scripts/                 # Preprocessing and maintenance scripts
+└── docs/                    # Separate Fumadocs documentation app
+    ├── app/                 # Docs-site routes/layout
+    ├── content/docs/        # Documentation MDX files
+    ├── lib/                 # Docs-site helpers/source loading
+    └── package.json         # Separate dependencies and scripts for the docs app
 ```
 
-## Three-Layer Library Architecture
+## Current Runtime Layers
 
-The `lib/` directory implements a clean three-layer architecture:
+The repository no longer reads best as a strict three-layer `lib/` stack. A more accurate mental model is:
 
-### Layer 1: Core (`lib/core.ts`)
-- **Type definitions**: `Post`, `PostMetadata`, `SearchResult`, `Config`
-- **Zod schemas**: API validation schemas for requests/responses
-- **Error handling**: `ApiError` class with status codes and details
-- **Logging**: Sophisticated logger with formatters and log levels
-- **Cache utilities**: `cacheControl` helpers for HTTP caching headers
-- **Constants**: Site configuration, default metadata
+### 1. App Router + UI Shell (`app/`, `components/`)
 
-### Layer 2: Server (`lib/server.ts`)
-- **BackendService singleton**: Central data access layer
-- **LRU cache**: 500-item cache with 1-hour TTL
-- **Fuse.js search**: Fuzzy search across posts with configurable thresholds
-- **Content preprocessing**: MDX parsing, metadata extraction, reading time calculation
-- **API handlers**: `getPost`, `getPosts`, `searchPosts`
-- **Utility functions**: `handleRequest` wrapper with error handling
+- `app/layout.tsx` defines the global shell: fonts, theme provider, tooltip context, header, analytics, and structured data
+- Route-specific layouts in `app/blog/` and `app/blog/posts/` add blog chrome, scroll management, math support, and post-specific structure
+- Server components fetch data close to the route entry points, then hand off to client components for animation-heavy experiences like the landing page hero and particle background
 
-### Layer 3: Services (`lib/services.ts`)
-- **Simplified API**: Wrapper around BackendService for easy consumption
-- **`services.posts.*`**: `get()`, `getAll()`, `search()`, `getByTag()`, `getAdjacent()`
-- **`services.tags.*`**: `getAll()`
-- **Type-safe**: All methods return properly typed data
-- **Async/await**: Clean promise-based API
+### 2. Content Processing + Search (`content/posts/`, `lib/server.ts`)
 
-This architecture ensures:
-- **Separation of concerns**: Each layer has a clear responsibility
-- **Testability**: Layers can be tested in isolation
-- **Maintainability**: Changes are localized to appropriate layers
-- **Type safety**: TypeScript types flow through all layers 
+- `BackendService` is the central content access layer
+- It preprocesses MDX posts from `content/posts/**/index.mdx`
+- Frontmatter is validated with Zod before posts enter the in-memory maps and search index
+- The service also derives reading time, cleans MDX syntax for search, builds sorted/tagged caches, and exposes helpers such as `getAllPosts()`, `getPostMetadata()`, `getAdjacentPosts()`, and `getRelatedPosts()`
+
+### 3. Shared Runtime Infrastructure (`lib/core.ts`, `lib/metadata.ts`, `lib/feed.ts`, `lib/logger.ts`, `lib/schema.ts`)
+
+- `lib/core.ts` owns config, API validation schemas, `ApiError`, and the request-validation / correlation-id middleware used by route handlers
+- `lib/metadata.ts` centralizes metadata generation
+- `lib/feed.ts` powers feed routes
+- `lib/logger.ts`, `lib/constants.ts`, and `lib/utils.ts` provide the smaller but important plumbing that keeps the app consistent
+
+### 4. Documentation Workspace (`docs/`)
+
+- The docs live in a separate Next.js app built with Fumadocs
+- That workspace has its own `package.json`, routing tree, and content source
+- Keeping it separate lets the main app and the docs site evolve independently while still living in the same repository
+
+## Why This Split Works
+
+- **Content stays portable**: posts live outside route code
+- **UI stays composable**: layouts and components can change without rewriting data access
+- **Backend logic stays testable**: preprocessing and API helpers are plain TypeScript modules
+- **Docs stay close to the code**: the Fumadocs workspace can describe the current architecture without being coupled to the production app bundle
