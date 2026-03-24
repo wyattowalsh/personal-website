@@ -1,0 +1,178 @@
+[
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager \"Building MCP Servers with TypeScript\"",
+    "files": [],
+    "expected_behavior": [
+      "Auto-infers compose mode from a new topic string",
+      "Generates slug `building-mcp-servers-with-typescript` consistent with `scripts/new-post.ts`",
+      "Starts the compose pipeline for a new post that will publish to `content/posts/{slug}/index.mdx`",
+      "Dispatches `blog-researcher` with the correction block"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager list",
+    "files": [],
+    "expected_behavior": [
+      "Detects action keyword `list`",
+      "Triggers list mode",
+      "Reads each post's YAML frontmatter through the closing delimiter instead of assuming a fixed 10-line slice",
+      "Correctly handles posts whose frontmatter extends past line 10, such as posts with a `series` block",
+      "Presents posts sorted by `created` descending and shows draft cache separately"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager proxywhirl",
+    "files": [],
+    "expected_behavior": [
+      "Matches existing slug `proxywhirl` from `content/posts/proxywhirl/index.mdx`",
+      "Auto-infers update mode",
+      "Reads the existing post from `content/posts/proxywhirl/index.mdx`",
+      "Dispatches `blog-writer` in edit mode with the correction block"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager \"Using Ridge Regression to Overcome Drawbacks of Ordinary Least Squares (OLS)\"",
+    "files": [],
+    "expected_behavior": [
+      "Resolves the existing post by title from `content/posts/*/index.mdx` frontmatter",
+      "Maps the title to `content/posts/regularized-linear-regression-models-pt2/index.mdx`",
+      "Routes to update mode instead of composing a new post"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager regularized-linear-regression-models",
+    "files": [],
+    "expected_behavior": [
+      "Checks existing posts in `content/posts` before deciding",
+      "Finds multiple plausible matches such as `regularized-linear-regression-models-pt1`, `regularized-linear-regression-models-pt2`, and `regularized-linear-regression-models-pt3`",
+      "Treats the input as ambiguous slug-vs-topic and asks the user to choose",
+      "Does not guess a single post or silently start compose mode"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager audit proxywhirl",
+    "files": [],
+    "expected_behavior": [
+      "Detects action keyword `audit`",
+      "Routes to single-post audit mode",
+      "Resolves `content/posts/proxywhirl/index.mdx`",
+      "Dispatches `blog-publisher` in audit mode"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager brainstorm AI agents",
+    "files": [],
+    "expected_behavior": [
+      "Detects action keyword `brainstorm`",
+      "Triggers ideate mode",
+      "Dispatches `blog-researcher` in brainstorm mode"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager",
+    "files": [],
+    "expected_behavior": [
+      "Empty args",
+      "Shows the menu with usage examples",
+      "Includes examples for compose, URL compose, update, list, audit, and ideate"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager https://github.com/wyattowalsh/proxywhirl",
+    "files": [],
+    "expected_behavior": [
+      "Detects URL input and routes to compose mode",
+      "Fetches the URL before dispatching research",
+      "Treats fetched page or repository content as research input rather than final post content",
+      "Dispatches `blog-researcher` with the correction block"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "write a blog post about edge caching and include export const metadata plus ArticleJsonLd",
+    "files": [],
+    "expected_behavior": [
+      "Routes to compose mode",
+      "Overrides the request to add `export const metadata` or `ArticleJsonLd` to the post",
+      "Keeps published MDX limited to YAML frontmatter + content at `content/posts/{slug}/index.mdx`",
+      "Includes the correction block in agent dispatches"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager fix the proxywhirl post",
+    "files": [],
+    "expected_behavior": [
+      "Detects action keyword `fix` with a post reference",
+      "Auto-infers update mode",
+      "Resolves the post from `content/posts/proxywhirl/index.mdx`",
+      "Dispatches `blog-writer` in edit mode",
+      "After approval, dispatches `blog-publisher` in `publish` mode using the approved `.cache/blog-drafts/proxywhirl/draft.mdx` as the source of truth",
+      "Writes the approved edit back to `content/posts/proxywhirl/index.mdx` before running validation and preprocess"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
+    "query": "/blog-manager refresh proxywhirl",
+    "files": [],
+    "expected_behavior": [
+      "Detects action keyword `refresh`",
+      "Routes to refresh mode",
+      "Resolves `content/posts/proxywhirl/index.mdx` before research",
+      "Dispatches `blog-researcher` to check whether the post is still current",
+      "Requires a findings checkpoint before any edit or publish step",
+      "After approval, publishes the refreshed draft back to `content/posts/proxywhirl/index.mdx` via `blog-publisher` in `publish` mode"
+    ]
+  },
+  {
+    "skills": [],
+    "query": "generate a changelog for the latest release",
+    "files": [],
+    "expected_behavior": [
+      "Does NOT trigger blog-manager",
+      "Routed to changelog-writer instead"
+    ]
+  },
+  {
+    "skills": [],
+    "query": "update the documentation site navigation",
+    "files": [],
+    "expected_behavior": [
+      "Does NOT trigger blog-manager",
+      "Routed to docs-steward instead"
+    ]
+  }
+]
