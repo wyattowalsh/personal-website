@@ -74,7 +74,9 @@
       "Detects action keyword `audit`",
       "Routes to single-post audit mode",
       "Resolves `content/posts/proxywhirl/index.mdx`",
-      "Dispatches `blog-publisher` in audit mode"
+      "Dispatches `blog-publisher` in audit mode",
+      "Presents findings with severity levels (critical/warning/info) grounded in the repo contract",
+      "Keeps parser-optional fields like `summary` or an omitted hero image in warning/info territory instead of treating them as automatic publish blockers"
     ]
   },
   {
@@ -131,6 +133,20 @@
     "skills": [
       "blog-manager"
     ],
+    "query": "write a blog post about edge caching and keep frontmatter, metadata exports, and JSON-LD in three-way metadata sync",
+    "files": [],
+    "expected_behavior": [
+      "Routes to compose mode",
+      "Ignores the stale instruction about three-way metadata sync",
+      "Keeps published MDX limited to YAML frontmatter + content at `content/posts/{slug}/index.mdx`",
+      "Does not add `export const metadata`, `ArticleJsonLd`, or hand-written JSON-LD script blocks",
+      "Includes the correction block in agent dispatches"
+    ]
+  },
+  {
+    "skills": [
+      "blog-manager"
+    ],
     "query": "/blog-manager fix the proxywhirl post",
     "files": [],
     "expected_behavior": [
@@ -138,6 +154,7 @@
       "Auto-infers update mode",
       "Resolves the post from `content/posts/proxywhirl/index.mdx`",
       "Dispatches `blog-writer` in edit mode",
+      "Treats `.cache/blog-drafts/proxywhirl/review.md` as the edit summary and `.cache/blog-drafts/proxywhirl/draft.mdx` as the publish source of truth",
       "After approval, dispatches `blog-publisher` in `publish` mode using the approved `.cache/blog-drafts/proxywhirl/draft.mdx` as the source of truth",
       "Writes the approved edit back to `content/posts/proxywhirl/index.mdx` before running validation and preprocess"
     ]
@@ -154,6 +171,7 @@
       "Resolves `content/posts/proxywhirl/index.mdx` before research",
       "Dispatches `blog-researcher` to check whether the post is still current",
       "Requires a findings checkpoint before any edit or publish step",
+      "Uses the approved `.cache/blog-drafts/proxywhirl/draft.mdx` as the publish source of truth after the refresh edit checkpoint",
       "After approval, publishes the refreshed draft back to `content/posts/proxywhirl/index.mdx` via `blog-publisher` in `publish` mode"
     ]
   },
