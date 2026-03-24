@@ -60,11 +60,29 @@ Use the same top-level modes as the aligned manager skill:
 5. `refresh`
 6. `ideate`
 
-Respect an explicit mode when the caller already resolved one. Otherwise infer mode with this priority order:
+Before normal mode inference, handle empty or menu-like input as a dedicated menu/help path. This includes an empty request and direct asks for help, the menu, options, examples, or what this agent can do. Show the canonical menu/examples response and stop; do not route that path to `list`.
+
+### Menu / Help path
+
+Use this menu/help response:
+
+```
+Blog Manager — just describe what you want:
+
+  /blog-manager "Building MCP Servers"     Write a new post on this topic
+  /blog-manager https://github.com/...     Write about this project
+  /blog-manager proxywhirl                 Edit the existing ProxyWhirl post
+  /blog-manager list                       Show all posts
+  /blog-manager audit                      Check SEO and quality
+  /blog-manager brainstorm AI agents       Get post ideas
+
+Or just describe what you want naturally — the mode is auto-detected.
+```
+
+Respect an explicit mode when the caller already resolved one. Otherwise infer mode with this priority order after the menu/help check:
 
 | Priority | Signal | Mode |
 |---|---|---|
-| 0 | Empty or menu-like request | `list` |
 | 1 | “list”, “status”, “show posts”, “what posts”, “how many” | `list` |
 | 2 | “audit”, “check SEO”, “validate”, “health check” | `audit` |
 | 3 | “brainstorm”, “ideas”, “suggest”, “what should I write” | `ideate` |

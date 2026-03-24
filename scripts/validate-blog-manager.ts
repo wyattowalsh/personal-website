@@ -19,6 +19,12 @@ type FileAssertions = {
   mustNotMatch?: RegexAssertion[];
 };
 
+type MirroredFileAssertion = {
+  sourcePath: string;
+  mirrorPath: string;
+  reason: string;
+};
+
 const root = process.cwd();
 
 function resolvePath(relativePath: string): string {
@@ -35,6 +41,20 @@ function getLineNumber(content: string, index: number): number {
 
 function previewMatch(match: string): string {
   return match.length > 80 ? `${match.slice(0, 77)}...` : match;
+}
+
+function normalizeComparableText(content: string): string {
+  return content.replace(/\r\n/g, '\n').trimEnd();
+}
+
+function compareNames(left: string, right: string): number {
+  if (left < right) {
+    return -1;
+  }
+  if (left > right) {
+    return 1;
+  }
+  return 0;
 }
 
 function addFailure(failures: string[], message: string) {
@@ -323,6 +343,60 @@ const canonicalSkillChecks: FileAssertions[] = [
   },
 ];
 
+const copilotWrapperChecks: FileAssertions[] = [
+  {
+    path: '.github/skills/blog-manager/SKILL.md',
+    mustInclude: [
+      {
+        snippet: 'This wrapper only mirrors the smallest runtime-critical',
+        reason: 'wrapper staying minimal while shipping critical runtime docs'
+      },
+      {
+        snippet: 'Read these local copied references first for runtime-critical guidance:',
+        reason: 'wrapper preferring local mirrored refs first'
+      },
+      {
+        snippet: '`references/agent-dispatch.md`',
+        reason: 'local dispatch reference'
+      },
+      {
+        snippet: '`references/worker-contracts.md`',
+        reason: 'local worker contract reference'
+      },
+      {
+        snippet: '`references/validation-checklist.md`',
+        reason: 'local validation checklist reference'
+      },
+      {
+        snippet: 'and treat that canonical source as authoritative.',
+        reason: 'wrapper preserving canonical source precedence'
+      },
+      {
+        snippet: 'the local mirrored refs as the minimum safe operating contract.',
+        reason: 'wrapper remaining minimally self-sufficient'
+      },
+    ],
+  },
+];
+
+const copilotMirroredReferenceChecks: MirroredFileAssertion[] = [
+  {
+    sourcePath: '.agents/skills/blog-manager/references/agent-dispatch.md',
+    mirrorPath: '.github/skills/blog-manager/references/agent-dispatch.md',
+    reason: 'dispatch correction reference'
+  },
+  {
+    sourcePath: '.agents/skills/blog-manager/references/worker-contracts.md',
+    mirrorPath: '.github/skills/blog-manager/references/worker-contracts.md',
+    reason: 'worker contract reference'
+  },
+  {
+    sourcePath: '.agents/skills/blog-manager/references/validation-checklist.md',
+    mirrorPath: '.github/skills/blog-manager/references/validation-checklist.md',
+    reason: 'validation checklist reference'
+  },
+];
+
 const staleRuntimePatterns: RegexAssertion[] = [
   {
     pattern: /app\/blog\/posts\/(?:\{slug\}|\[slug\]|\*|\*\*)\/page\.mdx/,
@@ -351,6 +425,162 @@ const staleRuntimePatterns: RegexAssertion[] = [
   {
     pattern: /lib\/client\.ts/,
     reason: 'stale client entry point'
+  },
+];
+
+const overlayStalePatterns: RegexAssertion[] = [
+  {
+    pattern: /app\/blog\/posts\/(?:\{slug\}|\[slug\]|\*|\*\*)\/page\.mdx/,
+    reason: 'legacy authored post path'
+  },
+  {
+    pattern: /three-way metadata/i,
+    reason: 'legacy metadata-sync model'
+  },
+  {
+    pattern: /lib\/services\.ts/,
+    reason: 'stale services entry point'
+  },
+  {
+    pattern: /services\.(?:posts|tags)\.getAll\(\)/,
+    reason: 'stale services API usage'
+  },
+  {
+    pattern: /lib\/client\.ts/,
+    reason: 'stale client entry point'
+  },
+];
+
+const overlayGuideChecks: FileAssertions[] = [
+  {
+    path: '.github/copilot-instructions.md',
+    mustInclude: [
+      {
+        snippet: 'Authored blog posts live at `content/posts/{slug}/index.mdx`; do not author them under `app/blog/posts/`.',
+        reason: 'github copilot guidance pointing at the authored post path'
+      },
+      {
+        snippet: '`app/blog/posts/[slug]/page.tsx` renders authored posts, and `app/blog/posts/[slug]/layout.tsx` owns route metadata and JSON-LD.',
+        reason: 'github copilot guidance keeping render and metadata ownership aligned'
+      },
+      {
+        snippet: 'For blog-specific workflows and drift prevention, defer to `.agents/skills/blog-manager/SKILL.md` (canonical portable source) instead of expanding this repo-wide file into a second spec.',
+        reason: 'github copilot guidance delegating to the canonical skill'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
+  },
+  {
+    path: '.github/instructions/blog-authoring.instructions.md',
+    mustInclude: [
+      {
+        snippet: "applyTo: 'content/posts/*/index.mdx'",
+        reason: 'github blog-authoring instructions targeting the authored post file'
+      },
+      {
+        snippet: 'Treat YAML frontmatter as the only authored metadata. `app/blog/posts/[slug]/page.tsx` renders the post, and `app/blog/posts/[slug]/layout.tsx` owns route metadata and JSON-LD.',
+        reason: 'github blog-authoring instructions keeping metadata ownership aligned'
+      },
+      {
+        snippet: 'Never add `export const metadata`, `ArticleJsonLd`, or other per-post metadata/JSON-LD wiring inside an authored post.',
+        reason: 'github blog-authoring instructions banning legacy per-post metadata wiring'
+      },
+      {
+        snippet: 'Before finishing authoring work, run `pnpm lint && pnpm typecheck`. After publish-related changes, run `pnpm preprocess`.',
+        reason: 'github blog-authoring instructions keeping validation and rebuild steps current'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
+  },
+  {
+    path: 'app/AGENTS.md',
+    mustInclude: [
+      {
+        snippet: 'Location: `content/posts/{slug}/index.mdx`',
+        reason: 'app guidance pointing at the authored post location'
+      },
+      {
+        snippet: '- `app/blog/posts/[slug]/page.tsx` renders that MDX file',
+        reason: 'app guidance keeping render ownership aligned'
+      },
+      {
+        snippet: '- `app/blog/posts/[slug]/layout.tsx` generates metadata and JSON-LD',
+        reason: 'app guidance keeping metadata ownership aligned'
+      },
+      {
+        snippet: '- Do not create per-post `page.mdx` files under `app/blog/posts/`',
+        reason: 'app guidance banning legacy authored route files'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
+  },
+  {
+    path: 'app/blog/AGENTS.md',
+    mustInclude: [
+      {
+        snippet: 'Creates `content/posts/{slug}/index.mdx`.',
+        reason: 'blog guidance pointing new-post output at the authored post location'
+      },
+      {
+        snippet: '- `app/blog/posts/[slug]/layout.tsx` generates page metadata and injects structured data from frontmatter.',
+        reason: 'blog guidance keeping metadata ownership aligned'
+      },
+      {
+        snippet: '- Do not add `export const metadata`, `ArticleJsonLd`, or manual JSON-LD `<script>` tags inside posts',
+        reason: 'blog guidance banning legacy per-post metadata wiring'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
+  },
+  {
+    path: 'content/AGENTS.md',
+    mustInclude: [
+      {
+        snippet: '- `app/blog/posts/[slug]/page.tsx` reads and compiles each `index.mdx` file',
+        reason: 'content guidance keeping render ownership aligned'
+      },
+      {
+        snippet: '- Use only helpers actually wired through `mdx-components.tsx`; do not add `ArticleJsonLd` to post MDX',
+        reason: 'content guidance banning legacy post-local JSON-LD helpers'
+      },
+      {
+        snippet: '- Manually create metadata exports or JSON-LD `<script>` tags — `app/blog/posts/[slug]/layout.tsx` handles metadata and structured data generation from frontmatter',
+        reason: 'content guidance keeping metadata ownership aligned'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
+  },
+  {
+    path: 'scripts/AGENTS.md',
+    mustInclude: [
+      {
+        snippet: 'Creates: `content/posts/{slug}/index.mdx`',
+        reason: 'scripts guidance keeping new-post output aligned'
+      },
+      {
+        snippet: '- Scans `content/posts/**/index.mdx` for MDX files',
+        reason: 'scripts guidance keeping preprocess inputs aligned'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
+  },
+  {
+    path: 'lib/AGENTS.md',
+    mustInclude: [
+      {
+        snippet: '| `metadata.ts` | SEO metadata + post structured data | `generatePostMetadata()`, `generatePostStructuredData()` |',
+        reason: 'lib guidance documenting the shared metadata helpers'
+      },
+      {
+        snippet: '// In app/blog/posts/[slug]/layout.tsx',
+        reason: 'lib guidance grounding metadata usage in the shared post layout'
+      },
+      {
+        snippet: 'const structuredData = generatePostStructuredData(post, slug)',
+        reason: 'lib guidance documenting the shared post structured-data call'
+      },
+    ],
+    mustNotMatch: overlayStalePatterns,
   },
 ];
 
@@ -473,35 +703,158 @@ const bridgeChecks: FileAssertions[] = [
   mustNotMatch: staleRuntimePatterns,
 }));
 
+async function collectComparableFiles(basePath: string, relativeDir = ''): Promise<Map<string, string>> {
+  const directoryPath = relativeDir ? path.join(basePath, relativeDir) : basePath;
+  const entries = await fs.readdir(directoryPath, { withFileTypes: true });
+  entries.sort((left, right) => compareNames(left.name, right.name));
+
+  const files = new Map<string, string>();
+
+  for (const entry of entries) {
+    if (entry.name === '.DS_Store') {
+      continue;
+    }
+
+    const relativePath = relativeDir ? path.posix.join(relativeDir, entry.name) : entry.name;
+    const absolutePath = path.join(directoryPath, entry.name);
+
+    if (entry.isDirectory()) {
+      const nestedFiles = await collectComparableFiles(basePath, relativePath);
+      for (const [nestedPath, content] of nestedFiles) {
+        files.set(nestedPath, content);
+      }
+      continue;
+    }
+
+    if (entry.isFile()) {
+      files.set(relativePath, normalizeComparableText(await fs.readFile(absolutePath, 'utf-8')));
+      continue;
+    }
+
+    if (entry.isSymbolicLink()) {
+      const stat = await fs.stat(absolutePath);
+      if (stat.isDirectory()) {
+        const nestedFiles = await collectComparableFiles(basePath, relativePath);
+        for (const [nestedPath, content] of nestedFiles) {
+          files.set(nestedPath, content);
+        }
+        continue;
+      }
+
+      if (stat.isFile()) {
+        files.set(relativePath, normalizeComparableText(await fs.readFile(absolutePath, 'utf-8')));
+        continue;
+      }
+    }
+
+    throw new Error(`unsupported runtime skill entry type at ${relativePath}`);
+  }
+
+  return files;
+}
+
 async function validateRuntimeSkillAdapter(failures: string[]) {
+  const canonicalRelativePath = '.agents/skills/blog-manager';
+  const runtimeRelativePath = '.claude/skills/blog-manager';
+  const canonicalPath = resolvePath(canonicalRelativePath);
   const runtimePath = resolvePath('.claude/skills/blog-manager');
 
   try {
-    const stat = await fs.lstat(runtimePath);
-    if (!stat.isSymbolicLink()) {
+    const stat = await fs.stat(runtimePath);
+    if (!stat.isDirectory()) {
       addFailure(
         failures,
-        '.claude/skills/blog-manager: expected a symlink to the canonical .agents skill directory'
+        `${runtimeRelativePath}: expected a directory or symlinked directory matching ${canonicalRelativePath}`
       );
       return;
     }
-
-    const target = await fs.readlink(runtimePath);
-    if (target !== '../../.agents/skills/blog-manager') {
-      addFailure(
-        failures,
-        `.claude/skills/blog-manager: expected symlink target "../../.agents/skills/blog-manager" but found ${JSON.stringify(target)}`
-      );
-    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    addFailure(failures, `.claude/skills/blog-manager: could not inspect symlink (${message})`);
+    addFailure(failures, `${runtimeRelativePath}: could not inspect runtime adapter (${message})`);
+    return;
+  }
+
+  let canonicalFiles: Map<string, string>;
+  let runtimeFiles: Map<string, string>;
+
+  try {
+    [canonicalFiles, runtimeFiles] = await Promise.all([
+      collectComparableFiles(canonicalPath),
+      collectComparableFiles(runtimePath),
+    ]);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    addFailure(failures, `${runtimeRelativePath}: could not compare runtime adapter (${message})`);
+    return;
+  }
+
+  const canonicalFilePaths = Array.from(canonicalFiles.keys()).sort(compareNames);
+  const runtimeFilePaths = Array.from(runtimeFiles.keys()).sort(compareNames);
+
+  for (const relativePath of canonicalFilePaths) {
+    if (!runtimeFiles.has(relativePath)) {
+      addFailure(
+        failures,
+        `${runtimeRelativePath}: missing ${JSON.stringify(relativePath)}; refresh it from ${canonicalRelativePath}`
+      );
+    }
+  }
+
+  for (const relativePath of runtimeFilePaths) {
+    if (!canonicalFiles.has(relativePath)) {
+      addFailure(
+        failures,
+        `${runtimeRelativePath}: unexpected ${JSON.stringify(relativePath)}; refresh it from ${canonicalRelativePath}`
+      );
+    }
+  }
+
+  for (const relativePath of canonicalFilePaths) {
+    const runtimeContent = runtimeFiles.get(relativePath);
+    if (runtimeContent === undefined) {
+      continue;
+    }
+
+    if (canonicalFiles.get(relativePath) !== runtimeContent) {
+      addFailure(
+        failures,
+        `${runtimeRelativePath}/${relativePath}: runtime adapter drift; refresh it from ${canonicalRelativePath}/${relativePath}`
+      );
+    }
   }
 }
 
 async function validateFiles(checks: FileAssertions[], failures: string[]) {
   for (const check of checks) {
     await validateFile(check, failures);
+  }
+}
+
+async function validateMirroredFiles(checks: MirroredFileAssertion[], failures: string[]) {
+  for (const check of checks) {
+    let sourceContent: string;
+    let mirrorContent: string;
+
+    try {
+      [sourceContent, mirrorContent] = await Promise.all([
+        readFile(check.sourcePath),
+        readFile(check.mirrorPath),
+      ]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      addFailure(
+        failures,
+        `${check.mirrorPath}: could not compare mirrored file for ${check.reason} (${message})`
+      );
+      continue;
+    }
+
+    if (normalizeComparableText(sourceContent) !== normalizeComparableText(mirrorContent)) {
+      addFailure(
+        failures,
+        `${check.mirrorPath}: mirrored file drift for ${check.reason}; refresh it from ${check.sourcePath}`
+      );
+    }
   }
 }
 
@@ -512,6 +865,9 @@ async function main() {
 
   await runSection('repo-truth sentinels', (items) => validateFiles(repoTruthChecks, items), failures);
   await runSection('canonical skill invariants', (items) => validateFiles(canonicalSkillChecks, items), failures);
+  await runSection('copilot skill wrapper', (items) => validateFiles(copilotWrapperChecks, items), failures);
+  await runSection('copilot mirrored refs', (items) => validateMirroredFiles(copilotMirroredReferenceChecks, items), failures);
+  await runSection('overlay guidance', (items) => validateFiles(overlayGuideChecks, items), failures);
   await runSection('runtime agent alignment', (items) => validateFiles(runtimeAgentAlignmentChecks, items), failures);
   await runSection('runtime skill adapter', validateRuntimeSkillAdapter, failures);
   await runSection('stale worker prompts', (items) => validateFiles(workerPromptChecks, items), failures);
