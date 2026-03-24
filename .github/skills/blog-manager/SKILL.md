@@ -14,8 +14,8 @@ license: MIT
 
 Thin Copilot-native wrapper for the canonical portable skill at
 `.agents/skills/blog-manager/`. Keep `.agents/skills/blog-manager/` as the
-source of truth. This wrapper should only cover Copilot-specific loading and
-runtime differences.
+source of truth. This wrapper only mirrors the smallest runtime-critical
+reference subset needed for Copilot packaging resilience.
 
 ## Dispatch
 
@@ -33,23 +33,39 @@ Treat the current user request as the canonical skill's input string;
 slash-command examples in the canonical source are examples, not a Copilot-only
 requirement.
 
+## Runtime references
+
+Read these local copied references first for runtime-critical guidance:
+
+| File | Content | Load when |
+|------|---------|-----------|
+| `references/agent-dispatch.md` | Correction block, dispatch context, checkpoint templates | Every worker handoff |
+| `references/worker-contracts.md` | Stage ownership, allowed edits, artifact paths | compose, update, refresh, audit |
+| `references/validation-checklist.md` | Pre-dispatch and pre-publish checks | publish, audit, final validation |
+
+These files are copied from `.agents/skills/blog-manager/references/` so the
+Copilot wrapper can still operate if only the `.github` skill payload is
+loaded. Prefer the local copies first, but if they are missing, insufficient,
+or disagree with the canonical skill, fall back to `.agents/skills/blog-manager/`
+and treat that canonical source as authoritative.
+
+If the canonical path is unavailable in the current host, use this wrapper plus
+the local mirrored refs as the minimum safe operating contract.
+
 ## Canonical source
 
-Read `.agents/skills/blog-manager/SKILL.md` first for:
+Read `.agents/skills/blog-manager/SKILL.md` for:
 
 - mode classification
 - pipeline stages and checkpoints
 - repo truth and publish target
 - scope boundaries
 
-Then load canonical references on demand:
+Then load non-mirrored canonical references on demand:
 
 | File | Content | Load when |
 |------|---------|-----------|
-| `.agents/skills/blog-manager/references/agent-dispatch.md` | Correction block, dispatch context, checkpoint templates | Every worker handoff |
 | `.agents/skills/blog-manager/references/post-conventions.md` | Frontmatter, authored-post rules, image conventions | compose, update, refresh |
-| `.agents/skills/blog-manager/references/worker-contracts.md` | Stage ownership, allowed edits, artifact paths | compose, update, refresh, audit |
-| `.agents/skills/blog-manager/references/validation-checklist.md` | Pre-dispatch and pre-publish checks | publish, audit, final validation |
 | `.agents/skills/blog-manager/references/mdx-components.md` | Auto-available MDX components | draft/edit work only |
 
 Do not load all references at once.
@@ -73,12 +89,22 @@ Enforce the same boundaries directly in your reasoning:
 When the canonical skill calls for a blog worker:
 
 - Prefer the matching Copilot/custom agent if the current runtime exposes one.
-- Otherwise execute that stage yourself while preserving the same artifact paths, handoff contracts, and final publish target from the canonical references.
+- Otherwise execute that stage yourself while preserving the same artifact
+  paths, handoff contracts, correction block, and final publish target from the
+  local runtime refs above, falling back to the canonical source if needed.
 
 ## Critical rules
 
-1. `.agents/skills/blog-manager/` remains the only full source of truth; do not fork its full workflow into this wrapper.
-2. Use the canonical mode names exactly: `compose`, `update`, `list`, `audit`, `refresh`, `ideate`.
-3. Publish only to `content/posts/{slug}/index.mdx`; drafts and handoffs stay under `.cache/blog-drafts/{slug}/`.
-4. After published blog changes, run `pnpm lint && pnpm typecheck`, then `pnpm preprocess`.
-5. If canonical and runtime-specific guidance disagree, follow repo truth from the canonical references above.
+1. `.agents/skills/blog-manager/` remains the only full source of truth; local
+   `references/` is a minimal mirrored subset, not a fork.
+2. Prefer the local copies of `agent-dispatch`, `worker-contracts`, and
+   `validation-checklist` first; if guidance differs, follow
+   `.agents/skills/blog-manager/`.
+3. Use the canonical mode names exactly: `compose`, `update`, `list`, `audit`,
+   `refresh`, `ideate`.
+4. Publish only to `content/posts/{slug}/index.mdx`; drafts and handoffs stay
+   under `.cache/blog-drafts/{slug}/`.
+5. After published blog changes, run `pnpm lint && pnpm typecheck`, then
+   `pnpm preprocess`.
+6. If canonical and runtime-specific guidance disagree, follow repo truth from
+   the canonical references above.
