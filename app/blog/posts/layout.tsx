@@ -1,8 +1,8 @@
 import "katex/dist/katex.min.css";
 import { Suspense } from "react";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { PostLayout } from "@/components/PostLayout";
 import { MathProvider } from "@/components/MathContext";
+import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { cn } from "@/lib/utils";
 import { CustomScrollbars } from "@/components/Scroll";
 
@@ -20,11 +20,10 @@ export default function PostsLayout({ children }: Props) {
 				"relative z-10"
 			)}>
 				<MathProvider>
+					<ScrollIndicator />
 					<Suspense fallback={<LoadingSpinner />}>
-					<CustomScrollbars>
-						<PostLayout>
+						<CustomScrollbars>
 							{children}
-						</PostLayout>
 						</CustomScrollbars>
 					</Suspense>
 				</MathProvider>

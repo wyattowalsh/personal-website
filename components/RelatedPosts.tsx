@@ -1,65 +1,18 @@
-"use client";
-
-import { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn, extractPostSlug } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { TagPill } from '@/components/ui/tag-pill';
 import { Clock } from 'lucide-react';
 import type { Route } from 'next';
+import type { PostMetadata } from '@/lib/types';
 
-interface RelatedPost {
-	slug: string;
-	title: string;
-	summary?: string;
-	image?: string;
-	tags: string[];
-	created: string;
-	readingTime?: string;
+interface RelatedPostsProps {
+	posts: PostMetadata[];
 }
 
-export function RelatedPosts() {
-	const pathname = usePathname();
-	const [posts, setPosts] = useState<RelatedPost[]>([]);
-	const [isLoading, setIsLoading] = useState(true);
-
-	useEffect(() => {
-		const slug = extractPostSlug(pathname);
-		if (!slug) {
-			setIsLoading(false); // eslint-disable-line react-hooks/set-state-in-effect -- early exit
-			return;
-		}
-
-		const cacheKey = `related:${slug}`;
-		const cached = sessionStorage.getItem(cacheKey);
-		if (cached) {
-			try {
-				setPosts(JSON.parse(cached));
-				setIsLoading(false);
-				return;
-			} catch { /* fall through to fetch */ }
-		}
-
-		const controller = new AbortController();
-		setIsLoading(true);
-		fetch(`/api/blog/posts/${slug}/related`, { signal: controller.signal })
-			.then((r) => r.json())
-			.then(({ data }) => {
-				const posts = data || [];
-				setPosts(posts);
-				sessionStorage.setItem(cacheKey, JSON.stringify(posts));
-			})
-			.catch((err) => {
-				if (err.name !== 'AbortError') setPosts([]);
-			})
-			.finally(() => setIsLoading(false));
-
-		return () => controller.abort();
-	}, [pathname]);
-
-	if (!isLoading && posts.length === 0) return null;
+export function RelatedPosts({ posts }: RelatedPostsProps) {
+	if (posts.length === 0) return null;
 
 	return (
 		<section
@@ -76,34 +29,16 @@ export function RelatedPosts() {
 				Related Posts
 			</h2>
 
-			{isLoading ? (
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-					{[...Array(3)].map((_, i) => (
-						<div key={i} className="animate-pulse">
-							<div className="aspect-[16/10] bg-muted rounded-t-xl" />
-							<div className="p-4 space-y-3 bg-muted/50 rounded-b-xl">
-								<div className="h-4 bg-muted rounded w-3/4" />
-								<div className="h-3 bg-muted rounded w-1/2" />
-								<div className="flex gap-2">
-									<div className="h-5 bg-muted rounded-full w-16" />
-									<div className="h-5 bg-muted rounded-full w-12" />
-								</div>
-							</div>
-						</div>
-					))}
-				</div>
-			) : (
-				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-					{posts.map((post) => (
-						<RelatedPostCard key={post.slug} post={post} />
-					))}
-				</div>
-			)}
+			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+				{posts.map((post) => (
+					<RelatedPostCard key={post.slug} post={post} />
+				))}
+			</div>
 		</section>
 	);
 }
 
-function RelatedPostCard({ post }: { post: RelatedPost }) {
+function RelatedPostCard({ post }: { post: PostMetadata }) {
 	const { slug, title, image, tags, readingTime } = post;
 	const displayTags = tags.slice(0, 2);
 	const isSvg = image?.endsWith('.svg');

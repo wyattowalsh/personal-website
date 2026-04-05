@@ -2,6 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PostCard } from "./PostCard";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,38 +28,43 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 import type { PostMetadata } from "@/lib/types";
 
-// Update interface to extend PostMetadata
-interface Post extends PostMetadata {
-	// Add any additional fields needed for the UI
-	sortings?: {
-		byDate: {
-			asc: string[];
-			desc: string[];
-		};
-		byTitle: {
-			asc: string[];
-			desc: string[];
-		};
-	};
-}
-
 interface SearchBarProps {
 	posts: PostMetadata[];
 	tags: string[];
+	initialQuery: string;
 }
 
-// Add this helper function at the top of the file
 const getPostDate = (post: PostMetadata): number => {
   return post.created ? new Date(post.created).getTime() : 0;
 };
 
-// Add this helper function at the top
 const getPostTags = (post: PostMetadata): string[] => {
   return post.tags || [];
 };
 
-export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags }) => {
+export const getInitialResults = (posts: PostMetadata[], query: string): PostMetadata[] => {
+	const sortedPosts = [...posts].sort((a, b) => getPostDate(b) - getPostDate(a));
+	const trimmedQuery = query.trim().toLowerCase();
+
+	if (!trimmedQuery) {
+		return sortedPosts;
+	}
+
+	return sortedPosts.filter((post) => {
+		return [
+			post.title,
+			post.summary,
+			getPostTags(post).join(" "),
+		].some((value) => value?.toLowerCase().includes(trimmedQuery));
+	});
+};
+
+export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags, initialQuery }) => {
 	const prefersReducedMotion = useReducedMotion();
+	const router = useRouter();
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
+	const currentUrlQuery = searchParams.get("q") ?? "";
 
 	// Sort tags case-insensitively but preserve original case for display
 	const tags = useMemo(
@@ -69,10 +75,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags 
 	);
 
 	// Ensure stable initial states
-	const [query, setQuery] = useState("");
-	const [debouncedQuery, setDebouncedQuery] = useState("");
-	const [results, setResults] = useState<Post[]>(() =>
-		[...posts].sort((a, b) => getPostDate(b) - getPostDate(a))
+	const [query, setQuery] = useState(initialQuery);
+	const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
+	const [results, setResults] = useState<PostMetadata[]>(() =>
+		getInitialResults(posts, initialQuery)
 	);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [sortMethod, setSortMethod] = useState<string>("date");
@@ -85,9 +91,13 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags 
 			return;
 		}
 
-		const sortedPosts = [...posts].sort((a, b) => getPostDate(b) - getPostDate(a));
-		setResults(sortedPosts);
-	}, [posts]);
+		setResults(getInitialResults(posts, currentUrlQuery));
+	}, [currentUrlQuery, posts]);
+
+	useEffect(() => {
+		setQuery(currentUrlQuery);
+		setDebouncedQuery(currentUrlQuery);
+	}, [currentUrlQuery]);
 
 	// Debounce search query
 	useEffect(() => {
@@ -115,15 +125,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags 
 
 			if (cancelled) return;
 
-			const instance = new FuseRef.current(posts, {
-				keys: [
-					{ name: "title", weight: 1.0 },
-					{ name: "summary", weight: 0.8 },
-					{ name: "content", weight: 0.6 },
-					{ name: "tags", weight: 0.9 },
-				],
-				includeScore: true,
-				threshold: 0.3,
+				const instance = new FuseRef.current(posts, {
+					keys: [
+						{ name: "title", weight: 1.0 },
+						{ name: "summary", weight: 0.8 },
+						{ name: "tags", weight: 0.9 },
+					],
+					includeScore: true,
+					threshold: 0.3,
 				ignoreLocation: true,
 				useExtendedSearch: true,
 				findAllMatches: true,
@@ -137,7 +146,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags 
 
 	// Update search effect to maintain sort order - use debouncedQuery instead of query
 	useEffect(() => {
-		let searchResults = [...posts]; // Create new array to avoid mutating props
+		let searchResults = debouncedQuery.trim()
+			? getInitialResults(posts, debouncedQuery)
+			: [...posts];
 
 		if (debouncedQuery.trim() && fuse) {
 			const fuseResults = fuse.search(debouncedQuery);
@@ -165,6 +176,28 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags 
 
 		setResults(searchResults);
 	}, [debouncedQuery, selectedTags, sortMethod, sortDirection, posts, fuse]);
+
+	useEffect(() => {
+		const trimmedQuery = debouncedQuery.trim();
+		const nextParams = new URLSearchParams(searchParams.toString());
+
+		if (trimmedQuery) {
+			nextParams.set("q", trimmedQuery);
+		} else {
+			nextParams.delete("q");
+		}
+
+		const currentParams = searchParams.toString();
+		const nextQueryString = nextParams.toString();
+
+		if (nextQueryString === currentParams) {
+			return;
+		}
+
+		router.replace(nextQueryString ? `${pathname}?${nextQueryString}` : pathname, {
+			scroll: false,
+		});
+	}, [debouncedQuery, pathname, router, searchParams]);
 
 	// Track search analytics separately with a longer settle timer
 	// to avoid firing on every intermediate keystroke
@@ -424,7 +457,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags 
 				)}
 			>
 				{results.length > 0 ? (
-					results.length === 1 ? (
+			results.length === 1 ? (
 						// Single result - centered
 						<div
 							className="sm:col-span-2 lg:col-start-2 lg:col-span-1"

@@ -1,7 +1,7 @@
 import { BackendService } from "@/lib/server";
 import { BlogPageContent } from "@/components/BlogPageContent";
 import { Metadata } from 'next';
-import { getConfig } from '@/lib/core';
+import { getConfig } from '@/lib/config';
 
 const siteUrl = getConfig().site.url;
 
@@ -25,11 +25,34 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function BlogPostsPage() {
+type BlogPostsPageProps = {
+  searchParams: Promise<{
+    q?: string | string[];
+  }>;
+};
+
+function normalizeQueryParam(query?: string | string[]): string {
+  if (Array.isArray(query)) {
+    return query[0] ?? '';
+  }
+
+  return query ?? '';
+}
+
+export default async function BlogPostsPage({ searchParams }: BlogPostsPageProps) {
   await BackendService.ensurePreprocessed();
   const instance = BackendService.getInstance();
-  const posts = await instance.getAllPosts();
-  const tags = await instance.getAllTags();
+  const [{ q }, posts, tags] = await Promise.all([
+    searchParams,
+    instance.getPostSummaries(),
+    instance.getAllTags(),
+  ]);
 
-  return <BlogPageContent posts={posts.map(({ content: _c, wordCount: _wc, adjacent: _adj, ...meta }) => meta)} tags={tags} />;
+  return (
+    <BlogPageContent
+      posts={posts}
+      tags={tags}
+      initialQuery={normalizeQueryParam(q)}
+    />
+  );
 }

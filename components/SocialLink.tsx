@@ -1,18 +1,13 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "motion/react";
-import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
-import React, { useMemo } from "react";
-import { useTheme } from "next-themes";
+import type { ComponentType, CSSProperties, JSX } from "react";
 import type { Route } from 'next';
 
 interface SocialLinkProps {
   link: {
     name: string;
     url: string;
-    icon: React.ComponentType<{ className?: string }>;
+    icon: ComponentType<{ className?: string }>;
     color?: string;
   };
 }
@@ -111,17 +106,13 @@ function adjustColorForMode(color: string, isDark: boolean) {
   return isDark ? darkModeAdjustment : lightModeAdjustment;
 }
 
-export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
-  const prefersReducedMotion = useReducedMotion();
+export function SocialLink({ link }: SocialLinkProps): JSX.Element {
   const isInternalLink = link.url.startsWith("/");
-
-  const { resolvedTheme } = useTheme();
-  const isDark = resolvedTheme === 'dark';
-  // Memoize color calculations — only recompute when color or theme changes
-  const colors = useMemo(
-    () => adjustColorForMode(link.color || "#6a9fb5", isDark),
-    [link.color, isDark]
-  );
+  const baseColor = link.color || "#6a9fb5";
+  const colors = {
+    light: adjustColorForMode(baseColor, false),
+    dark: adjustColorForMode(baseColor, true),
+  };
 
   // Update the icon container class names and styles
   const iconContainerClassName = cn(
@@ -130,25 +121,25 @@ export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
     "rounded-xl",
     // Enhanced contrast background
     "bg-white/95 dark:bg-white/5", // Adjusted opacity for dark mode
-    "backdrop-blur-sm",
     // Border and shadow for depth
     "border border-black/5 dark:border-white/10",
-    "shadow-lg dark:shadow-black/30",
+    "shadow-md dark:shadow-black/25",
     // Animations
-    "transform-gpu transition-all duration-500",
+    "motion-safe:transform-gpu motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out",
+    "motion-safe:group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none",
     // Additional contrast
     "after:absolute after:inset-0 after:rounded-xl",
     "after:bg-gradient-to-br",
     "after:from-white/50 after:to-transparent dark:after:from-white/10 dark:after:to-transparent",
     "after:opacity-0 group-hover:after:opacity-100",
-    "after:transition-opacity after:duration-500"
   );
 
   // Update the label class names
   const labelClassName = cn(
     "mt-4 text-sm md:text-base lg:text-lg",
     "font-medium text-center",
-    "transition-all duration-500",
+    "motion-safe:transition-colors motion-safe:duration-300",
+    "motion-reduce:transition-none",
     // Ensure text contrast and remove underline
     "no-underline",
     "text-slate-900 dark:text-slate-100",
@@ -156,44 +147,47 @@ export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
   );
 
   const linkContent = (
-    <motion.div
+    <div
       className={cn(
         // Base layout
         "group relative flex flex-col items-center justify-center",
         "w-full h-full p-4 md:p-6 lg:p-8",
         "rounded-2xl overflow-hidden",
+        "[--link-hover-color:var(--link-hover-color-light)] dark:[--link-hover-color:var(--link-hover-color-dark)]",
+        "[--link-icon-color:var(--link-icon-color-light)] dark:[--link-icon-color:var(--link-icon-color-dark)]",
+        "[--link-icon-bg:var(--link-icon-bg-light)] dark:[--link-icon-bg:var(--link-icon-bg-dark)]",
         // Enhanced glass morphism
-        "backdrop-blur-sm",
         "bg-white/5 dark:bg-black/20",
         "border border-black/5 dark:border-white/10",
         // Hover and animation
-        "transition-all duration-500 ease-out",
+        "motion-safe:transform-gpu motion-safe:transition-[transform,box-shadow] motion-safe:duration-300 motion-safe:ease-out",
+        "motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.02]",
+        "motion-reduce:transform-none motion-reduce:transition-none",
         // Shadows
         "shadow-lg hover:shadow-xl",
         "shadow-black/5 dark:shadow-white/5"
       )}
       style={{
-        '--hover-color': colors.bgHoverStyle,
-      } as React.CSSProperties}
-      whileHover={prefersReducedMotion ? undefined : {
-        scale: 1.05,
-        rotateX: 2,
-        rotateY: 2,
-      }}
+        '--link-hover-color-light': colors.light.bgHoverStyle,
+        '--link-hover-color-dark': colors.dark.bgHoverStyle,
+        '--link-icon-color-light': colors.light.iconColor,
+        '--link-icon-color-dark': colors.dark.iconColor,
+        '--link-icon-bg-light': colors.light.iconBgColor,
+        '--link-icon-bg-dark': colors.dark.iconBgColor,
+      } as CSSProperties}
     >
       {/* Icon Container with guaranteed contrast */}
-      <motion.div
+      <div
         className={iconContainerClassName}
         style={{
-          backgroundColor: colors.iconBgColor,
+          backgroundColor: 'var(--link-icon-bg)',
         }}
       >
         <div
           className={cn(
             "relative z-10",
-            "transition-all duration-500"
           )}
-          style={{ color: colors.iconColor }}
+          style={{ color: 'var(--link-icon-color)' }}
         >
           <link.icon
             className={cn(
@@ -204,7 +198,7 @@ export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
             )}
           />
         </div>
-      </motion.div>
+      </div>
 
       {/* Label */}
       <span
@@ -214,22 +208,23 @@ export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
       </span>
 
       {/* Enhanced hover effect */}
-      <motion.div
+      <div
         className={cn(
           "absolute inset-0 -z-10",
           "opacity-0 group-hover:opacity-100",
-          "transition-opacity duration-500",
+          "motion-safe:transition-opacity motion-safe:duration-300",
+          "motion-reduce:transition-none",
           "pointer-events-none"
         )}
         style={{
           background: `radial-gradient(
-            600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-            var(--hover-color),
+            420px circle at 50% 50%,
+            var(--link-hover-color),
             transparent 40%
           )`,
         }}
       />
-    </motion.div>
+    </div>
   );
 
   if (isInternalLink) {
@@ -246,15 +241,15 @@ export function SocialLink({ link }: SocialLinkProps): React.JSX.Element {
     );
   }
 
-  // Determine if this is a social profile link (not email, not blog)
-  const isSocialProfile = !link.url.startsWith('mailto:') && !isInternalLink;
+  const isEmailLink = link.url.startsWith('mailto:');
+  const isSocialProfile = !isEmailLink && !isInternalLink;
 
   return (
     <a
       href={link.url}
-      target="_blank"
-      rel={isSocialProfile ? "me noopener noreferrer" : "noopener noreferrer"}
-      aria-label={`${link.name} (opens in new tab)`}
+      target={isEmailLink ? undefined : "_blank"}
+      rel={isSocialProfile ? "me noopener noreferrer" : isEmailLink ? undefined : "noopener noreferrer"}
+      aria-label={isEmailLink ? link.name : `${link.name} (opens in new tab)`}
       className={cn(
         "block w-full h-full rounded-2xl no-underline",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"

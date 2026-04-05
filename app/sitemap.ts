@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { BackendService } from '@/lib/server'
-import { getConfig } from '@/lib/core'
+import { getConfig } from '@/lib/config'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const config = getConfig()
@@ -38,6 +38,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 0.9,
     },
+    {
+      url: `${siteUrl}/blog/archive`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
     ...postEntries,
     {
       url: `${siteUrl}/blog/tags`,
@@ -46,5 +52,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     },
     ...tagEntries,
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
   ]
 }

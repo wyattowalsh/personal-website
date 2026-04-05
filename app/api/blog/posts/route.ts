@@ -7,7 +7,7 @@ export const revalidate = false;
 export const GET = coreApi.middleware.withErrorHandler(
   async (_request: Request) => {
     await BackendService.ensurePreprocessed();
-    const posts = await BackendService.getInstance().getAllPosts();
+    const posts = await BackendService.getInstance().getPostSummaries();
     return jsonResponse(posts, { cache: API_REVALIDATE_SECONDS });
   }
 );

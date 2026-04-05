@@ -1,7 +1,11 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'crypto';
-import { createRateLimiter } from './rate-limit';
+import { createRateLimitKey, createRateLimiter } from './rate-limit';
+import type { RateLimitSnapshot } from './types';
 
 const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // 24h
+const ADMIN_RATE_LIMIT_MAX = 5;
+const ADMIN_RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000;
+const ADMIN_AUTH_RATE_LIMIT_SCOPE = 'admin-auth';
 export const ADMIN_SESSION_COOKIE_NAME = 'admin_session';
 export const ADMIN_SESSION_COOKIE_MAX_AGE_SECONDS = TOKEN_EXPIRY_MS / 1000;
 export const ADMIN_SESSION_COOKIE_PATH = '/';
@@ -19,7 +23,9 @@ export function serializeAdminSessionCookie(
   return `${ADMIN_SESSION_COOKIE_NAME}=${value}; HttpOnly; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}SameSite=Strict; Max-Age=${maxAge}; Path=${path}`;
 }
 
-const SITE_HOST = new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev').host;
+function getSiteHost() {
+  return new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev').host;
+}
 
 /**
  * Validate that a request originates from the same site.
@@ -34,10 +40,11 @@ export function validateRequestOrigin(request: Request): boolean {
 
   const origin = request.headers.get('origin');
   const referer = request.headers.get('referer');
+  const siteHost = getSiteHost();
 
   if (origin) {
     try {
-      return new URL(origin).host === SITE_HOST;
+      return new URL(origin).host === siteHost;
     } catch {
       return false;
     }
@@ -45,7 +52,7 @@ export function validateRequestOrigin(request: Request): boolean {
 
   if (referer) {
     try {
-      return new URL(referer).host === SITE_HOST;
+      return new URL(referer).host === siteHost;
     } catch {
       return false;
     }
@@ -55,23 +62,30 @@ export function validateRequestOrigin(request: Request): boolean {
   return secFetchSite === 'same-origin' || secFetchSite === 'none';
 }
 
-/** @deprecated Use {@link validateRequestOrigin} instead. */
-export const validateAdminRequestOrigin = validateRequestOrigin;
-
-/** Extract client IP from proxy headers. Returns null if no IP found. */
-export function resolveClientIp(request: Request): string | null {
-  const realIp = request.headers.get('x-real-ip')?.trim();
-  if (realIp) return realIp;
-  const forwarded = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim();
-  if (forwarded) return forwarded;
+/**
+ * Standard App Router Request objects do not expose a trusted client IP.
+ * Ignore client-controlled proxy headers unless a trusted platform adapter is added.
+ */
+export function resolveClientIp(_request: Request): string | null {
   return null;
 }
 
 export function resolveAdminRateLimitKey(request: Request): string {
-  return resolveClientIp(request) ?? 'unknown';
+  const url = new URL(request.url);
+
+  return createRateLimitKey({
+    scope: ADMIN_AUTH_RATE_LIMIT_SCOPE,
+    host: getSiteHost(),
+    method: request.method.toUpperCase(),
+    path: url.pathname,
+  });
 }
 
-const rateLimiter = createRateLimiter({ max: 5, windowMs: 15 * 60 * 1000, evictAt: 1000 });
+const rateLimiter = createRateLimiter({
+  max: ADMIN_RATE_LIMIT_MAX,
+  windowMs: ADMIN_RATE_LIMIT_WINDOW_MS,
+  evictAt: 1000,
+});
 
 /** Lazy signing key — defers check to runtime so `next build` can import this module. */
 function getSigningKey(): string {
@@ -84,13 +98,28 @@ function getSigningKey(): string {
 const deriveKey = (password: string) =>
   createHmac('sha256', getSigningKey()).update(password).digest();
 
-/** HR-4: in-memory rate limiting keyed by IP */
-export function checkRateLimit(ip: string): boolean {
-  return rateLimiter.check(ip);
+/** HR-4: in-memory rate limiting keyed by trusted request metadata */
+export function checkRateLimit(key: string): boolean {
+  return rateLimiter.check(key);
 }
 
-export function clearRateLimit(ip: string): void {
-  rateLimiter.clear(ip);
+export function clearRateLimit(key: string): void {
+  rateLimiter.clear(key);
+}
+
+export function getAdminRateLimitSnapshot(limit = 10): RateLimitSnapshot[] {
+  return rateLimiter.snapshot(limit);
+}
+
+export function getAdminRateLimitSummary() {
+  const snapshot = rateLimiter.snapshot(Number.MAX_SAFE_INTEGER);
+  return {
+    trackedKeys: snapshot.length,
+    limitedKeys: snapshot.filter((entry) => entry.isLimited).length,
+    totalBlockedAttempts: snapshot.reduce((total, entry) => total + entry.blockedCount, 0),
+    maxAttempts: ADMIN_RATE_LIMIT_MAX,
+    windowMs: ADMIN_RATE_LIMIT_WINDOW_MS,
+  };
 }
 
 /** HR-3: constant-time password comparison via SHA-256 — fixed-length, no empty-string bypass */

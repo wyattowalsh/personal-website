@@ -1,5 +1,5 @@
 import { BackendService } from '@/lib/server';
-import { getConfig } from '@/lib/core';
+import { getConfig } from '@/lib/config';
 import { generateCollectionPageSchema, generateBreadcrumbSchema } from '@/lib/schema';
 import { JsonLd } from '@/components/PostSchema';
 import { Metadata } from 'next';
@@ -13,6 +13,18 @@ export const metadata: Metadata = {
   title: 'Archive',
   description: 'Browse all blog posts by date',
   alternates: { canonical: `${siteUrl}/blog/archive` },
+  openGraph: {
+    type: 'website',
+    title: 'Archive - Wyatt Walsh',
+    description: 'Browse all blog posts by date',
+    url: `${siteUrl}/blog/archive`,
+    siteName: 'Wyatt Walsh',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Archive - Wyatt Walsh',
+    description: 'Browse all blog posts by date',
+  },
 };
 
 export const dynamic = 'force-static';

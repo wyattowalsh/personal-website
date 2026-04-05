@@ -21,7 +21,10 @@ export const GET = coreApi.middleware.withErrorHandler(
     }
 
     await BackendService.ensurePreprocessed();
-    const adjacent = await BackendService.getInstance().getAdjacentPosts(slug);
+    const adjacent = await BackendService.getInstance().getAdjacentPostLinks(slug);
+    if (!adjacent) {
+      throw new ApiError(404, 'Post not found');
+    }
     return jsonResponse(adjacent, { cache: API_REVALIDATE_SECONDS });
   }
 );

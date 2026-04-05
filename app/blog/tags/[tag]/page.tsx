@@ -2,6 +2,9 @@ import { BackendService } from "@/lib/server";
 import { PostCard } from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
+import { getConfig } from "@/lib/config";
+
+const siteUrl = getConfig().site.url;
 
 export async function generateStaticParams() {
     await BackendService.ensurePreprocessed();
@@ -16,9 +19,26 @@ export async function generateMetadata({
 }: { params: Promise<{ tag: string }> }): Promise<Metadata> {
     const { tag } = await params;
     const decodedTag = decodeURIComponent(tag);
+    const canonicalUrl = `${siteUrl}/blog/tags/${encodeURIComponent(decodedTag)}`;
+
     return {
         title: `Posts tagged with #${decodedTag}`,
         description: `Browse all blog posts tagged with #${decodedTag}`,
+        alternates: {
+            canonical: canonicalUrl,
+        },
+        openGraph: {
+            type: "website",
+            title: `#${decodedTag} Posts - Wyatt Walsh`,
+            description: `Browse all blog posts tagged with #${decodedTag}`,
+            url: canonicalUrl,
+            siteName: "Wyatt Walsh",
+        },
+        twitter: {
+            card: "summary_large_image",
+            title: `#${decodedTag} Posts - Wyatt Walsh`,
+            description: `Browse all blog posts tagged with #${decodedTag}`,
+        },
     };
 }
 
@@ -35,7 +55,7 @@ export default async function TagPage({ params }: Props) {
     await BackendService.ensurePreprocessed();
     const backend = BackendService.getInstance();
     const [posts, tags] = await Promise.all([
-        backend.getAllPosts(),
+        backend.getPostSummaries(),
         backend.getAllTags()
     ]);
 

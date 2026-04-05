@@ -16,7 +16,7 @@ export const GET = coreApi.middleware.withErrorHandler(
     }
 
     await BackendService.ensurePreprocessed();
-    const post = await BackendService.getInstance().getPost(slug);
+    const post = await BackendService.getInstance().getPublicPost(slug);
     if (!post) throw new ApiError(404, 'Post not found');
     return jsonResponse(post, { cache: API_REVALIDATE_SECONDS });
   }

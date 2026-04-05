@@ -5,17 +5,34 @@ import { PostHeader } from "@/components/PostHeader";
 import { PostPagination } from "@/components/PostPagination";
 import { Comments } from "@/components/Comments";
 import { TableOfContents } from "@/components/TableOfContents";
-import { PostLayoutSeriesNav } from "@/components/PostLayoutSeriesNav";
 import { PostLayoutShareButtons } from "@/components/PostLayoutShareButtons";
 import { RelatedPosts } from "@/components/RelatedPosts";
+import { SeriesNav } from "@/components/SeriesNav";
 import { Webmentions } from "@/components/Webmentions";
 import { cn } from "@/lib/utils";
+import type { AdjacentPosts, PostMetadata } from "@/lib/types";
+
+interface SeriesNavigationData {
+	seriesName: string;
+	currentSlug: string;
+	posts: Array<{ slug: string; title: string; order: number }>;
+}
 
 interface PostLayoutProps {
 	children: React.ReactNode;
+	post: PostMetadata;
+	adjacentPosts: AdjacentPosts | null;
+	relatedPosts: PostMetadata[];
+	seriesNavigation: SeriesNavigationData | null;
 }
 
-export function PostLayout({ children }: PostLayoutProps) {
+export function PostLayout({
+	children,
+	post,
+	adjacentPosts,
+	relatedPosts,
+	seriesNavigation,
+}: PostLayoutProps) {
 	return (
 		<ErrorBoundary>
 			<article
@@ -36,15 +53,7 @@ export function PostLayout({ children }: PostLayoutProps) {
 						Failed to load post header
 					</div>
 				}>
-					<Suspense
-						fallback={
-							<div className="w-full h-48 flex items-center justify-center">
-								<LoadingSpinner size="lg" />
-							</div>
-						}
-					>
-						<PostHeader />
-					</Suspense>
+					<PostHeader post={post} />
 				</ErrorBoundary>
 
 				<hr className={cn(
@@ -54,10 +63,17 @@ export function PostLayout({ children }: PostLayoutProps) {
 					"max-w-5xl mx-auto" // Match PostHeader width
 				)} />
 
-				{/* Series navigation (top) — rendered by client wrapper that fetches series data */}
-				<ErrorBoundary>
-					<PostLayoutSeriesNav />
-				</ErrorBoundary>
+				{seriesNavigation && (
+					<ErrorBoundary>
+						<div className="max-w-5xl mx-auto not-prose">
+							<SeriesNav
+								seriesName={seriesNavigation.seriesName}
+								currentSlug={seriesNavigation.currentSlug}
+								posts={seriesNavigation.posts}
+							/>
+						</div>
+					</ErrorBoundary>
+				)}
 
 				{/* Table of contents + content area (mobile: collapsible above content, desktop: sticky sidebar) */}
 				<div className="xl:flex xl:flex-row-reverse xl:gap-8 max-w-5xl mx-auto">
@@ -99,10 +115,17 @@ export function PostLayout({ children }: PostLayoutProps) {
 					</div>
 				</ErrorBoundary>
 
-				{/* Series navigation (bottom) */}
-				<ErrorBoundary>
-					<PostLayoutSeriesNav />
-				</ErrorBoundary>
+				{seriesNavigation && (
+					<ErrorBoundary>
+						<div className="max-w-5xl mx-auto not-prose">
+							<SeriesNav
+								seriesName={seriesNavigation.seriesName}
+								currentSlug={seriesNavigation.currentSlug}
+								posts={seriesNavigation.posts}
+							/>
+						</div>
+					</ErrorBoundary>
+				)}
 
 				<hr className={cn(
 					"my-8",
@@ -116,15 +139,7 @@ export function PostLayout({ children }: PostLayoutProps) {
 						Failed to load post navigation
 					</div>
 				}>
-					<Suspense
-						fallback={
-							<div className="w-full h-24 flex items-center justify-center">
-								<LoadingSpinner />
-							</div>
-						}
-					>
-						<PostPagination />
-					</Suspense>
+					<PostPagination adjacentPosts={adjacentPosts} />
 				</ErrorBoundary>
 
 				<hr className={cn(
@@ -156,7 +171,7 @@ export function PostLayout({ children }: PostLayoutProps) {
 				{/* Related posts — after webmentions */}
 				<ErrorBoundary>
 					<div className="not-prose">
-						<RelatedPosts />
+						<RelatedPosts posts={relatedPosts} />
 					</div>
 				</ErrorBoundary>
 			</article>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { createRateLimiter } from '@/lib/rate-limit';
+import { createRateLimitKey, createRateLimiter } from '@/lib/rate-limit';
 
 describe('createRateLimiter', () => {
   afterEach(() => {
@@ -28,6 +28,20 @@ describe('createRateLimiter', () => {
     expect(limiter.check('ip-b')).toBe(true);
   });
 
+  it('resets counter exactly at window expiry boundary', () => {
+    vi.useFakeTimers();
+    const windowMs = 10_000;
+    const limiter = createRateLimiter({ max: 1, windowMs });
+
+    expect(limiter.check('ip')).toBe(true);
+    expect(limiter.check('ip')).toBe(false);
+
+    // Advance to exactly the window boundary
+    vi.advanceTimersByTime(windowMs);
+
+    expect(limiter.check('ip')).toBe(true);
+  });
+
   it('resets counter after window expires', () => {
     vi.useFakeTimers();
     const windowMs = 10_000;
@@ -50,6 +64,92 @@ describe('createRateLimiter', () => {
     limiter.clear('ip');
 
     expect(limiter.check('ip')).toBe(true);
+  });
+
+  it('snapshot() returns active entries in most-recent-first order', () => {
+    vi.useFakeTimers();
+    const limiter = createRateLimiter({ max: 3, windowMs: 10_000, evictAt: 100 });
+
+    limiter.check('snapshot-expired-ip');
+    vi.advanceTimersByTime(10_001);
+    limiter.check('snapshot-older-ip');
+    vi.advanceTimersByTime(1_000);
+    limiter.check('snapshot-newer-ip');
+
+    const snapshot = limiter.snapshot(2);
+
+    expect(snapshot).toHaveLength(2);
+    expect(snapshot.map((entry) => entry.key)).toEqual([
+      'snapshot-newer-ip',
+      'snapshot-older-ip',
+    ]);
+    expect(snapshot.find((entry) => entry.key === 'snapshot-expired-ip')).toBeUndefined();
+    expect(snapshot[0]).toMatchObject({
+      key: 'snapshot-newer-ip',
+      count: 1,
+      remaining: 2,
+      blockedCount: 0,
+      isLimited: false,
+    });
+  });
+
+  it('getState() returns current state and null after expiration', () => {
+    vi.useFakeTimers();
+    const limiter = createRateLimiter({ max: 2, windowMs: 5_000, evictAt: 100 });
+
+    expect(limiter.check('stateful-ip')).toBe(true);
+    vi.advanceTimersByTime(1_000);
+    expect(limiter.check('stateful-ip')).toBe(true);
+
+    expect(limiter.getState('stateful-ip')).toMatchObject({
+      key: 'stateful-ip',
+      count: 2,
+      remaining: 0,
+      blockedCount: 0,
+      isLimited: false,
+    });
+
+    vi.advanceTimersByTime(4_001);
+
+    expect(limiter.getState('stateful-ip')).toBeNull();
+    expect(limiter.snapshot()).toEqual([]);
+  });
+
+  it('tracks blockedCount in getState() and snapshot() and resets after the window', () => {
+    vi.useFakeTimers();
+    const windowMs = 5_000;
+    const limiter = createRateLimiter({ max: 2, windowMs, evictAt: 100 });
+
+    expect(limiter.check('blocked-ip')).toBe(true);
+    expect(limiter.check('blocked-ip')).toBe(true);
+    expect(limiter.check('blocked-ip')).toBe(false);
+    expect(limiter.check('blocked-ip')).toBe(false);
+
+    expect(limiter.getState('blocked-ip')).toMatchObject({
+      key: 'blocked-ip',
+      count: 4,
+      remaining: 0,
+      blockedCount: 2,
+      isLimited: true,
+    });
+    expect(limiter.snapshot(1)).toEqual([
+      expect.objectContaining({
+        key: 'blocked-ip',
+        blockedCount: 2,
+        isLimited: true,
+      }),
+    ]);
+
+    vi.advanceTimersByTime(windowMs + 1);
+
+    expect(limiter.check('blocked-ip')).toBe(true);
+    expect(limiter.getState('blocked-ip')).toMatchObject({
+      key: 'blocked-ip',
+      count: 1,
+      remaining: 1,
+      blockedCount: 0,
+      isLimited: false,
+    });
   });
 
   it('eviction triggers when map exceeds evictAt threshold', () => {
@@ -115,5 +215,17 @@ describe('createRateLimiter', () => {
       expect(limiter.check('ip')).toBe(true);
     }
     expect(limiter.check('ip')).toBe(false);
+  });
+});
+
+describe('createRateLimitKey', () => {
+  it('omits empty parts while preserving deterministic order', () => {
+    expect(createRateLimitKey({
+      scope: 'admin-auth',
+      host: 'w4w.dev',
+      empty: '   ',
+      path: '/api/admin/auth',
+      attempt: 0,
+    })).toBe('scope=admin-auth|host=w4w.dev|path=/api/admin/auth|attempt=0');
   });
 });

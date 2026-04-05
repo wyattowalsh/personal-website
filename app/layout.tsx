@@ -4,14 +4,13 @@ import localFont from "next/font/local";
 import "./tailwind.css";  // Tailwind v4 with config directive
 import "./globals.css";  // Custom styles (no Tailwind directives)
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { ScrollIndicator } from "@/components/ScrollIndicator";
 import { Header } from "@/components/Header";
 import { StrictMode } from "react";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { cn } from "@/lib/utils";
-import { getDefaultMetadata, getConfig } from "@/lib/core";
+import { getDefaultMetadata, getConfig } from "@/lib/config";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -38,6 +37,7 @@ const gaId = process.env.NEXT_PUBLIC_GA_ID;
 export const metadata: Metadata = {
 	metadataBase: new URL(siteUrl),
 	...getDefaultMetadata(),
+	manifest: '/manifest.json',
 	icons: {
 		icon: [
 			{ url: '/favicon.ico', sizes: '32x32' },
@@ -141,7 +141,6 @@ export default function RootLayout({
 								<main id="main-content" className="flex-1 flex flex-col pt-14 sm:pt-16">{children}</main>
 							</div>
 						</TooltipProvider>
-						<ScrollIndicator />
 					</ThemeProvider>
 					{gtmId && <GoogleTagManager gtmId={gtmId} />}
 					{gaId && <GoogleAnalytics gaId={gaId} />}

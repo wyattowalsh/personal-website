@@ -48,7 +48,25 @@ export interface AdjacentPost {
   title: string;
 }
 
-export type PostMetadata = Omit<Post, 'content' | 'wordCount' | 'adjacent'>;
+export interface AdjacentPosts {
+  previous: AdjacentPost | null;
+  next: AdjacentPost | null;
+}
+
+export type PublicPost = Omit<Post, 'createdTimestamp' | 'adjacent'>;
+
+export type PostMetadata = Omit<PublicPost, 'content' | 'wordCount'>;
+
+export interface PublicSearchMatch {
+  key: string;
+  indices: Array<[number, number]>;
+}
+
+export interface PublicPostSearchResult {
+  post: PostMetadata;
+  score: number | null;
+  matches: PublicSearchMatch[];
+}
 
 export interface PreprocessStats {
   duration: number;
@@ -57,4 +75,31 @@ export interface PreprocessStats {
   errors: number;
   memory: string;
   particleConfigPath?: string;
+}
+
+export type TelemetryLogLevel =
+  | 'debug'
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'timing';
+
+export interface LogEntry {
+  id: string;
+  timestamp: string;
+  level: TelemetryLogLevel;
+  message: string;
+  source?: string;
+  data?: string;
+}
+
+export interface RateLimitSnapshot {
+  key: string;
+  count: number;
+  remaining: number;
+  resetAt: string;
+  lastSeenAt: string;
+  blockedCount: number;
+  isLimited: boolean;
 }

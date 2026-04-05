@@ -29,7 +29,7 @@ export default function BlogRootLayout({
   return (
     <div className="flex flex-col">
       <ScrollReset />
-      <main className={cn(
+      <div className={cn(
         "container mx-auto flex-grow",
         "pt-4 sm:pt-6 md:pt-8"
       )}>
@@ -37,7 +37,7 @@ export default function BlogRootLayout({
           {children}
         </BlogLayoutContent>
         <BlogFooter />
-      </main>
+      </div>
     </div>
   );
 }

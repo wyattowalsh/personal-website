@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { api as coreApi, ApiError } from '@/lib/core';
+import { logger } from '@/lib/logger';
 import {
   ADMIN_SESSION_COOKIE_MAX_AGE_SECONDS,
   ADMIN_SESSION_COOKIE_NAME,
@@ -21,11 +22,13 @@ const loginSchema = z.object({
 export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
     if (!validateRequestOrigin(request)) {
+      logger.warning('Blocked admin auth request from invalid origin', undefined, 'admin-auth');
       throw new ApiError(403, 'Forbidden', undefined, 'FORBIDDEN_ORIGIN');
     }
 
     const rateLimitKey = resolveAdminRateLimitKey(request);
     if (!checkRateLimit(rateLimitKey)) {
+      logger.warning('Rate limited admin login attempt', { rateLimitKey }, 'admin-auth');
       throw new ApiError(429, 'Too many attempts', undefined, 'RATE_LIMITED');
     }
 
@@ -47,10 +50,12 @@ export const POST = coreApi.middleware.withErrorHandler(
 
     // HR-3 + HR-5: padded timing-safe compare + HMAC session token
     if (!adminPassword || !validatePassword(password, adminPassword)) {
+      logger.warning('Rejected admin login attempt', { rateLimitKey }, 'admin-auth');
       throw new ApiError(401, 'Invalid password');
     }
 
     const token = createSessionToken(adminPassword);
+    logger.success('Admin login successful', { rateLimitKey }, 'admin-auth');
     const response = Response.json({ success: true });
     response.headers.append(
       'Set-Cookie',

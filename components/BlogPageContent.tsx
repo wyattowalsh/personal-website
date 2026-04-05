@@ -9,9 +9,10 @@ import type { PostMetadata } from "@/lib/types";
 interface BlogPageContentProps {
   posts: PostMetadata[];
   tags: string[];
+  initialQuery: string;
 }
 
-export function BlogPageContent({ posts, tags }: BlogPageContentProps) {
+export function BlogPageContent({ posts, tags, initialQuery }: BlogPageContentProps) {
   const [showParticles, setShowParticles] = useState(false);
   const PARTICLE_DEFER_MS = 5000;
 
@@ -34,7 +35,7 @@ export function BlogPageContent({ posts, tags }: BlogPageContentProps) {
   return (
     <>
       {showParticles ? <ParticlesBackground /> : null}
-      <BlogContent posts={posts} tags={tags} />
+      <BlogContent posts={posts} tags={tags} initialQuery={initialQuery} />
     </>
   );
 }

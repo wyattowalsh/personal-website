@@ -1,6 +1,6 @@
 import { Feed } from 'feed';
 import { BackendService } from '@/lib/server';
-import { getConfig } from '@/lib/core';
+import { getConfig } from '@/lib/config';
 import { stripMdxSyntax } from '@/lib/utils';
 
 /**

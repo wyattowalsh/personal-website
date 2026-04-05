@@ -5,9 +5,10 @@ import type { PostMetadata } from "@/lib/types";
 interface BlogContentProps {
   posts: PostMetadata[];
   tags: string[];
+  initialQuery: string;
 }
 
-export function BlogContent({ posts, tags }: BlogContentProps) {
+export function BlogContent({ posts, tags, initialQuery }: BlogContentProps) {
   return (
     <div className={cn(
       "w-full",
@@ -29,7 +30,7 @@ export function BlogContent({ posts, tags }: BlogContentProps) {
           "loaded"
         )}
       >
-        <SearchBar posts={posts} tags={tags} />
+        <SearchBar posts={posts} tags={tags} initialQuery={initialQuery} />
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import 'server-only';
 import Fuse from 'fuse.js';
+import type { FuseResult, FuseResultMatch } from 'fuse.js';
 import matter from 'gray-matter';
 import path from 'path';
 import fs from 'fs/promises';
@@ -7,17 +8,52 @@ import { glob } from 'glob';
 import readingTime from 'reading-time';
 import { z } from 'zod';
 import { logger, formatters } from './logger';
-import type { Post, PostMetadata, PreprocessStats } from './types';
+import type {
+  AdjacentPost,
+  AdjacentPosts,
+  Post,
+  PostMetadata,
+  PreprocessStats,
+  PublicPost,
+  PublicPostSearchResult,
+} from './types';
 import { stripMdxSyntax } from './utils';
 import {
   SEARCH_THRESHOLD,
   API_REVALIDATE_SECONDS
 } from './constants';
 
+const FRONTMATTER_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+function isValidFrontmatterDate(value: string): boolean {
+  if (!FRONTMATTER_DATE_PATTERN.test(value)) {
+    return false;
+  }
+
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+
+  return (
+    date.getUTCFullYear() === year &&
+    date.getUTCMonth() === month - 1 &&
+    date.getUTCDate() === day
+  );
+}
+
+function parseFrontmatterDate(value: string): Date {
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+const frontmatterDateSchema = z.string().trim().min(1).refine(
+  isValidFrontmatterDate,
+  'Expected a valid YYYY-MM-DD date',
+);
+
 const frontmatterSchema = z.object({
   title: z.string().min(1),
-  created: z.string().min(1),
-  updated: z.string().optional(),
+  created: frontmatterDateSchema,
+  updated: frontmatterDateSchema.optional(),
   image: z.string().optional(),
   caption: z.string().optional(),
   summary: z.string().optional(),
@@ -26,7 +62,47 @@ const frontmatterSchema = z.object({
     name: z.string(),
     order: z.number(),
   }).optional(),
+}).superRefine((data, ctx) => {
+  if (data.updated && data.updated < data.created) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Updated date must be on or after created date',
+      path: ['updated'],
+    });
+  }
 });
+
+function toPublicPost(post: Post): PublicPost {
+  const { adjacent: _adjacent, createdTimestamp: _createdTimestamp, ...publicPost } = post;
+  return publicPost;
+}
+
+function toPostMetadata(post: Post): PostMetadata {
+  const { content: _content, wordCount: _wordCount, ...metadata } = toPublicPost(post);
+  return metadata;
+}
+
+function toAdjacentPost(post: Post | null): AdjacentPost | null {
+  if (!post) {
+    return null;
+  }
+
+  return {
+    slug: post.slug,
+    title: post.title,
+  };
+}
+
+function toPublicSearchResult(result: FuseResult<Post>): PublicPostSearchResult {
+  return {
+    post: toPostMetadata(result.item),
+    score: typeof result.score === 'number' ? result.score : null,
+    matches: result.matches?.map((match: FuseResultMatch) => ({
+      key: String(match.key),
+      indices: match.indices.map(([start, end]): [number, number] => [start, end]),
+    })) ?? [],
+  };
+}
 
 // Backend service implementation
 class BackendService {
@@ -38,12 +114,16 @@ class BackendService {
   private preprocessed: boolean = false;
   private sortedPostsCache: Post[] | null = null;
   private taggedPostsCache: Map<string, Post[]> = new Map();
+  private latestPreprocessStats: PreprocessStats | null = null;
+  private lastPreprocessedAt: string | null = null;
+  private lastPreprocessStartedAt: string | null = null;
 
   private constructor() {
     this.searchIndex = new Fuse([], {
       keys: ['title', 'summary', 'content', 'tags'],
       threshold: SEARCH_THRESHOLD,
-      includeMatches: true
+      includeMatches: true,
+      includeScore: true
     });
     this.posts = new Map();
     this.tags = new Set();
@@ -76,8 +156,11 @@ class BackendService {
 
     // Atomically assign the promise before any async work begins
     const isDev = process.env.NODE_ENV === 'development';
+    instance.lastPreprocessStartedAt = new Date().toISOString();
     const promise = instance.preprocess(isDev)
-      .then(() => {
+      .then((stats) => {
+        instance.latestPreprocessStats = stats;
+        instance.lastPreprocessedAt = new Date().toISOString();
         instance.preprocessed = true;
       })
       .catch((err) => {
@@ -94,17 +177,28 @@ class BackendService {
     return this.posts.get(slug) || null;
   }
 
+  async getPublicPost(slug: string): Promise<PublicPost | null> {
+    const post = await this.getPost(slug);
+    return post ? toPublicPost(post) : null;
+  }
+
   async getPostMetadata(slug: string): Promise<PostMetadata | null> {
     const post = await this.getPost(slug);
     if (!post) return null;
 
-    // Return only metadata fields
-    const { content: _c, wordCount: _wc, adjacent: _adj, ...metadata } = post;
-    return metadata;
+    return toPostMetadata(post);
   }
 
-  async search(query: string) {
+  async getPostSummaries(): Promise<PostMetadata[]> {
+    return (await this.getAllPosts()).map(toPostMetadata);
+  }
+
+  async search(query: string): Promise<FuseResult<Post>[]> {
     return this.searchIndex.search(query);
+  }
+
+  async searchPublic(query: string): Promise<PublicPostSearchResult[]> {
+    return (await this.search(query)).map(toPublicSearchResult);
   }
 
   async getPostsByTag(tag: string): Promise<Post[]> {
@@ -132,9 +226,32 @@ class BackendService {
     return Array.from(this.tags).sort();
   }
 
-  async getAdjacentPosts(slug: string) {
+  getTelemetryState() {
+    return {
+      preprocessed: this.preprocessed,
+      isPreprocessing: this.preprocessPromise !== null && !this.preprocessed,
+      latestPreprocessStats: this.latestPreprocessStats,
+      lastPreprocessedAt: this.lastPreprocessedAt,
+      lastPreprocessStartedAt: this.lastPreprocessStartedAt,
+      cache: {
+        sortedPostsCached: this.sortedPostsCache !== null,
+        taggedPostsCached: this.taggedPostsCache.size,
+      },
+      counts: {
+        posts: this.posts.size,
+        tags: this.tags.size,
+        searchIndexSize: this.posts.size,
+      },
+    };
+  }
+
+  async getAdjacentPosts(slug: string): Promise<{ previous: Post | null; next: Post | null } | null> {
     const posts = await this.getAllPosts();
     const index = posts.findIndex(p => p.slug === slug);
+
+    if (index === -1) {
+      return null;
+    }
 
     return {
       previous: index > 0 ? posts[index - 1] : null,
@@ -142,12 +259,24 @@ class BackendService {
     };
   }
 
-  async getRelatedPosts(slug: string, limit = 3): Promise<Post[]> {
+  async getAdjacentPostLinks(slug: string): Promise<AdjacentPosts | null> {
+    const adjacent = await this.getAdjacentPosts(slug);
+    if (!adjacent) {
+      return null;
+    }
+
+    return {
+      previous: toAdjacentPost(adjacent.previous),
+      next: toAdjacentPost(adjacent.next),
+    };
+  }
+
+  async getRelatedPosts(slug: string, limit = 3): Promise<Post[] | null> {
     const post = await this.getPost(slug);
-    if (!post) return [];
+    if (!post) return null;
 
     const allPosts = await this.getAllPosts();
-    const currentPostDate = new Date(post.created).getTime();
+    const currentPostDate = post.createdTimestamp ?? parseFrontmatterDate(post.created).getTime();
 
     return allPosts
       .filter(p => p.slug !== slug)
@@ -156,7 +285,7 @@ class BackendService {
         const totalTags = new Set([...p.tags, ...post.tags]).size;
         const tagScore = totalTags > 0 ? sharedTags / totalTags : 0;
 
-        const postDate = new Date(p.created).getTime();
+        const postDate = p.createdTimestamp ?? parseFrontmatterDate(p.created).getTime();
         const daysDiff = Math.abs(postDate - currentPostDate) / (1000 * 60 * 60 * 24);
         const recencyScore = Math.exp(-daysDiff / 365);
 
@@ -166,6 +295,11 @@ class BackendService {
       .sort((a, b) => b.score - a.score)
       .slice(0, limit)
       .map(r => r.post);
+  }
+
+  async getRelatedPostSummaries(slug: string, limit = 3): Promise<PostMetadata[] | null> {
+    const related = await this.getRelatedPosts(slug, limit);
+    return related ? related.map(toPostMetadata) : null;
   }
 
   async getSeriesPosts(seriesName: string): Promise<Post[]> {
@@ -178,59 +312,57 @@ class BackendService {
   async preprocess(isDev: boolean): Promise<PreprocessStats> {
     const startTime = Date.now();
     const errors: Error[] = [];
-    
-    logger.group('Preprocessing started');
-    logger.memory(); // Log initial memory usage
+    const nextPosts = new Map<string, Post>();
+    const nextTags = new Set<string>();
+
+    logger.info('Preprocessing started');
     logger.info(`Mode: ${isDev ? 'Development' : 'Production'}`);
 
     try {
-      // Clear caches
-      this.posts.clear();
-      this.tags.clear();
-      this.sortedPostsCache = null;
-      this.taggedPostsCache.clear();
-      logger.debug('Cleared all caches');
-
-      // Update posts directory path and use glob
       const postsDir = path.join(process.cwd(), 'content/posts');
       const files = await glob('**/index.mdx', { cwd: postsDir, absolute: true });
 
       logger.info(`Found ${files.length} posts to process`);
-      
+
       for (const filePath of files) {
         try {
           const relativePath = path.relative(postsDir, filePath);
-          logger.progress(files.indexOf(filePath) + 1, files.length, `Processing ${formatters.path(filePath)}`);
-          
+          logger.info(`Processing ${formatters.path(filePath)}`);
+
           const content = await fs.readFile(filePath, 'utf-8');
           const { data, content: markdown } = matter(content);
           const slug = path.basename(path.dirname(relativePath));
-          
-          const validated = frontmatterSchema.parse(data);
 
+          const validated = frontmatterSchema.parse(data);
           const cleanContent = stripMdxSyntax(markdown);
+          const normalizedContent = cleanContent.trim();
+          const createdDate = parseFrontmatterDate(validated.created);
+
+          if (nextPosts.has(slug)) {
+            throw new Error(`Duplicate slug detected: ${slug}`);
+          }
 
           // Calculate word count and reading time from clean content
-          const wordCount = cleanContent.trim().split(/\s+/).length;
-          const readingTimeResult = readingTime(cleanContent);
+          const wordCount = normalizedContent ? normalizedContent.split(/\s+/).length : 0;
+          const readingTimeResult = readingTime(normalizedContent);
           const readingTimeText = readingTimeResult.text;
 
           const post: Post = {
             slug,
             ...validated,
-            content: cleanContent,
+            content: normalizedContent,
             wordCount,
             readingTime: readingTimeText,
             created: validated.created,
             updated: validated.updated || validated.created,
             tags: validated.tags,
             series: validated.series,
-            createdTimestamp: new Date(validated.created).getTime(),
+            createdTimestamp: createdDate.getTime(),
           };
 
           // Validate hero image exists
           if (post.image) {
-            const imagePath = path.join(process.cwd(), 'public', post.image);
+            const imagePath = path.join(process.cwd(), 'public', post.image.replace(/^\/+/, ''));
             try {
               await fs.access(imagePath);
             } catch {
@@ -238,10 +370,10 @@ class BackendService {
             }
           }
 
-          this.posts.set(slug, post);
-          post.tags.forEach(tag => this.tags.add(tag));
+          nextPosts.set(slug, post);
+          post.tags.forEach(tag => nextTags.add(tag));
 
-          logger.file('Processed', filePath, {
+          logger.debug(`Processed: ${formatters.path(filePath)}`, {
             size: formatters.fileSize(content.length),
             tags: post.tags.length
           });
@@ -251,11 +383,28 @@ class BackendService {
         }
       }
 
+      if (nextPosts.size === 0) {
+        errors.push(new Error('Preprocessing produced no valid posts'));
+      }
+
+      if (errors.length > 0 && (!isDev || nextPosts.size === 0)) {
+        throw new AggregateError(
+          errors,
+          `Preprocessing failed for ${errors.length} content item${errors.length === 1 ? '' : 's'}`
+        );
+      }
+
+      this.posts = nextPosts;
+      this.tags = nextTags;
+      this.sortedPostsCache = null;
+      this.taggedPostsCache.clear();
+
       // Rebuild search index
       this.searchIndex = new Fuse(Array.from(this.posts.values()), {
         keys: ['title', 'summary', 'content', 'tags'],
         threshold: SEARCH_THRESHOLD,
-        includeMatches: true
+        includeMatches: true,
+        includeScore: true
       });
 
       // Log final stats
@@ -263,32 +412,28 @@ class BackendService {
       const stats: PreprocessStats = {
         duration, // Return raw duration number instead of formatted string
         postsProcessed: this.posts.size,
-        searchIndexSize: Array.from(this.posts.values()).length,
+        searchIndexSize: this.posts.size,
         errors: errors.length,
         memory: formatters.fileSize(process.memoryUsage().heapUsed)
       };
 
-      // Use formatters.duration() only for logging
-      logger.table([{
+      logger.info('Stats', {
         ...stats,
         duration: formatters.duration(duration)
-      }]);
-
-      logger.memory(); // Log final memory usage
+      });
       logger.timing('Total preprocessing time', duration);
 
       if (errors.length > 0) {
-        logger.warning(`Completed with ${errors.length} errors`);
+        logger.warning(
+          `Continuing in development with ${this.posts.size} valid posts and ${errors.length} invalid content item${errors.length === 1 ? '' : 's'}`
+        );
       } else {
         logger.success('Preprocessing completed successfully');
       }
 
-      logger.groupEnd();
       return stats;
     } catch (error) {
       logger.error('Fatal preprocessing error:', error as Error);
-      logger.memory(); // Log memory usage on error
-      logger.groupEnd();
       throw error;
     }
   }

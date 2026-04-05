@@ -1,8 +1,4 @@
-"use client";
-
 import { SocialLink } from "./SocialLink";
-import { motion, Variants } from "motion/react";
-import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import { Github, Linkedin, Twitter, Codepen, BookOpen, Mail } from 'lucide-react';
 import { Reddit } from './icons/Reddit';
@@ -60,40 +56,11 @@ export const links = [
   color: link.color || "#6a9fb5",
 }));
 
-// Explicitly type the component as React.FC
-export const Links: React.FC = () => {
-  const prefersReducedMotion = useReducedMotion();
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: prefersReducedMotion ? 0 : 0.1,
-        delayChildren: prefersReducedMotion ? 0 : 0.3,
-      }
-    }
-  };
-
-  const itemVariants: Variants = {
-    hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 400,
-        damping: 20
-      }
-    }
-  };
-
+export function Links() {
   return (
-    <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
+    <div
       className={cn(
+        "relative isolate",
         // Grid layout
         "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
         "gap-4 sm:gap-6 md:gap-8 lg:gap-10",
@@ -103,7 +70,6 @@ export const Links: React.FC = () => {
         "rounded-2xl",
         // Enhanced glass effect with proper contrast
         "bg-white/5 dark:bg-slate-900/10",
-        "backdrop-blur-xl",
         // Themed borders
         "border border-primary/10 dark:border-primary-light/10",
         // Dynamic shadows
@@ -114,35 +80,28 @@ export const Links: React.FC = () => {
         "from-primary/5 via-transparent to-accent/5",
         "dark:from-primary-light/5 dark:via-transparent dark:to-accent/5",
         // Smooth transitions
-        "transition-all duration-500 ease-in-out",
-        // Enhanced background effects
-        "after:absolute after:inset-0 after:-z-10",
-        "after:bg-gradient-to-br after:from-white/10 after:to-primary/5",
-        "after:dark:from-primary-light/5 after:dark:to-transparent",
-        "after:rounded-2xl after:blur-3xl after:transition-opacity",
-        "hover:after:opacity-100"
+        "motion-safe:transition-shadow motion-safe:duration-300 motion-safe:ease-out",
+        "motion-reduce:transition-none",
+        // Lightweight background effects
+        "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-2xl",
+        "before:bg-gradient-to-br before:from-white/10 before:to-primary/5",
+        "before:opacity-70 dark:before:from-primary-light/5 dark:before:to-transparent",
       )}
     >
-      {links.map((link, index) => (
-        <motion.div
+      {links.map((link) => (
+        <div
           key={link.name}
-          variants={itemVariants}
-          custom={index}
           className={cn(
             "w-full",
             "min-h-[100px] sm:min-h-[120px]",
-            // Add hover state feedback
-            "group",
-            "transition-transform duration-500",
             "hover:z-10",
             // Ensure proper stacking
             "relative isolate",
           )}
         >
           <SocialLink link={link} />
-        </motion.div>
+        </div>
       ))}
-    </motion.div>
+    </div>
   );
-};
-
+}

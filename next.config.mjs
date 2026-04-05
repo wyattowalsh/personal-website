@@ -1,30 +1,20 @@
 // next.config.mjs
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import withBundleAnalyzer from '@next/bundle-analyzer'
 
 const isDev = process.env.NODE_ENV !== 'production'
-
-/** @returns {string | null} */
-function getLinkRewriteDestination() {
-  const rawTarget = process.env.LINK_REWRITE_TARGET?.trim()
-  if (!rawTarget) return null
-
-  try {
-    const targetUrl = new URL(rawTarget)
-    if (!['http:', 'https:'].includes(targetUrl.protocol)) return null
-
-    const basePath = targetUrl.pathname === '/' ? '' : targetUrl.pathname.replace(/\/$/, '')
-    return `${targetUrl.origin}${basePath}/l/:path*`
-  } catch {
-    return null
-  }
-}
-
-const linkRewriteDestination = getLinkRewriteDestination()
+const repoRoot = path.dirname(fileURLToPath(import.meta.url))
 
 // CSP builder
+// Note: 'unsafe-inline' in script-src is required by next-themes (FOUC-prevention
+// inline script) and @next/third-parties GTM/GA snippets. Removing it requires
+// nonce-based CSP via Next.js middleware — tracked as a future hardening task.
+// 'unsafe-inline' in style-src is required by React inline styles and Tailwind.
 function buildCsp() {
   const scriptSrc = [
     "'self'", "'unsafe-inline'", "'wasm-unsafe-eval'",
+    ...(isDev ? ["'unsafe-eval'"] : []),
     'https://giscus.app', 'https://www.googletagmanager.com',
     'https://www.google-analytics.com', 'https://*.sentry.io',
     'https://va.vercel-scripts.com',
@@ -66,7 +56,9 @@ const nextConfig = {
   },
   // Turbopack is the default bundler in Next.js 16; the webpack config below
   // is kept for compatibility when explicitly using --webpack.
-  turbopack: {},
+  turbopack: {
+    root: repoRoot,
+  },
   webpack: (config) => {
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -74,16 +66,6 @@ const nextConfig = {
       path: false,
     }
     return config
-  },
-  async rewrites() {
-    if (!linkRewriteDestination) return []
-
-    return [
-      {
-        source: '/l/:path*',
-        destination: linkRewriteDestination,
-      },
-    ]
   },
   async headers() {
     return [

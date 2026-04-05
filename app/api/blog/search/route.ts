@@ -8,7 +8,7 @@ export const GET = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
     const { query } = await coreApi.middleware.validateRequest(request, schemas.search);
     await BackendService.ensurePreprocessed();
-    const results = await BackendService.getInstance().search(query);
+    const results = await BackendService.getInstance().searchPublic(query);
     return jsonResponse(results, { cache: API_REVALIDATE_SECONDS });
   }
 );

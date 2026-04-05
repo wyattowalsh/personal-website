@@ -2,18 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const mockSearchResults = [
   {
-    item: {
+    post: {
       slug: 'test-post-1',
       title: 'Test Post 1',
       created: '2025-01-15',
+      updated: '2025-01-15',
       tags: ['typescript'],
     },
-    refIndex: 0,
     score: 0.1,
+    matches: [{ key: 'title', indices: [[0, 3] as [number, number]] }],
   },
 ];
 
-const mockSearch = vi.fn((query: string) => {
+const mockSearchPublic = vi.fn((query: string) => {
   if (query === 'test') return Promise.resolve(mockSearchResults);
   return Promise.resolve([]);
 });
@@ -23,7 +24,7 @@ vi.mock('@/lib/server', () => ({
   BackendService: {
     ensurePreprocessed: () => mockEnsurePreprocessed(),
     getInstance: () => ({
-      search: mockSearch,
+      searchPublic: mockSearchPublic,
     }),
   },
   jsonResponse: (data: unknown, _options?: unknown) =>
@@ -53,14 +54,15 @@ describe('GET /api/blog/search', () => {
 
     const body = await response.json();
     expect(body.data).toHaveLength(1);
-    expect(body.data[0].item.slug).toBe('test-post-1');
+    expect(body.data[0].post.slug).toBe('test-post-1');
+    expect(body.data[0].post).not.toHaveProperty('content');
   });
 
-  it('calls search with the provided query', async () => {
+  it('calls searchPublic with the provided query', async () => {
     const request = new Request('http://localhost/api/blog/search?query=test');
     await GET(request);
 
-    expect(mockSearch).toHaveBeenCalledWith('test');
+    expect(mockSearchPublic).toHaveBeenCalledWith('test');
   });
 
   it('calls ensurePreprocessed before searching', async () => {
@@ -100,7 +102,7 @@ describe('GET /api/blog/search', () => {
   });
 
   it('returns 500 when search throws unexpectedly', async () => {
-    mockSearch.mockRejectedValueOnce(new Error('Search engine down'));
+    mockSearchPublic.mockRejectedValueOnce(new Error('Search engine down'));
     const request = new Request('http://localhost/api/blog/search?query=test');
     const response = await GET(request);
     expect(response.status).toBe(500);

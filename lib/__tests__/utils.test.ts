@@ -35,6 +35,16 @@ describe('stripMdxSyntax', () => {
     const input = 'Before <ArticleJsonLd title="Test" /> After';
     expect(stripMdxSyntax(input)).toBe('Before  After');
   });
+
+  it('strips markdown presentation syntax while preserving readable text', () => {
+    const input = '# Heading\n\n**Bold** and *italic* with [Link](https://example.com) and `code`\n- item';
+    expect(stripMdxSyntax(input)).toBe('Heading\n\nBold and italic with Link and code\nitem');
+  });
+
+  it('strips fenced code blocks and image markup without leaking delimiters', () => {
+    const input = '![Diagram](/diagram.png)\n\n```ts\nconst value = 1;\n```';
+    expect(stripMdxSyntax(input)).toBe('Diagram\n\nconst value = 1;');
+  });
 });
 
 describe('formatDate', () => {

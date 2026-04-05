@@ -21,7 +21,10 @@ export const GET = coreApi.middleware.withErrorHandler(
     }
 
     await BackendService.ensurePreprocessed();
-    const related = await BackendService.getInstance().getRelatedPosts(slug);
+    const related = await BackendService.getInstance().getRelatedPostSummaries(slug);
+    if (!related) {
+      throw new ApiError(404, 'Post not found');
+    }
     return jsonResponse(related, { cache: API_REVALIDATE_SECONDS });
   }
 );

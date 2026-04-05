@@ -11,6 +11,7 @@ const mockPosts: Post[] = [
     content: 'Test content one',
     wordCount: 3,
     readingTime: '1 min read',
+    createdTimestamp: 1736899200000,
   },
   {
     slug: 'test-post-2',
@@ -21,30 +22,37 @@ const mockPosts: Post[] = [
     content: 'Test content two',
     wordCount: 3,
     readingTime: '1 min read',
+    createdTimestamp: 1736467200000,
   },
 ];
 
-const mockGetAdjacentPosts = vi.fn((slug: string) => {
+const mockGetAdjacentPostLinks = vi.fn((slug: string) => {
   const idx = mockPosts.findIndex((p) => p.slug === slug);
+  if (idx === -1) {
+    return Promise.resolve(null);
+  }
+
   return Promise.resolve({
-    previous: idx > 0 ? mockPosts[idx - 1] : null,
-    next: idx < mockPosts.length - 1 ? mockPosts[idx + 1] : null,
+    previous: idx > 0 ? { slug: mockPosts[idx - 1].slug, title: mockPosts[idx - 1].title } : null,
+    next: idx < mockPosts.length - 1 ? { slug: mockPosts[idx + 1].slug, title: mockPosts[idx + 1].title } : null,
   });
 });
 
-const mockGetRelatedPosts = vi.fn((_slug: string) =>
-  Promise.resolve([mockPosts[1]])
-);
+const mockGetRelatedPostSummaries = vi.fn((slug: string) => {
+  if (!mockPosts.find((post) => post.slug === slug)) {
+    return Promise.resolve(null);
+  }
 
-const mockGetPost = vi.fn((slug: string) => {
-  const post = mockPosts.find((p) => p.slug === slug) ?? null;
-  return Promise.resolve(post);
+  return Promise.resolve([
+    (({ content: _content, wordCount: _wordCount, adjacent: _adjacent, createdTimestamp: _createdTimestamp, ...metadata }) => metadata)(mockPosts[1]),
+  ]);
 });
 
 const mockGetPostMetadata = vi.fn((slug: string) => {
   const post = mockPosts.find((p) => p.slug === slug);
   if (!post) return Promise.resolve(null);
-  const { content, wordCount, ...metadata } = post;
+
+  const { content: _content, wordCount: _wordCount, adjacent: _adjacent, createdTimestamp: _createdTimestamp, ...metadata } = post;
   return Promise.resolve(metadata);
 });
 
@@ -54,9 +62,8 @@ vi.mock('@/lib/server', () => ({
   BackendService: {
     ensurePreprocessed: () => mockEnsurePreprocessed(),
     getInstance: () => ({
-      getAdjacentPosts: mockGetAdjacentPosts,
-      getRelatedPosts: mockGetRelatedPosts,
-      getPost: mockGetPost,
+      getAdjacentPostLinks: mockGetAdjacentPostLinks,
+      getRelatedPostSummaries: mockGetRelatedPostSummaries,
       getPostMetadata: mockGetPostMetadata,
     }),
   },
@@ -76,7 +83,6 @@ import { GET as getAdjacent } from '../blog/posts/[slug]/adjacent/route';
 import { GET as getRelated } from '../blog/posts/[slug]/related/route';
 import { GET as getMetadata } from '../blog/posts/[slug]/metadata/route';
 
-// Helper to create props with slug
 function makeProps(slug: string) {
   return { params: Promise.resolve({ slug }) };
 }
@@ -84,14 +90,22 @@ function makeProps(slug: string) {
 describe('GET /api/blog/posts/[slug]/adjacent', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('returns adjacent posts for a valid slug', async () => {
+  it('returns adjacent post links for a valid slug', async () => {
     const request = new Request('http://localhost/api/blog/posts/test-post-1/adjacent');
     const response = await getAdjacent(request, makeProps('test-post-1'));
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.data.previous).toBeNull();
-    expect(body.data.next).toBeDefined();
-    expect(body.data.next.slug).toBe('test-post-2');
+    expect(body.data.next).toEqual({
+      slug: 'test-post-2',
+      title: 'Test Post 2',
+    });
+  });
+
+  it('returns 404 for a missing slug', async () => {
+    const request = new Request('http://localhost/api/blog/posts/nonexistent/adjacent');
+    const response = await getAdjacent(request, makeProps('nonexistent'));
+    expect(response.status).toBe(404);
   });
 
   it('returns 400 for an invalid slug', async () => {
@@ -110,13 +124,21 @@ describe('GET /api/blog/posts/[slug]/adjacent', () => {
 describe('GET /api/blog/posts/[slug]/related', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('returns related posts for a valid slug', async () => {
+  it('returns related post summaries for a valid slug', async () => {
     const request = new Request('http://localhost/api/blog/posts/test-post-1/related');
     const response = await getRelated(request, makeProps('test-post-1'));
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.data).toHaveLength(1);
     expect(body.data[0].slug).toBe('test-post-2');
+    expect(body.data[0]).not.toHaveProperty('content');
+    expect(body.data[0]).not.toHaveProperty('createdTimestamp');
+  });
+
+  it('returns 404 for a missing slug', async () => {
+    const request = new Request('http://localhost/api/blog/posts/nonexistent/related');
+    const response = await getRelated(request, makeProps('nonexistent'));
+    expect(response.status).toBe(404);
   });
 
   it('returns 400 for an invalid slug', async () => {
@@ -141,6 +163,9 @@ describe('GET /api/blog/posts/[slug]/metadata', () => {
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.data.slug).toBe('test-post-1');
+    expect(body.data).not.toHaveProperty('content');
+    expect(body.data).not.toHaveProperty('wordCount');
+    expect(body.data).not.toHaveProperty('createdTimestamp');
   });
 
   it('returns 404 for a missing slug', async () => {
@@ -162,17 +187,14 @@ describe('GET /api/blog/posts/[slug]/metadata', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// Error handling — unexpected exceptions (HR-S-012)
-// ---------------------------------------------------------------------------
 describe('error handling — unexpected exceptions', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(console, 'error').mockImplementation(() => {});
   });
 
-  it('returns 500 when getAdjacentPosts throws', async () => {
-    mockGetAdjacentPosts.mockRejectedValueOnce(new Error('db connection failed'));
+  it('returns 500 when getAdjacentPostLinks throws', async () => {
+    mockGetAdjacentPostLinks.mockRejectedValueOnce(new Error('db connection failed'));
     const request = new Request('http://localhost/api/blog/posts/test-post-1/adjacent');
     const response = await getAdjacent(request, makeProps('test-post-1'));
     expect(response.status).toBe(500);
@@ -181,8 +203,8 @@ describe('error handling — unexpected exceptions', () => {
     expect(body.error.message).toBe('Internal server error');
   });
 
-  it('returns 500 when getRelatedPosts throws', async () => {
-    mockGetRelatedPosts.mockRejectedValueOnce(new Error('unexpected failure'));
+  it('returns 500 when getRelatedPostSummaries throws', async () => {
+    mockGetRelatedPostSummaries.mockRejectedValueOnce(new Error('unexpected failure'));
     const request = new Request('http://localhost/api/blog/posts/test-post-1/related');
     const response = await getRelated(request, makeProps('test-post-1'));
     expect(response.status).toBe(500);

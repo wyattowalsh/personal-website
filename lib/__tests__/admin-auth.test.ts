@@ -2,10 +2,13 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   checkRateLimit,
   clearRateLimit,
+  getAdminRateLimitSnapshot,
+  getAdminRateLimitSummary,
   validatePassword,
   createSessionToken,
   validateSessionToken,
   validateRequestOrigin,
+  resolveAdminRateLimitKey,
   resolveClientIp,
 } from '@/lib/admin-auth';
 
@@ -111,7 +114,91 @@ describe('checkRateLimit', () => {
   });
 });
 
+describe('admin rate limit helpers', () => {
+  const windowMs = 15 * 60 * 1000;
+  const trackedIps = [
+    'admin-snapshot-expired-ip',
+    'admin-snapshot-older-ip',
+    'admin-snapshot-newer-ip',
+    'admin-summary-expired-ip',
+    'admin-summary-limited-ip',
+    'admin-summary-active-ip',
+  ];
+
+  beforeEach(() => {
+    trackedIps.forEach(clearRateLimit);
+  });
+
+  afterEach(() => {
+    trackedIps.forEach(clearRateLimit);
+    vi.useRealTimers();
+  });
+
+  it('getAdminRateLimitSnapshot returns recent active entries only', () => {
+    vi.useFakeTimers();
+
+    checkRateLimit('admin-snapshot-expired-ip');
+    vi.advanceTimersByTime(windowMs + 1);
+    checkRateLimit('admin-snapshot-older-ip');
+    vi.advanceTimersByTime(1_000);
+    checkRateLimit('admin-snapshot-newer-ip');
+
+    const snapshot = getAdminRateLimitSnapshot(5);
+
+    expect(snapshot).toHaveLength(2);
+    expect(snapshot.map((entry) => entry.key)).toEqual([
+      'admin-snapshot-newer-ip',
+      'admin-snapshot-older-ip',
+    ]);
+    expect(snapshot.find((entry) => entry.key === 'admin-snapshot-expired-ip')).toBeUndefined();
+    expect(snapshot[0]).toMatchObject({
+      key: 'admin-snapshot-newer-ip',
+      count: 1,
+      remaining: 4,
+      blockedCount: 0,
+      isLimited: false,
+    });
+  });
+
+  it('getAdminRateLimitSummary aggregates active limited entries and blocked attempts', () => {
+    vi.useFakeTimers();
+
+    checkRateLimit('admin-summary-expired-ip');
+    vi.advanceTimersByTime(windowMs + 1);
+
+    for (let i = 0; i < 7; i++) {
+      checkRateLimit('admin-summary-limited-ip');
+    }
+
+    checkRateLimit('admin-summary-active-ip');
+
+    expect(getAdminRateLimitSummary()).toEqual({
+      trackedKeys: 2,
+      limitedKeys: 1,
+      totalBlockedAttempts: 2,
+      maxAttempts: 5,
+      windowMs,
+    });
+  });
+
+  it('getAdminRateLimitSummary includes all entries even when there are more than 100', () => {
+    vi.useFakeTimers();
+    
+    // Add 150 different IPs
+    for (let i = 0; i < 150; i++) {
+      checkRateLimit(`ip-${i}`);
+    }
+    
+    const summary = getAdminRateLimitSummary();
+    expect(summary.trackedKeys).toBe(150);
+  });
+});
+
 describe('validateRequestOrigin', () => {
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://w4w.dev');
+  });
+
   afterEach(() => {
     vi.unstubAllEnvs();
   });
@@ -180,46 +267,75 @@ describe('validateRequestOrigin', () => {
 });
 
 describe('resolveClientIp', () => {
-  it('returns x-real-ip when present', () => {
+  it('ignores x-real-ip because it is client-controlled', () => {
     const req = new Request('http://localhost:3000/api/test', {
       headers: { 'x-real-ip': '192.168.1.1' },
     });
-    expect(resolveClientIp(req)).toBe('192.168.1.1');
+    expect(resolveClientIp(req)).toBeNull();
   });
 
-  it('returns first IP from x-forwarded-for', () => {
+  it('ignores x-forwarded-for because it is client-controlled', () => {
     const req = new Request('http://localhost:3000/api/test', {
       headers: { 'x-forwarded-for': '10.0.0.1, 10.0.0.2, 10.0.0.3' },
     });
-    expect(resolveClientIp(req)).toBe('10.0.0.1');
+    expect(resolveClientIp(req)).toBeNull();
   });
 
-  it('prefers x-real-ip over x-forwarded-for', () => {
+  it('returns null when both proxy IP headers are present', () => {
     const req = new Request('http://localhost:3000/api/test', {
       headers: {
         'x-real-ip': '192.168.1.1',
         'x-forwarded-for': '10.0.0.1, 10.0.0.2',
       },
     });
-    expect(resolveClientIp(req)).toBe('192.168.1.1');
-  });
-
-  it('returns null when no IP headers present', () => {
-    const req = new Request('http://localhost:3000/api/test');
     expect(resolveClientIp(req)).toBeNull();
   });
 
-  it('trims whitespace from x-real-ip', () => {
-    const req = new Request('http://localhost:3000/api/test', {
-      headers: { 'x-real-ip': '  192.168.1.1  ' },
-    });
-    expect(resolveClientIp(req)).toBe('192.168.1.1');
+  it('returns null when no trusted client IP metadata is available', () => {
+    const req = new Request('http://localhost:3000/api/test');
+    expect(resolveClientIp(req)).toBeNull();
+  });
+});
+
+describe('resolveAdminRateLimitKey', () => {
+  beforeEach(() => {
+    vi.stubEnv('NEXT_PUBLIC_SITE_URL', 'https://w4w.dev');
   });
 
-  it('trims whitespace from x-forwarded-for entries', () => {
-    const req = new Request('http://localhost:3000/api/test', {
-      headers: { 'x-forwarded-for': '  10.0.0.1 , 10.0.0.2' },
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('uses trusted route metadata instead of proxy headers', () => {
+    const reqWithProxyHeaders = new Request('http://localhost:3000/api/admin/auth', {
+      method: 'POST',
+      headers: {
+        'x-real-ip': '192.168.1.1',
+        'x-forwarded-for': '10.0.0.1, 10.0.0.2',
+      },
     });
-    expect(resolveClientIp(req)).toBe('10.0.0.1');
+    const reqWithoutProxyHeaders = new Request('http://localhost:3000/api/admin/auth', {
+      method: 'POST',
+    });
+
+    expect(resolveAdminRateLimitKey(reqWithProxyHeaders)).toBe(
+      resolveAdminRateLimitKey(reqWithoutProxyHeaders)
+    );
+    expect(resolveAdminRateLimitKey(reqWithProxyHeaders)).toBe(
+      'scope=admin-auth|host=w4w.dev|method=POST|path=/api/admin/auth'
+    );
+  });
+
+  it('changes when trusted route metadata changes', () => {
+    const loginRequest = new Request('http://localhost:3000/api/admin/auth', {
+      method: 'POST',
+    });
+    const statusRequest = new Request('http://localhost:3000/api/admin/auth', {
+      method: 'GET',
+    });
+
+    expect(resolveAdminRateLimitKey(loginRequest)).not.toBe(
+      resolveAdminRateLimitKey(statusRequest)
+    );
   });
 });

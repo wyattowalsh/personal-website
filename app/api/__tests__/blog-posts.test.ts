@@ -11,6 +11,7 @@ const mockPosts: Post[] = [
     content: 'Test content one',
     wordCount: 3,
     readingTime: '1 min read',
+    createdTimestamp: 1736899200000,
   },
   {
     slug: 'test-post-2',
@@ -21,13 +22,23 @@ const mockPosts: Post[] = [
     content: 'Test content two',
     wordCount: 3,
     readingTime: '1 min read',
+    createdTimestamp: 1736467200000,
   },
 ];
 
-const mockGetAllPosts = vi.fn(() => Promise.resolve(mockPosts));
-const mockGetPost = vi.fn((slug: string) => {
+const mockGetPostSummaries = vi.fn(() =>
+  Promise.resolve(
+    mockPosts.map(({ content: _content, wordCount: _wordCount, adjacent: _adjacent, createdTimestamp: _createdTimestamp, ...metadata }) => metadata),
+  ),
+);
+const mockGetPublicPost = vi.fn((slug: string) => {
   const post = mockPosts.find((p) => p.slug === slug) ?? null;
-  return Promise.resolve(post);
+  if (!post) {
+    return Promise.resolve(null);
+  }
+
+  const { adjacent: _adjacent, createdTimestamp: _createdTimestamp, ...publicPost } = post;
+  return Promise.resolve(publicPost);
 });
 const mockEnsurePreprocessed = vi.fn(() => Promise.resolve());
 
@@ -35,8 +46,8 @@ vi.mock('@/lib/server', () => ({
   BackendService: {
     ensurePreprocessed: () => mockEnsurePreprocessed(),
     getInstance: () => ({
-      getAllPosts: mockGetAllPosts,
-      getPost: mockGetPost,
+      getPostSummaries: mockGetPostSummaries,
+      getPublicPost: mockGetPublicPost,
     }),
   },
   jsonResponse: (data: unknown, _options?: unknown) =>
@@ -59,7 +70,7 @@ describe('GET /api/blog/posts', () => {
     vi.clearAllMocks();
   });
 
-  it('returns an array of posts', async () => {
+  it('returns an array of lean post summaries', async () => {
     const request = new Request('http://localhost/api/blog/posts');
     const response = await getAll(request);
 
@@ -69,6 +80,9 @@ describe('GET /api/blog/posts', () => {
     expect(body.data).toHaveLength(2);
     expect(body.data[0].slug).toBe('test-post-1');
     expect(body.data[1].slug).toBe('test-post-2');
+    expect(body.data[0]).not.toHaveProperty('content');
+    expect(body.data[0]).not.toHaveProperty('wordCount');
+    expect(body.data[0]).not.toHaveProperty('createdTimestamp');
   });
 
   it('calls ensurePreprocessed before fetching', async () => {
@@ -88,7 +102,7 @@ describe('GET /api/blog/posts', () => {
   });
 
   it('returns 500 when BackendService throws unexpectedly', async () => {
-    mockGetAllPosts.mockRejectedValueOnce(new Error('DB down'));
+    mockGetPostSummaries.mockRejectedValueOnce(new Error('DB down'));
     const request = new Request('http://localhost/api/blog/posts');
     const response = await getAll(request);
     expect(response.status).toBe(500);
@@ -100,7 +114,7 @@ describe('GET /api/blog/posts/[slug]', () => {
     vi.clearAllMocks();
   });
 
-  it('returns a single post by slug', async () => {
+  it('returns a public post by slug without internal timestamps', async () => {
     const request = new Request('http://localhost/api/blog/posts/test-post-1');
     const response = await getBySlug(request, {
       params: Promise.resolve({ slug: 'test-post-1' }),
@@ -111,6 +125,8 @@ describe('GET /api/blog/posts/[slug]', () => {
     const body = await response.json();
     expect(body.data.slug).toBe('test-post-1');
     expect(body.data.title).toBe('Test Post 1');
+    expect(body.data.content).toBe('Test content one');
+    expect(body.data).not.toHaveProperty('createdTimestamp');
   });
 
   it('returns 404 for a missing slug', async () => {
@@ -147,7 +163,7 @@ describe('GET /api/blog/posts/[slug]', () => {
   });
 
   it('returns 500 when BackendService throws unexpectedly', async () => {
-    mockGetPost.mockRejectedValueOnce(new Error('DB down'));
+    mockGetPublicPost.mockRejectedValueOnce(new Error('DB down'));
     const request = new Request('http://localhost/api/blog/posts/test-post-1');
     const response = await getBySlug(request, {
       params: Promise.resolve({ slug: 'test-post-1' }),

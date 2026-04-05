@@ -1,4 +1,6 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import path from 'path';
+import * as fs from 'fs/promises';
+import { describe, it, expect, vi, beforeAll, afterEach } from 'vitest';
 import { BackendService, jsonResponse } from '../server';
 
 describe('BackendService', () => {
@@ -125,6 +127,10 @@ describe('BackendService', () => {
       expect(allPosts.length).toBeGreaterThanOrEqual(3);
       const middleSlug = allPosts[1].slug;
       const adjacent = await backend.getAdjacentPosts(middleSlug);
+      expect(adjacent).not.toBeNull();
+      if (!adjacent) {
+        return;
+      }
       expect(adjacent.previous).not.toBeNull();
       expect(adjacent.next).not.toBeNull();
       expect(adjacent.previous!.slug).toBe(allPosts[0].slug);
@@ -136,6 +142,10 @@ describe('BackendService', () => {
       const allPosts = await backend.getAllPosts();
       const firstSlug = allPosts[0].slug;
       const adjacent = await backend.getAdjacentPosts(firstSlug);
+      expect(adjacent).not.toBeNull();
+      if (!adjacent) {
+        return;
+      }
       expect(adjacent.previous).toBeNull();
       expect(adjacent.next).not.toBeNull();
     });
@@ -145,19 +155,18 @@ describe('BackendService', () => {
       const allPosts = await backend.getAllPosts();
       const lastSlug = allPosts[allPosts.length - 1].slug;
       const adjacent = await backend.getAdjacentPosts(lastSlug);
+      expect(adjacent).not.toBeNull();
+      if (!adjacent) {
+        return;
+      }
       expect(adjacent.previous).not.toBeNull();
       expect(adjacent.next).toBeNull();
     });
 
-    it('returns null previous for unknown slug (findIndex returns -1)', async () => {
+    it('returns null for unknown slug', async () => {
       const backend = BackendService.getInstance();
       const adjacent = await backend.getAdjacentPosts('nonexistent-slug');
-      // When slug is not found, findIndex returns -1:
-      // - previous: index > 0 → false → null
-      // - next: index < posts.length - 1 → true → posts[0]
-      // This is a known edge case in the current implementation
-      expect(adjacent.previous).toBeNull();
-      expect(adjacent.next).not.toBeNull();
+      expect(adjacent).toBeNull();
     });
   });
 
@@ -191,7 +200,7 @@ describe('BackendService', () => {
   });
 
   describe('getPostMetadata', () => {
-    it('returns metadata without content, wordCount, or adjacent fields', async () => {
+    it('returns metadata without content, wordCount, adjacent, or createdTimestamp fields', async () => {
       const backend = BackendService.getInstance();
       const metadata = await backend.getPostMetadata('proxywhirl');
       expect(metadata).not.toBeNull();
@@ -201,6 +210,7 @@ describe('BackendService', () => {
       expect(metadata).not.toHaveProperty('content');
       expect(metadata).not.toHaveProperty('wordCount');
       expect(metadata).not.toHaveProperty('adjacent');
+      expect(metadata).not.toHaveProperty('createdTimestamp');
     });
 
     it('returns null for unknown slug', async () => {
@@ -224,21 +234,29 @@ describe('BackendService', () => {
     it('returns posts sorted by tag similarity + recency', async () => {
       const backend = BackendService.getInstance();
       const related = await backend.getRelatedPosts('proxywhirl');
+      expect(related).not.toBeNull();
+      if (!related) {
+        return;
+      }
       expect(related.length).toBeGreaterThan(0);
       expect(related.length).toBeLessThanOrEqual(3);
       // Should not include the source post
       expect(related.every(p => p.slug !== 'proxywhirl')).toBe(true);
     });
 
-    it('returns empty array for unknown slug', async () => {
+    it('returns null for unknown slug', async () => {
       const backend = BackendService.getInstance();
       const related = await backend.getRelatedPosts('nonexistent-post');
-      expect(related).toEqual([]);
+      expect(related).toBeNull();
     });
 
     it('respects the limit parameter', async () => {
       const backend = BackendService.getInstance();
       const related = await backend.getRelatedPosts('proxywhirl', 1);
+      expect(related).not.toBeNull();
+      if (!related) {
+        return;
+      }
       expect(related.length).toBeLessThanOrEqual(1);
     });
 
@@ -247,6 +265,10 @@ describe('BackendService', () => {
       const related = await backend.getRelatedPosts('proxywhirl');
       const sourcePost = await backend.getPost('proxywhirl');
       expect(sourcePost).not.toBeNull();
+      expect(related).not.toBeNull();
+      if (!related) {
+        return;
+      }
 
       // All returned posts should share at least one tag with the source
       // (since tag score is weighted 0.7 and recency 0.3, posts with zero
@@ -263,6 +285,10 @@ describe('BackendService', () => {
       const backend = BackendService.getInstance();
       const related = await backend.getRelatedPosts('proxywhirl', 100);
       const allPosts = await backend.getAllPosts();
+      expect(related).not.toBeNull();
+      if (!related) {
+        return;
+      }
       // At most allPosts.length - 1 (excluding the source post)
       expect(related.length).toBeLessThanOrEqual(allPosts.length - 1);
     });
@@ -270,6 +296,10 @@ describe('BackendService', () => {
     it('returns related posts that share tags with the regression series', async () => {
       const backend = BackendService.getInstance();
       const related = await backend.getRelatedPosts('regularized-linear-regression-models-pt1');
+      expect(related).not.toBeNull();
+      if (!related) {
+        return;
+      }
       expect(related.length).toBeGreaterThan(0);
 
       // The regression pt2 and pt3 share identical tags, so they should appear
@@ -306,6 +336,132 @@ describe('BackendService', () => {
       const backend = BackendService.getInstance();
       const series = await backend.getSeriesPosts('');
       expect(series).toEqual([]);
+    });
+  });
+
+  describe('public DTO helpers', () => {
+    it('getPostSummaries omits content and internal timestamps', async () => {
+      const backend = BackendService.getInstance();
+      const summaries = await backend.getPostSummaries();
+
+      expect(summaries.length).toBeGreaterThan(0);
+      expect(summaries[0]).not.toHaveProperty('content');
+      expect(summaries[0]).not.toHaveProperty('wordCount');
+      expect(summaries[0]).not.toHaveProperty('createdTimestamp');
+    });
+
+    it('getPublicPost preserves content while hiding internal fields', async () => {
+      const backend = BackendService.getInstance();
+      const post = await backend.getPublicPost('proxywhirl');
+
+      expect(post).not.toBeNull();
+      expect(post).toHaveProperty('content');
+      expect(post).not.toHaveProperty('createdTimestamp');
+      expect(post).not.toHaveProperty('adjacent');
+    });
+
+    it('getAdjacentPostLinks returns minimal post references', async () => {
+      const backend = BackendService.getInstance();
+      const allPosts = await backend.getAllPosts();
+      const adjacent = await backend.getAdjacentPostLinks(allPosts[1].slug);
+
+      expect(adjacent).not.toBeNull();
+      expect(adjacent?.previous).toEqual({
+        slug: allPosts[0].slug,
+        title: allPosts[0].title,
+      });
+      expect(adjacent?.next).toEqual({
+        slug: allPosts[2].slug,
+        title: allPosts[2].title,
+      });
+    });
+
+    it('getRelatedPostSummaries returns lean metadata', async () => {
+      const backend = BackendService.getInstance();
+      const related = await backend.getRelatedPostSummaries('proxywhirl', 1);
+
+      expect(related).not.toBeNull();
+      expect(related).toHaveLength(1);
+      expect(related?.[0]).not.toHaveProperty('content');
+      expect(related?.[0]).not.toHaveProperty('createdTimestamp');
+    });
+
+    it('searchPublic strips full post content from search results', async () => {
+      const backend = BackendService.getInstance();
+      const results = await backend.searchPublic('ProxyWhirl');
+
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].post.slug).toBe('proxywhirl');
+      expect(results[0].post).not.toHaveProperty('content');
+      expect(Array.isArray(results[0].matches)).toBe(true);
+    });
+  });
+
+  describe('preprocess validation', () => {
+    const invalidSlug = '__vitest-invalid-date';
+    const validSlug = '__vitest-valid-post';
+
+    async function writePost(slug: string, content: string) {
+      const postDir = path.join(process.cwd(), 'content/posts', slug);
+      await fs.mkdir(postDir, { recursive: true });
+      await fs.writeFile(path.join(postDir, 'index.mdx'), content, 'utf-8');
+    }
+
+    afterEach(async () => {
+      vi.restoreAllMocks();
+      await fs.rm(path.join(process.cwd(), 'content/posts', invalidSlug), { recursive: true, force: true });
+      await fs.rm(path.join(process.cwd(), 'content/posts', validSlug), { recursive: true, force: true });
+      await BackendService.getInstance().preprocess(false);
+    });
+
+    it('rejects invalid production content without replacing the last good snapshot', async () => {
+      const backend = BackendService.getInstance();
+      const baselinePosts = await backend.getAllPosts();
+
+      await writePost(invalidSlug, `---
+title: "Invalid Date"
+created: "2024-02-30"
+updated: "2024-02-30"
+tags: ["Test"]
+---
+
+Broken content`);
+
+      await expect(backend.preprocess(false)).rejects.toThrow('Preprocessing failed');
+      expect(await backend.getAllPosts()).toBe(baselinePosts);
+    });
+
+    it('continues with valid posts in development while counting invalid content errors', async () => {
+      const backend = BackendService.getInstance();
+      const baselineCount = (await backend.getAllPosts()).length;
+
+      await writePost(validSlug, `---
+title: "Valid Post"
+created: "2024-02-29"
+updated: "2024-03-01"
+tags: ["Test"]
+---
+
+# Heading
+
+**Hello** [world](https://example.com)`);
+      await writePost(invalidSlug, `---
+title: "Invalid Date"
+created: "2024-02-30"
+updated: "2024-02-30"
+tags: ["Test"]
+---
+
+Broken content`);
+
+      const stats = await backend.preprocess(true);
+      const validPost = await backend.getPost(validSlug);
+
+      expect(stats.postsProcessed).toBe(baselineCount + 1);
+      expect(stats.errors).toBe(1);
+      expect(validPost?.content).toContain('Hello');
+      expect(validPost?.content).not.toContain('**');
+      expect(await backend.getPost(invalidSlug)).toBeNull();
     });
   });
 });

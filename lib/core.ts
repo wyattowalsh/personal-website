@@ -1,14 +1,8 @@
 import 'server-only';
 import * as Sentry from '@sentry/nextjs';
-import { z } from 'zod';
-import type { Config } from './types';
+import type { ZodType } from 'zod';
 
-// Export common validation schemas
-export const schemas = {
-  slug: z.object({ slug: z.string().min(1).max(200).regex(/^[a-zA-Z0-9_-]+$/, { error: 'Invalid slug format' }) }),
-  search: z.object({ query: z.string().min(1).max(100) }),
-  tag: z.object({ tag: z.string().min(1).max(50) }),
-};
+export { getConfig, getDefaultMetadata, schemas } from './config';
 
 
 // Enhanced error handling
@@ -45,59 +39,6 @@ export class ApiError extends Error {
   }
 }
 
-
-// Configuration management
-const defaultConfig: Config = {
-  site: {
-    title: "Wyatt Walsh",
-    description: 'Articles about software engineering, data science, and technology',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://w4w.dev',
-    author: {
-      name: 'Wyatt Walsh',
-      email: 'mail@w4w.dev',
-      twitter: 'wyattowalsh',
-      github: 'wyattowalsh',
-      linkedin: 'wyattowalsh',
-    }
-  },
-  blog: {
-    postsPerPage: 10,
-    featuredLimit: 3
-  },
-};
-
-export function getDefaultMetadata() {
-  const config = getConfig();
-  return {
-    title: config.site.title,
-    description: config.site.description,
-    url: config.site.url,
-    author: config.site.author,
-  };
-}
-
-class ConfigManager {
-  private static instance: ConfigManager;
-  private config: Config;
-
-  private constructor() {
-    this.config = defaultConfig;
-  }
-
-  public static getInstance(): ConfigManager {
-    if (!ConfigManager.instance) {
-      ConfigManager.instance = new ConfigManager();
-    }
-    return ConfigManager.instance;
-  }
-
-  public getConfig(): Config {
-    return this.config;
-  }
-}
-
-export const getConfig = () => ConfigManager.getInstance().getConfig();
-
 const CORRELATION_ID_HEADER = 'x-correlation-id';
 const CORRELATION_ID_MAX_LENGTH = 128;
 
@@ -128,7 +69,7 @@ function withCorrelationId(response: Response, correlationId: string): Response 
 // API middleware exports
 export const api = {
   middleware: {
-    validateRequest: async <T>(req: Request, schema: z.Schema<T>): Promise<T> => {
+    validateRequest: async <T>(req: Request, schema: ZodType<T>): Promise<T> => {
       let data: unknown;
 
       if (req.method === 'GET') {
@@ -152,9 +93,8 @@ export const api = {
       return validation.data;
     },
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- withErrorHandler requires generic function signature
-    withErrorHandler: <T extends (...args: any[]) => Promise<Response>>(handler: T): T =>
-      (async (...args: any[]) => {
+    withErrorHandler: <T extends (...args: never[]) => Promise<Response>>(handler: T): T =>
+      (async (...args: Parameters<T>) => {
         const request = getRequestFromHandlerArgs(args);
         const correlationId = resolveCorrelationId(request);
         try {

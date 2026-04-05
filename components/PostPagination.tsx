@@ -1,91 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 import { Card } from "@/components/ui/card";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { cn, extractPostSlug } from "@/lib/utils";
-import type { AdjacentPost } from "@/lib/types";
+import { cn } from "@/lib/utils";
+import type { AdjacentPosts } from "@/lib/types";
 import type { Route } from "next";
 
-export function PostPagination() {
-	const [state, setState] = useState<{
-		data: { prevPost: AdjacentPost | null; nextPost: AdjacentPost | null };
-		isLoading: boolean;
-		error: string | null;
-	}>({
-		data: { prevPost: null, nextPost: null },
-		isLoading: true,
-		error: null,
-	});
+interface PostPaginationProps {
+	adjacentPosts: AdjacentPosts | null;
+}
 
-	const pathname = usePathname();
-
-	useEffect(() => {
-		const loadAdjacentPosts = async () => {
-			try {
-				setState((prev) => ({ ...prev, isLoading: true, error: null }));
-				
-				// Extract slug from pathname
-				const slug = extractPostSlug(pathname);
-				
-				if (!slug) {
-					console.warn('Could not extract slug from pathname:', pathname);
-					return;
-				}
-
-				const response = await fetch(`/api/blog/posts/${slug}/adjacent`);
-				
-				if (!response.ok) {
-					throw new Error(`Failed to fetch adjacent posts (${response.status})`);
-				}
-
-				const { data } = await response.json();
-				setState((prev) => ({
-					...prev,
-					data: {
-						prevPost: data?.previous || null,
-						nextPost: data?.next || null,
-					},
-					isLoading: false,
-				}));
-			} catch (error) {
-				console.error("Error loading adjacent posts:", error);
-				setState((prev) => ({
-					...prev,
-					isLoading: false,
-					error: "Failed to load navigation",
-					data: { prevPost: null, nextPost: null },
-				}));
-			}
-		};
-
-		if (pathname) loadAdjacentPosts();
-	}, [pathname]);
-
-	if (state.isLoading) {
-		return (
-			<div className="h-24 flex items-center justify-center">
-				<div className="animate-pulse space-x-4">
-					{[...Array(2)].map((_, i) => (
-						<div key={i} className="w-48 h-16 bg-muted rounded-lg" />
-					))}
-				</div>
-			</div>
-		);
-	}
-
-	if (state.error) {
-		return (
-			<div className="text-destructive text-center my-8 p-4 rounded-lg bg-destructive/10">
-				{state.error}
-			</div>
-		);
-	}
-
-	const { prevPost, nextPost } = state.data;
+export function PostPagination({ adjacentPosts }: PostPaginationProps) {
+	const prevPost = adjacentPosts?.previous ?? null;
+	const nextPost = adjacentPosts?.next ?? null;
 
 	if (!prevPost && !nextPost) return null;
 

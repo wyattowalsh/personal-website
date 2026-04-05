@@ -4,32 +4,139 @@
  * Resets on serverless cold start — acceptable for edge/serverless.
  * For persistent rate limiting, use Upstash Redis.
  */
+import type { RateLimitSnapshot } from './types';
+
+type RateLimitKeyPart = string | number | boolean | null | undefined;
+
+export function createRateLimitKey(
+  parts: Record<string, RateLimitKeyPart>
+): string {
+  return Object.entries(parts)
+    .flatMap(([name, value]) => {
+      if (value === null || value === undefined) return [];
+
+      const normalized = String(value).trim();
+      if (!normalized) return [];
+
+      return [`${name}=${normalized}`];
+    })
+    .join('|');
+}
+
 export function createRateLimiter(opts: {
   max: number;
   windowMs: number;
   evictAt?: number;
 }) {
-  const map = new Map<string, { count: number; resetAt: number }>();
+  type RateLimitEntry = {
+    count: number;
+    resetAt: number;
+    lastSeenAt: number;
+    blockedCount: number;
+  };
+
+  const map = new Map<string, RateLimitEntry>();
   const evictAt = opts.evictAt ?? 500;
 
-  return {
-    check(ip: string): boolean {
-      const now = Date.now();
-      if (map.size > evictAt) {
-        for (const [k, e] of map) {
-          if (now > e.resetAt) map.delete(k);
-        }
+  function isExpired(entry: RateLimitEntry, now: number) {
+    return now >= entry.resetAt;
+  }
+
+  function evictExpired(now: number) {
+    if (map.size <= evictAt) return;
+
+    for (const [key, entry] of map) {
+      if (isExpired(entry, now)) {
+        map.delete(key);
       }
-      const entry = map.get(ip);
-      if (!entry || now >= entry.resetAt) {
-        map.set(ip, { count: 1, resetAt: now + opts.windowMs });
+    }
+  }
+
+  function getActiveEntry(key: string, now: number): RateLimitEntry | null {
+    const entry = map.get(key);
+    if (!entry) return null;
+
+    if (isExpired(entry, now)) {
+      map.delete(key);
+      return null;
+    }
+
+    return entry;
+  }
+
+  function getActiveEntries(now: number): Array<[string, RateLimitEntry]> {
+    const entries: Array<[string, RateLimitEntry]> = [];
+
+    for (const [key, entry] of map.entries()) {
+      if (isExpired(entry, now)) {
+        map.delete(key);
+        continue;
+      }
+
+      entries.push([key, entry]);
+    }
+
+    return entries;
+  }
+
+  function toSnapshot(key: string, entry: RateLimitEntry): RateLimitSnapshot {
+    return {
+      key,
+      count: entry.count,
+      remaining: Math.max(0, opts.max - entry.count),
+      resetAt: new Date(entry.resetAt).toISOString(),
+      lastSeenAt: new Date(entry.lastSeenAt).toISOString(),
+      blockedCount: entry.blockedCount,
+      isLimited: entry.count > opts.max,
+    };
+  }
+
+  return {
+    check(key: string): boolean {
+      const now = Date.now();
+      evictExpired(now);
+
+      const entry = map.get(key);
+      if (!entry || isExpired(entry, now)) {
+        map.set(key, {
+          count: 1,
+          resetAt: now + opts.windowMs,
+          lastSeenAt: now,
+          blockedCount: 0,
+        });
         return true;
       }
+
       entry.count++;
-      return entry.count <= opts.max;
+      entry.lastSeenAt = now;
+
+      if (entry.count > opts.max) {
+        entry.blockedCount++;
+        return false;
+      }
+
+      return true;
     },
-    clear(ip: string): void {
-      map.delete(ip);
+
+    clear(key: string): void {
+      map.delete(key);
+    },
+
+    snapshot(limit = 10): RateLimitSnapshot[] {
+      const now = Date.now();
+
+      return getActiveEntries(now)
+        .sort((a, b) => b[1].lastSeenAt - a[1].lastSeenAt)
+        .slice(0, limit)
+        .map(([key, entry]) => toSnapshot(key, entry));
+    },
+
+    getState(key: string): RateLimitSnapshot | null {
+      const now = Date.now();
+      evictExpired(now);
+      const entry = getActiveEntry(key, now);
+      if (!entry) return null;
+      return toSnapshot(key, entry);
     },
   };
 }

@@ -187,4 +187,25 @@ describe('buildFeed', () => {
     expect(rss).toContain('JavaScript');
     expect(rss).toContain('React');
   });
+
+  it('strips markdown presentation markup from feed content', async () => {
+    const posts = [
+      makePost({
+        content: '# Heading\n\n**Bold** [Link](https://example.com)\n\n```ts\nconst value = 1;\n```',
+      }),
+    ];
+    vi.mocked(BackendService.getInstance).mockReturnValue({
+      getAllPosts: vi.fn().mockResolvedValue(posts),
+    } as never);
+
+    const feed = await buildFeed();
+    const rss = feed.rss2();
+
+    expect(rss).toContain('Heading');
+    expect(rss).toContain('Bold');
+    expect(rss).toContain('Link');
+    expect(rss).not.toContain('**Bold**');
+    expect(rss).not.toContain('[Link](');
+    expect(rss).not.toContain('```');
+  });
 });

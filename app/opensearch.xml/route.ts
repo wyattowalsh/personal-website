@@ -1,4 +1,4 @@
-import { getConfig } from '@/lib/core'
+import { getConfig } from '@/lib/config'
 
 export const revalidate = 86400
 

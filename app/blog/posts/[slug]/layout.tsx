@@ -1,6 +1,32 @@
 import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { BackendService } from '@/lib/server';
 import { generatePostMetadata, generatePostStructuredData } from '@/lib/metadata';
+import { PostLayout } from '@/components/PostLayout';
+
+type SeriesNavigationData = {
+  seriesName: string;
+  currentSlug: string;
+  posts: Array<{ slug: string; title: string; order: number }>;
+} | null;
+
+async function getSeriesNavigationData(slug: string, seriesName: string): Promise<SeriesNavigationData> {
+  const seriesPosts = await BackendService.getInstance().getSeriesPosts(seriesName);
+
+  if (seriesPosts.length < 2) {
+    return null;
+  }
+
+  return {
+    seriesName,
+    currentSlug: slug,
+    posts: seriesPosts.map((post) => ({
+      slug: post.slug,
+      title: post.title,
+      order: post.series?.order ?? 0,
+    })),
+  };
+}
 
 export async function generateMetadata({
   params,
@@ -36,17 +62,34 @@ export default async function PostSlugLayout({
   const backend = BackendService.getInstance();
   const post = await backend.getPost(slug);
 
+  if (!post) {
+    notFound();
+  }
+
+  const [adjacentPosts, relatedPosts, seriesNavigation] = await Promise.all([
+    backend.getAdjacentPostLinks(slug),
+    backend.getRelatedPostSummaries(slug),
+    post.series?.name
+      ? getSeriesNavigationData(slug, post.series.name)
+      : Promise.resolve<SeriesNavigationData>(null),
+  ]);
+
   return (
     <>
-      {post && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: generatePostStructuredData(post, slug).replace(/</g, '\\u003c'),
-          }}
-        />
-      )}
-      {children}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: generatePostStructuredData(post, slug).replace(/</g, '\\u003c'),
+        }}
+      />
+      <PostLayout
+        post={post}
+        adjacentPosts={adjacentPosts}
+        relatedPosts={relatedPosts ?? []}
+        seriesNavigation={seriesNavigation}
+      >
+        {children}
+      </PostLayout>
     </>
   );
 }
