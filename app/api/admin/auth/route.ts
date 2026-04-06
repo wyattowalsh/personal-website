@@ -19,16 +19,18 @@ const loginSchema = z.object({
   password: z.string().min(1, { error: 'Password is required' }),
 });
 
+const ADMIN_AUTH_LOG_PREFIX = '[admin-auth]';
+
 export const POST = coreApi.middleware.withErrorHandler(
   async (request: Request) => {
     if (!validateRequestOrigin(request)) {
-      logger.warning('Blocked admin auth request from invalid origin', undefined, 'admin-auth');
+      logger.warning(`${ADMIN_AUTH_LOG_PREFIX} Blocked admin auth request from invalid origin`);
       throw new ApiError(403, 'Forbidden', undefined, 'FORBIDDEN_ORIGIN');
     }
 
     const rateLimitKey = resolveAdminRateLimitKey(request);
     if (!checkRateLimit(rateLimitKey)) {
-      logger.warning('Rate limited admin login attempt', { rateLimitKey }, 'admin-auth');
+      logger.warning(`${ADMIN_AUTH_LOG_PREFIX} Rate limited admin login attempt`, { rateLimitKey });
       throw new ApiError(429, 'Too many attempts', undefined, 'RATE_LIMITED');
     }
 
@@ -50,12 +52,12 @@ export const POST = coreApi.middleware.withErrorHandler(
 
     // HR-3 + HR-5: padded timing-safe compare + HMAC session token
     if (!adminPassword || !validatePassword(password, adminPassword)) {
-      logger.warning('Rejected admin login attempt', { rateLimitKey }, 'admin-auth');
+      logger.warning(`${ADMIN_AUTH_LOG_PREFIX} Rejected admin login attempt`, { rateLimitKey });
       throw new ApiError(401, 'Invalid password');
     }
 
     const token = createSessionToken(adminPassword);
-    logger.success('Admin login successful', { rateLimitKey }, 'admin-auth');
+    logger.success(`${ADMIN_AUTH_LOG_PREFIX} Admin login successful`, { rateLimitKey });
     const response = Response.json({ success: true });
     response.headers.append(
       'Set-Cookie',
