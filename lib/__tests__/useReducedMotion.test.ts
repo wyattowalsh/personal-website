@@ -83,4 +83,31 @@ describe('useReducedMotion', () => {
     });
     expect(result.current).toBe(true);
   });
+
+  it('falls back to legacy media query listeners when addEventListener is unavailable', async () => {
+    Object.defineProperty(window, 'matchMedia', {
+      value: vi.fn(() => ({
+        matches: currentMatches,
+        media: '(prefers-reduced-motion: reduce)',
+        addListener: (cb: ChangeListener) => {
+          listeners.push(cb);
+        },
+        removeListener: (cb: ChangeListener) => {
+          const idx = listeners.indexOf(cb);
+          if (idx >= 0) listeners.splice(idx, 1);
+        },
+        onchange: null,
+        dispatchEvent: vi.fn(),
+      })),
+      writable: true,
+      configurable: true,
+    });
+
+    const { useReducedMotion } = await import('@/components/hooks/useReducedMotion');
+    const { unmount } = renderHook(() => useReducedMotion());
+
+    expect(listeners.length).toBeGreaterThan(0);
+    unmount();
+    expect(listeners.length).toBe(0);
+  });
 });

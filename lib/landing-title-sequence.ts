@@ -11,7 +11,9 @@ interface ThemeSequenceMeta {
 }
 
 type SequenceTheme = {
+  id?: string;
   text: string;
+  signalDeck?: SignalDeckMeta;
 };
 
 const SIGNAL_FAMILY_RULES: Array<{ pattern: RegExp; meta: SignalDeckMeta }> = [
@@ -38,15 +40,17 @@ function normalizeSequenceToken(value: string): string {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 }
 
-function getThemeSequenceMeta(text: string): ThemeSequenceMeta {
-  const phraseKey = normalizeSequenceToken(text);
+function getThemeSequenceMeta(theme: SequenceTheme): ThemeSequenceMeta {
+  const identitySource = theme.id ?? theme.text;
+  const phraseKey = normalizeSequenceToken(identitySource);
   const words = phraseKey.split(/\s+/).filter(Boolean);
+  const family = theme.signalDeck?.family ?? deriveSignalDeckMeta(theme.text).family;
 
   return {
     phraseKey,
     leadWord: words[0] ?? phraseKey,
     roleWord: words.at(-1) ?? phraseKey,
-    familyKey: normalizeSequenceToken(deriveSignalDeckMeta(text).family),
+    familyKey: normalizeSequenceToken(family),
   };
 }
 
@@ -75,8 +79,8 @@ export function deriveSignalDeckMeta(text: string): SignalDeckMeta {
 }
 
 export function hasThemeAdjacencyConflict<T extends SequenceTheme>(currentTheme: T, nextTheme: T): boolean {
-  const currentMeta = getThemeSequenceMeta(currentTheme.text);
-  const nextMeta = getThemeSequenceMeta(nextTheme.text);
+  const currentMeta = getThemeSequenceMeta(currentTheme);
+  const nextMeta = getThemeSequenceMeta(nextTheme);
 
   return currentMeta.phraseKey === nextMeta.phraseKey
     || currentMeta.leadWord === nextMeta.leadWord

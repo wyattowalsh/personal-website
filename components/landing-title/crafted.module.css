@@ -1,0 +1,829 @@
+@reference "../../app/tailwind.css";
+
+.root {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.72rem;
+}
+
+.compactRoot {
+  gap: 0.56rem;
+}
+
+.deck,
+.focusFrame {
+  width: min(100%, 42rem);
+}
+
+.deck {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 94%, rgba(255, 255, 255, 0.08));
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 94%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--crafted-panel-strong) 94%, rgba(255, 255, 255, 0.02))),
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--crafted-glow-soft) 34%, transparent), transparent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 24px rgba(15, 23, 42, 0.12);
+  padding: 0.6rem 0.85rem;
+}
+
+.deckLeading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.deckBadge,
+.deckLabel,
+.deckCounter,
+.eyebrow,
+.panelLabel,
+.metricChip,
+.footerItem,
+.protoMark,
+.codeTopBar,
+.hudMarker,
+.conduitNode,
+.rackCell {
+  font-family: var(--font-monaspace), monospace;
+  text-transform: uppercase;
+}
+
+.deckBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 90%, transparent);
+  padding: 0.34rem 0.58rem 0.34rem 0.42rem;
+  color: var(--crafted-text);
+  background: color-mix(in srgb, var(--crafted-panel-strong) 90%, transparent);
+  letter-spacing: 0.14em;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.deckSwatch {
+  width: 0.62rem;
+  height: 0.62rem;
+  border-radius: 999px;
+  background: var(--crafted-gradient);
+  box-shadow: 0 0 12px var(--crafted-glow-strong);
+}
+
+.deckLabel {
+  color: var(--crafted-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.deckDescriptor {
+  min-width: 0;
+  color: var(--crafted-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deckCounter {
+  justify-self: end;
+  color: var(--crafted-text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.deckCounterTotal {
+  color: var(--crafted-muted);
+}
+
+.deckAssay {
+  border-radius: 1rem 1.35rem 1rem 1.25rem;
+}
+
+.deckTopology {
+  border-radius: 1rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 94%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--crafted-panel-strong) 94%, rgba(255, 255, 255, 0.02))),
+    repeating-linear-gradient(90deg, transparent 0 1.55rem, color-mix(in srgb, var(--crafted-glow-soft) 24%, transparent) 1.55rem 1.62rem);
+}
+
+.deckCommand,
+.deckSecure,
+.deckLedger {
+  border-radius: 0.95rem;
+}
+
+.deckMonolith,
+.deckStress,
+.deckArchive {
+  border-radius: 1.1rem;
+}
+
+.deckVisor,
+.deckPrototype {
+  border-radius: 1.3rem 1.3rem 0.95rem 0.95rem;
+}
+
+.deckErgo,
+.deckAssembly,
+.deckEdge {
+  border-radius: 999px;
+}
+
+.deckAtelier,
+.deckVault {
+  border-radius: 1rem 1rem 1.35rem 1rem;
+}
+
+.focusFrame {
+  position: relative;
+  outline: none;
+}
+
+.focusFrame::before {
+  content: '';
+  position: absolute;
+  inset: -0.3rem;
+  border-radius: 1.8rem;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--crafted-glow-soft) 68%, transparent), transparent 48%, color-mix(in srgb, var(--crafted-glow-strong) 54%, transparent));
+  opacity: 0;
+  filter: blur(14px);
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.focusFrame:focus-visible::before,
+.focusFrame:focus-within::before {
+  opacity: 0.95;
+}
+
+.shell {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 10rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 94%, rgba(255, 255, 255, 0.12));
+  border-radius: 1.55rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel-strong) 98%, rgba(255, 255, 255, 0.02))),
+    radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--crafted-glow-soft) 42%, transparent), transparent 34%),
+    linear-gradient(90deg, transparent, color-mix(in srgb, var(--crafted-glow-soft) 10%, transparent), transparent);
+  box-shadow: var(--crafted-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  container-type: inline-size;
+}
+
+.compactShell {
+  min-height: 9rem;
+}
+
+.shellBackdrop,
+.shellGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shellBackdrop {
+  background:
+    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.04) 16%, transparent 36%),
+    radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--crafted-glow-soft) 32%, transparent), transparent 28%);
+  opacity: 0.82;
+}
+
+.shellGlow {
+  inset: 0.85rem;
+  border-radius: inherit;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 76%, rgba(255, 255, 255, 0.06));
+  opacity: 0.58;
+}
+
+.shellInner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.85rem;
+  min-height: 100%;
+  color: var(--crafted-text);
+  padding: 1rem;
+}
+
+.shellReaction {
+  border-radius: 1.3rem 2rem 1.45rem 1.8rem;
+}
+
+.shellReaction .shellGlow {
+  clip-path: polygon(0 12%, 13% 12%, 13% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.shellDistillation {
+  border-radius: 1.2rem 1.2rem 1.85rem 1.2rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel-strong) 98%, rgba(255, 255, 255, 0.02))),
+    repeating-linear-gradient(90deg, transparent 0 2.1rem, color-mix(in srgb, var(--crafted-glow-soft) 18%, transparent) 2.1rem 2.16rem),
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--crafted-glow-soft) 36%, transparent), transparent 28%);
+}
+
+.shellCode {
+  border-radius: 1rem;
+}
+
+.shellCode .shellGlow {
+  clip-path: polygon(0 0, 100% 0, 100% 86%, 94% 100%, 0 100%);
+}
+
+.shellMonolith {
+  border-radius: 1.2rem 1.65rem 1.4rem 1rem;
+}
+
+.shellVisor {
+  border-radius: 1.4rem 1.4rem 1rem 1rem;
+}
+
+.shellResilience {
+  border-radius: 1.55rem;
+}
+
+.shellRelief {
+  border-radius: 1.1rem 1.1rem 1.55rem 1.55rem;
+}
+
+.shellExperience {
+  border-radius: 1.65rem 1.25rem 1.65rem 1.25rem;
+}
+
+.shellAtelier {
+  border-radius: 1.1rem 1.45rem 1.35rem 1.05rem;
+}
+
+.shellDefenseVault,
+.shellCybersecurity {
+  border-radius: 1rem 1rem 1.3rem 1.3rem;
+}
+
+.shellDefenseVault .shellGlow,
+.shellCybersecurity .shellGlow {
+  clip-path: polygon(0 8%, 10% 8%, 10% 0, 90% 0, 90% 8%, 100% 8%, 100% 92%, 90% 92%, 90% 100%, 10% 100%, 10% 92%, 0 92%);
+}
+
+.shellBlockchain {
+  border-radius: 1rem 1rem 1.45rem 1rem;
+}
+
+.shellArchive {
+  border-radius: 1rem 1.4rem 1rem 1.4rem;
+}
+
+.shellAssembly,
+.shellEdge,
+.shellPrototype {
+  border-radius: 1.35rem;
+}
+
+.iconFrame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 86%, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel-strong) 94%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel) 92%, rgba(255, 255, 255, 0.03))),
+    radial-gradient(circle at 50% 26%, color-mix(in srgb, var(--crafted-glow-soft) 30%, transparent), transparent 58%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 18px color-mix(in srgb, var(--crafted-glow-soft) 28%, transparent);
+}
+
+.iconGlyph {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: color-mix(in srgb, var(--crafted-glow-strong) 76%, white 24%);
+  filter: drop-shadow(0 0 0.85rem color-mix(in srgb, var(--crafted-glow-strong) 52%, transparent));
+}
+
+.eyebrow,
+.panelLabel {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.45rem;
+  letter-spacing: 0.18em;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--crafted-muted);
+}
+
+.panelLabel {
+  color: color-mix(in srgb, var(--crafted-glow-strong) 60%, var(--crafted-muted));
+}
+
+.titleStack {
+  display: grid;
+  gap: 0.16rem;
+  min-width: 0;
+}
+
+.titleLineFrame {
+  display: block;
+  min-width: 0;
+}
+
+.titleLineMotion,
+.titleLineStatic {
+  display: inline-block;
+  max-width: 100%;
+  background-image: var(--crafted-gradient);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 1rem color-mix(in srgb, var(--crafted-glow-soft) 58%, transparent);
+}
+
+.titleLineStatic {
+  white-space: normal;
+  text-wrap: balance;
+}
+
+.titleWord {
+  display: inline-block;
+}
+
+.titleWord + .titleWord {
+  margin-left: 0.42ch;
+}
+
+.titleReaction,
+.titleDistributed,
+.titleMonolith,
+.titleResilience,
+.titleRelief,
+.titleExperience,
+.titleAtelier,
+.titleDefense,
+.titleLedger,
+.titleSecure,
+.titleArchive,
+.titleAssembly,
+.titleEdge,
+.titlePrototype {
+  font-family: var(--font-geist-sans), sans-serif;
+}
+
+.titleReaction {
+  font-size: clamp(1.45rem, 1.1rem + 2vw, 2.7rem);
+  font-weight: 780;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+}
+
+.titleDistributed {
+  font-size: clamp(1.18rem, 0.9rem + 1.7vw, 2.2rem);
+  font-weight: 720;
+  letter-spacing: -0.035em;
+  line-height: 0.96;
+}
+
+.titleDistributed .titleLineFrame:first-child {
+  font-size: 0.82em;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.titleCode,
+.titleLedger,
+.titleSecure {
+  font-family: var(--font-monaspace), monospace;
+  line-height: 0.98;
+}
+
+.titleCode {
+  font-size: clamp(1.32rem, 1rem + 1.8vw, 2.3rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.titleMonolith {
+  font-size: clamp(1.4rem, 1rem + 2vw, 2.55rem);
+  font-weight: 820;
+  line-height: 0.92;
+  letter-spacing: -0.05em;
+}
+
+.titleVisor {
+  font-size: clamp(1.2rem, 0.92rem + 1.6vw, 2.12rem);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+}
+
+.titleVisor .titleLineFrame:first-child {
+  font-size: 0.82em;
+}
+
+.titleResilience,
+.titleRelief,
+.titleExperience,
+.titleAtelier,
+.titleDefense,
+.titleLedger,
+.titleSecure,
+.titleArchive,
+.titleAssembly,
+.titleEdge,
+.titlePrototype {
+  font-size: clamp(1.22rem, 0.94rem + 1.7vw, 2.2rem);
+  font-weight: 760;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+
+.titleDefense,
+.titleSecure {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.titleArchive {
+  font-weight: 700;
+}
+
+.titlePrototype .titleLineFrame:first-child,
+.titleEdge .titleLineFrame:first-child {
+  font-size: 0.84em;
+}
+
+.caption {
+  max-width: 34rem;
+  color: var(--crafted-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.metricRail,
+.footerRail,
+.pathTrace,
+.perimeterBand,
+.chassisRail,
+.secureStatus,
+.strataBands,
+.conduitRow,
+.hudChrome,
+.hashRail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.42rem;
+}
+
+.metricColumn,
+.rackCells,
+.spineRail,
+.atelierGauge,
+.codeGutter {
+  display: grid;
+  gap: 0.42rem;
+  align-content: start;
+}
+
+.metricColumn {
+  justify-items: start;
+}
+
+.metricChip,
+.footerItem,
+.hudMarker,
+.conduitNode,
+.rackCell,
+.token,
+.strataBand,
+.curveNode,
+.protoMark,
+.traySlot,
+.perimeterNode,
+.insightStamp,
+.ledgerBlock {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 86%, transparent);
+  background: color-mix(in srgb, var(--crafted-panel-strong) 88%, transparent);
+  color: var(--crafted-text);
+  border-radius: 999px;
+  padding: 0.24rem 0.48rem;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.footerItem,
+.token,
+.strataBand,
+.traySlot,
+.ledgerBlock {
+  color: var(--crafted-muted);
+}
+
+.tokenMatrix {
+  justify-content: flex-start;
+}
+
+.reactionGrid,
+.distillationGrid,
+.codeSlab,
+.strataRelief,
+.experienceBlock,
+.ledgerGrid,
+.secureGrid,
+.assemblyGrid,
+.perimeterGrid,
+.prototypeGrid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.reactionGrid,
+.monolithGrid,
+.vaultGrid,
+.manualGrid,
+.atelierGrid,
+.stressGrid,
+.codeWindow,
+.visorStage,
+.inlineHero,
+.prototypeHeader,
+.securePanelTop,
+.distillationBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.95rem;
+  align-items: center;
+}
+
+.instrumentColumn {
+  display: grid;
+  gap: 0.65rem;
+  align-content: start;
+  min-width: 8.25rem;
+}
+
+.reactionStage,
+.distillationMain,
+.codeColumn,
+.monolithFace,
+.pageStack,
+.vaultCell,
+.hudTitle {
+  display: grid;
+  gap: 0.72rem;
+  min-width: 0;
+}
+
+.codeTopBar {
+  justify-content: space-between;
+  gap: 0.8rem;
+  color: var(--crafted-muted);
+  font-size: 0.64rem;
+  letter-spacing: 0.2em;
+}
+
+.codeWindow {
+  align-items: stretch;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.codeGutter {
+  min-width: 2rem;
+  color: var(--crafted-muted);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+}
+
+.monolithGrid {
+  align-items: stretch;
+}
+
+.monolithFace {
+  padding: 0.95rem;
+  border-radius: 1rem;
+  background:
+    linear-gradient(160deg, color-mix(in srgb, var(--crafted-panel-strong) 96%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel) 90%, rgba(255, 255, 255, 0.02)));
+  clip-path: polygon(0 0, 84% 0, 100% 12%, 100% 100%, 14% 100%, 0 86%);
+}
+
+.notchRail {
+  display: grid;
+  gap: 0.72rem;
+  align-content: start;
+  justify-items: center;
+  padding: 0.8rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--crafted-panel-strong) 92%, transparent);
+}
+
+.hudChrome {
+  justify-content: space-between;
+}
+
+.hudMarker {
+  background: color-mix(in srgb, var(--crafted-glow-soft) 24%, var(--crafted-panel-strong));
+}
+
+.visorStage {
+  align-items: stretch;
+}
+
+.hudTitle {
+  padding: 0.95rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 74%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 86%, transparent), color-mix(in srgb, var(--crafted-panel-strong) 86%, transparent));
+}
+
+.stressCore {
+  position: relative;
+  display: grid;
+  place-items: center;
+  gap: 0.55rem;
+  width: 8rem;
+  min-height: 8rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 86%, transparent);
+  background:
+    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--crafted-glow-soft) 42%, transparent), transparent 60%),
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel-strong) 96%, transparent), color-mix(in srgb, var(--crafted-panel) 92%, transparent));
+}
+
+.stressRing {
+  position: absolute;
+  inset: 0.65rem;
+  border-radius: 999px;
+  border: 1px dashed color-mix(in srgb, var(--crafted-edge) 72%, transparent);
+}
+
+.strataBand {
+  border-radius: 0.8rem;
+}
+
+.insightStamp {
+  border-radius: 0.85rem;
+}
+
+.vaultCell {
+  align-content: start;
+  min-height: 100%;
+  padding: 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--crafted-edge) 78%, transparent);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel-strong) 94%, transparent), color-mix(in srgb, var(--crafted-panel) 92%, transparent));
+}
+
+.ledgerBlocks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.ledgerBlock {
+  justify-content: center;
+  width: 100%;
+  border-radius: 0.9rem;
+  padding: 0.5rem 0.42rem;
+}
+
+.manualGrid {
+  align-items: stretch;
+}
+
+.spineRail {
+  padding: 0.35rem;
+  border-right: 1px solid color-mix(in srgb, var(--crafted-edge) 62%, transparent);
+}
+
+.pageStack {
+  min-height: 100%;
+}
+
+.traySlots {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.traySlot {
+  justify-content: center;
+  width: 100%;
+  min-height: 3rem;
+  border-radius: 0.95rem;
+  padding: 0.55rem;
+}
+
+.perimeterNode,
+.curveNode {
+  border-radius: 0.85rem;
+}
+
+@container (max-width: 30rem) {
+  .deck {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+
+  .deckCounter {
+    justify-self: start;
+  }
+
+  .reactionGrid,
+  .monolithGrid,
+  .vaultGrid,
+  .manualGrid,
+  .atelierGrid,
+  .stressGrid,
+  .codeWindow,
+  .visorStage,
+  .inlineHero,
+  .prototypeHeader,
+  .securePanelTop,
+  .distillationBody {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .instrumentColumn,
+  .notchRail,
+  .stressCore {
+    width: 100%;
+  }
+
+  .stressCore {
+    min-height: 6.25rem;
+  }
+
+  .ledgerBlocks,
+  .traySlots {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container (max-width: 22rem) {
+  .shellInner {
+    padding: 0.86rem;
+  }
+
+  .titleReaction,
+  .titleDistributed,
+  .titleCode,
+  .titleMonolith,
+  .titleVisor,
+  .titleResilience,
+  .titleRelief,
+  .titleExperience,
+  .titleAtelier,
+  .titleDefense,
+  .titleLedger,
+  .titleSecure,
+  .titleArchive,
+  .titleAssembly,
+  .titleEdge,
+  .titlePrototype {
+    font-size: clamp(1.05rem, 0.92rem + 1vw, 1.6rem);
+  }
+
+  .ledgerBlocks,
+  .traySlots {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .metricRail,
+  .footerRail,
+  .pathTrace,
+  .perimeterBand,
+  .chassisRail,
+  .secureStatus,
+  .strataBands,
+  .conduitRow,
+  .hudChrome,
+  .hashRail {
+    gap: 0.3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focusFrame::before {
+    transition: none;
+  }
+}

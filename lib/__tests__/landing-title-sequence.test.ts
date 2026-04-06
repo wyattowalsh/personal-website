@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { LANDING_TITLE_RENDERERS } from '@/components/landing-title/registry';
 import {
   buildRotationSequence,
   deriveSignalDeckMeta,
@@ -63,6 +64,34 @@ describe('hasThemeAdjacencyConflict', () => {
       { text: 'data orchestrator' },
     )).toBe(false);
   });
+
+  it('prefers stable ids and signal deck metadata over mutable display text', () => {
+    expect(hasThemeAdjacencyConflict(
+      {
+        id: 'code-architect',
+        text: 'software chassis',
+        signalDeck: { family: 'Architect', descriptor: 'systems precision' },
+      },
+      {
+        id: 'cloud-shaper',
+        text: 'creative systems copy',
+        signalDeck: { family: 'Cartographer', descriptor: 'route synthesis' },
+      },
+    )).toBe(false);
+
+    expect(hasThemeAdjacencyConflict(
+      {
+        id: 'code-architect',
+        text: 'software chassis',
+        signalDeck: { family: 'Architect', descriptor: 'systems precision' },
+      },
+      {
+        id: 'zero-trust-architect',
+        text: 'security shell',
+        signalDeck: { family: 'Architect', descriptor: 'systems precision' },
+      },
+    )).toBe(true);
+  });
 });
 
 describe('buildRotationSequence', () => {
@@ -80,6 +109,23 @@ describe('buildRotationSequence', () => {
       SAMPLE_THEMES.map((theme) => theme.text).sort(),
     );
 
+    expect(hasThemeAdjacencyConflict(anchorTheme, sequence[0]!)).toBe(false);
+
+    for (let index = 1; index < sequence.length; index += 1) {
+      expect(hasThemeAdjacencyConflict(sequence[index - 1]!, sequence[index]!)).toBe(false);
+    }
+  });
+
+  it('builds a collision-free sequence from the live landing title registry', () => {
+    vi.spyOn(Math, 'random').mockImplementation(deterministicRandom());
+
+    const anchorTheme = LANDING_TITLE_RENDERERS[0]!;
+    const sequence = buildRotationSequence(LANDING_TITLE_RENDERERS, anchorTheme);
+
+    expect(sequence).toHaveLength(LANDING_TITLE_RENDERERS.length);
+    expect(sequence.map(({ id }) => id).sort()).toEqual(
+      LANDING_TITLE_RENDERERS.map(({ id }) => id).sort(),
+    );
     expect(hasThemeAdjacencyConflict(anchorTheme, sequence[0]!)).toBe(false);
 
     for (let index = 1; index < sequence.length; index += 1) {

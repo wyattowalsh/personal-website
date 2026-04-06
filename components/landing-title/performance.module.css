@@ -1,0 +1,582 @@
+@reference "../../app/tailwind.css";
+
+.cluster {
+  position: relative;
+  container-type: inline-size;
+}
+
+.control {
+  border-radius: 1.7rem;
+}
+
+.motionActive {
+  .deck,
+  .shell {
+    will-change: transform, opacity;
+  }
+}
+
+.deck {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 42rem);
+  padding: 0.7rem 0.85rem;
+  border-radius: 1.4rem;
+  border: 1px solid var(--perf-shell-edge);
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--perf-panel) 94%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--perf-panel-2) 92%, rgba(255, 255, 255, 0.03))),
+    radial-gradient(circle at 16% 50%, var(--perf-shell-soft), transparent 42%);
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.deck::before {
+  content: '';
+  position: absolute;
+  inset: 0.55rem 0.8rem auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--perf-shell-strong), transparent);
+  opacity: 0.7;
+}
+
+.deckLeading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.deckBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.36rem 0.62rem 0.36rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--perf-shell-edge);
+  background: color-mix(in srgb, var(--perf-panel) 88%, rgba(255, 255, 255, 0.06));
+  color: var(--perf-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.deckBadgeSwatch {
+  width: 0.66rem;
+  height: 0.66rem;
+  border-radius: 999px;
+  background: var(--perf-gradient);
+  box-shadow: 0 0 12px var(--perf-shell-strong);
+}
+
+.deckQualifier {
+  color: var(--perf-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.deckMeta {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.deckDescriptor {
+  color: var(--perf-muted);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.metricRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.metricChip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.42rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 78%, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--perf-panel-3) 88%, rgba(255, 255, 255, 0.02));
+  color: var(--perf-text);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.counter {
+  display: inline-flex;
+  justify-self: end;
+  align-items: baseline;
+  gap: 0.15rem;
+  color: var(--perf-text);
+  font-family: var(--font-monaspace), monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.counterTotal {
+  color: var(--perf-muted);
+}
+
+.shell {
+  position: relative;
+  isolation: isolate;
+  min-height: 10.5rem;
+  padding: 1rem;
+  border-radius: 1.55rem;
+  border: 1px solid var(--perf-shell-edge);
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--perf-panel) 96%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--perf-panel-2) 90%, rgba(255, 255, 255, 0.03))),
+    radial-gradient(circle at 20% 20%, var(--perf-shell-soft), transparent 36%),
+    radial-gradient(circle at 80% 0%, var(--perf-shell-soft), transparent 32%);
+  box-shadow: var(--perf-shell-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.shellBackdrop,
+.shellGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shellBackdrop {
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.04) 18%, transparent 38%),
+    radial-gradient(circle at 50% 110%, var(--perf-shell-soft), transparent 45%);
+  opacity: 0.8;
+}
+
+.shellGlow {
+  inset: 0.85rem;
+  border-radius: 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 64%, rgba(255, 255, 255, 0.06));
+  opacity: 0.55;
+}
+
+.shellInner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 100%;
+  color: var(--perf-text);
+}
+
+.shellAutomation {
+  border-radius: 1.8rem 1.25rem 1.45rem 1.45rem;
+}
+
+.shellAutomation .shellGlow {
+  clip-path: polygon(0 12%, 16% 12%, 16% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+.shellRobotics {
+  border-radius: 1.15rem 2rem 1.25rem 2rem;
+}
+
+.shellRobotics .shellGlow {
+  clip-path: polygon(0 8%, 12% 8%, 12% 0, 88% 0, 88% 8%, 100% 8%, 100% 92%, 88% 92%, 88% 100%, 12% 100%, 12% 92%, 0 92%);
+}
+
+.shellIntelligent {
+  border-radius: 1.4rem;
+}
+
+.shellScalability {
+  border-radius: 1.5rem 1.5rem 1.9rem 1.9rem;
+}
+
+.iconFrame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 82%, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--perf-panel-3) 92%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--perf-panel) 88%, rgba(255, 255, 255, 0.02)));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 18px var(--perf-shell-soft);
+}
+
+.iconFrameLarge {
+  width: 3.25rem;
+  height: 3.25rem;
+}
+
+.iconGlyph {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.copyBlock {
+  min-width: 0;
+  display: grid;
+  gap: 0.22rem;
+}
+
+.overline {
+  color: var(--perf-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.primaryLine,
+.systemLine,
+.artistWord,
+.secondaryLine {
+  line-height: 0.98;
+}
+
+.primaryLine {
+  font-size: clamp(1.5rem, 1.1rem + 2vw, 2.85rem);
+  font-weight: 820;
+  letter-spacing: -0.04em;
+}
+
+.secondaryLine {
+  font-size: clamp(1.1rem, 0.95rem + 1.2vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+
+.systemLine {
+  font-size: clamp(1.2rem, 1rem + 1.35vw, 2.2rem);
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+.roleChip {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 82%, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--perf-panel-3) 88%, rgba(255, 255, 255, 0.03));
+  color: var(--perf-text);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.automationGrid,
+.scalabilityGrid,
+.intelligentGrid {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.heroBand,
+.scalabilityCore,
+.systemBand {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.flowRow,
+.utilityBarRow,
+.fanoutRow,
+.capacityRow,
+.utilityMatrix {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.flowStep,
+.utilityBarLabel {
+  color: var(--perf-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.flowStep {
+  padding: 0.25rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 70%, rgba(255, 255, 255, 0.06));
+  background: color-mix(in srgb, var(--perf-panel-3) 86%, rgba(255, 255, 255, 0.02));
+}
+
+.utilityBarWrap {
+  display: grid;
+  gap: 0.25rem;
+  justify-items: center;
+}
+
+.utilityBar,
+.capacityBar {
+  display: block;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: var(--perf-gradient);
+  box-shadow: 0 0 14px var(--perf-shell-soft);
+  transform-origin: left center;
+}
+
+.utilityBar {
+  width: 4.25rem;
+}
+
+.capacityBar {
+  width: calc(5rem * var(--capacity-target));
+}
+
+.roboticsGrid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.roboticsBracket,
+.servoStack {
+  display: grid;
+  gap: 0.35rem;
+  align-items: center;
+  justify-items: center;
+}
+
+.utilityNode,
+.utilityNodeSquare,
+.fanoutNode {
+  display: inline-flex;
+  width: 0.66rem;
+  height: 0.66rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 82%, rgba(255, 255, 255, 0.08));
+  background: color-mix(in srgb, var(--perf-panel-3) 86%, rgba(255, 255, 255, 0.03));
+  box-shadow: 0 0 12px var(--perf-shell-soft);
+}
+
+.utilityNodeSquare {
+  border-radius: 0.25rem;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.utilityBeam,
+.fanoutStem {
+  display: block;
+  width: 0.18rem;
+  height: 2.8rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, transparent, var(--perf-shell-strong), transparent);
+  transform-origin: center bottom;
+}
+
+.roboticsCore {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.4rem 0;
+}
+
+.roboticsHeadline {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.artistBand {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 72%, rgba(255, 255, 255, 0.08));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--perf-panel-3) 90%, rgba(255, 255, 255, 0.02)), transparent 90%);
+}
+
+.artistWord {
+  font-size: clamp(1.1rem, 0.96rem + 1.25vw, 1.9rem);
+  font-weight: 760;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.fanoutNode {
+  position: relative;
+  justify-content: center;
+  align-items: flex-end;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.fanoutStem {
+  position: absolute;
+  bottom: calc(100% + 0.22rem);
+  height: 1.35rem;
+}
+
+.deckAutomation {
+  border-radius: 1.6rem 1.1rem 1.2rem 1.2rem;
+}
+
+.deckRobotics {
+  border-radius: 1rem 1.8rem 1rem 1.8rem;
+}
+
+.deckIntelligent {
+  border-radius: 1.2rem;
+}
+
+.deckScalability {
+  border-radius: 1.2rem 1.2rem 1.55rem 1.55rem;
+}
+
+.motionActive .flowStep,
+.motionActive .metricChip,
+.motionActive .deckBadgeSwatch,
+.motionActive .utilityNode,
+.motionActive .utilityNodeSquare,
+.motionActive .fanoutNode {
+  animation: performancePulse 2.8s ease-in-out infinite;
+}
+
+.motionActive .shellBackdrop {
+  animation: laneSweep 10s linear infinite;
+}
+
+.motionActive .utilityBeam,
+.motionActive .fanoutStem {
+  animation: servoArc 2.4s ease-in-out infinite;
+}
+
+.motionActive .capacityBar {
+  animation: capacityWave 3.2s ease-in-out infinite;
+}
+
+@keyframes performancePulse {
+  0%, 100% { opacity: 0.78; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes laneSweep {
+  0% { transform: translateX(-10%); }
+  50% { transform: translateX(8%); }
+  100% { transform: translateX(-10%); }
+}
+
+@keyframes capacityWave {
+  0%, 100% { opacity: 0.82; filter: saturate(1); }
+  50% { opacity: 1; filter: saturate(1.18); }
+}
+
+@keyframes servoArc {
+  0%, 100% { opacity: 0.66; transform: scaleY(0.72); }
+  50% { opacity: 1; transform: scaleY(1); }
+}
+
+@container (max-inline-size: 30rem) {
+  .deck {
+    grid-template-columns: 1fr auto;
+    gap: 0.55rem 0.7rem;
+    padding: 0.7rem;
+  }
+
+  .deckLeading,
+  .deckMeta {
+    grid-column: 1 / -1;
+  }
+
+  .deckMeta {
+    justify-items: start;
+  }
+
+  .metricRow,
+  .flowRow,
+  .utilityBarRow,
+  .fanoutRow,
+  .capacityRow,
+  .utilityMatrix {
+    justify-content: flex-start;
+  }
+
+  .shell {
+    min-height: 9.6rem;
+    padding: 0.9rem;
+  }
+
+  .roboticsGrid,
+  .heroBand,
+  .scalabilityCore,
+  .systemBand,
+  .artistBand,
+  .roboticsHeadline {
+    grid-template-columns: 1fr;
+  }
+
+  .roboticsBracket,
+  .servoStack {
+    display: none;
+  }
+}
+
+@container (max-inline-size: 22rem) {
+  .deck {
+    padding: 0.65rem;
+  }
+
+  .deckBadge,
+  .deckQualifier,
+  .deckDescriptor,
+  .metricChip,
+  .counter,
+  .overline,
+  .flowStep,
+  .utilityBarLabel,
+  .roleChip,
+  .secondaryLine,
+  .artistWord {
+    letter-spacing: 0.12em;
+  }
+
+  .primaryLine,
+  .systemLine {
+    font-size: clamp(1.2rem, 0.98rem + 4vw, 1.8rem);
+  }
+
+  .shell {
+    min-height: auto;
+  }
+
+  .heroBand,
+  .scalabilityCore,
+  .systemBand,
+  .artistBand {
+    gap: 0.6rem;
+  }
+
+  .iconFrameLarge {
+    width: 2.9rem;
+    height: 2.9rem;
+  }
+}

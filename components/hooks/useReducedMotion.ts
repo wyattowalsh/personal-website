@@ -4,8 +4,13 @@ const query = '(prefers-reduced-motion: reduce)';
 
 function subscribe(callback: () => void) {
   const mq = window.matchMedia(query);
-  mq.addEventListener('change', callback);
-  return () => mq.removeEventListener('change', callback);
+  if (typeof mq.addEventListener === 'function') {
+    mq.addEventListener('change', callback);
+    return () => mq.removeEventListener('change', callback);
+  }
+
+  mq.addListener(callback);
+  return () => mq.removeListener(callback);
 }
 
 function getSnapshot() {
