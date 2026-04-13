@@ -1,646 +1,932 @@
-.root {
-  display: flex;
+.cluster {
   width: 100%;
-  min-width: 0;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.72rem;
 }
 
-.compactRoot {
-  gap: 0.52rem;
+.clusterCompact {
+  max-width: 30rem;
 }
 
-.signalDeck {
-  display: inline-grid;
-  width: min(100%, 34rem);
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.65rem;
-  border-radius: 999px;
-  padding: 0.42rem 0.7rem 0.42rem 0.95rem;
-  border: 1px solid color-mix(in srgb, var(--arcane-glow-soft) 84%, rgba(255, 255, 255, 0.18));
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--arcane-surface) 92%, rgba(255, 255, 255, 0.08)), color-mix(in srgb, var(--arcane-surface-strong) 92%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--arcane-glow-soft) 28%, transparent), transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0.7rem color-mix(in srgb, var(--arcane-glow-soft) 40%, transparent);
-}
-
-.mysticDeck {
-  border-radius: 1rem;
-}
-
-.weaverDeck {
-  border-radius: 0.9rem;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--arcane-surface) 92%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 92%, rgba(255, 255, 255, 0.02))),
-    repeating-linear-gradient(90deg, transparent 0 1.45rem, color-mix(in srgb, var(--arcane-glow-soft) 28%, transparent) 1.45rem 1.5rem);
-}
-
-.visionaryDeck {
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-surface) 94%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 92%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--arcane-glow-soft) 32%, transparent) 50%, transparent 100%);
-}
-
-.deckFamily,
-.panelTag,
-.panelFamily,
-.descriptorToken,
-.panelIndex,
-.deckCounter {
-  font-family: var(--font-monaspace), monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-}
-
-.deckFamily {
-  font-size: 0.62rem;
-  font-weight: 650;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 72%, white 28%);
-}
-
-.deckDescriptor {
-  min-width: 0;
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 58%, rgba(226, 232, 240, 0.84));
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.deckCounter {
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 68%, rgba(226, 232, 240, 0.9));
-}
-
-.deckCounterTotal {
-  opacity: 0.6;
-}
-
-.focusFrame {
-  position: relative;
-  width: 100%;
+.control {
   outline: none;
 }
 
-.focusFrame::before {
+.control:focus-visible .scene {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--arc-edge),
+    0 26px 66px var(--arc-glow-soft);
+}
+
+.scene {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  border: 1px solid var(--arc-edge);
+  background:
+    radial-gradient(circle at top right, var(--arc-glow-soft), transparent 58%),
+    linear-gradient(160deg, var(--arc-panel), var(--arc-panel-2) 58%, var(--arc-panel-3));
+  color: var(--arc-text);
+  box-shadow:
+    inset 0 1px 0 var(--arc-overlay),
+    0 24px 60px var(--arc-glow-soft);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.scene::before,
+.scene::after {
   content: '';
   position: absolute;
-  inset: -0.28rem;
-  border-radius: 2rem;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--arcane-glow-soft) 58%, transparent), transparent 42%, color-mix(in srgb, var(--arcane-glow-strong) 48%, transparent));
-  opacity: 0;
-  filter: blur(12px);
-  transition: opacity 180ms ease;
+  inset: 1rem;
+  border-radius: 1.6rem;
   pointer-events: none;
 }
 
-.focusFrame:focus-visible::before,
-.focusFrame:focus-within::before {
-  opacity: 0.9;
+.scene::before {
+  border: 1px solid var(--arc-overlay);
 }
 
-.shell {
-  position: relative;
-  isolation: isolate;
-  display: grid;
-  width: min(100%, 36rem);
-  min-height: 8.5rem;
-  gap: 0.8rem;
-  padding: 1rem 1.05rem 1rem;
-  overflow: hidden;
-  border-radius: 1.55rem;
-  border: 1px solid color-mix(in srgb, var(--arcane-glow-soft) 84%, rgba(255, 255, 255, 0.12));
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--arcane-surface) 97%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    radial-gradient(circle at 10% 16%, color-mix(in srgb, var(--arcane-glow-soft) 45%, transparent), transparent 36%),
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--arcane-glow-soft) 10%, transparent), transparent);
-  box-shadow: var(--arcane-shell-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+.scene::after {
+  inset: auto 1.25rem 1.1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--arc-edge), transparent);
 }
 
-.compactShell {
-  min-height: 7.6rem;
-  padding: 0.88rem 0.92rem 0.9rem;
+.sceneSorcerer,
+.sceneMage,
+.sceneWeaver,
+.sceneConjurer,
+.sceneMystic,
+.sceneOracle {
+  padding: 1rem 1rem 1.15rem;
 }
 
-.shellGlow,
-.shellOrnament {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.shellGlow {
-  border-radius: inherit;
-  background:
-    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--arcane-glow-soft) 45%, transparent), transparent 34%),
-    radial-gradient(circle at 82% 78%, color-mix(in srgb, var(--arcane-glow-soft) 28%, transparent), transparent 26%);
-  opacity: 0.95;
-}
-
-.shellOrnament {
-  inset: 0.8rem;
-  border-radius: inherit;
-  border: 1px solid color-mix(in srgb, var(--arcane-glow-soft) 22%, transparent);
-  opacity: 0.62;
-}
-
-.panelHeader,
-.titleStage,
-.descriptorTrack {
-  position: relative;
-  z-index: 1;
-}
-
-.panelHeader {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+.sceneMystic .sceneBody {
+  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
   align-items: center;
+  min-height: 15rem;
+  gap: 0.45rem;
+}
+
+.sceneMystic .titleBlock {
+  position: relative;
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  z-index: 2;
+  max-width: none;
+  padding: 1rem 0.8rem 1rem 0.15rem;
+  text-align: left;
+}
+
+.sceneMystic .titleBlock::after {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  right: 0;
+  bottom: 1rem;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--arc-edge), transparent);
+}
+
+.sceneMystic .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneMystic .titleLockup {
+  max-width: 10.5rem;
+}
+
+.sceneMystic .descriptor {
+  max-width: 11rem;
+}
+
+.sceneMystic .iconBadge {
+  display: none;
+}
+
+.sceneMystic .sceneRig {
+  min-height: 14rem;
+  width: min(100%, 18rem);
+  justify-self: end;
+  border: none;
+  background: none;
+}
+
+.sceneSorcerer .sceneBody {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
+  align-items: center;
+  min-height: 15rem;
   gap: 0.55rem;
 }
 
-.panelIndex,
-.panelFamily,
-.descriptorToken {
-  border: 1px solid color-mix(in srgb, var(--arcane-glow-soft) 52%, rgba(255, 255, 255, 0.08));
-  background: color-mix(in srgb, var(--arcane-surface-strong) 92%, rgba(255, 255, 255, 0.04));
+.sceneSorcerer .titleBlock {
+  order: 2;
+  max-width: 10.8rem;
+  justify-self: end;
+  z-index: 2;
 }
 
-.panelIndex,
-.panelFamily {
-  display: inline-flex;
+.sceneSorcerer .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneSorcerer .iconBadge {
+  display: none;
+}
+
+.sceneSorcerer .titleLockup,
+.sceneSorcerer .descriptor {
+  max-width: 10.5rem;
+}
+
+.sceneSorcerer .sceneRig {
+  order: 1;
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+.sceneMage .sceneBody {
+  grid-template-columns: minmax(0, 8.4rem) minmax(0, 1fr);
   align-items: center;
-  justify-content: center;
-  min-height: 1.7rem;
-  border-radius: 999px;
-  padding: 0.25rem 0.65rem;
-  font-size: 0.58rem;
-  font-weight: 650;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 72%, rgba(226, 232, 240, 0.92));
+  min-height: 15rem;
+  gap: 0.55rem;
 }
 
-.panelTag {
-  min-width: 0;
-  font-size: 0.58rem;
-  font-weight: 700;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 54%, rgba(226, 232, 240, 0.82));
-  white-space: nowrap;
+.sceneMage .titleBlock {
+  max-width: 8.2rem;
+  padding-left: 0.1rem;
+  z-index: 2;
+}
+
+.sceneMage .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneMage .iconBadge {
+  display: none;
+}
+
+.sceneMage .titleLockup,
+.sceneMage .descriptor {
+  max-width: 8rem;
+}
+
+.sceneMage .sceneRig {
+  min-height: 14rem;
+  border: none;
+  background: none;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.titleStage {
+.deck {
   display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.95rem;
+  gap: 0.8rem;
+  margin-bottom: 0.95rem;
+  color: var(--arc-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
-.iconCore {
+.deckFamily,
+.deckCounter {
+  white-space: nowrap;
+}
+
+.deckCounter {
+  justify-self: end;
+}
+
+.deckCounterTotal {
+  opacity: 0.65;
+}
+
+.deckNotes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.38rem;
+}
+
+.deckNote,
+.oracleTag {
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background: var(--arc-overlay);
+  padding: 0.22rem 0.5rem;
+}
+
+.sceneBody {
+  display: grid;
+  gap: 1rem;
+}
+
+.titleBlock {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.kicker {
+  color: var(--arc-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.headlineWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.iconBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 3rem;
   height: 3rem;
-  border-radius: 0.95rem;
-  border: 1px solid color-mix(in srgb, var(--arcane-glow-soft) 54%, rgba(255, 255, 255, 0.08));
+  border-radius: 1rem;
+  border: 1px solid var(--arc-edge);
   background:
-    linear-gradient(145deg, color-mix(in srgb, var(--arcane-surface-strong) 96%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface) 94%, rgba(255, 255, 255, 0.03))),
-    radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--arcane-glow-soft) 35%, transparent), transparent 58%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 1rem color-mix(in srgb, var(--arcane-glow-soft) 28%, transparent);
+    linear-gradient(160deg, var(--arc-overlay), transparent),
+    var(--arc-gradient);
+  box-shadow: 0 18px 34px var(--arc-glow-soft);
 }
 
-.iconSvg {
-  width: 1.55rem;
-  height: 1.55rem;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 78%, white 22%);
-  filter: drop-shadow(0 0 0.8rem color-mix(in srgb, var(--arcane-glow-strong) 54%, transparent));
+.icon {
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
-.titleStack {
+.titleLockup {
   display: grid;
-  gap: 0.12rem;
-  min-width: 0;
+  gap: 0.4rem;
 }
 
-.titleLine {
-  display: block;
-  min-width: 0;
-}
-
-.titleLineAnimated,
-.titleLineStatic {
-  display: inline-block;
-  max-width: 100%;
-  background-image: var(--arcane-gradient);
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 1.2rem color-mix(in srgb, var(--arcane-glow-soft) 58%, transparent);
-}
-
-.titleLineStatic {
-  white-space: normal;
+.title {
+  margin: 0;
+  font-size: clamp(1.42rem, 3vw, 2.12rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
-.inlineWord + .inlineWord {
-  margin-left: 0.48ch;
+.descriptor {
+  margin: 0;
+  max-width: 30rem;
+  color: var(--arc-muted);
+  font-size: 0.87rem;
+  line-height: 1.5;
 }
 
-.descriptorTrack {
+.sceneRig {
+  position: relative;
+  min-height: 7.4rem;
+  border-radius: 1.55rem;
+  border: 1px solid var(--arc-edge);
+  background:
+    linear-gradient(160deg, var(--arc-overlay), transparent),
+    var(--arc-inlay);
+  overflow: hidden;
+}
+
+.sorcererRig,
+.mageRig,
+.weaverRig,
+.conjurerRig,
+.mysticRig,
+.oracleRig {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.sorcererRig {
+  position: relative;
+  display: block;
+  padding: 0;
+}
+
+.sorcererRig::before,
+.sorcererRig::after,
+.mageRig::before,
+.mageRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.sorcererRig::before {
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  height: 4.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background: radial-gradient(circle at center, var(--arc-glow-soft), transparent 66%);
+  box-shadow: inset 0 1px 0 var(--arc-overlay);
+}
+
+.sorcererRig::after {
+  inset: 1.45rem 2.2rem auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--arc-glow-strong), transparent);
+}
+
+.sorcererTablet {
+  position: absolute;
+  width: 3.2rem;
+  min-height: 5.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--arc-edge);
+  background:
+    repeating-linear-gradient(
+      180deg,
+      var(--arc-overlay) 0 0.48rem,
+      transparent 0.48rem 0.86rem
+    ),
+    linear-gradient(180deg, var(--arc-overlay), transparent);
+  box-shadow:
+    inset 0 1px 0 var(--arc-overlay),
+    0 14px 28px var(--arc-glow-soft);
+}
+
+.sorcererTablet:nth-child(1) {
+  top: 2.8rem;
+  left: 1rem;
+  transform: rotate(-5deg);
+}
+
+.sorcererTablet:nth-child(2) {
+  top: 1.25rem;
+  left: 50%;
+  margin-left: -1.6rem;
+  min-height: 6.6rem;
+}
+
+.sorcererTablet:nth-child(3) {
+  top: 3.05rem;
+  right: 1rem;
+  transform: rotate(6deg);
+}
+
+.mageRig {
+  position: relative;
+  display: block;
+  padding: 0;
+}
+
+.mageRig::before {
+  inset: 1rem;
+  border-radius: 1.8rem;
+  border: 1px solid var(--arc-edge);
+  opacity: 0.25;
+}
+
+.mageRig::after {
+  left: 50%;
+  bottom: 0.8rem;
+  transform: translateX(-50%);
+  width: 55%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--arc-glow-strong), transparent);
+}
+
+.mageSigil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4.6rem;
+  height: 4.6rem;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background:
+    radial-gradient(circle at center, var(--arc-glow-strong), transparent 60%),
+    linear-gradient(160deg, var(--arc-overlay), transparent);
+  z-index: 2;
+}
+
+.mageInscription {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background: none;
+  z-index: 1;
+}
+
+.mageInscription:nth-of-type(2) {
+  width: 7.4rem;
+  height: 7.4rem;
+}
+
+.mageInscription:nth-of-type(3) {
+  width: 10.4rem;
+  height: 10.4rem;
+  border-style: dashed;
+  opacity: 0.45;
+}
+
+.mageRune {
+  position: absolute;
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 0.14rem;
+  border: 1px solid var(--arc-edge);
+  background: var(--arc-glow-soft);
+  transform: rotate(45deg);
+  z-index: 3;
+}
+
+.mageRune:nth-of-type(4) {
+  top: 0.9rem;
+  left: 50%;
+  margin-left: -0.325rem;
+}
+
+.mageRune:nth-of-type(5) {
+  bottom: 1.2rem;
+  left: 1.8rem;
+}
+
+.mageRune:nth-of-type(6) {
+  bottom: 1.2rem;
+  right: 1.8rem;
+}
+
+.weaverLoom {
+  position: relative;
+  width: 100%;
+  min-height: inherit;
+}
+
+.weaverWarp {
+  position: absolute;
+  inset: 0.7rem 1.4rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.weaverWarp span {
+  width: 2px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--arc-glow-strong) 15%,
+    var(--arc-glow-strong) 85%,
+    transparent 100%
+  );
+  border-radius: 999px;
+}
+
+.weaverWeft {
+  position: absolute;
+  inset: 1.6rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.weaverWeft span {
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--arc-overlay) 10%,
+    var(--arc-glow-soft) 50%,
+    var(--arc-overlay) 90%,
+    transparent 100%
+  );
+  border-radius: 999px;
+}
+
+.weaverShuttle {
+  position: absolute;
+  top: 50%;
+  left: 56%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  width: 1.2rem;
+  height: 0.5rem;
+  border-radius: 0.24rem;
+  background: var(--arc-gradient);
+  border: 1px solid var(--arc-edge);
+  box-shadow: 0 0 12px var(--arc-glow);
+  z-index: 2;
+}
+
+.conjurerRig {
+  min-height: 7.8rem;
+}
+
+.conjurerCore {
+  width: 5.6rem;
+  height: 5.6rem;
+  border-radius: 1.4rem;
+  border: 1px solid var(--arc-edge);
+  background:
+    radial-gradient(circle at center, var(--arc-glow-strong), transparent 55%),
+    linear-gradient(160deg, var(--arc-overlay), transparent);
+}
+
+.conjurerTrace {
+  position: absolute;
+  width: 3.6rem;
+  height: 3.6rem;
+  border: 1px solid var(--arc-edge);
+  border-radius: 0.9rem;
+}
+
+.conjurerTrace:nth-of-type(2) {
+  top: 1rem;
+  left: 1rem;
+}
+
+.conjurerTrace:nth-of-type(3) {
+  top: 1rem;
+  right: 1rem;
+}
+
+.conjurerTrace:nth-of-type(4) {
+  bottom: 1rem;
+  left: 1rem;
+}
+
+.conjurerTrace:nth-of-type(5) {
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.mysticHalo,
+.oracleDial {
+  position: absolute;
+  width: 10.5rem;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+}
+
+.mysticHalo {
+  top: 50%;
+  left: 56%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at center, var(--arc-glow-soft), transparent 60%),
+    radial-gradient(circle at center, transparent 48%, var(--arc-overlay) 48%, transparent 68%);
+  width: 13rem;
+  box-shadow: 0 0 40px var(--arc-glow-soft);
+}
+
+.mysticPetals {
+  position: relative;
+  width: 13rem;
+  aspect-ratio: 1;
+  justify-self: end;
+  margin-inline-end: 0.35rem;
+}
+
+.mysticPetals span {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 2.2rem;
+  height: 6.2rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--arc-overlay-bold), var(--arc-glow-strong), transparent);
+  opacity: 0.82;
+  filter: blur(0.2px);
+  transform-origin: top center;
+}
+
+.mysticPetals span:nth-child(1) {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+
+.mysticPetals span:nth-child(2) {
+  transform: translate(-50%, -50%) rotate(36deg);
+}
+
+.mysticPetals span:nth-child(3) {
+  transform: translate(-50%, -50%) rotate(72deg);
+}
+
+.mysticPetals span:nth-child(4) {
+  transform: translate(-50%, -50%) rotate(108deg);
+}
+
+.mysticPetals span:nth-child(5) {
+  transform: translate(-50%, -50%) rotate(144deg);
+}
+
+.mysticPetals span:nth-child(6) {
+  transform: translate(-50%, -50%) rotate(180deg);
+}
+
+.mysticPetals span:nth-child(7) {
+  transform: translate(-50%, -50%) rotate(216deg);
+}
+
+.mysticPetals span:nth-child(8) {
+  transform: translate(-50%, -50%) rotate(252deg);
+}
+
+.oracleRing {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  aspect-ratio: 1;
+}
+
+.oracleRing:nth-of-type(1) {
+  width: 7rem;
+  background: radial-gradient(circle at center, var(--arc-glow-soft), transparent 70%);
+}
+
+.oracleRing:nth-of-type(2) {
+  width: 14rem;
+  border-style: dashed;
+  opacity: 0.35;
+}
+
+.oracleDial {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+  background:
+    radial-gradient(circle at center, transparent 44%, var(--arc-overlay) 44%, transparent 60%),
+    radial-gradient(circle at center, var(--arc-glow-soft), transparent 62%);
+}
+
+.oracleSweep {
+  position: absolute;
+  top: calc(50% - 2.5rem);
+  left: 50%;
+  width: 10rem;
+  height: 5rem;
+  background: linear-gradient(90deg, transparent, var(--arc-glow-strong));
+  clip-path: polygon(0 100%, 100% 50%, 0 0);
+  opacity: 0.6;
+  transform-origin: left center;
+  z-index: 2;
+}
+
+.oraclePips {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.oraclePips span {
+  position: absolute;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--arc-glow);
+  box-shadow: 0 0 6px var(--arc-glow);
+}
+
+.oraclePips span:nth-child(1) {
+  top: 14%;
+  left: 28%;
+}
+
+.oraclePips span:nth-child(2) {
+  top: 22%;
+  right: 18%;
+}
+
+.oraclePips span:nth-child(3) {
+  top: 50%;
+  right: 8%;
+  opacity: 0.6;
+}
+
+.oraclePips span:nth-child(4) {
+  bottom: 28%;
+  left: 14%;
+  opacity: 0.5;
+}
+
+.oraclePips span:nth-child(5) {
+  bottom: 16%;
+  right: 28%;
+}
+
+.oracleTags {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-top: 4.5rem;
 }
 
-.descriptorToken {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.65rem;
-  border-radius: 999px;
-  padding: 0.18rem 0.58rem;
-  font-size: 0.52rem;
-  font-weight: 620;
-  color: color-mix(in srgb, var(--arcane-glow-strong) 66%, rgba(226, 232, 240, 0.86));
-}
-
-.dataSorcerer {
-  border-radius: 1.25rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    repeating-linear-gradient(90deg, transparent 0 2rem, color-mix(in srgb, var(--arcane-glow-soft) 14%, transparent) 2rem 2.08rem),
-    linear-gradient(0deg, transparent 0 84%, color-mix(in srgb, var(--arcane-glow-soft) 14%, transparent) 84% 86%, transparent 86% 100%);
-}
-
-.dataSorcerer .titleStage {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-.dataSorcerer .descriptorTrack {
-  justify-content: flex-end;
-}
-
-.dataSorcererLines {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1.02rem, 0.9rem + 1.2vw, 1.82rem);
-  line-height: 1.03;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.technologicalConjurer {
-  border-radius: 1.9rem 1rem 1.9rem 1rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(90deg, color-mix(in srgb, var(--arcane-glow-soft) 16%, transparent) 0 8%, transparent 8% 92%, color-mix(in srgb, var(--arcane-glow-soft) 16%, transparent) 92% 100%);
-}
-
-.technologicalConjurer .shellOrnament {
-  border-style: dashed;
-  clip-path: polygon(3% 0, 97% 0, 100% 14%, 100% 86%, 97% 100%, 3% 100%, 0 86%, 0 14%);
-}
-
-.technologicalConjurer .titleStage {
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas: 'title icon';
-}
-
-.technologicalConjurer .iconCore {
-  grid-area: icon;
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 1.25rem;
-}
-
-.technologicalConjurer .titleStack {
-  grid-area: title;
-  gap: 0.18rem;
-}
-
-.conjurerLines {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(0.92rem, 0.78rem + 1.02vw, 1.62rem);
-  line-height: 0.98;
+.oracleTag {
+  color: var(--arc-text);
+  font-size: 0.65rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
 
-.innovationMystic {
-  border-radius: 999px 999px 1.4rem 1.4rem;
-  background:
-    radial-gradient(circle at 50% 0, color-mix(in srgb, var(--arcane-glow-soft) 28%, transparent), transparent 42%),
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02)));
+.scene[data-motion='animated'] .iconBadge,
+.scene[data-motion='animated'] .oracleDial,
+.scene[data-motion='animated'] .oracleRing:nth-of-type(1),
+.scene[data-motion='animated'] .conjurerCore,
+.scene[data-motion='animated'] .mageSigil {
+  animation: arcanePulse 8s ease-in-out infinite;
 }
 
-.innovationMystic .shellOrnament {
-  inset: 0.95rem 1.25rem 1rem;
-  border-radius: 999px;
+.scene[data-motion='animated'] .mysticHalo {
+  animation: mysticHaloPulse 8s ease-in-out infinite;
 }
 
-.innovationMystic .titleStage {
-  grid-template-columns: minmax(0, 1fr) auto;
+.scene[data-motion='animated'] .sorcererTablet:nth-child(2),
+.scene[data-motion='animated'] .weaverShuttle,
+.scene[data-motion='animated'] .oracleSweep {
+  animation: arcaneDrift 5.8s ease-in-out infinite;
 }
 
-.innovationMystic .descriptorTrack {
-  justify-content: center;
+.scene[data-motion='animated'] .weaverWeft span:nth-child(2n),
+.scene[data-motion='animated'] .mysticPetals span:nth-child(odd) {
+  animation: arcaneShimmer 4.6s ease-in-out infinite;
 }
 
-.innovationMysticLines {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(1.02rem, 0.86rem + 1.06vw, 1.72rem);
-  line-height: 0.95;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
+.scene[data-motion='animated'] .mageInscription:nth-of-type(3) {
+  animation: sigilSpin 24s linear infinite;
 }
 
-.workflowMage {
-  border-radius: 1rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    repeating-linear-gradient(90deg, transparent 0 1.4rem, color-mix(in srgb, var(--arcane-glow-soft) 18%, transparent) 1.4rem 1.48rem),
-    linear-gradient(0deg, transparent 0 82%, color-mix(in srgb, var(--arcane-glow-soft) 16%, transparent) 82% 84%, transparent 84% 100%);
+.scene[data-motion='animated'] .oraclePips span:nth-child(odd) {
+  animation: oraclePipBlink 3.2s ease-in-out infinite;
 }
 
-.workflowMage .titleStage {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-.workflowMage .descriptorTrack {
-  gap: 0.32rem;
-}
-
-.workflowMageLines {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1rem, 0.88rem + 0.96vw, 1.64rem);
-  line-height: 1.04;
-  letter-spacing: 0.08em;
-  text-transform: lowercase;
-}
-
-.algorithmWeaver {
-  border-radius: 1.2rem 2rem 1.2rem 2rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    repeating-linear-gradient(90deg, transparent 0 1rem, color-mix(in srgb, var(--arcane-glow-soft) 16%, transparent) 1rem 1.08rem),
-    repeating-linear-gradient(0deg, transparent 0 1rem, color-mix(in srgb, var(--arcane-glow-soft) 12%, transparent) 1rem 1.08rem);
-}
-
-.algorithmWeaver .titleStage {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-.algorithmWeaver .descriptorTrack {
-  justify-content: center;
-}
-
-.algorithmWeaverLines {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1rem, 0.86rem + 1.02vw, 1.68rem);
-  line-height: 0.98;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.platformVisionary {
-  border-radius: 2rem 2rem 1rem 1rem;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-glow-soft) 18%, transparent) 0 24%, transparent 24% 100%);
-}
-
-.platformVisionary .shellOrnament {
-  inset: auto 1rem 1rem;
-  height: 1px;
-  border: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--arcane-glow-strong) 64%, transparent), transparent);
-}
-
-.platformVisionary .titleStage {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.platformVisionary .descriptorTrack {
-  justify-content: space-between;
-}
-
-.platformVisionaryLines {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(1rem, 0.84rem + 0.98vw, 1.72rem);
-  line-height: 1.02;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.systemsDreamer {
-  border-radius: 1.8rem;
-  background:
-    radial-gradient(circle at 50% 0, color-mix(in srgb, var(--arcane-glow-soft) 20%, transparent), transparent 36%),
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--arcane-glow-soft) 10%, transparent), transparent);
-}
-
-.systemsDreamer .shellOrnament {
-  inset: auto 1.15rem 1rem;
-  height: 2.6rem;
-  border-radius: 999px 999px 0 0;
-}
-
-.systemsDreamer .titleStage {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.systemsDreamer .descriptorTrack {
-  justify-content: center;
-}
-
-.systemsDreamerLines {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(1.02rem, 0.86rem + 1vw, 1.74rem);
-  line-height: 0.98;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.digitalFuturist {
-  border-radius: 1rem 1rem 2rem 2rem;
-  background:
-    radial-gradient(circle at 82% 30%, color-mix(in srgb, var(--arcane-glow-soft) 24%, transparent), transparent 28%),
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(90deg, transparent 0 12%, color-mix(in srgb, var(--arcane-glow-soft) 14%, transparent) 12% 14%, transparent 14% 100%);
-}
-
-.digitalFuturist .titleStage {
-  grid-template-columns: auto minmax(0, 1fr);
-}
-
-.digitalFuturist .iconCore {
-  border-radius: 999px;
-}
-
-.digitalFuturist .descriptorTrack {
-  justify-content: flex-start;
-}
-
-.digitalFuturistLines {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(0.98rem, 0.84rem + 1vw, 1.68rem);
-  line-height: 0.96;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-}
-
-.enterpriseDreamer {
-  border-radius: 1.15rem;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--arcane-surface) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--arcane-surface-strong) 98%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(0deg, color-mix(in srgb, var(--arcane-glow-soft) 12%, transparent) 0 14%, transparent 14% 100%);
-}
-
-.enterpriseDreamer .shellOrnament {
-  inset: auto 1rem 0.8rem;
-  height: 2.8rem;
-  border: 0;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--arcane-glow-soft) 18%, transparent) 0 8%, transparent 8% 16%, color-mix(in srgb, var(--arcane-glow-soft) 26%, transparent) 16% 24%, transparent 24% 34%, color-mix(in srgb, var(--arcane-glow-soft) 20%, transparent) 34% 46%, transparent 46% 58%, color-mix(in srgb, var(--arcane-glow-soft) 30%, transparent) 58% 70%, transparent 70% 82%, color-mix(in srgb, var(--arcane-glow-soft) 18%, transparent) 82% 92%, transparent 92% 100%);
-  mask: linear-gradient(180deg, transparent 0 40%, black 40% 100%);
-}
-
-.enterpriseDreamer .titleStage {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.enterpriseDreamer .descriptorTrack {
-  justify-content: space-between;
-}
-
-.enterpriseDreamerLines {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(0.98rem, 0.84rem + 1vw, 1.66rem);
-  line-height: 0.96;
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
-}
-
-@media (max-width: 42rem) {
-  .signalDeck {
-    width: min(100%, 30rem);
+@keyframes arcanePulse {
+  0%,
+  100% {
+    transform: scale(1);
   }
 
-  .shell {
-    width: min(100%, 32rem);
+  50% {
+    transform: scale(1.03);
   }
 }
 
-@media (max-width: 30rem) {
-  .signalDeck {
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      'family counter'
-      'descriptor descriptor';
-    gap: 0.35rem 0.55rem;
-    padding-inline: 0.7rem;
+@keyframes mysticHaloPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
   }
 
-  .deckFamily {
-    grid-area: family;
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+}
+
+@keyframes arcaneDrift {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.6;
   }
 
-  .deckDescriptor {
-    grid-area: descriptor;
-    white-space: normal;
+  50% {
+    transform: translateY(-0.25rem);
+    opacity: 1;
+  }
+}
+
+@keyframes arcaneShimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sigilSpin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes oraclePipBlink {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .deck {
+    grid-template-columns: 1fr;
+    justify-items: start;
   }
 
   .deckCounter {
-    grid-area: counter;
+    justify-self: start;
   }
 
-  .shell {
+  .headlineWrap {
+    grid-template-columns: 1fr;
+  }
+
+  .sceneMystic .sceneBody {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .sceneSorcerer .sceneBody,
+  .sceneMage .sceneBody {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .sceneSorcerer .titleBlock,
+  .sceneMage .titleBlock {
+    justify-self: center;
+    max-width: none;
+    padding: 0;
+    text-align: center;
+  }
+
+  .sceneSorcerer .headlineWrap,
+  .sceneMage .headlineWrap,
+  .sceneMystic .headlineWrap {
+    justify-items: center;
+  }
+
+  .sceneSorcerer .titleLockup,
+  .sceneSorcerer .descriptor,
+  .sceneMage .titleLockup,
+  .sceneMage .descriptor {
+    max-width: none;
+  }
+
+  .sceneSorcerer .sceneRig,
+  .sceneMage .sceneRig {
     width: 100%;
-    min-height: 7.2rem;
-    gap: 0.68rem;
-    padding: 0.82rem 0.82rem 0.86rem;
+    min-height: 12rem;
   }
 
-  .panelHeader {
-    grid-template-columns: auto 1fr;
-    grid-template-areas:
-      'index family'
-      'tag tag';
+  .sceneMystic .titleBlock {
+    padding: 0;
+    text-align: center;
   }
 
-  .panelIndex {
-    grid-area: index;
+  .sceneMystic .titleBlock::after {
+    display: none;
   }
 
-  .panelFamily {
-    grid-area: family;
-    justify-self: end;
+  .sceneMystic .headlineWrap {
+    justify-items: center;
   }
 
-  .panelTag {
-    grid-area: tag;
+  .sceneMystic .titleLockup,
+  .sceneMystic .descriptor {
+    max-width: none;
   }
 
-  .iconCore {
-    width: 2.6rem;
-    height: 2.6rem;
+  .sceneMystic .sceneRig {
+    width: 100%;
+    justify-self: center;
+    min-height: 12rem;
   }
 
-  .iconSvg {
-    width: 1.35rem;
-    height: 1.35rem;
+  .sorcererTablet:nth-child(1) {
+    left: 0.7rem;
   }
 
-  .dataSorcerer .titleStage,
-  .workflowMage .titleStage,
-  .algorithmWeaver .titleStage,
-  .digitalFuturist .titleStage {
+  .sorcererTablet:nth-child(3) {
+    right: 0.7rem;
+  }
+
+  .sorcererRig,
+  .mageRig {
     grid-template-columns: 1fr;
-    justify-items: start;
   }
-
-  .technologicalConjurer .titleStage,
-  .innovationMystic .titleStage,
-  .platformVisionary .titleStage,
-  .systemsDreamer .titleStage,
-  .enterpriseDreamer .titleStage {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-
-  .technologicalConjurer .iconCore,
-  .innovationMystic .iconCore,
-  .platformVisionary .iconCore,
-  .systemsDreamer .iconCore,
-  .enterpriseDreamer .iconCore {
-    order: -1;
-  }
-
-  .descriptorTrack {
-    gap: 0.32rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .titleLineAnimated,
-  .titleLineStatic,
-  .signalDeck,
-  .shellGlow,
-  .iconSvg {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-.root[data-motion-mode='reduced'] .titleLineAnimated,
-.root[data-motion-mode='reduced'] .signalDeck,
-.root[data-motion-mode='reduced'] .iconSvg,
-.root[data-motion-mode='reduced'] .shellGlow {
-  animation: none !important;
-  transition: none !important;
 }

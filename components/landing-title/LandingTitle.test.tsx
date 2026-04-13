@@ -62,10 +62,10 @@ describe('LandingTitle locked previews', () => {
   });
 
   it('supports locked previews via legacy theme text lookup', () => {
-    render(<LandingTitle forcedThemeText="innovation mystic" disableRotation />);
+    render(<LandingTitle forcedThemeText="emergence mystic" disableRotation />);
 
     expect(
-      screen.getByRole('group', { name: /innovation mystic/i }),
+      screen.getByRole('group', { name: /emergence mystic/i }),
     ).toBeTruthy();
   });
 });

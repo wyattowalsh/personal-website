@@ -26,6 +26,7 @@ export interface LandingTitleProps {
   disableRotation?: boolean;
   forceReducedMotion?: boolean;
   hideSignalDeck?: boolean;
+  framed?: boolean;
   showName?: boolean;
   compact?: boolean;
   className?: string;
@@ -41,6 +42,7 @@ export function LandingTitle({
   disableRotation = false,
   forceReducedMotion,
   hideSignalDeck = false,
+  framed = true,
   showName = true,
   compact = false,
   className,
@@ -85,55 +87,49 @@ export function LandingTitle({
   }, [isRotationEnabled]);
 
   const advance = useCallback(() => {
-    setWordIndex((previousIndex) => {
-      if (previousIndex + 1 < rotationSequence.length) {
-        return previousIndex + 1;
-      }
+    setWordIndex((prev) => {
+      if (prev + 1 < rotationSequence.length) return prev + 1;
 
-      const previousRenderer =
-        rotationSequence[previousIndex] ?? rotationSequence[rotationSequence.length - 1] ?? null;
-      setRotationSequence(buildRotationSequence(LANDING_TITLE_RENDERERS, previousRenderer));
+      const last = rotationSequence[prev] ?? rotationSequence[rotationSequence.length - 1] ?? null;
+      setRotationSequence(buildRotationSequence(LANDING_TITLE_RENDERERS, last));
       return 0;
     });
   }, [rotationSequence]);
 
-  const cancelScheduledAdvance = useCallback(() => {
+  // Ref keeps startRotation stable while always calling the latest advance.
+  const advanceRef = useRef(advance);
+  advanceRef.current = advance;
+
+  const pauseRotation = useCallback(() => {
+    if (cycleStartedAtRef.current !== null) {
+      elapsedCycleMsRef.current = Math.min(
+        elapsedCycleMsRef.current + (performance.now() - cycleStartedAtRef.current),
+        ANIMATION_INTERVAL,
+      );
+      cycleStartedAtRef.current = null;
+    }
     if (advanceTimeoutRef.current !== null) {
       clearTimeout(advanceTimeoutRef.current);
       advanceTimeoutRef.current = null;
     }
   }, []);
 
-  const syncCycleProgress = useCallback(() => {
-    if (cycleStartedAtRef.current === null) {
-      return;
-    }
-
-    elapsedCycleMsRef.current = Math.min(
-      elapsedCycleMsRef.current + (performance.now() - cycleStartedAtRef.current),
-      ANIMATION_INTERVAL,
-    );
-    cycleStartedAtRef.current = null;
-  }, []);
-
-  const pauseRotation = useCallback(() => {
-    syncCycleProgress();
-    cancelScheduledAdvance();
-  }, [cancelScheduledAdvance, syncCycleProgress]);
-
   const startRotation = useCallback(() => {
-    cancelScheduledAdvance();
+    if (advanceTimeoutRef.current !== null) {
+      clearTimeout(advanceTimeoutRef.current);
+      advanceTimeoutRef.current = null;
+    }
 
     const remainingMs = Math.max(ANIMATION_INTERVAL - elapsedCycleMsRef.current, 16);
     cycleStartedAtRef.current = performance.now();
 
     advanceTimeoutRef.current = setTimeout(() => {
-      cancelScheduledAdvance();
+      advanceTimeoutRef.current = null;
       cycleStartedAtRef.current = null;
       elapsedCycleMsRef.current = 0;
-      advance();
+      advanceRef.current();
     }, remainingMs);
-  }, [advance, cancelScheduledAdvance]);
+  }, []);
 
   useEffect(() => {
     if (!isRotationEnabled) {
@@ -229,18 +225,21 @@ export function LandingTitle({
       data-motion-mode={prefersReducedMotion ? 'reduced' : 'animated'}
       className={cn(
         'relative z-10',
-        'mx-auto w-full rounded-[1.75rem]',
+        'mx-auto w-full',
+        framed && 'rounded-[1.75rem]',
         compact
           ? 'max-w-[28rem] px-3 py-3 sm:px-4 sm:py-4'
-          : 'max-w-[48rem] px-2 py-1 sm:max-w-[48rem] sm:px-4 sm:py-2 md:px-6 md:py-4 lg:px-8 lg:py-6 xl:max-w-[52rem]',
+          : framed
+            ? 'max-w-[48rem] px-2 py-1 sm:max-w-[48rem] sm:px-4 sm:py-2 md:px-6 md:py-4 lg:px-8 lg:py-6 xl:max-w-[52rem]'
+            : 'max-w-[48rem] px-0 py-0 sm:max-w-[48rem] md:px-2 lg:px-4 xl:max-w-[52rem]',
         'flex flex-col items-center',
-        'bg-linear-to-br',
-        'from-background/40 via-background/18 to-transparent',
-        'dark:from-background/28 dark:via-background/16 dark:to-background/6',
-        'border border-primary/10',
-        'dark:border-primary/20',
-        'shadow-lg shadow-primary/5',
-        'dark:shadow-primary/8',
+        framed && 'bg-linear-to-br',
+        framed && 'from-background/40 via-background/18 to-transparent',
+        framed && 'dark:from-background/28 dark:via-background/16 dark:to-background/6',
+        framed && 'border border-primary/10',
+        framed && 'dark:border-primary/20',
+        framed && 'shadow-lg shadow-primary/5',
+        framed && 'dark:shadow-primary/8',
         'transition-colors duration-300',
         className,
       )}

@@ -1,582 +1,763 @@
-@reference "../../app/tailwind.css";
+/* ─── Shell ──────────────────────────────────────────────────────────────────── */
 
 .cluster {
-  position: relative;
-  container-type: inline-size;
+  width: 100%;
+}
+
+.clusterCompact {
+  max-width: 31rem;
 }
 
 .control {
-  border-radius: 1.7rem;
+  outline: none;
 }
 
-.motionActive {
-  .deck,
-  .shell {
-    will-change: transform, opacity;
-  }
+.control:focus-visible .scene {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--perf-edge),
+    0 26px 64px var(--perf-glow-soft);
 }
 
-.deck {
+.scene {
   position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.75rem;
-  width: min(100%, 42rem);
-  padding: 0.7rem 0.85rem;
-  border-radius: 1.4rem;
-  border: 1px solid var(--perf-shell-edge);
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--perf-panel) 94%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--perf-panel-2) 92%, rgba(255, 255, 255, 0.03))),
-    radial-gradient(circle at 16% 50%, var(--perf-shell-soft), transparent 42%);
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.08);
   overflow: hidden;
+  border-radius: 2rem;
+  border: 1px solid var(--perf-edge);
+  background:
+    radial-gradient(circle at top right, var(--perf-glow-soft), transparent 58%),
+    linear-gradient(160deg, var(--perf-panel), var(--perf-panel-2) 58%, var(--perf-panel-3));
+  color: var(--perf-text);
+  box-shadow:
+    inset 0 1px 0 var(--perf-highlight),
+    0 24px 60px var(--perf-glow-soft);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
 }
 
-.deck::before {
+.scene::before,
+.scene::after {
   content: '';
   position: absolute;
-  inset: 0.55rem 0.8rem auto;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--perf-shell-strong), transparent);
-  opacity: 0.7;
-}
-
-.deckLeading {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-.deckBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.36rem 0.62rem 0.36rem 0.45rem;
-  border-radius: 999px;
-  border: 1px solid var(--perf-shell-edge);
-  background: color-mix(in srgb, var(--perf-panel) 88%, rgba(255, 255, 255, 0.06));
-  color: var(--perf-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.deckBadgeSwatch {
-  width: 0.66rem;
-  height: 0.66rem;
-  border-radius: 999px;
-  background: var(--perf-gradient);
-  box-shadow: 0 0 12px var(--perf-shell-strong);
-}
-
-.deckQualifier {
-  color: var(--perf-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.deckMeta {
-  min-width: 0;
-  display: grid;
-  gap: 0.35rem;
-}
-
-.deckDescriptor {
-  color: var(--perf-muted);
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.metricRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.4rem;
-}
-
-.metricChip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.42rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 78%, rgba(255, 255, 255, 0.08));
-  background: color-mix(in srgb, var(--perf-panel-3) 88%, rgba(255, 255, 255, 0.02));
-  color: var(--perf-text);
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.counter {
-  display: inline-flex;
-  justify-self: end;
-  align-items: baseline;
-  gap: 0.15rem;
-  color: var(--perf-text);
-  font-family: var(--font-monaspace), monospace;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-}
-
-.counterTotal {
-  color: var(--perf-muted);
-}
-
-.shell {
-  position: relative;
-  isolation: isolate;
-  min-height: 10.5rem;
-  padding: 1rem;
-  border-radius: 1.55rem;
-  border: 1px solid var(--perf-shell-edge);
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--perf-panel) 96%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--perf-panel-2) 90%, rgba(255, 255, 255, 0.03))),
-    radial-gradient(circle at 20% 20%, var(--perf-shell-soft), transparent 36%),
-    radial-gradient(circle at 80% 0%, var(--perf-shell-soft), transparent 32%);
-  box-shadow: var(--perf-shell-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-}
-
-.shellBackdrop,
-.shellGlow {
-  position: absolute;
-  inset: 0;
+  inset: 1rem;
+  border-radius: 1.5rem;
   pointer-events: none;
 }
 
-.shellBackdrop {
+.scene::before {
+  border: 1px solid var(--perf-highlight);
+}
+
+.scene::after {
+  inset: auto 1.25rem 1.1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--perf-edge), transparent);
+}
+
+/* ─── Scene-specific padding & layout ────────────────────────────────────────── */
+
+.sceneAutomation,
+.sceneRobotics,
+.sceneNeural {
+  padding: 1rem 1rem 1.15rem;
+}
+
+/* Automation: title LEFT, rig RIGHT */
+
+.sceneAutomation .sceneBody {
+  grid-template-columns: minmax(0, 10.5rem) minmax(0, 1fr);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.55rem;
+}
+
+.sceneAutomation .titleBlock {
+  max-width: 10.2rem;
+  padding-left: 0.1rem;
+  z-index: 2;
+}
+
+.sceneAutomation .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneAutomation .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneAutomation .titleLockup,
+.sceneAutomation .descriptor {
+  max-width: 10rem;
+}
+
+.sceneAutomation .sceneRig {
+  min-height: 14rem;
+  border: none;
   background:
-    linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.04) 18%, transparent 38%),
-    radial-gradient(circle at 50% 110%, var(--perf-shell-soft), transparent 45%);
-  opacity: 0.8;
+    radial-gradient(circle at 50% 44%, var(--perf-glow-soft), transparent 44%),
+    linear-gradient(160deg, var(--perf-subtle-fill), transparent);
+  overflow: visible;
 }
 
-.shellGlow {
-  inset: 0.85rem;
-  border-radius: 1.1rem;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 64%, rgba(255, 255, 255, 0.06));
-  opacity: 0.55;
+/* Robotics: rig LEFT, title RIGHT */
+
+.sceneRobotics .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 10rem);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.55rem;
 }
 
-.shellInner {
-  position: relative;
-  z-index: 1;
+.sceneRobotics .titleBlock {
+  order: 2;
+  max-width: 9.8rem;
+  justify-self: end;
+  z-index: 2;
+}
+
+.sceneRobotics .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneRobotics .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneRobotics .titleLockup,
+.sceneRobotics .descriptor {
+  max-width: 9.6rem;
+}
+
+.sceneRobotics .sceneRig {
+  order: 1;
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* Neural: title LEFT (narrow), rig RIGHT (wider) */
+
+.sceneNeural .sceneBody {
+  grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.5rem;
+}
+
+.sceneNeural .titleBlock {
+  max-width: 9.2rem;
+  padding-left: 0.1rem;
+  z-index: 2;
+}
+
+.sceneNeural .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneNeural .iconBadge {
+  display: none;
+}
+
+.sceneNeural .titleLockup,
+.sceneNeural .descriptor {
+  max-width: 9rem;
+}
+
+.sceneNeural .sceneRig {
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
   display: grid;
-  min-height: 100%;
-  color: var(--perf-text);
+  place-items: center;
 }
 
-.shellAutomation {
-  border-radius: 1.8rem 1.25rem 1.45rem 1.45rem;
+/* ─── Deck ───────────────────────────────────────────────────────────────────── */
+
+.deck {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.95rem;
+  color: var(--perf-muted);
+  font-size: 0.63rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
 }
 
-.shellAutomation .shellGlow {
-  clip-path: polygon(0 12%, 16% 12%, 16% 0, 100% 0, 100% 100%, 0 100%);
+.deckFamily,
+.deckCounter {
+  white-space: nowrap;
 }
 
-.shellRobotics {
-  border-radius: 1.15rem 2rem 1.25rem 2rem;
+.deckCounter {
+  justify-self: end;
 }
 
-.shellRobotics .shellGlow {
-  clip-path: polygon(0 8%, 12% 8%, 12% 0, 88% 0, 88% 8%, 100% 8%, 100% 92%, 88% 92%, 88% 100%, 12% 100%, 12% 92%, 0 92%);
+.deckCounterTotal {
+  opacity: 0.65;
 }
 
-.shellIntelligent {
-  border-radius: 1.4rem;
+.deckNotes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.38rem;
 }
 
-.shellScalability {
-  border-radius: 1.5rem 1.5rem 1.9rem 1.9rem;
+.deckNote {
+  border-radius: 999px;
+  border: 1px solid var(--perf-edge);
+  background: var(--perf-subtle-fill);
+  padding: 0.2rem 0.5rem;
 }
 
-.iconFrame {
+/* ─── Title & content ────────────────────────────────────────────────────────── */
+
+.sceneBody {
+  display: grid;
+  gap: 1rem;
+}
+
+.titleBlock {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.kicker {
+  color: var(--perf-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.headlineWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.iconBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.9rem;
-  height: 2.9rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 82%, rgba(255, 255, 255, 0.12));
+  border: 1px solid var(--perf-edge);
   background:
-    linear-gradient(135deg, color-mix(in srgb, var(--perf-panel-3) 92%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--perf-panel) 88%, rgba(255, 255, 255, 0.02)));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 18px var(--perf-shell-soft);
+    linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+    var(--perf-gradient);
+  box-shadow: 0 18px 34px var(--perf-glow-soft);
 }
 
-.iconFrameLarge {
-  width: 3.25rem;
-  height: 3.25rem;
-}
-
-.iconGlyph {
+.icon {
   width: 1.4rem;
   height: 1.4rem;
 }
 
-.copyBlock {
-  min-width: 0;
+.titleLockup {
   display: grid;
-  gap: 0.22rem;
+  gap: 0.42rem;
 }
 
-.overline {
+.title {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+.descriptor {
+  margin: 0;
+  max-width: 30rem;
   color: var(--perf-muted);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: 0.87rem;
+  line-height: 1.5;
 }
 
-.primaryLine,
-.systemLine,
-.artistWord,
-.secondaryLine {
-  line-height: 0.98;
+/* ─── Scene rig (base) ───────────────────────────────────────────────────────── */
+
+.sceneRig {
+  position: relative;
+  min-height: 7.5rem;
+  border-radius: 1.55rem;
+  border: 1px solid var(--perf-edge);
+  background:
+    linear-gradient(160deg, var(--perf-highlight), var(--perf-subtle-fill)),
+    var(--perf-panel-3);
+  overflow: hidden;
 }
 
-.primaryLine {
-  font-size: clamp(1.5rem, 1.1rem + 2vw, 2.85rem);
-  font-weight: 820;
-  letter-spacing: -0.04em;
+/* ─── Automation rig — VU gauge dial ─────────────────────────────────────────── */
+
+/* Semicircular gauge arc with radial tick marks */
+.automationGauge {
+  position: absolute;
+  top: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 10rem;
+  height: 5rem;
+  border-radius: 10rem 10rem 0 0;
+  border: 1px solid var(--perf-edge);
+  border-bottom: none;
+  background:
+    repeating-conic-gradient(
+      from -90deg at 50% 100%,
+      transparent 0deg 17deg,
+      var(--perf-tick) 17deg 19deg
+    ),
+    radial-gradient(circle at 50% 100%, var(--perf-glow-strong), transparent 58%);
 }
 
-.secondaryLine {
-  font-size: clamp(1.1rem, 0.95rem + 1.2vw, 1.75rem);
-  font-weight: 650;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
+/* Inner concentric arc */
+.automationGauge::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 7rem;
+  height: 3.5rem;
+  border-radius: 7rem 7rem 0 0;
+  border: 1px solid var(--perf-edge);
+  border-bottom: none;
 }
 
-.systemLine {
-  font-size: clamp(1.2rem, 1rem + 1.35vw, 2.2rem);
-  font-weight: 760;
-  letter-spacing: -0.02em;
-}
-
-.roleChip {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  padding: 0.28rem 0.55rem;
+/* Pivot dot at gauge center */
+.automationGauge::after {
+  content: '';
+  position: absolute;
+  bottom: -0.35rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.7rem;
+  height: 0.7rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 82%, rgba(255, 255, 255, 0.08));
-  background: color-mix(in srgb, var(--perf-panel-3) 88%, rgba(255, 255, 255, 0.03));
-  color: var(--perf-text);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  background: var(--perf-glow-strong);
+  box-shadow: 0 0 14px var(--perf-glow);
 }
 
-.automationGrid,
-.scalabilityGrid,
-.intelligentGrid {
-  display: grid;
-  gap: 0.9rem;
+/* Needle sweeping inside the gauge */
+.automationNeedle {
+  position: absolute;
+  top: 2.6rem;
+  left: 50%;
+  width: 2px;
+  height: 3.6rem;
+  background: linear-gradient(180deg, transparent, var(--perf-glow-strong));
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(-20deg);
 }
 
-.heroBand,
-.scalabilityCore,
-.systemBand {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.9rem;
-  align-items: center;
-}
-
-.flowRow,
-.utilityBarRow,
-.fanoutRow,
-.capacityRow,
-.utilityMatrix {
+/* Cue indicator dots at bottom */
+.automationCues {
+  position: absolute;
+  bottom: 1.4rem;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  flex-wrap: wrap;
+  gap: 1.4rem;
 }
 
-.flowStep,
-.utilityBarLabel {
-  color: var(--perf-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.flowStep {
-  padding: 0.25rem 0.45rem;
+.automationCues span {
+  width: 0.55rem;
+  height: 0.55rem;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 70%, rgba(255, 255, 255, 0.06));
-  background: color-mix(in srgb, var(--perf-panel-3) 86%, rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--perf-edge);
+  background: var(--perf-glow-strong);
+  box-shadow: 0 0 10px var(--perf-glow-soft);
 }
 
-.utilityBarWrap {
-  display: grid;
-  gap: 0.25rem;
-  justify-items: center;
-}
+/* ─── Robotics rig — articulated crane mast ──────────────────────────────────── */
 
-.utilityBar,
-.capacityBar {
-  display: block;
-  height: 0.28rem;
+/* Vertical mast with top and mid joint dots */
+.roboticsMast {
+  position: absolute;
+  left: 2.2rem;
+  top: 1.2rem;
+  bottom: 1.6rem;
+  width: 0.45rem;
   border-radius: 999px;
-  background: var(--perf-gradient);
-  box-shadow: 0 0 14px var(--perf-shell-soft);
+  background: linear-gradient(180deg, var(--perf-glow-strong), var(--perf-highlight));
+}
+
+.roboticsMast::before {
+  content: '';
+  position: absolute;
+  top: -0.3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  border: 1px solid var(--perf-edge);
+  background: var(--perf-panel);
+  box-shadow: 0 0 14px var(--perf-glow-soft);
+}
+
+.roboticsMast::after {
+  content: '';
+  position: absolute;
+  top: 48%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--perf-edge);
+  background: var(--perf-panel);
+  box-shadow: 0 0 10px var(--perf-glow-soft);
+}
+
+/* Horizontal boom arm from mast top */
+.roboticsBoom {
+  position: absolute;
+  top: 1.65rem;
+  left: 2.2rem;
+  width: 68%;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--perf-glow-strong), transparent);
   transform-origin: left center;
 }
 
-.utilityBar {
-  width: 4.25rem;
-}
-
-.capacityBar {
-  width: calc(5rem * var(--capacity-target));
-}
-
-.roboticsGrid {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.roboticsBracket,
-.servoStack {
-  display: grid;
-  gap: 0.35rem;
-  align-items: center;
-  justify-items: center;
-}
-
-.utilityNode,
-.utilityNodeSquare,
-.fanoutNode {
-  display: inline-flex;
-  width: 0.66rem;
-  height: 0.66rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 82%, rgba(255, 255, 255, 0.08));
-  background: color-mix(in srgb, var(--perf-panel-3) 86%, rgba(255, 255, 255, 0.03));
-  box-shadow: 0 0 12px var(--perf-shell-soft);
-}
-
-.utilityNodeSquare {
-  border-radius: 0.25rem;
-  width: 0.75rem;
-  height: 0.75rem;
-}
-
-.utilityBeam,
-.fanoutStem {
-  display: block;
-  width: 0.18rem;
-  height: 2.8rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, transparent, var(--perf-shell-strong), transparent);
-  transform-origin: center bottom;
-}
-
-.roboticsCore {
-  display: grid;
-  gap: 0.7rem;
-  padding: 0.4rem 0;
-}
-
-.roboticsHeadline {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.9rem;
-  align-items: center;
-}
-
-.artistBand {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 0.85rem;
-  align-items: center;
-  padding: 0.8rem 0.9rem;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--perf-shell-edge) 72%, rgba(255, 255, 255, 0.08));
-  background: linear-gradient(135deg, color-mix(in srgb, var(--perf-panel-3) 90%, rgba(255, 255, 255, 0.02)), transparent 90%);
-}
-
-.artistWord {
-  font-size: clamp(1.1rem, 0.96rem + 1.25vw, 1.9rem);
-  font-weight: 760;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.fanoutNode {
-  position: relative;
-  justify-content: center;
-  align-items: flex-end;
-  width: 1.1rem;
-  height: 1.1rem;
-}
-
-.fanoutStem {
+.roboticsBoom::after {
+  content: '';
   position: absolute;
-  bottom: calc(100% + 0.22rem);
-  height: 1.35rem;
+  top: 50%;
+  right: -0.15rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--perf-edge);
+  background: var(--perf-panel);
+  transform: translateY(-50%);
 }
 
-.deckAutomation {
-  border-radius: 1.6rem 1.1rem 1.2rem 1.2rem;
+/* Hoist cable descending from boom tip */
+.roboticsHoist {
+  position: absolute;
+  top: 2.1rem;
+  right: 2.8rem;
+  width: 2px;
+  height: 6rem;
+  background: linear-gradient(180deg, var(--perf-glow-strong), transparent);
 }
 
-.deckRobotics {
-  border-radius: 1rem 1.8rem 1rem 1.8rem;
+/* Payload rectangle at cable end */
+.roboticsPayload {
+  position: absolute;
+  right: 1.6rem;
+  bottom: 2rem;
+  width: 3.4rem;
+  height: 4rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--perf-edge);
+  background:
+    radial-gradient(circle at center, var(--perf-glow-soft), transparent 58%),
+    linear-gradient(160deg, var(--perf-highlight), var(--perf-subtle-fill));
+  box-shadow: 0 14px 28px var(--perf-glow-soft);
 }
 
-.deckIntelligent {
-  border-radius: 1.2rem;
+/* ─── Neural rig — concentric pulse rings ────────────────────────────────────── */
+
+/* Grid stacking for concentric elements */
+.neuralCore,
+.neuralRingOuter,
+.neuralRingMiddle,
+.neuralRingInner,
+.neuralSynapses {
+  grid-area: 1 / 1;
 }
 
-.deckScalability {
-  border-radius: 1.2rem 1.2rem 1.55rem 1.55rem;
+/* Bright core */
+.neuralCore {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  background: radial-gradient(circle at center, var(--perf-glow-strong), var(--perf-glow-soft) 68%, transparent);
+  box-shadow: 0 0 28px var(--perf-glow);
+  z-index: 1;
 }
 
-.motionActive .flowStep,
-.motionActive .metricChip,
-.motionActive .deckBadgeSwatch,
-.motionActive .utilityNode,
-.motionActive .utilityNodeSquare,
-.motionActive .fanoutNode {
-  animation: performancePulse 2.8s ease-in-out infinite;
+/* Concentric rings */
+.neuralRingOuter,
+.neuralRingMiddle,
+.neuralRingInner {
+  border-radius: 999px;
+  border: 1px solid var(--perf-edge);
 }
 
-.motionActive .shellBackdrop {
-  animation: laneSweep 10s linear infinite;
+.neuralRingOuter {
+  width: 12rem;
+  height: 12rem;
+  background: radial-gradient(circle at center, transparent 52%, var(--perf-highlight) 52%, transparent 68%);
 }
 
-.motionActive .utilityBeam,
-.motionActive .fanoutStem {
-  animation: servoArc 2.4s ease-in-out infinite;
+.neuralRingMiddle {
+  width: 8.4rem;
+  height: 8.4rem;
+  background: radial-gradient(circle at center, transparent 48%, var(--perf-highlight) 48%, transparent 65%);
 }
 
-.motionActive .capacityBar {
-  animation: capacityWave 3.2s ease-in-out infinite;
+.neuralRingInner {
+  width: 4.8rem;
+  height: 4.8rem;
+  background: radial-gradient(circle at center, var(--perf-glow-soft), transparent 60%);
+}
+
+/* Orbital synapse dots */
+.neuralSynapses {
+  position: relative;
+  width: 12rem;
+  height: 12rem;
+  pointer-events: none;
+}
+
+.neuralSynapses span {
+  position: absolute;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--perf-glow-strong);
+  box-shadow: 0 0 8px var(--perf-glow-soft);
+}
+
+.neuralSynapses span:nth-child(1) {
+  top: 10%;
+  left: 58%;
+}
+
+.neuralSynapses span:nth-child(2) {
+  top: 32%;
+  right: 6%;
+}
+
+.neuralSynapses span:nth-child(3) {
+  bottom: 16%;
+  right: 20%;
+}
+
+.neuralSynapses span:nth-child(4) {
+  bottom: 26%;
+  left: 12%;
+}
+
+.neuralSynapses span:nth-child(5) {
+  top: 20%;
+  left: 16%;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
+
+.scene[data-motion='animated'] .iconBadge {
+  animation: performancePulse 7.5s ease-in-out infinite;
+}
+
+/* Automation: needle sweep + cue blink */
+.scene[data-motion='animated'] .automationNeedle {
+  animation: gaugeSweep 6s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .automationCues span:nth-child(2) {
+  animation: cueBlink 2.4s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .automationCues span:nth-child(3) {
+  animation: cueBlink 2.4s ease-in-out infinite 0.4s;
+}
+
+/* Robotics: payload bob + boom pivot */
+.scene[data-motion='animated'] .roboticsPayload {
+  animation: hoistBob 5.6s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .roboticsBoom {
+  animation: boomPivot 7s ease-in-out infinite;
+}
+
+/* Neural: core pulse + staggered ring expansion + synapse blink */
+.scene[data-motion='animated'] .neuralCore {
+  animation: neuralPulse 4.2s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .neuralRingOuter {
+  animation: ringExpand 6s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .neuralRingMiddle {
+  animation: ringExpand 6s ease-in-out infinite 0.8s;
+}
+
+.scene[data-motion='animated'] .neuralRingInner {
+  animation: ringExpand 6s ease-in-out infinite 1.6s;
+}
+
+.scene[data-motion='animated'] .neuralSynapses span:nth-child(odd) {
+  animation: synapseBlink 3.8s ease-in-out infinite;
 }
 
 @keyframes performancePulse {
-  0%, 100% { opacity: 0.78; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.08); }
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 18px 34px var(--perf-glow-soft);
+  }
+
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 24px 46px var(--perf-glow-strong);
+  }
 }
 
-@keyframes laneSweep {
-  0% { transform: translateX(-10%); }
-  50% { transform: translateX(8%); }
-  100% { transform: translateX(-10%); }
+@keyframes gaugeSweep {
+  0%,
+  100% {
+    transform: translateX(-50%) rotate(-20deg);
+  }
+
+  50% {
+    transform: translateX(-50%) rotate(20deg);
+  }
 }
 
-@keyframes capacityWave {
-  0%, 100% { opacity: 0.82; filter: saturate(1); }
-  50% { opacity: 1; filter: saturate(1.18); }
+@keyframes cueBlink {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 1;
+  }
 }
 
-@keyframes servoArc {
-  0%, 100% { opacity: 0.66; transform: scaleY(0.72); }
-  50% { opacity: 1; transform: scaleY(1); }
+@keyframes hoistBob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(0.3rem);
+  }
 }
 
-@container (max-inline-size: 30rem) {
+@keyframes boomPivot {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(1.5deg);
+  }
+}
+
+@keyframes neuralPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 28px var(--perf-glow);
+  }
+
+  50% {
+    transform: scale(1.15);
+    box-shadow: 0 0 42px var(--perf-glow);
+  }
+}
+
+@keyframes ringExpand {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+
+@keyframes synapseBlink {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.3);
+  }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
   .deck {
-    grid-template-columns: 1fr auto;
-    gap: 0.55rem 0.7rem;
-    padding: 0.7rem;
-  }
-
-  .deckLeading,
-  .deckMeta {
-    grid-column: 1 / -1;
-  }
-
-  .deckMeta {
+    grid-template-columns: 1fr;
     justify-items: start;
   }
 
-  .metricRow,
-  .flowRow,
-  .utilityBarRow,
-  .fanoutRow,
-  .capacityRow,
-  .utilityMatrix {
-    justify-content: flex-start;
+  .deckCounter {
+    justify-self: start;
   }
 
-  .shell {
-    min-height: 9.6rem;
-    padding: 0.9rem;
-  }
-
-  .roboticsGrid,
-  .heroBand,
-  .scalabilityCore,
-  .systemBand,
-  .artistBand,
-  .roboticsHeadline {
+  .headlineWrap {
     grid-template-columns: 1fr;
   }
 
-  .roboticsBracket,
-  .servoStack {
-    display: none;
-  }
-}
-
-@container (max-inline-size: 22rem) {
-  .deck {
-    padding: 0.65rem;
+  .sceneAutomation .sceneBody,
+  .sceneRobotics .sceneBody,
+  .sceneNeural .sceneBody {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
   }
 
-  .deckBadge,
-  .deckQualifier,
-  .deckDescriptor,
-  .metricChip,
-  .counter,
-  .overline,
-  .flowStep,
-  .utilityBarLabel,
-  .roleChip,
-  .secondaryLine,
-  .artistWord {
-    letter-spacing: 0.12em;
+  .sceneAutomation .titleBlock,
+  .sceneRobotics .titleBlock,
+  .sceneNeural .titleBlock {
+    justify-self: center;
+    max-width: none;
+    padding-left: 0;
+    text-align: center;
   }
 
-  .primaryLine,
-  .systemLine {
-    font-size: clamp(1.2rem, 0.98rem + 4vw, 1.8rem);
+  .sceneAutomation .headlineWrap,
+  .sceneRobotics .headlineWrap,
+  .sceneNeural .headlineWrap {
+    justify-items: center;
   }
 
-  .shell {
-    min-height: auto;
+  .sceneAutomation .titleLockup,
+  .sceneAutomation .descriptor,
+  .sceneRobotics .titleLockup,
+  .sceneRobotics .descriptor,
+  .sceneNeural .titleLockup,
+  .sceneNeural .descriptor {
+    max-width: none;
   }
 
-  .heroBand,
-  .scalabilityCore,
-  .systemBand,
-  .artistBand {
-    gap: 0.6rem;
-  }
-
-  .iconFrameLarge {
-    width: 2.9rem;
-    height: 2.9rem;
+  .sceneAutomation .sceneRig,
+  .sceneRobotics .sceneRig,
+  .sceneNeural .sceneRig {
+    width: 100%;
+    min-height: 12rem;
   }
 }

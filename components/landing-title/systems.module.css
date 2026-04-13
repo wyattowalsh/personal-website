@@ -1,877 +1,1454 @@
-@reference "../../app/tailwind.css";
+/* ═══════════════════════════════════════════════════════════════════════════
+   Systems lane – 7 subtitle rigs
+   Silhouette key:
+     cybernetic  → vertical spine + angular armor plates
+     zeroTrust   → concentric gate rings + crosshair
+     synthetic   → radial cortex node + dendrite branches
+     quantum     → tilted orbit ellipses + split-state panels
+     cloud       → billowing cumulus masses + vertical data rain
+     cartographer→ grid + crossing routes + contour rings
+     orchestrator→ musical staff lines + beat markers + conductor node
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Shell ─────────────────────────────────────────────────────────────── */
 
 .cluster {
   width: 100%;
-  max-width: min(90vw, 46rem);
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.clusterWithName {
-  margin-top: 0.75rem;
-}
-
-.clusterStandalone {
-  margin-top: 0;
 }
 
 .clusterCompact {
-  max-width: 100%;
-  gap: 0.5rem;
+  max-width: 31rem;
 }
 
 .control {
-  width: 100%;
   outline: none;
-  border-radius: 1.85rem;
 }
 
-.control:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--systems-glow) 30%, transparent);
+.control:focus-visible .scene {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--sys-edge),
+    0 26px 66px var(--sys-glow-soft);
 }
 
-.panel {
+.scene {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--systems-border);
-  border-radius: 1.7rem;
+  border-radius: 2rem;
+  border: 1px solid var(--sys-edge);
   background:
-    linear-gradient(145deg, color-mix(in srgb, var(--systems-panel) 94%, transparent), color-mix(in srgb, var(--systems-panel-strong) 96%, transparent)),
-    linear-gradient(135deg, color-mix(in srgb, var(--systems-glow) 8%, transparent), transparent 60%);
+    radial-gradient(circle at top right, var(--sys-glow-soft), transparent 58%),
+    linear-gradient(160deg, var(--sys-panel), var(--sys-panel-2) 58%, var(--sys-panel-3));
+  color: var(--sys-text);
   box-shadow:
-    0 1.4rem 3rem rgba(2, 6, 23, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 0 1px color-mix(in srgb, var(--systems-glow) 12%, transparent);
-  container-type: inline-size;
-  isolation: isolate;
+    inset 0 1px 0 var(--sys-struct-strong),
+    0 24px 60px var(--sys-glow-soft);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
 }
 
-.panel::before,
-.panel::after {
+.scene::before,
+.scene::after {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: 1rem;
+  border-radius: 1.6rem;
   pointer-events: none;
 }
 
-.panel::before {
-  background:
-    radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--systems-glow) 16%, transparent), transparent 34%),
-    radial-gradient(circle at 82% 76%, color-mix(in srgb, var(--systems-glow) 12%, transparent), transparent 30%);
-  opacity: 0.9;
+.scene::before {
+  border: 1px solid var(--sys-struct-strong);
 }
 
-.panel::after {
-  inset: 1px;
-  border-radius: inherit;
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 14%, transparent);
-  opacity: 0.7;
-}
-
-.canvas {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 1rem;
-  padding: 1rem;
-}
-
-.layoutSide .canvas {
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: stretch;
-}
-
-.layoutStack .canvas {
-  gap: 0.8rem;
-}
-
-.body {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.aura,
-.trace,
-.nodes {
-  position: absolute;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.aura {
-  inset: 0;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--systems-glow) 10%, transparent), transparent 48%, color-mix(in srgb, var(--systems-glow) 8%, transparent));
-  mix-blend-mode: screen;
-}
-
-.trace {
-  inset: auto 1.1rem 1rem 1.1rem;
+.scene::after {
+  inset: auto 1.25rem 1.1rem;
   height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--systems-glow) 90%, transparent), transparent);
-  opacity: 0.8;
+  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
 }
 
-.nodes {
-  top: 0.9rem;
-  right: 1rem;
-  width: 4rem;
-  height: 4rem;
-  border-radius: 999px;
-  border: 1px dashed color-mix(in srgb, var(--systems-glow) 36%, transparent);
-  opacity: 0.5;
+.sceneCybernetic,
+.sceneZeroTrust,
+.sceneSynthetic,
+.sceneQuantum,
+.sceneCloud,
+.sceneCartographer,
+.sceneOrchestrator {
+  padding: 1rem 1rem 1.15rem;
 }
 
-.deck {
-  display: inline-flex;
+/* ─── Scene body layout overrides ──────────────────────────────────────── */
+
+/* Cybernetic: title left, armor rig right */
+.sceneCybernetic .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 7.2rem);
   align-items: center;
-  gap: 0.65rem;
-  flex-wrap: wrap;
-  min-width: 0;
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 22%, transparent);
-  background: color-mix(in srgb, var(--systems-panel-strong) 92%, transparent);
-  color: var(--systems-muted);
-  border-radius: 999px;
-  padding: 0.45rem 0.7rem;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
-  font-size: 0.62rem;
-  line-height: 1;
+  min-height: 15rem;
+  gap: 0.45rem;
 }
 
-.deckTop {
-  align-self: flex-start;
+.sceneCybernetic .titleBlock {
+  max-width: 10.6rem;
+  padding-left: 0.1rem;
+  z-index: 2;
 }
 
-.deckSide {
-  align-self: stretch;
-  border-radius: 1rem;
-  min-width: 9rem;
+.sceneCybernetic .titleLockup,
+.sceneCybernetic .descriptor {
   max-width: 10rem;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 0.9rem 0.8rem;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--systems-glow) 8%, transparent), transparent 28%),
-    color-mix(in srgb, var(--systems-panel-strong) 94%, transparent);
 }
 
-.deckInline,
-.deckFooter {
-  border-radius: 1rem;
-  padding-inline: 0.85rem;
+.sceneCybernetic .sceneRig {
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
 }
 
-.deckCompact {
-  font-size: 0.56rem;
-}
-
-.deckBadge {
-  display: inline-flex;
+/* Zero Trust: title left, vault rig right */
+.sceneZeroTrust .sceneBody {
+  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
   align-items: center;
-  gap: 0.45rem;
-  color: var(--systems-text);
-}
-
-.deckSwatch {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  background: var(--systems-gradient);
-  box-shadow: 0 0 10px var(--systems-shadow);
-}
-
-.deckDescriptor {
-  opacity: 0.86;
-}
-
-.deckCounter {
-  margin-left: auto;
-  color: var(--systems-text);
-}
-
-.deckCounterTotal {
-  opacity: 0.72;
-}
-
-.titleRow {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.95rem;
-}
-
-.lockup {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.eyebrowRow {
-  display: flex;
-  align-items: center;
+  min-height: 15rem;
   gap: 0.5rem;
 }
 
-.eyebrowRow::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 45%, transparent), transparent);
+.sceneZeroTrust .titleBlock {
+  max-width: 9.6rem;
+  padding-left: 0.1rem;
+  z-index: 2;
 }
 
-.eyebrow {
-  display: inline-flex;
+.sceneZeroTrust .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneZeroTrust .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneZeroTrust .titleLockup,
+.sceneZeroTrust .descriptor {
+  max-width: 9.2rem;
+}
+
+.sceneZeroTrust .sceneRig {
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* Synthetic: cortex rig left, title right */
+.sceneSynthetic .sceneBody {
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.9fr);
   align-items: center;
-  gap: 0.35rem;
+  min-height: 15rem;
+  gap: 0.5rem;
+}
+
+.sceneSynthetic .titleBlock {
+  order: 2;
+  max-width: 10.8rem;
+  justify-self: end;
+  z-index: 2;
+}
+
+.sceneSynthetic .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneSynthetic .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneSynthetic .titleLockup,
+.sceneSynthetic .descriptor {
+  max-width: 10.4rem;
+}
+
+.sceneSynthetic .sceneRig {
+  order: 1;
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* Quantum: orbit rig left, title right */
+.sceneQuantum .sceneBody {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.55rem;
+}
+
+.sceneQuantum .titleBlock {
+  order: 2;
+  position: relative;
+  z-index: 2;
+  max-width: 13.75rem;
+  justify-self: end;
+  padding-right: 0.1rem;
+  text-align: left;
+}
+
+.sceneQuantum .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneQuantum .titleLockup,
+.sceneQuantum .descriptor {
+  max-width: 13rem;
+}
+
+.sceneQuantum .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneQuantum .sceneRig {
+  order: 1;
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* Cloud: title left, cumulus rig right */
+.sceneCloud .sceneBody {
+  grid-template-columns: minmax(0, 8.8rem) minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 15rem;
+  gap: 0.5rem;
+}
+
+.sceneCloud .titleBlock {
+  align-self: center;
+  max-width: 8.6rem;
+  padding-left: 0.1rem;
+  z-index: 2;
+}
+
+.sceneCloud .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneCloud .iconBadge {
+  display: none;
+}
+
+.sceneCloud .titleLockup,
+.sceneCloud .descriptor {
+  max-width: 8.2rem;
+}
+
+.sceneCloud .sceneRig {
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* Cartographer: atlas rig left, title right */
+.sceneCartographer .sceneBody {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.5rem;
+}
+
+.sceneCartographer .titleBlock {
+  order: 2;
+  max-width: 10rem;
+  justify-self: end;
+  z-index: 2;
+}
+
+.sceneCartographer .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneCartographer .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneCartographer .titleLockup,
+.sceneCartographer .descriptor {
+  max-width: 9.6rem;
+}
+
+.sceneCartographer .sceneRig {
+  order: 1;
+  min-height: 14rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* Orchestrator: score rig left, title right */
+.sceneOrchestrator .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.5rem;
+}
+
+.sceneOrchestrator .titleBlock {
+  order: 2;
+  max-width: 10rem;
+  justify-self: end;
+  z-index: 2;
+}
+
+.sceneOrchestrator .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneOrchestrator .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneOrchestrator .titleLockup,
+.sceneOrchestrator .descriptor {
+  max-width: 9.8rem;
+}
+
+.sceneOrchestrator .sceneRig {
+  order: 1;
+  min-height: 13.8rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+/* ─── Deck ─────────────────────────────────────────────────────────────── */
+
+.deck {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.95rem;
+  color: var(--sys-muted);
   font-size: 0.62rem;
-  letter-spacing: 0.28em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--systems-muted);
 }
 
-.title {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  color: var(--systems-text);
-}
-
-.line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.38ch;
-}
-
-.lineLead {
-  color: transparent;
-  background-image: var(--systems-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  text-shadow: 0 0 0.7rem color-mix(in srgb, var(--systems-glow) 16%, transparent);
-}
-
-.lineSupport {
-  color: color-mix(in srgb, var(--systems-text) 94%, transparent);
-}
-
-.word {
+.deckFamily,
+.deckCounter {
   white-space: nowrap;
 }
 
-.titleCybernetic {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1.15rem, 4cqi, 1.95rem);
-  line-height: 0.95;
-  letter-spacing: 0.14em;
+.deckCounter {
+  justify-self: end;
+}
+
+.deckCounterTotal {
+  opacity: 0.65;
+}
+
+.deckNotes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.38rem;
+}
+
+.deckNote {
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  background: var(--sys-struct);
+  padding: 0.22rem 0.5rem;
+}
+
+/* ─── Scene body / title block ─────────────────────────────────────────── */
+
+.sceneBody {
+  display: grid;
+  gap: 1rem;
+}
+
+.titleBlock {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.kicker {
+  color: var(--sys-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
 }
 
-.titleCode {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1.2rem, 4.2cqi, 1.9rem);
-  line-height: 0.98;
-  letter-spacing: 0.02em;
+.headlineWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
 }
 
-.titleTrust {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1.05rem, 3.7cqi, 1.78rem);
-  line-height: 0.96;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-}
-
-.titleSynthetic,
-.titleAdaptive,
-.titleTraining,
-.titlePhase {
-  font-family: var(--font-monaspace), monospace;
-  font-size: clamp(1rem, 3.5cqi, 1.7rem);
-  line-height: 1.02;
-  letter-spacing: 0.04em;
-}
-
-.titleQuantum,
-.titleBehavior,
-.titleProcess,
-.titleAtlas,
-.titleTopology,
-.titleOrchestrator {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(1.12rem, 3.8cqi, 1.92rem);
-  line-height: 0.98;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.titleEcosystem,
-.titleCloud {
-  font-family: var(--font-bricolage), sans-serif;
-  font-size: clamp(1.15rem, 4cqi, 2rem);
-  line-height: 0.95;
-  letter-spacing: 0.02em;
-}
-
-.iconWrap {
-  position: relative;
+.iconBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(2.7rem, 9cqi, 4rem);
-  aspect-ratio: 1;
-  border-radius: 1.2rem;
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 28%, transparent);
+  width: 3rem;
+  height: 3rem;
+  border-radius: 1rem;
+  border: 1px solid var(--sys-edge);
   background:
-    radial-gradient(circle at 30% 30%, color-mix(in srgb, var(--systems-glow) 18%, transparent), transparent 56%),
-    color-mix(in srgb, var(--systems-panel-strong) 94%, transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    linear-gradient(160deg, var(--sys-struct-strong), var(--sys-struct-faint)),
+    var(--sys-gradient);
+  box-shadow: 0 18px 34px var(--sys-glow-soft);
 }
 
 .icon {
-  width: clamp(1.1rem, 3.8cqi, 1.65rem);
-  height: clamp(1.1rem, 3.8cqi, 1.65rem);
-  color: color-mix(in srgb, var(--systems-glow) 92%, white 8%);
-  filter: drop-shadow(0 0 10px var(--systems-shadow));
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
-.chips,
-.footerRail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
+.titleLockup {
+  display: grid;
+  gap: 0.4rem;
 }
 
-.chip,
-.footerItem {
-  display: inline-flex;
-  align-items: center;
-  min-height: 1.6rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 18%, transparent);
-  background: color-mix(in srgb, var(--systems-panel) 92%, transparent);
-  padding: 0.28rem 0.62rem;
-  font-size: 0.62rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--systems-muted);
-}
-
-.footerItem {
-  border-radius: 0.8rem;
-  letter-spacing: 0.12em;
-}
-
-.caption {
+.title {
   margin: 0;
-  max-width: 52ch;
-  font-size: 0.77rem;
-  line-height: 1.45;
-  color: color-mix(in srgb, var(--systems-text) 72%, transparent);
+  font-size: clamp(1.42rem, 3vw, 2.16rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
-.shellChassis {
-  border-radius: 1.1rem 1.9rem 1.1rem 1.9rem;
+.descriptor {
+  margin: 0;
+  max-width: 30rem;
+  color: var(--sys-muted);
+  font-size: 0.87rem;
+  line-height: 1.5;
 }
 
-.shellChassis .trace {
-  top: 50%;
-  bottom: auto;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--systems-glow) 96%, transparent) 18%, transparent 74%);
-}
+/* ─── Rig base ─────────────────────────────────────────────────────────── */
 
-.shellChassis .nodes {
-  inset: auto auto 0.95rem 0.95rem;
-  width: 5.4rem;
-  height: 1.25rem;
-  border-radius: 999px;
-  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 20%, transparent) 0 0.55rem, transparent 0.55rem 0.8rem);
-  border: none;
-}
-
-.shellBlueprint {
-  border-radius: 0.95rem;
-  background-image:
-    linear-gradient(145deg, color-mix(in srgb, var(--systems-panel) 96%, transparent), color-mix(in srgb, var(--systems-panel-strong) 96%, transparent)),
-    linear-gradient(0deg, color-mix(in srgb, var(--systems-glow) 7%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 7%, transparent) 1px, transparent 1px);
-  background-size: auto, 18px 18px, 18px 18px;
-}
-
-.shellBlueprint .trace {
-  inset: 1rem 1rem auto auto;
-  width: 6.5rem;
-  height: 1px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 75%, transparent), transparent);
-}
-
-.shellVault {
-  border-radius: 1.3rem;
-  box-shadow:
-    0 1.4rem 3rem rgba(2, 6, 23, 0.26),
-    inset 0 0 0 1px color-mix(in srgb, var(--systems-glow) 20%, transparent),
-    inset 0 0 0 0.55rem color-mix(in srgb, var(--systems-glow) 5%, transparent);
-}
-
-.shellVault .nodes {
-  top: 0.95rem;
-  right: 1rem;
-  width: 3.6rem;
-  height: 3.6rem;
-  border-style: solid;
-  border-width: 2px;
-}
-
-.shellCognition {
-  border-radius: 1.7rem 1.7rem 1rem 1rem;
-}
-
-.shellCognition .canvas {
-  gap: 0.8rem;
-}
-
-.shellCognition .trace {
-  inset: 1.1rem auto 1.1rem 1.45rem;
-  width: 2px;
-  height: auto;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--systems-glow) 92%, transparent), transparent);
-}
-
-.shellCognition .nodes {
-  right: 1.1rem;
-  top: auto;
-  bottom: 1rem;
-  width: 4.8rem;
-  height: 1.3rem;
-  border-radius: 0.5rem;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 24%, transparent), transparent 72%);
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 24%, transparent);
-}
-
-.shellQuantum {
-  border-radius: 999px;
-}
-
-.shellQuantum .aura {
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--systems-glow) 14%, transparent), transparent 38%),
-    radial-gradient(circle at 28% 46%, color-mix(in srgb, var(--systems-glow) 12%, transparent), transparent 32%);
-}
-
-.shellQuantum .nodes {
-  inset: 0.7rem auto auto 0.95rem;
-  width: 4.5rem;
-  height: 4.5rem;
-}
-
-.shellHabitat {
-  border-radius: 1.8rem 1rem 1.8rem 1rem;
-}
-
-.shellHabitat .nodes {
-  inset: auto 1rem 1rem auto;
-  width: 5.2rem;
-  height: 1.75rem;
-  border-radius: 999px;
-  background:
-    radial-gradient(circle at 12% 50%, color-mix(in srgb, var(--systems-glow) 34%, transparent) 0 0.22rem, transparent 0.24rem),
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--systems-glow) 28%, transparent) 0 0.22rem, transparent 0.24rem),
-    radial-gradient(circle at 88% 50%, color-mix(in srgb, var(--systems-glow) 34%, transparent) 0 0.22rem, transparent 0.24rem);
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 16%, transparent);
-}
-
-.shellBehavior {
+.sceneRig {
+  position: relative;
+  min-height: 7.5rem;
   border-radius: 1.55rem;
-}
-
-.shellBehavior .trace {
-  inset: auto 1rem 1rem auto;
-  width: 5.2rem;
-  height: 5.2rem;
-  border-radius: 999px;
-  background: none;
-  border: 1px dashed color-mix(in srgb, var(--systems-glow) 34%, transparent);
-}
-
-.shellBehavior .nodes {
-  inset: 1rem auto auto 1rem;
-  width: 3rem;
-  height: 3rem;
-}
-
-.shellAdaptive {
-  border-radius: 1.2rem 2rem 1.2rem 2rem;
-}
-
-.shellAdaptive .canvas {
-  gap: 0.6rem;
-}
-
-.shellAdaptive .trace {
-  inset: 1rem auto auto 1rem;
-  width: calc(100% - 2rem);
-  height: 0.55rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 20%, transparent), color-mix(in srgb, var(--systems-glow) 90%, transparent), transparent 82%);
-}
-
-.shellPipeline {
-  border-radius: 1rem;
-}
-
-.shellPipeline .trace {
-  top: 50%;
-  bottom: auto;
-  height: 2px;
-  background: linear-gradient(90deg, transparent 8%, color-mix(in srgb, var(--systems-glow) 88%, transparent) 28%, color-mix(in srgb, var(--systems-glow) 44%, transparent) 56%, transparent 82%);
-}
-
-.shellPipeline .nodes {
-  inset: auto 1rem 1rem auto;
-  width: 4rem;
-  height: 1rem;
-  border-radius: 999px;
-  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 22%, transparent) 0 0.55rem, transparent 0.55rem 0.8rem);
-  border: none;
-}
-
-.shellPhase {
-  border-radius: 1.4rem;
-}
-
-.shellPhase .aura {
+  border: 1px solid var(--sys-edge);
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 12%, transparent) 0 14%, transparent 14% 28%, color-mix(in srgb, var(--systems-glow) 10%, transparent) 28% 44%, transparent 44% 60%, color-mix(in srgb, var(--systems-glow) 12%, transparent) 60% 76%, transparent 76%);
+    linear-gradient(160deg, var(--sys-struct), var(--sys-struct-faint)),
+    rgba(10, 14, 26, 0.24);
+  overflow: hidden;
 }
 
-.shellTraining {
-  border-radius: 1rem 1rem 1.7rem 1.7rem;
+.cyberneticRig,
+.zeroTrustRig,
+.syntheticRig,
+.quantumRig,
+.cloudRig,
+.cartographerRig,
+.orchestratorRig {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
 }
 
-.shellTraining .trace {
-  inset: auto 1rem 1rem 1rem;
+.cyberneticRig,
+.zeroTrustRig,
+.syntheticRig,
+.cloudRig,
+.cartographerRig,
+.orchestratorRig {
+  position: relative;
+  padding: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1 · CYBERNETIC ARCHITECT — Armor Chassis
+   Silhouette: vertical command spine + angular armor plates + relay dots
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cyberSpine {
+  position: absolute;
+  inset: 0.8rem auto 0.6rem 52%;
+  width: 3px;
+  background: linear-gradient(180deg, transparent, var(--sys-glow-strong) 12%, var(--sys-glow-strong) 88%, transparent);
+  box-shadow: 0 0 22px var(--sys-glow-soft);
+}
+
+/* Relay dots along spine */
+.cyberSpine::before,
+.cyberSpine::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  background: var(--sys-glow-strong);
+  box-shadow: 0 0 10px var(--sys-glow-soft);
+  transform: translateX(-50%);
+}
+
+.cyberSpine::before { top: 22%; }
+.cyberSpine::after  { top: 68%; }
+
+.cyberNodes {
+  position: absolute;
+  inset: 0;
+}
+
+/* Angular armor plates via clip-path */
+.cyberNodes span {
+  position: absolute;
+  background:
+    linear-gradient(160deg, var(--sys-struct-strong), var(--sys-struct-faint) 70%),
+    linear-gradient(180deg, var(--sys-glow-soft), transparent 58%);
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    0 14px 28px var(--sys-glow-soft);
+}
+
+/* Connector lines from plate to spine */
+.cyberNodes span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 1.8rem;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong));
+}
+
+/* Plate 1: top-left — large command plate */
+.cyberNodes span:nth-child(1) {
+  top: 0.7rem;
+  left: 0;
+  width: 5.4rem;
+  height: 4.2rem;
+  clip-path: polygon(6% 0, 100% 0, 100% 72%, 91% 100%, 0 100%, 0 20%);
+}
+
+.cyberNodes span:nth-child(1)::after {
+  right: -1.4rem;
+}
+
+/* Plate 2: mid-right — medium shoulder plate */
+.cyberNodes span:nth-child(2) {
+  top: 5.4rem;
+  right: 0;
+  width: 4.6rem;
+  height: 3.6rem;
+  clip-path: polygon(0 0, 92% 0, 100% 22%, 100% 100%, 8% 100%, 0 78%);
+}
+
+.cyberNodes span:nth-child(2)::after {
+  left: -1.3rem;
+  background: linear-gradient(90deg, var(--sys-glow-strong), transparent);
+}
+
+/* Plate 3: bottom-left — compact actuator plate */
+.cyberNodes span:nth-child(3) {
+  bottom: 0.5rem;
+  left: 0.3rem;
+  width: 3.8rem;
+  height: 2.8rem;
+  clip-path: polygon(10% 0, 100% 0, 100% 80%, 88% 100%, 0 100%, 0 22%);
+}
+
+.cyberNodes span:nth-child(3)::after {
+  right: -1.5rem;
+}
+
+/* Chassis dashed outline */
+.cyberneticRig::before,
+.cyberneticRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.cyberneticRig::before {
+  inset: 0.6rem;
+  border-radius: 1.3rem;
+  border: 1px dashed var(--sys-struct);
+}
+
+/* Command hub — hexagonal center node */
+.cyberneticRig::after {
+  top: 50%;
+  left: 52%;
+  width: 1.5rem;
+  height: 1.5rem;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 72%);
+  box-shadow: 0 0 20px var(--sys-glow-soft);
+  transform: translate(-50%, -50%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   2 · ZERO TRUST ARCHITECT — Vault Gates
+   Silhouette: concentric ring sectors + crosshair scanlines + locked core
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.zeroRing,
+.zeroRingInner,
+.zeroCore {
+  position: absolute;
+  border-radius: 999px;
+}
+
+/* Outer ring — gate sectors via conic gradient */
+.zeroRing {
+  width: 10.4rem;
+  aspect-ratio: 1;
+  border: 2px solid var(--sys-edge);
+  background: conic-gradient(
+    from 30deg,
+    transparent 0deg 52deg,
+    var(--sys-glow-soft) 52deg 68deg,
+    transparent 68deg 142deg,
+    var(--sys-glow-soft) 142deg 158deg,
+    transparent 158deg 232deg,
+    var(--sys-glow-soft) 232deg 248deg,
+    transparent 248deg 322deg,
+    var(--sys-glow-soft) 322deg 338deg,
+    transparent 338deg 360deg
+  );
+}
+
+/* Inner ring — solid lockdown band */
+.zeroRingInner {
+  width: 6.8rem;
+  aspect-ratio: 1;
+  border: 1.5px solid var(--sys-edge);
+  box-shadow: inset 0 0 22px var(--sys-glow-soft);
+}
+
+/* Core — locked identity node */
+.zeroCore {
+  width: 2.8rem;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 56%);
+  border: 1.5px solid var(--sys-edge);
+  box-shadow: 0 0 30px var(--sys-glow-soft);
+}
+
+/* Crosshair scanlines */
+.zeroTrustRig::before,
+.zeroTrustRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.zeroTrustRig::before {
+  width: 100%;
+  height: 1px;
+  top: 50%;
+  left: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 4%,
+    var(--sys-edge) 18%,
+    transparent 42%,
+    transparent 58%,
+    var(--sys-edge) 82%,
+    transparent 96%
+  );
+}
+
+.zeroTrustRig::after {
+  width: 1px;
+  height: 100%;
+  left: 50%;
+  top: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 4%,
+    var(--sys-edge) 18%,
+    transparent 42%,
+    transparent 58%,
+    var(--sys-edge) 82%,
+    transparent 96%
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3 · SYNTHETIC INTELLIGENCE ARCHITECT — Cortex Network
+   Silhouette: central cortex node + radiating dendrite branches + synapse dots
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Central cortex node — positioned via calc to avoid transform conflict with animation */
+.syntheticCore {
+  position: absolute;
+  top: calc(50% - 1.6rem);
+  left: calc(42% - 1.6rem);
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--sys-edge);
+  background: radial-gradient(circle at 38% 32%, var(--sys-glow-strong) 0%, var(--sys-glow-soft) 42%, transparent 68%);
+  box-shadow:
+    0 0 32px var(--sys-glow-soft),
+    inset 0 0 14px var(--sys-glow-soft);
+  z-index: 2;
+}
+
+.syntheticDendrites {
+  position: absolute;
+  inset: 0;
+}
+
+/* Dendrite branches — thin radiating lines */
+.syntheticDendrites span {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, var(--sys-glow-strong) 10%, transparent 92%);
+  transform-origin: left center;
+}
+
+/* Synapse endpoint dots */
+.syntheticDendrites span::before {
+  content: '';
+  position: absolute;
+  right: -0.25rem;
+  top: 50%;
+  width: 0.6rem;
   height: 0.6rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 24%, transparent) 0 18%, color-mix(in srgb, var(--systems-glow) 92%, transparent) 18% 44%, color-mix(in srgb, var(--systems-glow) 24%, transparent) 44% 60%, transparent 60%);
+  border: 1px solid var(--sys-edge);
+  background: var(--sys-glow-strong);
+  box-shadow: 0 0 12px var(--sys-glow-soft);
+  transform: translateY(-50%);
 }
 
-.shellCloud {
-  border-radius: 2rem 2rem 1.25rem 1.25rem;
+/* Mid-branch relay node */
+.syntheticDendrites span::after {
+  content: '';
+  position: absolute;
+  left: 35%;
+  top: 50%;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 999px;
+  background: var(--sys-glow-soft);
+  transform: translateY(-50%);
 }
 
-.shellCloud .aura {
+/* Dendrite 1: upper-right */
+.syntheticDendrites span:nth-child(1) {
+  top: 2.4rem;
+  left: 50%;
+  width: 44%;
+  transform: rotate(-30deg);
+}
+
+/* Dendrite 2: right-center */
+.syntheticDendrites span:nth-child(2) {
+  top: calc(50% - 1px);
+  left: 54%;
+  width: 40%;
+  transform: rotate(4deg);
+}
+
+/* Dendrite 3: lower-right */
+.syntheticDendrites span:nth-child(3) {
+  bottom: 2.6rem;
+  left: 46%;
+  width: 48%;
+  transform: rotate(34deg);
+}
+
+/* Scaffold ring */
+.syntheticRig::before,
+.syntheticRig::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 42%;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.syntheticRig::before {
+  width: 9rem;
+  height: 9rem;
+  border: 1px dashed var(--sys-struct);
+  transform: translate(-50%, -50%);
+}
+
+/* Inner orbital halo */
+.syntheticRig::after {
+  width: 5.4rem;
+  height: 5.4rem;
+  border: 1px solid var(--sys-struct-faint);
+  transform: translate(-50%, -50%);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4 · QUANTUM DESIGNER — Probability Field
+   Silhouette: tilted orbit ellipses + split-state panels with interference
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.quantumOrbit,
+.quantumOrbitAlt {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  top: 50%;
+  left: 42%;
+  transform: translate(-50%, -50%);
+}
+
+.quantumOrbit {
+  width: 10.6rem;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at center, transparent 52%, var(--sys-struct) 52%, transparent 68%);
+}
+
+.quantumOrbitAlt {
+  width: 7.4rem;
+  aspect-ratio: 1;
+  background: radial-gradient(circle at center, transparent 52%, var(--sys-struct) 52%, transparent 68%);
+  transform: translate(-50%, -50%) rotate(62deg);
+}
+
+/* Split-state panels */
+.quantumStates {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+  width: 6.4rem;
+  position: absolute;
+  inset: 50% 0.2rem auto auto;
+  transform: translateY(-50%);
+  align-items: center;
+}
+
+.quantumStates span {
+  position: relative;
+  min-height: 4.5rem;
+  border-radius: 1.2rem;
+  border: 1px solid var(--sys-edge);
   background:
-    radial-gradient(circle at 28% 42%, color-mix(in srgb, var(--systems-glow) 16%, transparent), transparent 34%),
-    radial-gradient(circle at 46% 36%, color-mix(in srgb, var(--systems-glow) 14%, transparent), transparent 30%),
-    radial-gradient(circle at 66% 50%, color-mix(in srgb, var(--systems-glow) 12%, transparent), transparent 36%);
+    linear-gradient(
+      135deg,
+      var(--sys-glow-soft) 0%,
+      transparent 48%,
+      var(--sys-struct-faint) 52%,
+      var(--sys-struct-strong) 100%
+    );
+  box-shadow: inset 0 1px 0 var(--sys-struct-strong);
 }
 
-.shellCloud .trace {
-  inset: auto 1rem 1rem 1rem;
+/* Interference fringe overlay */
+.quantumStates span::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 0.38rem,
+    var(--sys-struct-faint) 0.38rem 0.44rem
+  );
+  pointer-events: none;
+}
+
+.quantumStates span:nth-child(1) {
+  width: 82%;
+  justify-self: end;
+  transform: rotate(-10deg);
+}
+
+.quantumStates span:nth-child(2) {
+  min-height: 3.8rem;
+  width: 100%;
+  justify-self: start;
+  transform: translateX(-0.35rem);
+}
+
+.quantumStates span:nth-child(3) {
+  width: 72%;
+  justify-self: end;
+  transform: rotate(8deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5 · CLOUD SHAPER — Compute Weather
+   Silhouette: billowing cumulus masses + vertical data-rain lines + terrain
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.cloudMasses {
+  position: absolute;
+  inset: 0;
+}
+
+/* Cumulus cloud shapes — organic border-radius */
+.cloudMasses span {
+  position: absolute;
+  background:
+    radial-gradient(ellipse at 32% 36%, var(--sys-fill), transparent 52%),
+    linear-gradient(180deg, var(--sys-struct-strong), var(--sys-struct-faint));
+  box-shadow:
+    inset 0 2px 0 var(--sys-struct-strong),
+    0 20px 40px var(--sys-glow-soft);
+  border: 1px solid var(--sys-struct);
+}
+
+/* Cloud 1: large cumulus — top */
+.cloudMasses span:nth-child(1) {
+  top: 0.6rem;
+  left: 0.4rem;
+  width: 74%;
+  height: 5.4rem;
+  border-radius: 52% 42% 38% 58% / 68% 52% 48% 32%;
+}
+
+/* Cloud 2: medium cumulus — overlapping lower-right */
+.cloudMasses span:nth-child(2) {
+  top: 3.6rem;
+  right: 0.2rem;
+  width: 60%;
+  height: 4.2rem;
+  border-radius: 42% 54% 48% 42% / 58% 48% 42% 52%;
+}
+
+/* Data rain lines */
+.cloudRain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cloudRain span {
+  position: absolute;
+  bottom: 0.5rem;
+  width: 1.5px;
+  background: linear-gradient(180deg, var(--sys-glow-strong), transparent);
+}
+
+.cloudRain span:nth-child(1) { left: 16%; height: 3.6rem; opacity: 0.75; }
+.cloudRain span:nth-child(2) { left: 29%; height: 4.8rem; opacity: 0.55; }
+.cloudRain span:nth-child(3) { left: 44%; height: 3rem;  opacity: 0.65; }
+.cloudRain span:nth-child(4) { left: 60%; height: 4.2rem; opacity: 0.45; }
+
+/* Cloud halo outline */
+.cloudRig::before,
+.cloudRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.cloudRig::before {
+  top: 0.4rem;
+  right: 0.6rem;
+  width: 10.8rem;
+  height: 6.8rem;
+  border-radius: 50% 46% 40% 50% / 62% 54% 38% 40%;
+  border: 1px solid var(--sys-struct);
+}
+
+/* Terrain contour at base */
+.cloudRig::after {
+  bottom: 0.3rem;
+  left: 0.6rem;
+  right: 0.6rem;
   height: 1px;
-  background: repeating-linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 48%, transparent) 0 0.9rem, transparent 0.9rem 1.35rem);
+  background: linear-gradient(
+    90deg,
+    transparent 3%,
+    var(--sys-edge) 22%,
+    var(--sys-edge) 78%,
+    transparent 97%
+  );
 }
 
-.shellAtlas {
-  border-radius: 1rem;
+/* ═══════════════════════════════════════════════════════════════════════════
+   6 · AI CARTOGRAPHER — Route Atlas
+   Silhouette: grid + crossing routes + varying waypoint pins + contour rings
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.mapGrid {
+  position: absolute;
+  width: 11rem;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  background:
+    linear-gradient(90deg, transparent 48%, var(--sys-struct) 48%, var(--sys-struct) 52%, transparent 52%),
+    linear-gradient(transparent 48%, var(--sys-struct) 48%, var(--sys-struct) 52%, transparent 52%);
 }
 
-.shellAtlas .trace {
-  inset: 1rem 1rem auto auto;
-  width: 6rem;
-  height: 6rem;
-  background: none;
-  border: 1px solid color-mix(in srgb, var(--systems-glow) 18%, transparent);
-  border-radius: 0.75rem;
+/* Primary route: L-bend path */
+.mapRoute {
+  position: absolute;
+  width: 7.5rem;
+  height: 4.2rem;
+  border-bottom: 1.5px solid var(--sys-glow-strong);
+  border-left: 1.5px solid var(--sys-glow-strong);
+  border-radius: 0 0 0 0.4rem;
+  transform: rotate(-12deg);
 }
 
-.shellTopology {
-  border-radius: 1rem 1.6rem 1rem 1.6rem;
+/* Secondary route: diagonal crossing */
+.mapRouteAlt {
+  position: absolute;
+  width: 6.8rem;
+  height: 0;
+  border-top: 1.5px dashed var(--sys-glow-strong);
+  opacity: 0.45;
+  top: 36%;
+  left: 10%;
+  transform: rotate(28deg);
 }
 
-.shellTopology .trace {
-  inset: 1rem auto auto 1rem;
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
-  background: none;
-  border: 1px dashed color-mix(in srgb, var(--systems-glow) 22%, transparent);
-  border-radius: 1rem;
+/* Waypoint pins */
+.mapPins {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2.4rem;
+  z-index: 2;
 }
 
-.shellRack {
-  border-radius: 1rem;
+.mapPins span {
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 60%);
+  box-shadow: 0 0 12px var(--sys-glow-soft);
+  justify-self: center;
 }
 
-.shellRack .trace {
-  inset: 0.95rem auto auto 1rem;
-  width: calc(100% - 2rem);
-  height: 0.8rem;
-  border-radius: 0.5rem;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--systems-glow) 26%, transparent), color-mix(in srgb, var(--systems-glow) 88%, transparent), transparent 78%);
+/* Different pin sizes for waypoint hierarchy */
+.mapPins span:nth-child(1) { width: 1.15rem; min-height: 1.15rem; }
+.mapPins span:nth-child(2) { width: 0.7rem;  min-height: 0.7rem;  align-self: end; }
+.mapPins span:nth-child(3) { width: 0.9rem;  min-height: 0.9rem; }
+
+/* Topographic contour rings */
+.mapContours {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.shellRack .nodes {
-  inset: auto 1rem 1rem auto;
-  width: 4.6rem;
-  height: 1.2rem;
-  border-radius: 0.65rem;
+.mapContours span {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  opacity: 0.3;
 }
 
-.panel[data-motion='animated'] .trace,
-.panel[data-motion='animated'] .nodes,
-.panel[data-motion='animated'] .aura,
-.title[data-motion='animated'] .word,
-.panel[data-motion='animated'] .iconWrap {
-  will-change: transform, opacity;
+.mapContours span:nth-child(1) {
+  top: 0.8rem;
+  left: 0.6rem;
+  width: 3.6rem;
+  height: 3.6rem;
 }
 
-.shellChassis[data-motion='animated'] .trace,
-.shellPipeline[data-motion='animated'] .trace,
-.shellTraining[data-motion='animated'] .trace,
-.shellRack[data-motion='animated'] .trace,
-.shellAdaptive[data-motion='animated'] .trace {
-  animation: systemsSweep 3.2s linear infinite;
+.mapContours span:nth-child(2) {
+  bottom: 1.2rem;
+  right: 1rem;
+  width: 2.6rem;
+  height: 2.6rem;
 }
 
-.shellBlueprint[data-motion='animated'] .trace,
-.shellAtlas[data-motion='animated'] .trace,
-.shellTopology[data-motion='animated'] .trace {
-  animation: systemsBlueprintScan 4.8s linear infinite;
+/* Compass rose */
+.cartographerRig::before,
+.cartographerRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+  z-index: 3;
 }
 
-.shellVault[data-motion='animated'] .nodes {
-  animation: systemsLockPulse 2.6s ease-in-out infinite;
+.cartographerRig::before {
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  background: radial-gradient(circle at center, var(--sys-glow-soft), transparent 68%);
 }
 
-.shellQuantum[data-motion='animated'] .nodes,
-.shellPhase[data-motion='animated'] .aura {
-  animation: systemsOrbit 5.4s ease-in-out infinite;
+/* Compass needle */
+.cartographerRig::after {
+  top: calc(0.7rem + 0.1rem);
+  right: calc(0.7rem + 0.68rem);
+  width: 1px;
+  height: 1.3rem;
+  background: linear-gradient(180deg, var(--sys-glow-strong), transparent);
 }
 
-.shellHabitat[data-motion='animated'] .nodes,
-.shellCloud[data-motion='animated'] .aura {
-  animation: systemsDrift 5.8s ease-in-out infinite;
+/* ═══════════════════════════════════════════════════════════════════════════
+   7 · DATA ORCHESTRATOR — Conductor Score
+   Silhouette: 5 staff lines + note heads + 3 beat markers + conductor node
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.orchestratorScore {
+  position: absolute;
+  inset: 0;
 }
 
-.shellBehavior[data-motion='animated'] .trace {
-  animation: systemsLoop 4.4s linear infinite;
+/* Staff lines */
+.orchestratorScore span {
+  position: absolute;
+  left: 0;
+  right: 2.8rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 2%,
+    var(--sys-edge) 12%,
+    var(--sys-glow-strong) 55%,
+    transparent 82%
+  );
 }
 
-.title[data-motion='animated'] .word {
-  animation: systemsWordLift 0.8s ease-out both;
+.orchestratorScore span:nth-child(1) { top: 1.8rem; }
+.orchestratorScore span:nth-child(2) { top: 4rem; }
+.orchestratorScore span:nth-child(3) { top: 6.2rem; }
+.orchestratorScore span:nth-child(4) { top: 8.4rem; }
+.orchestratorScore span:nth-child(5) { top: 10.6rem; }
+
+/* Note heads on staff lines */
+.orchestratorScore span::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0.62rem;
+  height: 0.46rem;
+  border-radius: 50%;
+  background: var(--sys-glow-strong);
+  box-shadow: 0 0 8px var(--sys-glow-soft);
+  transform: translateY(-50%) rotate(-14deg);
 }
 
-.title[data-motion='animated'] .word:nth-child(2) {
-  animation-delay: 0.04s;
+.orchestratorScore span:nth-child(1)::after { right: 6%; }
+.orchestratorScore span:nth-child(2)::after { right: 20%; }
+.orchestratorScore span:nth-child(3)::after { right: 12%; }
+.orchestratorScore span:nth-child(4)::after { right: 26%; }
+.orchestratorScore span:nth-child(5)::after { right: 4%; }
+
+/* Beat marker container */
+.orchestratorBeats {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-.title[data-motion='animated'] .word:nth-child(3) {
-  animation-delay: 0.08s;
+/* Vertical bar lines */
+.orchestratorBeats span {
+  position: absolute;
+  top: 1.2rem;
+  bottom: 1.2rem;
+  width: 1.5px;
+  background: linear-gradient(180deg, transparent, var(--sys-edge) 15%, var(--sys-edge) 85%, transparent);
+  opacity: 0.45;
 }
 
-.iconWrap {
-  transition: transform 0.45s ease, box-shadow 0.45s ease;
+.orchestratorBeats span:nth-child(1) { left: 26%; }
+.orchestratorBeats span:nth-child(2) { left: 50%; }
+.orchestratorBeats span:nth-child(3) { left: 72%; }
+
+/* Conductor focal node */
+.orchestratorRig::before,
+.orchestratorRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
 }
 
-.panel[data-motion='animated'] .iconWrap {
-  animation: systemsIconFloat 3.6s ease-in-out infinite;
+.orchestratorRig::before {
+  top: 50%;
+  right: 0.5rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--sys-edge);
+  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 60%);
+  box-shadow: 0 0 26px var(--sys-glow-soft);
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+/* Baton trail from conductor */
+.orchestratorRig::after {
+  top: 50%;
+  right: 2.5rem;
+  width: 3.2rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong));
+}
+
+/* ─── Animations ───────────────────────────────────────────────────────── */
+
+.scene[data-motion='animated'] .iconBadge,
+.scene[data-motion='animated'] .zeroCore,
+.scene[data-motion='animated'] .syntheticCore {
+  animation: systemsPulse 8s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .quantumOrbit {
+  animation: quantumOrbitPulse 8s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .quantumOrbitAlt {
+  animation: quantumOrbitAltPulse 8s ease-in-out infinite;
+}
+
+/* Sweep — elements without base transforms */
+.scene[data-motion='animated'] .cyberNodes span:nth-child(2),
+.scene[data-motion='animated'] .mapRoute,
+.scene[data-motion='animated'] .orchestratorScore span:nth-child(3) {
+  animation: systemsSweep 5.6s ease-in-out infinite;
+}
+
+/* Dendrite fire — staggered opacity pulse */
+.scene[data-motion='animated'] .syntheticDendrites span {
+  animation: dendritePulse 5s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .syntheticDendrites span:nth-child(2) {
+  animation-delay: 0.7s;
+}
+
+.scene[data-motion='animated'] .syntheticDendrites span:nth-child(3) {
+  animation-delay: 1.4s;
+}
+
+/* Cloud drift */
+.scene[data-motion='animated'] .cloudMasses span:nth-child(1) {
+  animation: cloudDrift 11s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .cloudMasses span:nth-child(2) {
+  animation: cloudDrift 13s ease-in-out infinite reverse;
+}
+
+/* Data rain pulse */
+.scene[data-motion='animated'] .cloudRain span {
+  animation: rainPulse 3.2s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .cloudRain span:nth-child(2) { animation-delay: 0.45s; }
+.scene[data-motion='animated'] .cloudRain span:nth-child(3) { animation-delay: 0.9s; }
+.scene[data-motion='animated'] .cloudRain span:nth-child(4) { animation-delay: 1.35s; }
+
+/* Vault gate rotation */
+.scene[data-motion='animated'] .zeroRing {
+  animation: gateRotate 22s linear infinite;
+}
+
+@keyframes systemsPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.03); }
 }
 
 @keyframes systemsSweep {
-  0% {
-    transform: translateX(-16%);
-    opacity: 0.32;
-  }
-  50% {
-    transform: translateX(8%);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translateX(16%);
-    opacity: 0.38;
-  }
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50%      { opacity: 1;    transform: translateY(-0.2rem); }
 }
 
-@keyframes systemsBlueprintScan {
-  0% {
-    opacity: 0.25;
-    transform: translate3d(-2%, 0, 0);
-  }
-  50% {
-    opacity: 0.72;
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    opacity: 0.3;
-    transform: translate3d(2%, 0, 0);
-  }
+@keyframes quantumOrbitPulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, -50%) scale(1.03); }
 }
 
-@keyframes systemsLockPulse {
-  0%,
-  100% {
-    opacity: 0.42;
-    transform: scale(0.96);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.04);
-  }
+@keyframes quantumOrbitAltPulse {
+  0%, 100% { transform: translate(-50%, -50%) rotate(62deg) scale(1); }
+  50%      { transform: translate(-50%, -50%) rotate(62deg) scale(1.03); }
 }
 
-@keyframes systemsOrbit {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-    opacity: 0.48;
-  }
-  50% {
-    transform: translateY(-2px) rotate(6deg);
-    opacity: 0.85;
-  }
+@keyframes dendritePulse {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
 }
 
-@keyframes systemsDrift {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
-    opacity: 0.5;
-  }
-  50% {
-    transform: translate3d(0, -4px, 0);
-    opacity: 0.88;
-  }
+@keyframes cloudDrift {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(0.45rem); }
 }
 
-@keyframes systemsLoop {
-  0% {
-    transform: rotate(0deg);
-    opacity: 0.35;
-  }
-  50% {
-    transform: rotate(180deg);
-    opacity: 0.8;
-  }
-  100% {
-    transform: rotate(360deg);
-    opacity: 0.35;
-  }
+@keyframes rainPulse {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.85; }
 }
 
-@keyframes systemsWordLift {
-  0% {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+@keyframes gateRotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-@keyframes systemsIconFloat {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
+/* ─── Mobile ───────────────────────────────────────────────────────────── */
 
-@container (max-width: 38rem) {
-  .layoutSide .canvas {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 640px) {
+  .deck {
+    grid-template-columns: 1fr;
+    justify-items: start;
   }
 
-  .deckSide {
-    min-width: 0;
-    max-width: none;
-    flex-direction: row;
-    align-items: center;
-    border-radius: 999px;
-    padding: 0.45rem 0.7rem;
+  .deckCounter {
+    justify-self: start;
   }
 
-  .caption {
-    max-width: 42ch;
+  .headlineWrap {
+    grid-template-columns: 1fr;
   }
-}
 
-@container (max-width: 30rem) {
-  .canvas {
-    padding: 0.85rem;
+  /* All scenes: single column */
+  .sceneCybernetic .sceneBody,
+  .sceneZeroTrust .sceneBody,
+  .sceneSynthetic .sceneBody,
+  .sceneQuantum .sceneBody,
+  .sceneCloud .sceneBody,
+  .sceneCartographer .sceneBody,
+  .sceneOrchestrator .sceneBody {
+    grid-template-columns: 1fr;
     gap: 0.8rem;
   }
 
-  .titleRow {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.7rem;
+  /* All titles: centered */
+  .sceneCybernetic .titleBlock,
+  .sceneZeroTrust .titleBlock,
+  .sceneSynthetic .titleBlock,
+  .sceneQuantum .titleBlock,
+  .sceneCloud .titleBlock,
+  .sceneCartographer .titleBlock,
+  .sceneOrchestrator .titleBlock {
+    justify-self: center;
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
   }
 
-  .iconWrap {
-    width: 2.7rem;
-    justify-self: flex-start;
+  .sceneCybernetic .headlineWrap,
+  .sceneZeroTrust .headlineWrap,
+  .sceneSynthetic .headlineWrap,
+  .sceneQuantum .headlineWrap,
+  .sceneCloud .headlineWrap,
+  .sceneCartographer .headlineWrap,
+  .sceneOrchestrator .headlineWrap {
+    justify-items: center;
   }
 
-  .title {
-    gap: 0.1rem;
+  .sceneCybernetic .titleLockup,
+  .sceneCybernetic .descriptor,
+  .sceneZeroTrust .titleLockup,
+  .sceneZeroTrust .descriptor,
+  .sceneSynthetic .titleLockup,
+  .sceneSynthetic .descriptor,
+  .sceneQuantum .titleLockup,
+  .sceneQuantum .descriptor,
+  .sceneCloud .titleLockup,
+  .sceneCloud .descriptor,
+  .sceneCartographer .titleLockup,
+  .sceneCartographer .descriptor,
+  .sceneOrchestrator .titleLockup,
+  .sceneOrchestrator .descriptor {
+    max-width: none;
   }
 
-  .titleSynthetic,
-  .titleAdaptive,
-  .titleTraining,
-  .titlePhase {
-    font-size: clamp(0.94rem, 5.4cqi, 1.35rem);
-    letter-spacing: 0.03em;
+  /* All rigs: full width, compact */
+  .sceneCybernetic .sceneRig,
+  .sceneZeroTrust .sceneRig,
+  .sceneSynthetic .sceneRig,
+  .sceneQuantum .sceneRig,
+  .sceneCloud .sceneRig,
+  .sceneCartographer .sceneRig,
+  .sceneOrchestrator .sceneRig {
+    width: 100%;
+    min-height: 12rem;
   }
 
-  .titleCybernetic,
-  .titleTrust,
-  .titleQuantum,
-  .titleBehavior,
-  .titleProcess,
-  .titleAtlas,
-  .titleTopology,
-  .titleOrchestrator,
-  .titleEcosystem,
-  .titleCloud,
-  .titleCode {
-    font-size: clamp(1rem, 6cqi, 1.45rem);
+  /* Cybernetic mobile */
+  .cyberSpine {
+    inset: 0.8rem auto 0.8rem 50%;
   }
 
-  .deck,
-  .chip,
-  .footerItem,
-  .eyebrow {
-    letter-spacing: 0.11em;
+  .cyberNodes span:nth-child(1) {
+    top: 0.5rem;
+    left: 0.4rem;
+    width: 4.8rem;
+    height: 3.6rem;
   }
 
-  .caption {
-    font-size: 0.72rem;
+  .cyberNodes span:nth-child(2) {
+    top: 4.2rem;
+    right: 0.4rem;
+    width: 4.2rem;
+    height: 3.2rem;
   }
 
-  .shellQuantum,
-  .shellCloud {
-    border-radius: 1.35rem;
+  .cyberNodes span:nth-child(3) {
+    bottom: 0.4rem;
+    left: 0.6rem;
+    width: 3.4rem;
+    height: 2.4rem;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .panel[data-motion='animated'] .trace,
-  .panel[data-motion='animated'] .nodes,
-  .panel[data-motion='animated'] .aura,
-  .title[data-motion='animated'] .word,
-  .panel[data-motion='animated'] .iconWrap {
-    animation: none !important;
-    transform: none !important;
+  /* Synthetic mobile */
+  .syntheticCore {
+    top: calc(50% - 1.6rem);
+    left: calc(50% - 1.6rem);
+  }
+
+  .syntheticRig::before,
+  .syntheticRig::after {
+    left: 50%;
+  }
+
+  /* Quantum mobile */
+  .sceneQuantum .quantumOrbit,
+  .sceneQuantum .quantumOrbitAlt {
+    left: 50%;
+    top: 45%;
+  }
+
+  .sceneQuantum .quantumStates {
+    inset: auto 0 0;
+    width: 100%;
+    transform: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Cloud mobile */
+  .cloudRig::before {
+    width: auto;
+    inset-inline: 0.6rem;
+    top: 0.3rem;
+    right: 0.6rem;
+    height: 5.8rem;
+  }
+
+  /* Orchestrator mobile */
+  .orchestratorScore span {
+    right: 2rem;
+  }
+
+  .orchestratorBeats span {
+    top: 1rem;
+    bottom: 1rem;
   }
 }

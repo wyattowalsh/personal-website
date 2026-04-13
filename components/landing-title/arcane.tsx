@@ -1,24 +1,11 @@
 'use client';
 
-import { AnimatePresence, motion, type Transition } from 'motion/react';
-import {
-  Cpu,
-  Database,
-  Factory,
-  GitBranch,
-  Lightbulb,
-  Moon,
-  Radar,
-  Telescope,
-  Workflow,
-} from 'lucide-react';
+import { motion } from 'motion/react';
+import { Archive, Cpu, GitBranch, Hexagon, Moon, Radar } from 'lucide-react';
 import type { CSSProperties } from 'react';
 
 import styles from './arcane.module.css';
 import {
-  ctr,
-  fx,
-  ic,
   theme,
   typo,
   type LandingTitleRendererEntry,
@@ -27,6 +14,22 @@ import {
 } from '@/components/landing-title/shared';
 import type { SignalDeckMeta } from '@/lib/landing-title-sequence';
 import { cn } from '@/lib/utils';
+
+type ArcaneScene =
+  | 'sorcerer'
+  | 'mage'
+  | 'weaver'
+  | 'conjurer'
+  | 'mystic'
+  | 'oracle';
+
+interface ArcaneVariantConfig {
+  readonly scene: ArcaneScene;
+  readonly theme: SubtitleTheme;
+  readonly kicker: string;
+  readonly descriptor: string;
+  readonly notes: readonly string[];
+}
 
 const arcaneSubtitle = (
   id: string,
@@ -40,419 +43,219 @@ const arcaneSubtitle = (
   signalDeck: { family, descriptor },
 });
 
-export const ARCANE_SORCERER_THEMES: SubtitleTheme[] = [
-  theme(
-    arcaneSubtitle('data-sorcerer', 'data sorcerer', 'Mystic', 'arcane computation'),
-    {
-      gradient: 'linear-gradient(90deg, #c084fc 0%, #8b5cf6 48%, #22d3ee 100%)',
-      darkGradient: 'linear-gradient(90deg, #ddd6fe 0%, #c4b5fd 48%, #67e8f9 100%)',
-      glow: 'rgba(139, 92, 246, 0.72)',
-    },
-    { ...typo.sorcerer, fontStyle: 'normal', letterSpacing: '0.08em', fontWeight: 470 },
-    Database,
-    'left',
-    ic.pulse,
-    'materialize',
-    fx.aurora,
-    ctr.mystic,
-  ),
-  theme(
-    arcaneSubtitle('technological-conjurer', 'technological conjurer', 'Mystic', 'arcane computation'),
-    {
-      gradient: 'linear-gradient(120deg, #f0abfc 0%, #8b5cf6 42%, #38bdf8 100%)',
-      darkGradient: 'linear-gradient(120deg, #f5d0fe 0%, #c4b5fd 42%, #7dd3fc 100%)',
-      glow: 'rgba(192, 132, 252, 0.72)',
-    },
-    { ...typo.sorcerer, fontStyle: 'normal', letterSpacing: '0.11em', fontWeight: 500 },
-    Cpu,
-    'left',
-    ic.cast,
-    'weave',
-    fx.holographic,
-    ctr.mystic,
-  ),
-  theme(
-    arcaneSubtitle('innovation-mystic', 'innovation mystic', 'Mystic', 'arcane computation'),
-    {
-      gradient: 'linear-gradient(90deg, #67e8f9 0%, #a78bfa 45%, #f472b6 100%)',
-      darkGradient: 'linear-gradient(90deg, #a5f3fc 0%, #ddd6fe 45%, #f9a8d4 100%)',
-      glow: 'rgba(96, 165, 250, 0.7)',
-    },
-    { ...typo.sorcerer, letterSpacing: '0.13em', fontWeight: 420 },
-    Lightbulb,
-    'right',
-    ic.float,
-    'auroraBloom',
-    fx.holographic,
-    ctr.mystic,
-  ),
-];
+const DATA_SORCERER_THEME = theme(
+  arcaneSubtitle('data-sorcerer', 'archive sorcerer', 'Mystic', 'spellbound archives'),
+  {
+    gradient: 'linear-gradient(135deg, #5eead4 0%, #14b8a6 38%, #0f766e 100%)',
+    darkGradient: 'linear-gradient(135deg, #99f6e4 0%, #2dd4bf 40%, #14b8a6 100%)',
+    glow: 'rgba(20, 184, 166, 0.56)',
+  },
+  { ...typo.sorcerer, fontWeight: 500, fontStyle: 'normal' },
+  Archive,
+  'left',
+  '',
+  'dreamFloat',
+  '',
+  { border: '1px solid rgba(20, 184, 166, 0.24)', shadow: '0 22px 60px rgba(20, 184, 166, 0.16)' },
+);
 
-export const ARCANE_MAGE_THEMES: SubtitleTheme[] = [
-  theme(
-    arcaneSubtitle('workflow-mage', 'workflow mage', 'Weaver', 'procedural spellwork'),
-    {
-      gradient: 'linear-gradient(90deg, #818cf8 0%, #a78bfa 55%, #22d3ee 100%)',
-      darkGradient: 'linear-gradient(90deg, #c7d2fe 0%, #ddd6fe 55%, #67e8f9 100%)',
-      glow: 'rgba(129, 140, 248, 0.7)',
-    },
-    { ...typo.mage, letterSpacing: '0.08em', fontWeight: 560 },
-    Workflow,
-    'left',
-    ic.conduct,
-    'weave',
-    fx.shimmer,
-    ctr.mystic,
-  ),
-  theme(
-    arcaneSubtitle('algorithm-weaver', 'algorithm weaver', 'Weaver', 'procedural spellwork'),
-    {
-      gradient: 'linear-gradient(90deg, #22d3ee 0%, #818cf8 40%, #c084fc 100%)',
-      darkGradient: 'linear-gradient(90deg, #67e8f9 0%, #c7d2fe 40%, #ddd6fe 100%)',
-      glow: 'rgba(59, 130, 246, 0.68)',
-    },
-    { ...typo.mage, letterSpacing: '0.07em', fontWeight: 540 },
-    GitBranch,
-    'left',
-    ic.conduct,
-    'weave',
-    fx.matrix,
-    ctr.mystic,
-  ),
-];
+const WORKFLOW_MAGE_THEME = theme(
+  arcaneSubtitle('workflow-mage', 'sigil mage', 'Weaver', 'ritual sigil-craft'),
+  {
+    gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 40%, #f59e0b 100%)',
+    darkGradient: 'linear-gradient(135deg, #ddd6fe 0%, #a78bfa 42%, #fcd34d 100%)',
+    glow: 'rgba(124, 58, 237, 0.54)',
+  },
+  { ...typo.mage, fontWeight: 560 },
+  Hexagon,
+  'left',
+  '',
+  'dreamFloat',
+  '',
+  { border: '1px solid rgba(124, 58, 237, 0.22)', shadow: '0 22px 60px rgba(124, 58, 237, 0.15)' },
+);
 
-export const ARCANE_VISIONARY_THEMES: SubtitleTheme[] = [
-  theme(
-    arcaneSubtitle('platform-visionary', 'platform visionary', 'Visionary', 'long-horizon signal'),
-    {
-      gradient: 'linear-gradient(90deg, #22d3ee 0%, #38bdf8 48%, #818cf8 100%)',
-      darkGradient: 'linear-gradient(90deg, #a5f3fc 0%, #7dd3fc 48%, #c7d2fe 100%)',
-      glow: 'rgba(34, 211, 238, 0.68)',
-    },
-    { ...typo.visionary, fontStyle: 'normal', letterSpacing: '0.14em', fontWeight: 360 },
-    Telescope,
-    'right',
-    ic.float,
-    'auroraBloom',
-    fx.float,
-    ctr.visionaryHalo,
-  ),
-  theme(
-    arcaneSubtitle('systems-dreamer', 'systems dreamer', 'Visionary', 'long-horizon signal'),
-    {
-      gradient: 'linear-gradient(90deg, #a78bfa 0%, #60a5fa 52%, #67e8f9 100%)',
-      darkGradient: 'linear-gradient(90deg, #ddd6fe 0%, #bfdbfe 52%, #a5f3fc 100%)',
-      glow: 'rgba(129, 140, 248, 0.66)',
-    },
-    { ...typo.visionaryItalic, letterSpacing: '0.12em', fontWeight: 380 },
-    Moon,
-    'right',
-    ic.drift,
-    'dreamFloat',
-    fx.aurora,
-    ctr.visionaryHalo,
-  ),
-  theme(
-    arcaneSubtitle('digital-futurist', 'digital futurist', 'Visionary', 'long-horizon signal'),
-    {
-      gradient: 'linear-gradient(90deg, #67e8f9 0%, #3b82f6 42%, #a78bfa 100%)',
-      darkGradient: 'linear-gradient(90deg, #a5f3fc 0%, #93c5fd 42%, #ddd6fe 100%)',
-      glow: 'rgba(56, 189, 248, 0.7)',
-    },
-    { ...typo.visionary, letterSpacing: '0.16em', fontWeight: 340 },
-    Radar,
-    'right',
-    ic.orbit,
-    'drift',
-    fx.neon,
-    ctr.visionaryHalo,
-  ),
-  theme(
-    arcaneSubtitle('enterprise-dreamer', 'enterprise dreamer', 'Visionary', 'long-horizon signal'),
-    {
-      gradient: 'linear-gradient(90deg, #7dd3fc 0%, #818cf8 46%, #c084fc 100%)',
-      darkGradient: 'linear-gradient(90deg, #bae6fd 0%, #c7d2fe 46%, #e9d5ff 100%)',
-      glow: 'rgba(129, 140, 248, 0.7)',
-    },
-    { ...typo.visionaryItalic, fontStyle: 'normal', letterSpacing: '0.12em', fontWeight: 430 },
-    Factory,
-    'right',
-    ic.float,
-    'dreamFloat',
-    fx.shimmer,
-    ctr.visionaryHalo,
-  ),
+const ALGORITHM_WEAVER_THEME = theme(
+  arcaneSubtitle('algorithm-weaver', 'algorithm weaver', 'Weaver', 'threaded logic'),
+  {
+    gradient: 'linear-gradient(135deg, #f472b6 0%, #c084fc 44%, #67e8f9 100%)',
+    darkGradient: 'linear-gradient(135deg, #fbcfe8 0%, #ddd6fe 44%, #a5f3fc 100%)',
+    glow: 'rgba(236, 72, 153, 0.5)',
+  },
+  { ...typo.mage, fontWeight: 490, letterSpacing: '0.06em' },
+  GitBranch,
+  'left',
+  '',
+  'dreamFloat',
+  '',
+  { border: '1px solid rgba(236, 72, 153, 0.22)', shadow: '0 22px 60px rgba(236, 72, 153, 0.15)' },
+);
+
+const SILICON_CONJURER_THEME = theme(
+  arcaneSubtitle('silicon-conjurer', 'silicon conjurer', 'Mystic', 'summoned circuitry'),
+  {
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #fb7185 40%, #22d3ee 100%)',
+    darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fda4af 42%, #67e8f9 100%)',
+    glow: 'rgba(251, 146, 60, 0.54)',
+  },
+  { ...typo.sorcerer, fontWeight: 470 },
+  Cpu,
+  'left',
+  '',
+  'thunderExit',
+  '',
+  { border: '1px solid rgba(251, 146, 60, 0.22)', shadow: '0 22px 60px rgba(251, 146, 60, 0.15)' },
+);
+
+const EMERGENCE_MYSTIC_THEME = theme(
+  arcaneSubtitle('emergence-mystic', 'emergence mystic', 'Mystic', 'blooming foresight'),
+  {
+    gradient: 'linear-gradient(135deg, #f9a8d4 0%, #c084fc 42%, #818cf8 100%)',
+    darkGradient: 'linear-gradient(135deg, #fbcfe8 0%, #ddd6fe 42%, #c7d2fe 100%)',
+    glow: 'rgba(192, 132, 252, 0.5)',
+  },
+  { ...typo.visionaryItalic, fontWeight: 360, letterSpacing: '0.11em' },
+  Moon,
+  'left',
+  '',
+  'auroraBloom',
+  '',
+  { border: '1px solid rgba(192, 132, 252, 0.22)', shadow: '0 22px 60px rgba(192, 132, 252, 0.14)' },
+);
+
+const SIGNAL_ORACLE_THEME = theme(
+  arcaneSubtitle('signal-oracle', 'signal oracle', 'Oracle', 'far-signal divination'),
+  {
+    gradient: 'linear-gradient(135deg, #67e8f9 0%, #14b8a6 40%, #fbbf24 100%)',
+    darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #5eead4 40%, #fcd34d 100%)',
+    glow: 'rgba(34, 211, 238, 0.48)',
+  },
+  { ...typo.mapperLight, fontWeight: 520, textTransform: 'uppercase' },
+  Radar,
+  'left',
+  '',
+  'cartographyTilt',
+  '',
+  { border: '1px solid rgba(34, 211, 238, 0.2)', shadow: '0 22px 60px rgba(34, 211, 238, 0.14)' },
+);
+
+export const ARCANE_SHOWCASE_THEMES: SubtitleTheme[] = [
+  DATA_SORCERER_THEME,
+  WORKFLOW_MAGE_THEME,
+  ALGORITHM_WEAVER_THEME,
+  SILICON_CONJURER_THEME,
+  EMERGENCE_MYSTIC_THEME,
+  SIGNAL_ORACLE_THEME,
 ];
 
 export const ARCANE_SUBTITLE_THEMES: SubtitleTheme[] = [
-  ...ARCANE_SORCERER_THEMES,
-  ...ARCANE_MAGE_THEMES,
-  ...ARCANE_VISIONARY_THEMES,
+  ...ARCANE_SHOWCASE_THEMES,
 ];
 
-
-type ArcaneMotion =
-  | 'ledger'
-  | 'aperture'
-  | 'lens'
-  | 'workflow'
-  | 'weave'
-  | 'horizon'
-  | 'dream'
-  | 'pulse'
-  | 'skyline';
-
-interface ArcaneVariantConfig {
-  readonly familyClass: string;
-  readonly lineClass: string;
-  readonly lines: readonly string[];
-  readonly motion: ArcaneMotion;
-  readonly panelTag: string;
-  readonly shellClass: string;
-  readonly titleClass?: string;
-}
-
-const VARIANT_CONFIG: Record<string, ArcaneVariantConfig> = {
-  'data-sorcerer': {
-    familyClass: styles.mysticDeck,
-    lineClass: styles.dataSorcererLines,
-    lines: ['data sorcerer'],
-    motion: 'ledger',
-    panelTag: 'reading table',
-    shellClass: styles.dataSorcerer,
+const ARCANE_VARIANTS: readonly ArcaneVariantConfig[] = [
+  {
+    scene: 'sorcerer',
+    theme: DATA_SORCERER_THEME,
+    kicker: 'Archive invocation',
+    descriptor: 'Archive monoliths rise from a ritual basin so the title feels invoked instead of arranged.',
+    notes: ['catalog', 'invoke', 'decode'],
   },
-  'technological-conjurer': {
-    familyClass: styles.mysticDeck,
-    lineClass: styles.conjurerLines,
-    lines: ['technological', 'conjurer'],
-    motion: 'aperture',
-    panelTag: 'summoning aperture',
-    shellClass: styles.technologicalConjurer,
+  {
+    scene: 'mage',
+    theme: WORKFLOW_MAGE_THEME,
+    kicker: 'Inscribed seal',
+    descriptor: 'A hexagonal seal and radiating inscriptions let the title feel like a ward being drawn, not a flowchart.',
+    notes: ['seal', 'glyph', 'ward'],
   },
-  'innovation-mystic': {
-    familyClass: styles.mysticDeck,
-    lineClass: styles.innovationMysticLines,
-    lines: ['innovation', 'mystic'],
-    motion: 'lens',
-    panelTag: 'prophecy lens',
-    shellClass: styles.innovationMystic,
+  {
+    scene: 'weaver',
+    theme: ALGORITHM_WEAVER_THEME,
+    kicker: 'Logic loom',
+    descriptor: 'Crossed warp and weft threads with a shuttle read like a loom weaving code, not loading bars.',
+    notes: ['warp', 'thread', 'braid'],
   },
-  'workflow-mage': {
-    familyClass: styles.weaverDeck,
-    lineClass: styles.workflowMageLines,
-    lines: ['workflow mage'],
-    motion: 'workflow',
-    panelTag: 'ritual console',
-    shellClass: styles.workflowMage,
+  {
+    scene: 'conjurer',
+    theme: SILICON_CONJURER_THEME,
+    kicker: 'Chip gate',
+    descriptor: 'Circuit corners and a summoned core turn the title into a silicon ritual rather than an icon swap.',
+    notes: ['summon', 'etch', 'ignite'],
   },
-  'algorithm-weaver': {
-    familyClass: styles.weaverDeck,
-    lineClass: styles.algorithmWeaverLines,
-    lines: ['algorithm', 'weaver'],
-    motion: 'weave',
-    panelTag: 'logic loom',
-    shellClass: styles.algorithmWeaver,
+  {
+    scene: 'mystic',
+    theme: EMERGENCE_MYSTIC_THEME,
+    kicker: 'Forecast bloom',
+    descriptor: 'A petaled halo and rising sigils frame the title like an unfolding omen.',
+    notes: ['bloom', 'signal', 'omen'],
   },
-  'platform-visionary': {
-    familyClass: styles.visionaryDeck,
-    lineClass: styles.platformVisionaryLines,
-    lines: ['platform visionary'],
-    motion: 'horizon',
-    panelTag: 'observation deck',
-    shellClass: styles.platformVisionary,
+  {
+    scene: 'oracle',
+    theme: SIGNAL_ORACLE_THEME,
+    kicker: 'Far-signal lens',
+    descriptor: 'A radar sweep and divination tags let the title feel prophetic, not generic.',
+    notes: ['scan', 'listen', 'predict'],
   },
-  'systems-dreamer': {
-    familyClass: styles.visionaryDeck,
-    lineClass: styles.systemsDreamerLines,
-    lines: ['systems', 'dreamer'],
-    motion: 'dream',
-    panelTag: 'state horizon',
-    shellClass: styles.systemsDreamer,
-  },
-  'digital-futurist': {
-    familyClass: styles.visionaryDeck,
-    lineClass: styles.digitalFuturistLines,
-    lines: ['digital', 'futurist'],
-    motion: 'pulse',
-    panelTag: 'transmission panel',
-    shellClass: styles.digitalFuturist,
-  },
-  'enterprise-dreamer': {
-    familyClass: styles.visionaryDeck,
-    lineClass: styles.enterpriseDreamerLines,
-    lines: ['enterprise', 'dreamer'],
-    motion: 'skyline',
-    panelTag: 'strategic skyline',
-    shellClass: styles.enterpriseDreamer,
-  },
-};
-
-const SHELL_TRANSITIONS: Record<ArcaneMotion, Transition> = {
-  aperture: { duration: 0.56, ease: [0.22, 1, 0.36, 1] },
-  dream: { duration: 0.74, ease: [0.25, 0.46, 0.45, 0.94] },
-  horizon: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  ledger: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
-  lens: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
-  pulse: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
-  skyline: { duration: 0.58, ease: [0.22, 1, 0.36, 1] },
-  weave: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  workflow: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
-};
+];
 
 function withAlpha(color: string, alpha: number): string {
-  return color.replace(/([\d.]+)\)\s*$/, `${alpha})`);
+  return color.replace(/[\d.]+\)\s*$/, `${alpha})`);
 }
 
-function splitDescriptor(descriptor: string): string[] {
-  return descriptor.split(/\s+/).filter(Boolean);
+function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSProperties {
+  return {
+    '--arc-glow': themeConfig.glow,
+    '--arc-glow-soft': withAlpha(themeConfig.glow, isDark ? 0.18 : 0.18),
+    '--arc-glow-strong': withAlpha(themeConfig.glow, isDark ? 0.4 : 0.36),
+    '--arc-edge': withAlpha(themeConfig.glow, isDark ? 0.28 : 0.28),
+    '--arc-panel': isDark ? 'rgba(9, 12, 28, 0.9)' : 'rgba(255, 255, 255, 0.92)',
+    '--arc-panel-2': isDark ? 'rgba(21, 25, 47, 0.8)' : 'rgba(237, 241, 253, 0.96)',
+    '--arc-panel-3': isDark ? 'rgba(30, 36, 66, 0.62)' : 'rgba(218, 225, 243, 0.84)',
+    '--arc-text': isDark ? 'rgba(248, 250, 252, 0.98)' : 'rgba(15, 23, 42, 0.96)',
+    '--arc-muted': isDark ? 'rgba(186, 194, 212, 0.82)' : 'rgba(51, 65, 85, 0.86)',
+    '--arc-gradient': isDark ? themeConfig.darkGradient : themeConfig.gradient,
+    '--arc-overlay': isDark
+      ? 'rgba(255, 255, 255, 0.08)'
+      : withAlpha(themeConfig.glow, 0.1),
+    '--arc-overlay-bold': isDark
+      ? 'rgba(255, 255, 255, 0.3)'
+      : withAlpha(themeConfig.glow, 0.28),
+    '--arc-inlay': isDark
+      ? 'rgba(10, 14, 26, 0.24)'
+      : withAlpha(themeConfig.glow, 0.06),
+  } as CSSProperties;
 }
 
-function renderAnimatedLine(line: string, motionType: ArcaneMotion, lineIndex: number, animate: boolean) {
-  if (!animate) {
-    return <span className={styles.titleLineStatic}>{line}</span>;
-  }
-
-  switch (motionType) {
-    case 'aperture': {
-      const revealFromRight = lineIndex === 1;
-
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{
-            clipPath: revealFromRight ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)',
-            opacity: 0.35,
-            x: revealFromRight ? 18 : -18,
-            letterSpacing: '0.22em',
-          }}
-          animate={{ clipPath: 'inset(0 0 0 0)', opacity: 1, x: 0, letterSpacing: '0.14em' }}
-          exit={{
-            clipPath: revealFromRight ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)',
-            opacity: 0,
-            x: revealFromRight ? -16 : 16,
-          }}
-          transition={{ duration: 0.44, delay: lineIndex * 0.08, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {line}
-        </motion.span>
-      );
-    }
-    case 'workflow':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, y: 14, filter: 'blur(6px)' }}
-          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -14, filter: 'blur(4px)' }}
-          transition={{ duration: 0.42, delay: lineIndex * 0.05, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {line.split(' ').map((word, wordIndex) => (
-            <motion.span
-              key={`${word}-${wordIndex}`}
-              className={styles.inlineWord}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.24, delay: 0.08 + wordIndex * 0.06 }}
-            >
-              {word}
-            </motion.span>
-          ))}
-        </motion.span>
-      );
-    case 'weave':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, x: lineIndex === 0 ? -20 : 20, rotateZ: lineIndex === 0 ? -2 : 2 }}
-          animate={{ opacity: 1, x: 0, rotateZ: 0 }}
-          exit={{ opacity: 0, x: lineIndex === 0 ? 18 : -18 }}
-          transition={{ duration: 0.46, delay: lineIndex * 0.09, ease: [0.16, 1, 0.3, 1] }}
-        >
-          {line}
-        </motion.span>
-      );
-    case 'horizon':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, y: 18, scaleX: 0.94 }}
-          animate={{ opacity: 1, y: 0, scaleX: 1 }}
-          exit={{ opacity: 0, y: -18, scaleX: 1.02 }}
-          transition={{ duration: 0.52, delay: lineIndex * 0.06, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {line}
-        </motion.span>
-      );
-    case 'dream':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, y: 16, rotateX: 18 }}
-          animate={{ opacity: 1, y: [0, -2, 0], rotateX: 0 }}
-          exit={{ opacity: 0, y: -16, rotateX: -10 }}
-          transition={{ duration: 0.68, delay: lineIndex * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-        >
-          {line}
-        </motion.span>
-      );
-    case 'pulse':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, scale: 0.92, letterSpacing: '0.24em' }}
-          animate={{ opacity: 1, scale: [1.04, 0.99, 1], letterSpacing: '0.16em' }}
-          exit={{ opacity: 0, scale: 1.06 }}
-          transition={{ duration: 0.5, delay: lineIndex * 0.07, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {line}
-        </motion.span>
-      );
-    case 'skyline':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, y: 18, scaleY: 0.8, transformOrigin: 'bottom center' }}
-          animate={{ opacity: 1, y: 0, scaleY: 1 }}
-          exit={{ opacity: 0, y: -14, scaleY: 1.08 }}
-          transition={{ duration: 0.5, delay: lineIndex * 0.07, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {line}
-        </motion.span>
-      );
-    case 'lens':
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, y: 12, scale: 0.96, filter: 'blur(8px)' }}
-          animate={{ opacity: 1, y: [0, -1, 0], scale: [1.05, 0.99, 1], filter: 'blur(0px)' }}
-          exit={{ opacity: 0, y: -12, filter: 'blur(4px)' }}
-          transition={{ duration: 0.64, delay: lineIndex * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
-        >
-          {line}
-        </motion.span>
-      );
-    case 'ledger':
-    default:
-      return (
-        <motion.span
-          className={styles.titleLineAnimated}
-          initial={{ opacity: 0, x: -14, filter: 'blur(4px)' }}
-          animate={{ opacity: 1, x: 0, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, x: 14, filter: 'blur(4px)' }}
-          transition={{ duration: 0.38, delay: lineIndex * 0.05, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {line}
-        </motion.span>
-      );
-  }
+function ArcaneDeck({
+  themeConfig,
+  notes,
+  positionLabel,
+  totalLabel,
+}: {
+  themeConfig: SubtitleTheme;
+  notes: readonly string[];
+  positionLabel: string;
+  totalLabel: string;
+}) {
+  return (
+    <div className={styles.deck} aria-hidden="true">
+      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
+      <div className={styles.deckNotes}>
+        {notes.map((note) => (
+          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
+            {note}
+          </span>
+        ))}
+      </div>
+      <span className={styles.deckCounter}>
+        {positionLabel}
+        <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
+      </span>
+    </div>
+  );
 }
 
-interface ArcaneSubtitleRendererProps extends SubtitleRendererShellProps {
-  readonly theme: SubtitleTheme;
-}
-
-function ArcaneSubtitleRenderer({
+function ArcaneScene({
+  config,
   context,
   hideSignalDeck,
   onBlur,
@@ -461,128 +264,182 @@ function ArcaneSubtitleRenderer({
   onMouseLeave,
   positionLabel,
   rotationStatusLabel,
-  theme,
   totalLabel,
-}: ArcaneSubtitleRendererProps) {
-  const config = VARIANT_CONFIG[theme.id];
-  const descriptorTokens = splitDescriptor(theme.signalDeck.descriptor);
-  const Icon = theme.icon;
-  const shouldAnimate = context.shouldAnimateTagline && !context.prefersReducedMotion;
-  const compact = context.compact || !context.showName;
-  const titleStyle = {
-    '--arcane-gradient': context.isDark ? theme.darkGradient : theme.gradient,
-    '--arcane-glow': theme.glow,
-    '--arcane-glow-soft': withAlpha(theme.glow, context.isDark ? 0.24 : 0.14),
-    '--arcane-glow-strong': withAlpha(theme.glow, context.isDark ? 0.56 : 0.3),
-    '--arcane-surface': context.isDark ? 'rgba(7, 12, 28, 0.88)' : 'rgba(255, 255, 255, 0.82)',
-    '--arcane-surface-strong': context.isDark ? 'rgba(17, 24, 45, 0.9)' : 'rgba(241, 245, 249, 0.9)',
-    '--arcane-shell-shadow': context.isDark
-      ? `0 20px 48px ${withAlpha(theme.glow, 0.18)}`
-      : `0 14px 32px ${withAlpha(theme.glow, 0.1)}`,
-  } as CSSProperties;
-
-  const titleBlock = (
-    <div className={cn(styles.titleStack, config.lineClass, config.titleClass)}>
-      {config.lines.map((line, lineIndex) => (
-        <span key={`${theme.id}-${line}`} className={styles.titleLine}>
-          {renderAnimatedLine(line, config.motion, lineIndex, shouldAnimate)}
-        </span>
-      ))}
-    </div>
-  );
-
-  const iconNode = (
-    <motion.span
-      className={styles.iconCore}
-      initial={shouldAnimate ? { opacity: 0, scale: 0.72, rotate: -10 } : undefined}
-      animate={shouldAnimate ? { opacity: 1, scale: 1, rotate: 0 } : undefined}
-      exit={shouldAnimate ? { opacity: 0, scale: 0.8, rotate: 8 } : undefined}
-      transition={shouldAnimate ? { duration: 0.4, delay: 0.08, ease: [0.22, 1, 0.36, 1] } : undefined}
-    >
-      <Icon className={cn(styles.iconSvg, theme.iconClass)} aria-hidden="true" />
-    </motion.span>
-  );
+}: SubtitleRendererShellProps & { config: ArcaneVariantConfig }) {
+  const themeConfig = config.theme;
+  const Icon = themeConfig.icon;
 
   return (
     <div
-      className={cn(styles.root, compact && styles.compactRoot)}
-      data-motion-mode={context.prefersReducedMotion ? 'reduced' : 'animated'}
+      className={cn(styles.cluster, context.compact && styles.clusterCompact)}
       onMouseEnter={!context.prefersReducedMotion ? onMouseEnter : undefined}
       onMouseLeave={!context.prefersReducedMotion ? onMouseLeave : undefined}
-      style={titleStyle}
+      style={getSceneVars(themeConfig, context.isDark)}
     >
-      {!hideSignalDeck ? (
-        <div className={cn(styles.signalDeck, config.familyClass)} aria-hidden="true">
-          <span className={styles.deckFamily}>{theme.signalDeck.family}</span>
-          <span className={styles.deckDescriptor}>{theme.signalDeck.descriptor}</span>
-          <span className={styles.deckCounter}>
-            {positionLabel}
-            <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
-          </span>
-        </div>
-      ) : null}
-
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${theme.text}. ${theme.signalDeck.family} family, ${theme.signalDeck.descriptor}. ${rotationStatusLabel}`}
-        className={styles.focusFrame}
+        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
       >
-        <AnimatePresence mode="wait">
-          <motion.section
-            key={theme.id}
-            className={cn(styles.shell, config.shellClass, compact && styles.compactShell)}
-            initial={shouldAnimate ? { opacity: 0, y: 18, scale: 0.96 } : undefined}
-            animate={shouldAnimate ? { opacity: 1, y: 0, scale: 1 } : undefined}
-            exit={shouldAnimate ? { opacity: 0, y: -18, scale: 0.98 } : undefined}
-            transition={SHELL_TRANSITIONS[config.motion]}
-          >
-            <span className={styles.shellGlow} aria-hidden="true" />
-            <span className={styles.shellOrnament} aria-hidden="true" />
+        <motion.section
+          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
+          exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
+          transition={themeConfig.transition}
+          className={cn(styles.scene, {
+            [styles.sceneSorcerer]: config.scene === 'sorcerer',
+            [styles.sceneMage]: config.scene === 'mage',
+            [styles.sceneWeaver]: config.scene === 'weaver',
+            [styles.sceneConjurer]: config.scene === 'conjurer',
+            [styles.sceneMystic]: config.scene === 'mystic',
+            [styles.sceneOracle]: config.scene === 'oracle',
+          })}
+          data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
+        >
+          {!hideSignalDeck ? (
+            <ArcaneDeck
+              themeConfig={themeConfig}
+              notes={config.notes}
+              positionLabel={positionLabel}
+              totalLabel={totalLabel}
+            />
+          ) : null}
 
-            <div className={styles.panelHeader}>
-              <span className={styles.panelIndex}>{positionLabel}</span>
-              <span className={styles.panelTag}>{config.panelTag}</span>
-              <span className={styles.panelFamily}>{theme.signalDeck.family}</span>
-            </div>
-
-            <div className={styles.titleStage}>
-              {iconNode}
-              {titleBlock}
-            </div>
-
-            <div className={styles.descriptorTrack} aria-hidden="true">
-              {descriptorTokens.map((token) => (
-                <span key={`${theme.id}-${token}`} className={styles.descriptorToken}>
-                  {token}
+          <div className={styles.sceneBody}>
+            <div className={styles.titleBlock}>
+              <span className={styles.kicker}>{config.kicker}</span>
+              <div className={styles.headlineWrap}>
+                <span className={styles.iconBadge} aria-hidden="true">
+                  <Icon className={styles.icon} />
                 </span>
-              ))}
+                <div className={styles.titleLockup}>
+                  <h2 className={styles.title}>{themeConfig.text}</h2>
+                  <p className={styles.descriptor}>{config.descriptor}</p>
+                </div>
+              </div>
             </div>
-          </motion.section>
-        </AnimatePresence>
+
+            <div
+              className={cn(styles.sceneRig, {
+                [styles.sorcererRig]: config.scene === 'sorcerer',
+                [styles.mageRig]: config.scene === 'mage',
+                [styles.weaverRig]: config.scene === 'weaver',
+                [styles.conjurerRig]: config.scene === 'conjurer',
+                [styles.mysticRig]: config.scene === 'mystic',
+                [styles.oracleRig]: config.scene === 'oracle',
+              })}
+              aria-hidden="true"
+            >
+              {config.scene === 'sorcerer' ? (
+                <>
+                  <span className={styles.sorcererTablet} />
+                  <span className={styles.sorcererTablet} />
+                  <span className={styles.sorcererTablet} />
+                </>
+              ) : null}
+
+              {config.scene === 'mage' ? (
+                <>
+                  <span className={styles.mageSigil} />
+                  <span className={styles.mageInscription} />
+                  <span className={styles.mageInscription} />
+                  <span className={styles.mageRune} />
+                  <span className={styles.mageRune} />
+                  <span className={styles.mageRune} />
+                </>
+              ) : null}
+
+              {config.scene === 'weaver' ? (
+                <div className={styles.weaverLoom}>
+                  <div className={styles.weaverWarp}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.weaverWeft}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.weaverShuttle} />
+                </div>
+              ) : null}
+
+              {config.scene === 'conjurer' ? (
+                <>
+                  <span className={styles.conjurerCore} />
+                  <span className={styles.conjurerTrace} />
+                  <span className={styles.conjurerTrace} />
+                  <span className={styles.conjurerTrace} />
+                  <span className={styles.conjurerTrace} />
+                </>
+              ) : null}
+
+              {config.scene === 'mystic' ? (
+                <>
+                  <span className={styles.mysticHalo} />
+                  <div className={styles.mysticPetals}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'oracle' ? (
+                <>
+                  <span className={styles.oracleRing} />
+                  <span className={styles.oracleRing} />
+                  <span className={styles.oracleDial} />
+                  <span className={styles.oracleSweep} />
+                  <div className={styles.oraclePips}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.oracleTags}>
+                    {config.notes.map((note) => (
+                      <span key={`${themeConfig.id}-${note}`} className={styles.oracleTag}>
+                        {note}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
+        </motion.section>
       </div>
     </div>
   );
 }
 
-function createArcaneRenderer(theme: SubtitleTheme): LandingTitleRendererEntry {
+function createArcaneRenderer(config: ArcaneVariantConfig): LandingTitleRendererEntry {
   return {
-    id: theme.id,
-    lane: theme.lane,
-    render: (props) => <ArcaneSubtitleRenderer {...props} theme={theme} />,
-    signalDeck: theme.signalDeck,
-    text: theme.text,
-    theme,
+    id: config.theme.id,
+    lane: 'arcane',
+    render: (props) => <ArcaneScene {...props} config={config} />,
+    signalDeck: config.theme.signalDeck,
+    text: config.theme.text,
+    theme: config.theme,
   };
 }
 
-export const ARCANE_SORCERER_RENDERERS: readonly LandingTitleRendererEntry[] = ARCANE_SORCERER_THEMES.map(createArcaneRenderer);
-export const ARCANE_MAGE_RENDERERS: readonly LandingTitleRendererEntry[] = ARCANE_MAGE_THEMES.map(createArcaneRenderer);
-export const ARCANE_VISIONARY_RENDERERS: readonly LandingTitleRendererEntry[] = ARCANE_VISIONARY_THEMES.map(createArcaneRenderer);
-export const ARCANE_RENDERERS: readonly LandingTitleRendererEntry[] = [
-  ...ARCANE_SORCERER_RENDERERS,
-  ...ARCANE_MAGE_RENDERERS,
-  ...ARCANE_VISIONARY_RENDERERS,
+export const ARCANE_SHOWCASE_RENDERERS: readonly LandingTitleRendererEntry[] =
+  ARCANE_VARIANTS.map(createArcaneRenderer);
+
+export const ARCANE_SUBTITLE_RENDERERS: readonly LandingTitleRendererEntry[] = [
+  ...ARCANE_SHOWCASE_RENDERERS,
 ];

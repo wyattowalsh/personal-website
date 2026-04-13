@@ -563,48 +563,43 @@ function ThemeSubtitleRenderer({
   totalLabel,
 }: ThemeSubtitleRendererProps) {
   const { compact, isDark, prefersReducedMotion, shouldAnimateTagline, showName, wordIndex } = context;
-  const currentTheme = theme;
-  const Icon = currentTheme.icon;
-  const textSeed = createTextSeed(currentTheme.text);
-  const handleDeckMouseEnter = onMouseEnter;
-  const handleDeckMouseLeave = onMouseLeave;
-  const handleShellFocus = onFocus;
-  const handleShellBlur = onBlur;
+  const Icon = theme.icon;
+  const textSeed = createTextSeed(theme.text);
 
-  const isPreciseFamily = [ctr.precision.className, ctr.mapperGrid.className, ctr.neural.className].includes(currentTheme.containerClass ?? '');
-  const isAiryFamily = [ctr.mystic.className, ctr.organic.className, ctr.visionaryHalo.className].includes(currentTheme.containerClass ?? '');
-  const isForgedFamily = [ctr.alchemy.className, ctr.sculptor.className, ctr.artisan.className, ctr.securityPulse.className].includes(currentTheme.containerClass ?? '');
-  const isStageFamily = [ctr.virtuosoShell.className, ctr.orchestratorStage.className].includes(currentTheme.containerClass ?? '');
-  const segmentMode = currentTheme.renderMeta?.segmentMode ?? 'char';
-  const needsReadableFoundation = ['typewriter', 'wave', 'cascade'].includes(currentTheme.renderMode);
-  const surfaceGroup = isPreciseFamily
+  const ctrClass = theme.containerClass ?? '';
+  const isPrecise = [ctr.precision.className, ctr.mapperGrid.className, ctr.neural.className].includes(ctrClass);
+  const isAiry = [ctr.mystic.className, ctr.organic.className, ctr.visionaryHalo.className].includes(ctrClass);
+  const isForged = [ctr.alchemy.className, ctr.sculptor.className, ctr.artisan.className, ctr.securityPulse.className].includes(ctrClass);
+  const isStage = [ctr.virtuosoShell.className, ctr.orchestratorStage.className].includes(ctrClass);
+  const segmentMode = theme.renderMeta?.segmentMode ?? 'char';
+  const needsReadableFoundation = ['typewriter', 'wave', 'cascade'].includes(theme.renderMode);
+  const surfaceGroup = isPrecise
     ? 'precise'
-    : isAiryFamily
+    : isAiry
       ? 'airy'
-      : isForgedFamily
+      : isForged
         ? 'forged'
-        : isStageFamily
+        : isStage
           ? 'stage'
           : 'default';
   const derivedContentClass = cn(
-    currentTheme.contentClass,
-    isPreciseFamily && pillTreatments.precise,
-    isAiryFamily && pillTreatments.airy,
-    isForgedFamily && pillTreatments.forged,
-    isStageFamily && pillTreatments.stage,
+    theme.contentClass,
+    isPrecise && pillTreatments.precise,
+    isAiry && pillTreatments.airy,
+    isForged && pillTreatments.forged,
+    isStage && pillTreatments.stage,
   );
-  const derivedIconScaleClass = currentTheme.textClass?.includes(textTreatments.hero)
-    ? iconTreatments.large
-    : isStageFamily
+  const derivedIconScaleClass =
+    theme.textClass?.includes(textTreatments.hero) || isStage
       ? iconTreatments.large
-      : isPreciseFamily || currentTheme.fontFamily === 'mono'
+      : isPrecise || theme.fontFamily === 'mono'
         ? iconTreatments.compact
         : '';
-  const subtitleGlow = withAlpha(currentTheme.glow, isDark ? 0.48 : 0.34);
+  const subtitleGlow = withAlpha(theme.glow, isDark ? 0.48 : 0.34);
   const subtitleStroke = isDark ? 'rgba(255, 255, 255, 0.18)' : 'rgba(15, 23, 42, 0.14)';
 
   const gradientStyle: React.CSSProperties = {
-    backgroundImage: isDark ? currentTheme.darkGradient : currentTheme.gradient,
+    backgroundImage: isDark ? theme.darkGradient : theme.gradient,
     WebkitBackgroundClip: 'text',
     backgroundClip: 'text',
     color: 'transparent',
@@ -613,11 +608,11 @@ function ThemeSubtitleRenderer({
   };
 
   const typographyStyle: React.CSSProperties = {
-    fontFamily: currentTheme.fontFamily === 'mono' ? 'var(--font-monaspace), monospace' : 'var(--font-bricolage), sans-serif',
-    fontWeight: currentTheme.fontWeight,
-    letterSpacing: currentTheme.letterSpacing,
-    textTransform: currentTheme.textTransform,
-    fontStyle: currentTheme.fontStyle,
+    fontFamily: theme.fontFamily === 'mono' ? 'var(--font-monaspace), monospace' : 'var(--font-bricolage), sans-serif',
+    fontWeight: theme.fontWeight,
+    letterSpacing: theme.letterSpacing,
+    textTransform: theme.textTransform,
+    fontStyle: theme.fontStyle,
   };
 
   const readableBaseStyle: React.CSSProperties = {
@@ -626,8 +621,8 @@ function ThemeSubtitleRenderer({
       ? isDark ? 'rgba(248, 250, 252, 0.26)' : 'rgba(15, 23, 42, 0.16)'
       : isDark ? 'rgba(248, 250, 252, 0.34)' : 'rgba(15, 23, 42, 0.22)',
     textShadow: isDark
-      ? `0 0 ${needsReadableFoundation ? 8 : 9}px ${withAlpha(currentTheme.glow, needsReadableFoundation ? 0.14 : 0.16)}`
-      : `0 0 ${needsReadableFoundation ? 6 : 7}px ${withAlpha(currentTheme.glow, needsReadableFoundation ? 0.08 : 0.1)}`,
+      ? `0 0 ${needsReadableFoundation ? 8 : 9}px ${withAlpha(theme.glow, needsReadableFoundation ? 0.14 : 0.16)}`
+      : `0 0 ${needsReadableFoundation ? 6 : 7}px ${withAlpha(theme.glow, needsReadableFoundation ? 0.08 : 0.1)}`,
   };
 
   const typographyBaseClasses = cn(
@@ -637,39 +632,39 @@ function ThemeSubtitleRenderer({
 
   const typographyClasses = cn(
     typographyBaseClasses,
-    currentTheme.textClass,
+    theme.textClass,
     'transition-transform duration-300 ease-out',
-    currentTheme.effectClass,
+    theme.effectClass,
   );
 
-  const iconColor = currentTheme.glow.replace(/[\d.]+\)$/, '0.8)');
+  const iconColor = theme.glow.replace(/[\d.]+\)$/, '0.8)');
 
   const renderIcon = (position: 'left' | 'right') => {
-    if (currentTheme.iconPosition !== position) {
+    if (theme.iconPosition !== position) {
       return null;
     }
 
     const iconNode = (
-      <span className={cn(styles.subtitleIconBadge, currentTheme.iconBadgeClass, derivedIconScaleClass)}>
+      <span className={cn(styles.subtitleIconBadge, theme.iconBadgeClass, derivedIconScaleClass)}>
         <Icon
-          className={cn('h-5 w-5 shrink-0 sm:h-6 sm:w-6 md:h-7 md:w-7', currentTheme.iconClass)}
-          style={{ color: iconColor, filter: `drop-shadow(0 0 8px ${currentTheme.glow})` }}
+          className={cn('h-5 w-5 shrink-0 sm:h-6 sm:w-6 md:h-7 md:w-7', theme.iconClass)}
+          style={{ color: iconColor, filter: `drop-shadow(0 0 8px ${theme.glow})` }}
           aria-hidden="true"
         />
       </span>
     );
 
-    if (!shouldAnimateTagline || !currentTheme.iconMotion) {
-      return <span className={currentTheme.iconWrapperClass}>{iconNode}</span>;
+    if (!shouldAnimateTagline || !theme.iconMotion) {
+      return <span className={theme.iconWrapperClass}>{iconNode}</span>;
     }
 
     return (
       <motion.span
-        className={currentTheme.iconWrapperClass}
-        initial={currentTheme.iconMotion.initial}
-        animate={currentTheme.iconMotion.animate}
-        exit={currentTheme.iconMotion.exit}
-        transition={currentTheme.iconMotion.transition}
+        className={theme.iconWrapperClass}
+        initial={theme.iconMotion.initial}
+        animate={theme.iconMotion.animate}
+        exit={theme.iconMotion.exit}
+        transition={theme.iconMotion.transition}
       >
         {iconNode}
       </motion.span>
@@ -683,10 +678,10 @@ function ThemeSubtitleRenderer({
       {shouldRenderReadableEcho ? (
         <span
           aria-hidden="true"
-          className={cn(styles.subtitleReadableEcho, typographyBaseClasses, currentTheme.textClass)}
+          className={cn(styles.subtitleReadableEcho, typographyBaseClasses, theme.textClass)}
           style={readableBaseStyle}
         >
-          {currentTheme.text}
+          {theme.text}
         </span>
       ) : null}
       <span className={styles.subtitleAnimatedText}>{node}</span>
@@ -699,8 +694,8 @@ function ThemeSubtitleRenderer({
       ...combinedStyle,
       filter: 'none',
       textShadow: isDark
-        ? `0 0 0.72rem ${withAlpha(currentTheme.glow, 0.18)}`
-        : `0 0 0.56rem ${withAlpha(currentTheme.glow, 0.12)}`,
+        ? `0 0 0.72rem ${withAlpha(theme.glow, 0.18)}`
+        : `0 0 0.56rem ${withAlpha(theme.glow, 0.12)}`,
     };
     const animatedUnitStyle: React.CSSProperties = {
       ...animatedCombinedStyle,
@@ -713,19 +708,19 @@ function ThemeSubtitleRenderer({
       justifyContent: 'center',
       gap: segmentMode === 'word' ? '0.32ch' : undefined,
     };
-    const motionUnits = getMotionUnits(currentTheme.text, segmentMode);
-    const canRunCharChoreo = !prefersReducedMotion && currentTheme.text.length <= MAX_CHOREOGRAPHY_CHARS;
+    const motionUnits = getMotionUnits(theme.text, segmentMode);
+    const canRunCharChoreo = !prefersReducedMotion && theme.text.length <= MAX_CHOREOGRAPHY_CHARS;
 
     if (!shouldAnimateTagline) {
       return withReadableBase(
-        <span style={combinedStyle} className={typographyClasses} data-text={currentTheme.text}>
-          {currentTheme.text}
+        <span style={combinedStyle} className={typographyClasses} data-text={theme.text}>
+          {theme.text}
         </span>,
       );
     }
 
-    if (currentTheme.renderMode === 'typewriter' && canRunCharChoreo) {
-      const stagger = currentTheme.renderMeta?.stagger ?? (segmentMode === 'word' ? 0.08 : 0.04);
+    if (theme.renderMode === 'typewriter' && canRunCharChoreo) {
+      const stagger = theme.renderMeta?.stagger ?? (segmentMode === 'word' ? 0.08 : 0.04);
 
       return withReadableBase(
         <motion.span style={choreographyWrapperStyle} className={typographyClasses}>
@@ -749,9 +744,9 @@ function ThemeSubtitleRenderer({
       );
     }
 
-    if (currentTheme.renderMode === 'wave' && canRunCharChoreo) {
-      const stagger = currentTheme.renderMeta?.stagger ?? (segmentMode === 'word' ? 0.055 : 0.024);
-      const waveLift = currentTheme.renderMeta?.waveLift ?? (segmentMode === 'word' ? 10 : 7);
+    if (theme.renderMode === 'wave' && canRunCharChoreo) {
+      const stagger = theme.renderMeta?.stagger ?? (segmentMode === 'word' ? 0.055 : 0.024);
+      const waveLift = theme.renderMeta?.waveLift ?? (segmentMode === 'word' ? 10 : 7);
 
       return withReadableBase(
         <motion.span style={choreographyWrapperStyle} className={typographyClasses} initial={{ opacity: 0.9 }} animate={{ opacity: 1 }}>
@@ -775,9 +770,9 @@ function ThemeSubtitleRenderer({
       );
     }
 
-    if (currentTheme.renderMode === 'cascade' && canRunCharChoreo) {
-      const stagger = currentTheme.renderMeta?.stagger ?? (segmentMode === 'word' ? 0.06 : 0.018);
-      const cascadeDistance = currentTheme.renderMeta?.cascadeDistance ?? (segmentMode === 'word' ? 20 : 14);
+    if (theme.renderMode === 'cascade' && canRunCharChoreo) {
+      const stagger = theme.renderMeta?.stagger ?? (segmentMode === 'word' ? 0.06 : 0.018);
+      const cascadeDistance = theme.renderMeta?.cascadeDistance ?? (segmentMode === 'word' ? 20 : 14);
 
       return withReadableBase(
         <motion.span style={choreographyWrapperStyle} className={typographyClasses}>
@@ -801,10 +796,10 @@ function ThemeSubtitleRenderer({
       );
     }
 
-    if (currentTheme.renderMode === 'reveal') {
-      const revealDirection = currentTheme.renderMeta?.revealDirection ?? 'left';
+    if (theme.renderMode === 'reveal') {
+      const revealDirection = theme.renderMeta?.revealDirection ?? 'left';
       const revealFromRight = revealDirection === 'right';
-      const revealSkew = currentTheme.renderMeta?.revealSkew ?? (revealFromRight ? -8 : 8);
+      const revealSkew = theme.renderMeta?.revealSkew ?? (revealFromRight ? -8 : 8);
 
       return withReadableBase(
         <motion.span
@@ -825,14 +820,14 @@ function ThemeSubtitleRenderer({
           }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          {currentTheme.text}
+          {theme.text}
         </motion.span>,
       );
     }
 
-    if (currentTheme.renderMode === 'split') {
-      const splitDistance = currentTheme.renderMeta?.splitDistance ?? 18;
-      const segments = currentTheme.text.split(' ');
+    if (theme.renderMode === 'split') {
+      const splitDistance = theme.renderMeta?.splitDistance ?? 18;
+      const segments = theme.text.split(' ');
       const left = segments.slice(0, Math.ceil(segments.length / 2)).join(' ');
       const right = segments.slice(Math.ceil(segments.length / 2)).join(' ');
 
@@ -862,9 +857,9 @@ function ThemeSubtitleRenderer({
       );
     }
 
-    if (currentTheme.renderMode === 'morphText') {
+    if (theme.renderMode === 'morphText') {
       return withReadableBase(
-        <span className={cn(typographyClasses, 'relative inline-grid')} data-text={currentTheme.text}>
+        <span className={cn(typographyClasses, 'relative inline-grid')} data-text={theme.text}>
           <motion.span
             key={`prev-${wordIndex}`}
             aria-hidden="true"
@@ -875,7 +870,7 @@ function ThemeSubtitleRenderer({
             exit={{ opacity: 0, y: -14 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
           >
-            {currentTheme.text}
+            {theme.text}
           </motion.span>
           <motion.span
             key={`next-${wordIndex}`}
@@ -885,15 +880,15 @@ function ThemeSubtitleRenderer({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           >
-            {currentTheme.text}
+            {theme.text}
           </motion.span>
         </span>,
       );
     }
 
     return withReadableBase(
-      <span style={combinedStyle} className={typographyClasses} data-text={currentTheme.text}>
-        {currentTheme.text}
+      <span style={combinedStyle} className={typographyClasses} data-text={theme.text}>
+        {theme.text}
       </span>,
     );
   };
@@ -901,47 +896,47 @@ function ThemeSubtitleRenderer({
   const accentX = 16 + (textSeed % 62);
   const accentY = 14 + ((textSeed * 7) % 52);
   const sharedSignalStyle = {
-    '--subtitle-shell-edge': withAlpha(currentTheme.glow, isDark ? 0.24 : 0.14),
-    '--subtitle-shell-glow-soft': withAlpha(currentTheme.glow, isDark ? 0.16 : 0.08),
-    '--subtitle-shell-glow-strong': withAlpha(currentTheme.glow, isDark ? 0.34 : 0.17),
+    '--subtitle-shell-edge': withAlpha(theme.glow, isDark ? 0.24 : 0.14),
+    '--subtitle-shell-glow-soft': withAlpha(theme.glow, isDark ? 0.16 : 0.08),
+    '--subtitle-shell-glow-strong': withAlpha(theme.glow, isDark ? 0.34 : 0.17),
     '--subtitle-shell-ridge': isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(255, 255, 255, 0.5)',
     '--subtitle-shell-shadow': isDark ? 'rgba(2, 6, 23, 0.52)' : 'rgba(15, 23, 42, 0.14)',
-    '--subtitle-glow-soft': withAlpha(currentTheme.glow, isDark ? 0.18 : 0.12),
-    '--subtitle-glow-strong': withAlpha(currentTheme.glow, isDark ? 0.34 : 0.2),
-    '--subtitle-panel-edge': withAlpha(currentTheme.glow, isDark ? 0.28 : 0.22),
+    '--subtitle-glow-soft': withAlpha(theme.glow, isDark ? 0.18 : 0.12),
+    '--subtitle-glow-strong': withAlpha(theme.glow, isDark ? 0.34 : 0.2),
+    '--subtitle-panel-edge': withAlpha(theme.glow, isDark ? 0.28 : 0.22),
     '--subtitle-panel-bg': isDark ? 'rgba(10, 16, 34, 0.72)' : 'rgba(255, 255, 255, 0.78)',
     '--subtitle-panel-bg-2': isDark ? 'rgba(18, 26, 52, 0.6)' : 'rgba(241, 245, 249, 0.62)',
     '--subtitle-badge-bg': isDark ? 'rgba(10, 16, 34, 0.88)' : 'rgba(255, 255, 255, 0.9)',
-    '--subtitle-badge-border': withAlpha(currentTheme.glow, isDark ? 0.26 : 0.18),
-    '--subtitle-signal-gradient': isDark ? currentTheme.darkGradient : currentTheme.gradient,
+    '--subtitle-badge-border': withAlpha(theme.glow, isDark ? 0.26 : 0.18),
+    '--subtitle-signal-gradient': isDark ? theme.darkGradient : theme.gradient,
     '--subtitle-signal-label': isDark ? 'rgba(226, 232, 240, 0.92)' : 'rgba(15, 23, 42, 0.82)',
     '--subtitle-signal-muted': isDark ? 'rgba(148, 163, 184, 0.82)' : 'rgba(71, 85, 105, 0.72)',
     '--subtitle-signal-surface': isDark ? 'rgba(8, 15, 32, 0.76)' : 'rgba(255, 255, 255, 0.82)',
     '--subtitle-signal-surface-2': isDark ? 'rgba(18, 26, 52, 0.62)' : 'rgba(241, 245, 249, 0.72)',
     '--subtitle-signal-accent-x': `${accentX}%`,
     '--subtitle-signal-accent-y': `${accentY}%`,
-    '--subtitle-theme-outline': currentTheme.containerBorder,
-    '--subtitle-theme-panel-fill': currentTheme.containerBackground ?? 'linear-gradient(135deg, transparent, transparent)',
-    '--subtitle-theme-panel-shadow': currentTheme.containerShadow,
+    '--subtitle-theme-outline': theme.containerBorder,
+    '--subtitle-theme-panel-fill': theme.containerBackground ?? 'linear-gradient(135deg, transparent, transparent)',
+    '--subtitle-theme-panel-shadow': theme.containerShadow,
   } as React.CSSProperties;
   const subtitleThemeStyle = {
     ...sharedSignalStyle,
-    border: currentTheme.containerBorder,
-    boxShadow: currentTheme.containerShadow,
-    borderRadius: currentTheme.containerRadius ?? `${12 + (textSeed % 6)}px`,
+    border: theme.containerBorder,
+    boxShadow: theme.containerShadow,
+    borderRadius: theme.containerRadius ?? `${12 + (textSeed % 6)}px`,
     background: 'transparent',
     transition: 'border 0.5s ease, box-shadow 0.5s ease, border-radius 0.5s ease',
   } as React.CSSProperties;
   const subtitleGlowStyle = {
-    '--subtitle-glow-border-radius': isAiryFamily ? '999px' : subtitleThemeStyle.borderRadius,
+    '--subtitle-glow-border-radius': isAiry ? '999px' : subtitleThemeStyle.borderRadius,
   } as React.CSSProperties;
 
   const subtitleInner = (
     <>
-      <span className={cn(styles.subtitleAmbient, currentTheme.ambientClass)} aria-hidden="true" />
-      {currentTheme.ornament ? (
-        <span className={cn(styles.subtitleOrnament, currentTheme.ornamentClass)} aria-hidden="true">
-          {currentTheme.ornament}
+      <span className={cn(styles.subtitleAmbient, theme.ambientClass)} aria-hidden="true" />
+      {theme.ornament ? (
+        <span className={cn(styles.subtitleOrnament, theme.ornamentClass)} aria-hidden="true">
+          {theme.ornament}
         </span>
       ) : null}
       <span className={cn('relative z-2 inline-flex items-center gap-2 sm:gap-3', styles.subtitleContent, derivedContentClass)}>
@@ -965,8 +960,8 @@ function ThemeSubtitleRenderer({
       )}
       style={sharedSignalStyle}
       data-surface-group={surfaceGroup}
-      onMouseEnter={!prefersReducedMotion ? handleDeckMouseEnter : undefined}
-      onMouseLeave={!prefersReducedMotion ? handleDeckMouseLeave : undefined}
+      onMouseEnter={!prefersReducedMotion ? onMouseEnter : undefined}
+      onMouseLeave={!prefersReducedMotion ? onMouseLeave : undefined}
     >
       {!hideSignalDeck ? (
         <div className={styles.signalDeck} aria-hidden="true">
@@ -985,10 +980,10 @@ function ThemeSubtitleRenderer({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${currentTheme.text}. ${signalDeck.family} family, ${signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${theme.text}. ${signalDeck.family} family, ${signalDeck.descriptor}. ${rotationStatusLabel}`}
         className={cn('w-full', styles.subtitleBorderGlow, styles.subtitleControl)}
-        onFocus={handleShellFocus}
-        onBlur={handleShellBlur}
+        onFocus={onFocus}
+        onBlur={onBlur}
         style={subtitleGlowStyle}
       >
         {!shouldAnimateTagline ? (
@@ -997,8 +992,8 @@ function ThemeSubtitleRenderer({
             className={cn(
               'subtitle-container relative isolate flex min-h-[3.5rem] w-full items-center justify-center overflow-hidden px-3 py-2 sm:min-h-[4rem] sm:px-4 sm:py-2.5 md:min-h-[5rem] md:px-5 md:py-3',
               styles.subtitleShellFrame,
-              currentTheme.containerClass,
-              currentTheme.shellClass,
+              theme.containerClass,
+              theme.shellClass,
             )}
             style={subtitleThemeStyle}
           >
@@ -1007,17 +1002,17 @@ function ThemeSubtitleRenderer({
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
-              key={currentTheme.text}
-              initial={currentTheme.initial}
-              animate={currentTheme.animate}
-              exit={currentTheme.exit}
-              transition={currentTheme.transition}
+              key={theme.text}
+              initial={theme.initial}
+              animate={theme.animate}
+              exit={theme.exit}
+              transition={theme.transition}
               aria-hidden="true"
               className={cn(
                 'subtitle-container relative isolate flex min-h-[3.5rem] w-full items-center justify-center overflow-hidden px-3 py-2 sm:min-h-[4rem] sm:px-4 sm:py-2.5 md:min-h-[5rem] md:px-5 md:py-3',
                 styles.subtitleShellFrame,
-                currentTheme.containerClass,
-                currentTheme.shellClass,
+                theme.containerClass,
+                theme.shellClass,
               )}
               style={{ perspective: '1000px', transformStyle: 'preserve-3d', ...subtitleThemeStyle }}
             >

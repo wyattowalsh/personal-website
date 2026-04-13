@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTheme } from 'next-themes';
 import { LandingTitle } from '@/components/LandingTitle';
 import {
-  DEFAULT_LANDING_TITLE_SUBTITLE_ID,
   LANDING_TITLE_SUBTITLE_OPTIONS,
   resolveSubtitleOption,
 } from '@/components/landing-title/registry';
@@ -20,28 +19,77 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
+/* ── option tuples ────────────────────────────────────────────────────────── */
+
 const VIEW_OPTIONS = ['single', 'matrix'] as const;
 const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
 const MOTION_OPTIONS = ['system', 'animated', 'reduced'] as const;
 const FRAME_OPTIONS = ['desktop', 'tablet', 'mobile'] as const;
-const DEFAULT_SUBTITLE = DEFAULT_LANDING_TITLE_SUBTITLE_ID;
-const SUBTITLE_LABEL_ID = 'subtitle-audit-subtitle-label';
-const VIEW_LABEL_ID = 'subtitle-audit-view-label';
-const THEME_LABEL_ID = 'subtitle-audit-theme-label';
-const MOTION_LABEL_ID = 'subtitle-audit-motion-label';
-const FRAME_LABEL_ID = 'subtitle-audit-frame-label';
 
 type FrameMode = (typeof FRAME_OPTIONS)[number];
-
-function pickParam<T extends string>(value: string | null, allowed: readonly T[], fallback: T): T {
-  return allowed.includes(value as T) ? (value as T) : fallback;
-}
 
 const FRAME_CLASS_MAP: Record<FrameMode, string> = {
   desktop: 'w-full max-w-6xl',
   tablet: 'w-full max-w-4xl',
   mobile: 'w-full max-w-md',
 };
+
+function pickParam<T extends string>(value: string | null, allowed: readonly T[], fallback: T): T {
+  return allowed.includes(value as T) ? (value as T) : fallback;
+}
+
+/* ── select-option helpers ────────────────────────────────────────────────── */
+
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
+function toSelectOptions(values: readonly string[]): SelectOption[] {
+  return values.map((v) => ({ value: v, label: v.charAt(0).toUpperCase() + v.slice(1) }));
+}
+
+const SUBTITLE_SELECT_OPTIONS: SelectOption[] = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id, text }) => ({
+  value: id,
+  label: text,
+}));
+
+/* ── reusable labelled select ─────────────────────────────────────────────── */
+
+interface ControlSelectProps {
+  label: string;
+  value: string;
+  options: readonly SelectOption[];
+  onValueChange: (value: string) => void;
+}
+
+function ControlSelect({ label, value, options, onValueChange }: ControlSelectProps) {
+  const labelId = `subtitle-audit-${label.toLowerCase()}-label`;
+  return (
+    <div className="space-y-2">
+      <label
+        id={labelId}
+        className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground"
+      >
+        {label}
+      </label>
+      <Select value={value} onValueChange={onValueChange}>
+        <SelectTrigger aria-labelledby={labelId} className="w-full">
+          <SelectValue placeholder={`Select ${label.toLowerCase()}`} />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+}
+
+/* ── main lab component ───────────────────────────────────────────────────── */
 
 export function SubtitleAuditLab() {
   const router = useRouter();
@@ -58,6 +106,7 @@ export function SubtitleAuditLab() {
   const frameMode = pickParam(searchParams.get('frame'), FRAME_OPTIONS, 'desktop');
   const showSignalDeck = searchParams.get('deck') !== '0';
 
+  // Capture initial theme on mount, restore on unmount
   useEffect(() => {
     if (!hasCapturedInitialThemeRef.current && theme) {
       previousThemeRef.current = theme;
@@ -74,16 +123,13 @@ export function SubtitleAuditLab() {
   }, [setTheme]);
 
   useEffect(() => {
-    if (!hasCapturedInitialThemeRef.current) {
-      return;
+    if (hasCapturedInitialThemeRef.current) {
+      setTheme(themeMode);
     }
-
-    setTheme(themeMode);
   }, [setTheme, themeMode]);
 
   const updateParams = (updates: Record<string, string | null>) => {
     const nextParams = new URLSearchParams(searchParams.toString());
-
     for (const [key, value] of Object.entries(updates)) {
       if (!value) {
         nextParams.delete(key);
@@ -91,7 +137,6 @@ export function SubtitleAuditLab() {
         nextParams.set(key, value);
       }
     }
-
     const query = nextParams.toString();
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
@@ -103,17 +148,26 @@ export function SubtitleAuditLab() {
   const reducedMotionOverride =
     motionMode === 'system' ? undefined : motionMode === 'reduced';
 
-  const matrixThemes = useMemo(() => {
-    return [
+  const matrixThemes = useMemo(
+    () => [
       selectedSubtitle,
       ...LANDING_TITLE_SUBTITLE_OPTIONS.filter(({ id }) => id !== selectedSubtitle.id),
-    ];
-  }, [selectedSubtitle]);
+    ],
+    [selectedSubtitle],
+  );
 
   const goToRelativeSubtitle = (delta: number) => {
     const total = LANDING_TITLE_SUBTITLE_OPTIONS.length;
     const nextIndex = (selectedIndex + delta + total) % total;
-    updateParams({ subtitle: LANDING_TITLE_SUBTITLE_OPTIONS[nextIndex]?.id ?? DEFAULT_SUBTITLE });
+    updateParams({ subtitle: LANDING_TITLE_SUBTITLE_OPTIONS[nextIndex].id });
+  };
+
+  // Props shared by every LandingTitle preview instance
+  const sharedPreviewProps = {
+    disableRotation: true as const,
+    forceReducedMotion: reducedMotionOverride,
+    framed: false as const,
+    hideSignalDeck: !showSignalDeck,
   };
 
   return (
@@ -130,8 +184,8 @@ export function SubtitleAuditLab() {
             Inspect every homepage subtitle before the ground-up rebuild
           </h1>
           <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
-            Lock any of the {LANDING_TITLE_SUBTITLE_OPTIONS.length} subtitle variants, switch theme and
-            motion states, and compare them in either focused or matrix view before the dedicated
+            Lock any of the {LANDING_TITLE_SUBTITLE_OPTIONS.length} subtitle variants, switch theme
+            and motion states, and compare them in either focused or matrix view before the dedicated
             redesign lanes start swapping in bespoke renderers.
           </p>
         </div>
@@ -141,116 +195,36 @@ export function SubtitleAuditLab() {
         className="grid gap-4 rounded-[1.75rem] border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,0.75fr))_auto] lg:items-end"
         data-subtitle-controls
       >
-        <div className="space-y-2">
-          <label
-            id={SUBTITLE_LABEL_ID}
-            className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground"
-          >
-            Subtitle
-          </label>
-          <Select
-            value={selectedSubtitle.id}
-            onValueChange={(value) => updateParams({ subtitle: value })}
-          >
-            <SelectTrigger aria-labelledby={SUBTITLE_LABEL_ID} className="w-full">
-              <SelectValue placeholder="Select subtitle" />
-            </SelectTrigger>
-            <SelectContent>
-              {LANDING_TITLE_SUBTITLE_OPTIONS.map((option) => (
-                <SelectItem key={option.id} value={option.id}>
-                  {option.text}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label
-            id={VIEW_LABEL_ID}
-            className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground"
-          >
-            View
-          </label>
-          <Select
-            value={viewMode}
-            onValueChange={(value) => updateParams({ view: value })}
-          >
-            <SelectTrigger aria-labelledby={VIEW_LABEL_ID} className="w-full">
-              <SelectValue placeholder="Select view" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="single">Single</SelectItem>
-              <SelectItem value="matrix">Matrix</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label
-            id={THEME_LABEL_ID}
-            className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground"
-          >
-            Theme
-          </label>
-          <Select
-            value={themeMode}
-            onValueChange={(value) => updateParams({ theme: value })}
-          >
-            <SelectTrigger aria-labelledby={THEME_LABEL_ID} className="w-full">
-              <SelectValue placeholder="Select theme" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">System</SelectItem>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label
-            id={MOTION_LABEL_ID}
-            className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground"
-          >
-            Motion
-          </label>
-          <Select
-            value={motionMode}
-            onValueChange={(value) => updateParams({ motion: value })}
-          >
-            <SelectTrigger aria-labelledby={MOTION_LABEL_ID} className="w-full">
-              <SelectValue placeholder="Select motion" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">System</SelectItem>
-              <SelectItem value="animated">Animated</SelectItem>
-              <SelectItem value="reduced">Reduced</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <label
-            id={FRAME_LABEL_ID}
-            className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground"
-          >
-            Frame
-          </label>
-          <Select
-            value={frameMode}
-            onValueChange={(value) => updateParams({ frame: value })}
-          >
-            <SelectTrigger aria-labelledby={FRAME_LABEL_ID} className="w-full">
-              <SelectValue placeholder="Select frame" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="desktop">Desktop</SelectItem>
-              <SelectItem value="tablet">Tablet</SelectItem>
-              <SelectItem value="mobile">Mobile</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <ControlSelect
+          label="Subtitle"
+          value={selectedSubtitle.id}
+          options={SUBTITLE_SELECT_OPTIONS}
+          onValueChange={(v) => updateParams({ subtitle: v })}
+        />
+        <ControlSelect
+          label="View"
+          value={viewMode}
+          options={toSelectOptions(VIEW_OPTIONS)}
+          onValueChange={(v) => updateParams({ view: v })}
+        />
+        <ControlSelect
+          label="Theme"
+          value={themeMode}
+          options={toSelectOptions(THEME_OPTIONS)}
+          onValueChange={(v) => updateParams({ theme: v })}
+        />
+        <ControlSelect
+          label="Motion"
+          value={motionMode}
+          options={toSelectOptions(MOTION_OPTIONS)}
+          onValueChange={(v) => updateParams({ motion: v })}
+        />
+        <ControlSelect
+          label="Frame"
+          value={frameMode}
+          options={toSelectOptions(FRAME_OPTIONS)}
+          onValueChange={(v) => updateParams({ frame: v })}
+        />
 
         <div className="flex items-center justify-between gap-3 rounded-xl border border-border/60 px-3 py-2 lg:min-h-10">
           <div className="space-y-0.5">
@@ -298,43 +272,36 @@ export function SubtitleAuditLab() {
         data-subtitle-preview
       >
         {viewMode === 'single' ? (
-          <LandingTitle
-            forcedSubtitleId={selectedSubtitle.id}
-            disableRotation
-            forceReducedMotion={reducedMotionOverride}
-            hideSignalDeck={!showSignalDeck}
-          />
+          <LandingTitle forcedSubtitleId={selectedSubtitle.id} {...sharedPreviewProps} />
         ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-subtitle-matrix>
-              {matrixThemes.map((option, index) => (
-                <div
-                  key={option.id}
-                  className={cn(
-                    'rounded-[1.5rem] border border-border/60 bg-background/80 p-4 shadow-sm',
-                    option.id === selectedSubtitle.id && 'ring-1 ring-primary/40',
-                  )}
-                  data-subtitle-card={option.id}
-                >
-                 <div className="mb-3 flex items-center justify-between gap-3">
-                   <div className="min-w-0 space-y-1">
-                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                       {String(index + 1).padStart(2, '0')}
-                     </p>
-                     <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
-                   </div>
-                   <Button
-                     variant="ghost"
-                     size="sm"
-                     onClick={() => updateParams({ subtitle: option.id, view: 'single' })}
-                   >
-                     Focus
-                   </Button>
-                 </div>
-                 <LandingTitle
-                   forcedSubtitleId={option.id}
-                   disableRotation
-                   forceReducedMotion={reducedMotionOverride}
-                   hideSignalDeck={!showSignalDeck}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-subtitle-matrix>
+            {matrixThemes.map((option, index) => (
+              <div
+                key={option.id}
+                className={cn(
+                  'rounded-[1.5rem] border border-border/60 bg-background/80 p-4 shadow-sm',
+                  option.id === selectedSubtitle.id && 'ring-1 ring-primary/40',
+                )}
+                data-subtitle-card={option.id}
+              >
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                      {String(index + 1).padStart(2, '0')}
+                    </p>
+                    <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => updateParams({ subtitle: option.id, view: 'single' })}
+                  >
+                    Focus
+                  </Button>
+                </div>
+                <LandingTitle
+                  forcedSubtitleId={option.id}
+                  {...sharedPreviewProps}
                   showName={false}
                   compact
                 />

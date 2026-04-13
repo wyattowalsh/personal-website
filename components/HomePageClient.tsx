@@ -86,11 +86,12 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
             "relative z-10 flex flex-col justify-center min-h-screen",
             "px-4 sm:px-6 lg:px-8",
             "pt-20 sm:pt-24 pb-12 sm:pb-16 lg:pb-20",
-            "max-w-7xl mx-auto w-full"
+            "max-w-7xl mx-auto w-full",
+            styles.heroViewportFrame
           )}
         >
         <motion.div
-          className="flex flex-col items-center justify-center space-y-8"
+          className={cn("flex flex-col items-center justify-center", styles.heroStack)}
         >
             <motion.div
               className={cn(styles.imageContainer, "relative group")}
@@ -124,7 +125,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
               />
             </motion.div>
 
-            <LandingTitle />
+            <LandingTitle hideSignalDeck framed={false} />
 
             <Links />
 

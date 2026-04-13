@@ -1,746 +1,936 @@
-@reference "../../app/tailwind.css";
-
-.root {
-  display: flex;
+.cluster {
   width: 100%;
-  min-width: 0;
-  flex-direction: column;
+}
+
+.clusterCompact {
+  max-width: 31rem;
+}
+
+.control {
+  outline: none;
+}
+
+.control:focus-visible .scene {
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px var(--craft-edge),
+    0 26px 66px var(--craft-glow-soft);
+}
+
+.scene {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    radial-gradient(circle at top right, var(--craft-glow-soft), transparent 58%),
+    linear-gradient(160deg, var(--craft-panel), var(--craft-panel-2) 58%, var(--craft-panel-3));
+  color: var(--craft-text);
+  box-shadow:
+    inset 0 1px 0 var(--craft-line),
+    0 24px 60px var(--craft-glow-soft);
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.scene::before,
+.scene::after {
+  content: '';
+  position: absolute;
+  inset: 1rem;
+  border-radius: 1.6rem;
+  pointer-events: none;
+}
+
+.scene::before {
+  border: 1px solid var(--craft-line);
+}
+
+.scene::after {
+  inset: auto 1.25rem 1.1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--craft-edge), transparent);
+}
+
+.sceneAlchemist,
+.sceneDigitalSculptor,
+.sceneHolographicSculptor,
+.sceneCyberDefense,
+.sceneBlockchain,
+.sceneFrontier {
+  padding: 1rem 1rem 1.15rem;
+}
+
+.sceneBlockchain .sceneBody {
+  grid-template-columns: minmax(0, 10.5rem) minmax(0, 1fr);
+  align-items: stretch;
+  min-height: 15rem;
+  gap: 0.6rem;
+}
+
+.sceneBlockchain .titleBlock {
+  position: relative;
+  align-self: stretch;
+  display: grid;
+  align-content: center;
+  padding: 0.9rem 0.7rem 0.9rem 0.1rem;
+  text-align: left;
+}
+
+.sceneBlockchain .titleBlock::after {
+  content: '';
+  position: absolute;
+  top: 0.8rem;
+  right: 0;
+  bottom: 0.8rem;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--craft-edge), transparent);
+}
+
+.sceneBlockchain .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneBlockchain .titleLockup,
+.sceneBlockchain .descriptor {
+  max-width: 10rem;
+}
+
+.sceneBlockchain .iconBadge {
+  display: none;
+}
+
+.sceneBlockchain .sceneRig {
+  min-height: 14rem;
+  border: none;
+  background:
+    radial-gradient(circle at 72% 18%, var(--craft-glow-soft), transparent 34%),
+    linear-gradient(160deg, var(--craft-fill), transparent);
+}
+
+.sceneDigitalSculptor .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
   align-items: center;
-  gap: 0.72rem;
+  min-height: 15rem;
+  gap: 0.55rem;
 }
 
-.compactRoot {
-  gap: 0.56rem;
+.sceneDigitalSculptor .titleBlock {
+  order: 2;
+  max-width: 10rem;
+  justify-self: end;
+  z-index: 2;
 }
 
-.deck,
-.focusFrame {
-  width: min(100%, 42rem);
+.sceneDigitalSculptor .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneDigitalSculptor .iconBadge {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.85rem;
+}
+
+.sceneDigitalSculptor .titleLockup,
+.sceneDigitalSculptor .descriptor {
+  max-width: 9.8rem;
+}
+
+.sceneDigitalSculptor .sceneRig {
+  order: 1;
+  min-height: 13.8rem;
+  border: none;
+  background: none;
+  overflow: visible;
+}
+
+.sceneFrontier .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  align-items: center;
+  min-height: 15rem;
+  gap: 0.55rem;
+}
+
+.sceneFrontier .titleBlock {
+  order: 2;
+  max-width: 9.8rem;
+  justify-self: end;
+  z-index: 2;
+}
+
+.sceneFrontier .headlineWrap {
+  grid-template-columns: 1fr;
+  justify-items: start;
+}
+
+.sceneFrontier .iconBadge {
+  display: none;
+}
+
+.sceneFrontier .titleLockup,
+.sceneFrontier .descriptor {
+  max-width: 9.6rem;
+}
+
+.sceneFrontier .sceneRig {
+  order: 1;
+  min-height: 13.8rem;
+  border: none;
+  background: none;
+  overflow: visible;
 }
 
 .deck {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: 0.7rem;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 94%, rgba(255, 255, 255, 0.08));
-  border-radius: 1.2rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 94%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--crafted-panel-strong) 94%, rgba(255, 255, 255, 0.02))),
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--crafted-glow-soft) 34%, transparent), transparent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 10px 24px rgba(15, 23, 42, 0.12);
-  padding: 0.6rem 0.85rem;
-}
-
-.deckLeading {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-
-.deckBadge,
-.deckLabel,
-.deckCounter,
-.eyebrow,
-.panelLabel,
-.metricChip,
-.footerItem,
-.protoMark,
-.codeTopBar,
-.hudMarker,
-.conduitNode,
-.rackCell {
-  font-family: var(--font-monaspace), monospace;
+  gap: 0.8rem;
+  margin-bottom: 0.95rem;
+  color: var(--craft-muted);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
 }
 
-.deckBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 90%, transparent);
-  padding: 0.34rem 0.58rem 0.34rem 0.42rem;
-  color: var(--crafted-text);
-  background: color-mix(in srgb, var(--crafted-panel-strong) 90%, transparent);
-  letter-spacing: 0.14em;
-  font-size: 0.68rem;
-  font-weight: 700;
-}
-
-.deckSwatch {
-  width: 0.62rem;
-  height: 0.62rem;
-  border-radius: 999px;
-  background: var(--crafted-gradient);
-  box-shadow: 0 0 12px var(--crafted-glow-strong);
-}
-
-.deckLabel {
-  color: var(--crafted-muted);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
-.deckDescriptor {
-  min-width: 0;
-  color: var(--crafted-muted);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.deckFamily,
+.deckCounter {
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .deckCounter {
   justify-self: end;
-  color: var(--crafted-text);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
 }
 
 .deckCounterTotal {
-  color: var(--crafted-muted);
+  opacity: 0.65;
 }
 
-.deckAssay {
-  border-radius: 1rem 1.35rem 1rem 1.25rem;
+.deckNotes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.38rem;
 }
 
-.deckTopology {
-  border-radius: 1rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 94%, rgba(255, 255, 255, 0.06)), color-mix(in srgb, var(--crafted-panel-strong) 94%, rgba(255, 255, 255, 0.02))),
-    repeating-linear-gradient(90deg, transparent 0 1.55rem, color-mix(in srgb, var(--crafted-glow-soft) 24%, transparent) 1.55rem 1.62rem);
-}
-
-.deckCommand,
-.deckSecure,
-.deckLedger {
-  border-radius: 0.95rem;
-}
-
-.deckMonolith,
-.deckStress,
-.deckArchive {
-  border-radius: 1.1rem;
-}
-
-.deckVisor,
-.deckPrototype {
-  border-radius: 1.3rem 1.3rem 0.95rem 0.95rem;
-}
-
-.deckErgo,
-.deckAssembly,
-.deckEdge {
+.deckNote {
   border-radius: 999px;
+  border: 1px solid var(--craft-edge);
+  background: var(--craft-fill);
+  padding: 0.22rem 0.5rem;
 }
 
-.deckAtelier,
-.deckVault {
-  border-radius: 1rem 1rem 1.35rem 1rem;
-}
-
-.focusFrame {
-  position: relative;
-  outline: none;
-}
-
-.focusFrame::before {
-  content: '';
-  position: absolute;
-  inset: -0.3rem;
-  border-radius: 1.8rem;
-  background: linear-gradient(135deg, color-mix(in srgb, var(--crafted-glow-soft) 68%, transparent), transparent 48%, color-mix(in srgb, var(--crafted-glow-strong) 54%, transparent));
-  opacity: 0;
-  filter: blur(14px);
-  transition: opacity 180ms ease;
-  pointer-events: none;
-}
-
-.focusFrame:focus-visible::before,
-.focusFrame:focus-within::before {
-  opacity: 0.95;
-}
-
-.shell {
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  min-height: 10rem;
-  overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 94%, rgba(255, 255, 255, 0.12));
-  border-radius: 1.55rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel-strong) 98%, rgba(255, 255, 255, 0.02))),
-    radial-gradient(circle at 18% 16%, color-mix(in srgb, var(--crafted-glow-soft) 42%, transparent), transparent 34%),
-    linear-gradient(90deg, transparent, color-mix(in srgb, var(--crafted-glow-soft) 10%, transparent), transparent);
-  box-shadow: var(--crafted-shadow), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  container-type: inline-size;
-}
-
-.compactShell {
-  min-height: 9rem;
-}
-
-.shellBackdrop,
-.shellGlow {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.shellBackdrop {
-  background:
-    linear-gradient(120deg, transparent 0%, rgba(255, 255, 255, 0.04) 16%, transparent 36%),
-    radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--crafted-glow-soft) 32%, transparent), transparent 28%);
-  opacity: 0.82;
-}
-
-.shellGlow {
-  inset: 0.85rem;
-  border-radius: inherit;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 76%, rgba(255, 255, 255, 0.06));
-  opacity: 0.58;
-}
-
-.shellInner {
-  position: relative;
-  z-index: 1;
+.sceneBody {
   display: grid;
+  gap: 1rem;
+}
+
+.titleBlock {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.kicker {
+  color: var(--craft-muted);
+  font-size: 0.66rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.headlineWrap {
+  display: grid;
+  grid-template-columns: auto 1fr;
   gap: 0.85rem;
-  min-height: 100%;
-  color: var(--crafted-text);
-  padding: 1rem;
+  align-items: start;
 }
 
-.shellReaction {
-  border-radius: 1.3rem 2rem 1.45rem 1.8rem;
-}
-
-.shellReaction .shellGlow {
-  clip-path: polygon(0 12%, 13% 12%, 13% 0, 100% 0, 100% 100%, 0 100%);
-}
-
-.shellDistillation {
-  border-radius: 1.2rem 1.2rem 1.85rem 1.2rem;
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 98%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel-strong) 98%, rgba(255, 255, 255, 0.02))),
-    repeating-linear-gradient(90deg, transparent 0 2.1rem, color-mix(in srgb, var(--crafted-glow-soft) 18%, transparent) 2.1rem 2.16rem),
-    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--crafted-glow-soft) 36%, transparent), transparent 28%);
-}
-
-.shellCode {
-  border-radius: 1rem;
-}
-
-.shellCode .shellGlow {
-  clip-path: polygon(0 0, 100% 0, 100% 86%, 94% 100%, 0 100%);
-}
-
-.shellMonolith {
-  border-radius: 1.2rem 1.65rem 1.4rem 1rem;
-}
-
-.shellVisor {
-  border-radius: 1.4rem 1.4rem 1rem 1rem;
-}
-
-.shellResilience {
-  border-radius: 1.55rem;
-}
-
-.shellRelief {
-  border-radius: 1.1rem 1.1rem 1.55rem 1.55rem;
-}
-
-.shellExperience {
-  border-radius: 1.65rem 1.25rem 1.65rem 1.25rem;
-}
-
-.shellAtelier {
-  border-radius: 1.1rem 1.45rem 1.35rem 1.05rem;
-}
-
-.shellDefenseVault,
-.shellCybersecurity {
-  border-radius: 1rem 1rem 1.3rem 1.3rem;
-}
-
-.shellDefenseVault .shellGlow,
-.shellCybersecurity .shellGlow {
-  clip-path: polygon(0 8%, 10% 8%, 10% 0, 90% 0, 90% 8%, 100% 8%, 100% 92%, 90% 92%, 90% 100%, 10% 100%, 10% 92%, 0 92%);
-}
-
-.shellBlockchain {
-  border-radius: 1rem 1rem 1.45rem 1rem;
-}
-
-.shellArchive {
-  border-radius: 1rem 1.4rem 1rem 1.4rem;
-}
-
-.shellAssembly,
-.shellEdge,
-.shellPrototype {
-  border-radius: 1.35rem;
-}
-
-.iconFrame {
+.iconBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 3rem;
   height: 3rem;
-  border-radius: 0.95rem;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 86%, rgba(255, 255, 255, 0.1));
+  border-radius: 1rem;
+  border: 1px solid var(--craft-edge);
   background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel-strong) 94%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel) 92%, rgba(255, 255, 255, 0.03))),
-    radial-gradient(circle at 50% 26%, color-mix(in srgb, var(--crafted-glow-soft) 30%, transparent), transparent 58%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 0 18px color-mix(in srgb, var(--crafted-glow-soft) 28%, transparent);
+    linear-gradient(160deg, var(--craft-fill-strong), var(--craft-fill)),
+    var(--craft-gradient);
+  box-shadow: 0 18px 34px var(--craft-glow-soft);
 }
 
-.iconGlyph {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: color-mix(in srgb, var(--crafted-glow-strong) 76%, white 24%);
-  filter: drop-shadow(0 0 0.85rem color-mix(in srgb, var(--crafted-glow-strong) 52%, transparent));
+.icon {
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
-.eyebrow,
-.panelLabel {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  gap: 0.45rem;
-  letter-spacing: 0.18em;
-  font-size: 0.62rem;
-  font-weight: 700;
-  color: var(--crafted-muted);
-}
-
-.panelLabel {
-  color: color-mix(in srgb, var(--crafted-glow-strong) 60%, var(--crafted-muted));
-}
-
-.titleStack {
+.titleLockup {
   display: grid;
-  gap: 0.16rem;
-  min-width: 0;
+  gap: 0.4rem;
 }
 
-.titleLineFrame {
-  display: block;
-  min-width: 0;
-}
-
-.titleLineMotion,
-.titleLineStatic {
-  display: inline-block;
-  max-width: 100%;
-  background-image: var(--crafted-gradient);
-  background-size: 200% 100%;
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 1rem color-mix(in srgb, var(--crafted-glow-soft) 58%, transparent);
-}
-
-.titleLineStatic {
-  white-space: normal;
+.title {
+  margin: 0;
+  font-size: clamp(1.42rem, 3vw, 2.16rem);
+  line-height: 0.96;
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
-.titleWord {
-  display: inline-block;
+.descriptor {
+  margin: 0;
+  max-width: 30rem;
+  color: var(--craft-muted);
+  font-size: 0.87rem;
+  line-height: 1.5;
 }
 
-.titleWord + .titleWord {
-  margin-left: 0.42ch;
-}
-
-.titleReaction,
-.titleDistributed,
-.titleMonolith,
-.titleResilience,
-.titleRelief,
-.titleExperience,
-.titleAtelier,
-.titleDefense,
-.titleLedger,
-.titleSecure,
-.titleArchive,
-.titleAssembly,
-.titleEdge,
-.titlePrototype {
-  font-family: var(--font-geist-sans), sans-serif;
-}
-
-.titleReaction {
-  font-size: clamp(1.45rem, 1.1rem + 2vw, 2.7rem);
-  font-weight: 780;
-  letter-spacing: -0.04em;
-  line-height: 0.94;
-}
-
-.titleDistributed {
-  font-size: clamp(1.18rem, 0.9rem + 1.7vw, 2.2rem);
-  font-weight: 720;
-  letter-spacing: -0.035em;
-  line-height: 0.96;
-}
-
-.titleDistributed .titleLineFrame:first-child {
-  font-size: 0.82em;
-  letter-spacing: 0.01em;
-  text-transform: uppercase;
-}
-
-.titleCode,
-.titleLedger,
-.titleSecure {
-  font-family: var(--font-monaspace), monospace;
-  line-height: 0.98;
-}
-
-.titleCode {
-  font-size: clamp(1.32rem, 1rem + 1.8vw, 2.3rem);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.titleMonolith {
-  font-size: clamp(1.4rem, 1rem + 2vw, 2.55rem);
-  font-weight: 820;
-  line-height: 0.92;
-  letter-spacing: -0.05em;
-}
-
-.titleVisor {
-  font-size: clamp(1.2rem, 0.92rem + 1.6vw, 2.12rem);
-  font-weight: 700;
-  line-height: 0.96;
-  letter-spacing: -0.03em;
-}
-
-.titleVisor .titleLineFrame:first-child {
-  font-size: 0.82em;
-}
-
-.titleResilience,
-.titleRelief,
-.titleExperience,
-.titleAtelier,
-.titleDefense,
-.titleLedger,
-.titleSecure,
-.titleArchive,
-.titleAssembly,
-.titleEdge,
-.titlePrototype {
-  font-size: clamp(1.22rem, 0.94rem + 1.7vw, 2.2rem);
-  font-weight: 760;
-  line-height: 0.95;
-  letter-spacing: -0.035em;
-}
-
-.titleDefense,
-.titleSecure {
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-}
-
-.titleArchive {
-  font-weight: 700;
-}
-
-.titlePrototype .titleLineFrame:first-child,
-.titleEdge .titleLineFrame:first-child {
-  font-size: 0.84em;
-}
-
-.caption {
-  max-width: 34rem;
-  color: var(--crafted-muted);
-  font-size: 0.88rem;
-  line-height: 1.45;
-}
-
-.metricRail,
-.footerRail,
-.pathTrace,
-.perimeterBand,
-.chassisRail,
-.secureStatus,
-.strataBands,
-.conduitRow,
-.hudChrome,
-.hashRail {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.42rem;
-}
-
-.metricColumn,
-.rackCells,
-.spineRail,
-.atelierGauge,
-.codeGutter {
-  display: grid;
-  gap: 0.42rem;
-  align-content: start;
-}
-
-.metricColumn {
-  justify-items: start;
-}
-
-.metricChip,
-.footerItem,
-.hudMarker,
-.conduitNode,
-.rackCell,
-.token,
-.strataBand,
-.curveNode,
-.protoMark,
-.traySlot,
-.perimeterNode,
-.insightStamp,
-.ledgerBlock {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 86%, transparent);
-  background: color-mix(in srgb, var(--crafted-panel-strong) 88%, transparent);
-  color: var(--crafted-text);
-  border-radius: 999px;
-  padding: 0.24rem 0.48rem;
-  font-size: 0.64rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-}
-
-.footerItem,
-.token,
-.strataBand,
-.traySlot,
-.ledgerBlock {
-  color: var(--crafted-muted);
-}
-
-.tokenMatrix {
-  justify-content: flex-start;
-}
-
-.reactionGrid,
-.distillationGrid,
-.codeSlab,
-.strataRelief,
-.experienceBlock,
-.ledgerGrid,
-.secureGrid,
-.assemblyGrid,
-.perimeterGrid,
-.prototypeGrid {
-  display: grid;
-  gap: 0.8rem;
-}
-
-.reactionGrid,
-.monolithGrid,
-.vaultGrid,
-.manualGrid,
-.atelierGrid,
-.stressGrid,
-.codeWindow,
-.visorStage,
-.inlineHero,
-.prototypeHeader,
-.securePanelTop,
-.distillationBody {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 0.95rem;
-  align-items: center;
-}
-
-.instrumentColumn {
-  display: grid;
-  gap: 0.65rem;
-  align-content: start;
-  min-width: 8.25rem;
-}
-
-.reactionStage,
-.distillationMain,
-.codeColumn,
-.monolithFace,
-.pageStack,
-.vaultCell,
-.hudTitle {
-  display: grid;
-  gap: 0.72rem;
-  min-width: 0;
-}
-
-.codeTopBar {
-  justify-content: space-between;
-  gap: 0.8rem;
-  color: var(--crafted-muted);
-  font-size: 0.64rem;
-  letter-spacing: 0.2em;
-}
-
-.codeWindow {
-  align-items: stretch;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-}
-
-.codeGutter {
-  min-width: 2rem;
-  color: var(--crafted-muted);
-  font-size: 0.68rem;
-  letter-spacing: 0.16em;
-}
-
-.monolithGrid {
-  align-items: stretch;
-}
-
-.monolithFace {
-  padding: 0.95rem;
-  border-radius: 1rem;
-  background:
-    linear-gradient(160deg, color-mix(in srgb, var(--crafted-panel-strong) 96%, rgba(255, 255, 255, 0.04)), color-mix(in srgb, var(--crafted-panel) 90%, rgba(255, 255, 255, 0.02)));
-  clip-path: polygon(0 0, 84% 0, 100% 12%, 100% 100%, 14% 100%, 0 86%);
-}
-
-.notchRail {
-  display: grid;
-  gap: 0.72rem;
-  align-content: start;
-  justify-items: center;
-  padding: 0.8rem;
-  border-radius: 1rem;
-  background: color-mix(in srgb, var(--crafted-panel-strong) 92%, transparent);
-}
-
-.hudChrome {
-  justify-content: space-between;
-}
-
-.hudMarker {
-  background: color-mix(in srgb, var(--crafted-glow-soft) 24%, var(--crafted-panel-strong));
-}
-
-.visorStage {
-  align-items: stretch;
-}
-
-.hudTitle {
-  padding: 0.95rem;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 74%, transparent);
-  background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel) 86%, transparent), color-mix(in srgb, var(--crafted-panel-strong) 86%, transparent));
-}
-
-.stressCore {
+.sceneRig {
   position: relative;
+  min-height: 7.5rem;
+  border-radius: 1.55rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    linear-gradient(160deg, var(--craft-line-faint), transparent),
+    rgba(10, 14, 26, 0.24);
+  overflow: hidden;
+}
+
+.alchemistRig,
+.digitalRig,
+.holographicRig,
+.cyberDefenseRig,
+.blockchainRig,
+.frontierRig {
   display: grid;
   place-items: center;
-  gap: 0.55rem;
-  width: 8rem;
-  min-height: 8rem;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 86%, transparent);
-  background:
-    radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--crafted-glow-soft) 42%, transparent), transparent 60%),
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel-strong) 96%, transparent), color-mix(in srgb, var(--crafted-panel) 92%, transparent));
+  padding: 1rem;
 }
 
-.stressRing {
+.digitalRig,
+.frontierRig {
+  position: relative;
+  padding: 0;
+}
+
+/* ─── Alchemist rig elements ──────────────────────────────────────────────── */
+
+.alchemistAlembic {
   position: absolute;
-  inset: 0.65rem;
-  border-radius: 999px;
-  border: 1px dashed color-mix(in srgb, var(--crafted-edge) 72%, transparent);
-}
-
-.strataBand {
-  border-radius: 0.8rem;
-}
-
-.insightStamp {
-  border-radius: 0.85rem;
-}
-
-.vaultCell {
-  align-content: start;
-  min-height: 100%;
-  padding: 0.9rem;
-  border-radius: 1rem;
-  border: 1px solid color-mix(in srgb, var(--crafted-edge) 78%, transparent);
+  top: 0.6rem;
+  left: 1.4rem;
+  width: 2.4rem;
+  height: 4.8rem;
+  border-radius: 0.6rem 0.6rem 1.5rem 1.5rem;
+  border: 1px solid var(--craft-edge);
   background:
-    linear-gradient(145deg, color-mix(in srgb, var(--crafted-panel-strong) 94%, transparent), color-mix(in srgb, var(--crafted-panel) 92%, transparent));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 75%, var(--craft-glow-soft), transparent 70%);
 }
 
-.ledgerBlocks {
+.alchemistFlask {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5rem;
+  height: 5.8rem;
+  margin: -2.9rem 0 0 -2.5rem;
+  border-radius: 1.6rem 1.6rem 1.1rem 1.1rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    radial-gradient(circle at center, var(--craft-glow-soft), transparent 58%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+}
+
+.alchemistCrucible {
+  position: absolute;
+  bottom: 2.6rem;
+  right: 1.2rem;
+  width: 4.8rem;
+  height: 2.4rem;
+  border-radius: 0.4rem 0.4rem 2.2rem 2.2rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    radial-gradient(ellipse at 50% 20%, var(--craft-glow-soft), transparent 65%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03));
+}
+
+.alchemistCoil {
+  position: absolute;
+  top: 1rem;
+  right: 1.8rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  border-radius: 50%;
+  border: 2px solid var(--craft-edge);
+  border-top-color: transparent;
+  border-left-color: transparent;
+  background: none;
+}
+
+.alchemistTrays {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 1rem;
+  right: 1rem;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.55rem;
 }
 
-.ledgerBlock {
-  justify-content: center;
-  width: 100%;
-  border-radius: 0.9rem;
-  padding: 0.5rem 0.42rem;
+.alchemistTrays span {
+  min-height: 1.15rem;
+  border-radius: 999px;
+  border: 1px solid var(--craft-edge);
+  background:
+    linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.04);
 }
 
-.manualGrid {
-  align-items: stretch;
+/* ─── Digital sculptor rig — carved block + chisel + grooves ──────────────── */
+
+.digitalRig::before,
+.digitalRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
 }
 
-.spineRail {
-  padding: 0.35rem;
-  border-right: 1px solid color-mix(in srgb, var(--crafted-edge) 62%, transparent);
+.digitalRig::before {
+  inset: 0.6rem;
+  border-radius: 1.2rem;
+  border: 1px dashed var(--craft-line-faint);
 }
 
-.pageStack {
-  min-height: 100%;
+.digitalRig::after {
+  bottom: 0;
+  left: 1rem;
+  right: 1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--craft-edge), transparent);
 }
 
-.traySlots {
+.digitalBlock {
+  position: absolute;
+  left: 0.9rem;
+  bottom: 0.8rem;
+  width: 58%;
+  height: 76%;
+  border-radius: 0.5rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    linear-gradient(155deg, var(--craft-fill-strong) 0%, var(--craft-fill) 100%),
+    var(--craft-fill);
+  clip-path: polygon(0 12%, 68% 0, 100% 0, 100% 100%, 0 100%);
+  box-shadow:
+    inset 0 1px 0 var(--craft-line),
+    0 18px 40px var(--craft-glow-soft);
+}
+
+.digitalChisel {
+  position: absolute;
+  top: 1.2rem;
+  right: 1.8rem;
+  width: 2px;
+  height: 62%;
+  background: linear-gradient(180deg, var(--craft-glow-strong), transparent);
+  transform: rotate(-18deg);
+  transform-origin: top center;
+  border-radius: 1px;
+}
+
+.digitalGrooves {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.digitalGrooves span {
+  position: absolute;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 5%, var(--craft-glow-strong) 40%, transparent 95%);
+  border-radius: 1px;
+}
+
+.digitalGrooves span:nth-child(1) {
+  top: 30%;
+  left: 1.2rem;
+  width: 40%;
+  transform: rotate(-8deg);
+  opacity: 0.85;
+}
+
+.digitalGrooves span:nth-child(2) {
+  top: 52%;
+  left: 1.6rem;
+  width: 46%;
+  transform: rotate(-12deg);
+  opacity: 0.6;
+}
+
+.digitalGrooves span:nth-child(3) {
+  top: 72%;
+  left: 1rem;
+  width: 36%;
+  transform: rotate(-4deg);
+  opacity: 0.4;
+}
+
+/* ─── Holographic sculptor rig — beam + volume + contours ─────────────────── */
+
+.holoFrame {
+  position: absolute;
+  inset: 1rem;
+  border-radius: 1.35rem;
+  border: 1px dashed var(--craft-edge);
+}
+
+.holoBeam {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  height: 42%;
+  margin-left: -1px;
+  background: linear-gradient(180deg, transparent, var(--craft-glow-strong));
+  box-shadow: 0 0 14px var(--craft-glow-soft);
+  border-radius: 1px;
+}
+
+.holoVolume {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3.8rem;
+  height: 3.8rem;
+  margin: -1.9rem 0 0 -1.9rem;
+  border-radius: 50%;
+  border: 1px solid var(--craft-edge);
+  background:
+    radial-gradient(circle at center, var(--craft-glow-soft), transparent 68%),
+    linear-gradient(160deg, var(--craft-fill-strong), var(--craft-fill));
+  box-shadow:
+    0 0 0 1px var(--craft-line-faint),
+    0 0 28px var(--craft-glow-soft);
+}
+
+.holoContours {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.holoContours span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 1px solid var(--craft-edge);
+  background: none;
+}
+
+.holoContours span:nth-child(1) {
+  width: 2.8rem;
+  height: 2rem;
+  margin: -1rem 0 0 -1.4rem;
+  opacity: 0.85;
+}
+
+.holoContours span:nth-child(2) {
+  width: 5rem;
+  height: 3.4rem;
+  margin: -1.7rem 0 0 -2.5rem;
+  opacity: 0.55;
+}
+
+.holoContours span:nth-child(3) {
+  width: 7.2rem;
+  height: 4.8rem;
+  margin: -2.4rem 0 0 -3.6rem;
+  opacity: 0.3;
+}
+
+.holoContours span:nth-child(4) {
+  width: 9.4rem;
+  height: 6.2rem;
+  margin: -3.1rem 0 0 -4.7rem;
+  opacity: 0.15;
+}
+
+/* ─── Bastion artisan rig — rampart + shield + gate + plates ──────────────── */
+
+.defenseRampart {
+  position: absolute;
+  top: 0.5rem;
+  left: 1rem;
+  right: 1rem;
+  height: 2rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    linear-gradient(160deg, var(--craft-fill-strong), var(--craft-fill)),
+    var(--craft-fill);
+  clip-path: polygon(
+    0 45%, 6% 45%, 6% 0, 16% 0, 16% 45%, 26% 45%, 26% 0, 36% 0, 36% 45%,
+    64% 45%, 64% 0, 74% 0, 74% 45%, 84% 45%, 84% 0, 94% 0, 94% 45%,
+    100% 45%, 100% 100%, 0 100%
+  );
+}
+
+.defenseShield {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5.1rem;
+  height: 6rem;
+  margin: -3rem 0 0 -2.55rem;
+  border: 1px solid var(--craft-edge);
+  border-radius: 2rem 2rem 1.3rem 1.3rem;
+  background:
+    radial-gradient(circle at center, var(--craft-glow-soft), transparent 58%),
+    linear-gradient(160deg, var(--craft-fill), transparent);
+  clip-path: polygon(50% 0%, 88% 15%, 88% 58%, 50% 100%, 12% 58%, 12% 15%);
+}
+
+.defenseGate {
+  position: absolute;
+  bottom: 2.6rem;
+  left: 50%;
+  width: 3rem;
+  height: 3.6rem;
+  margin-left: -1.5rem;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      var(--craft-edge) 0 2px,
+      transparent 2px 7px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      var(--craft-fill) 0 1px,
+      transparent 1px 9px
+    );
+  border-radius: 0.5rem 0.5rem 0 0;
+  opacity: 0.5;
+}
+
+.defensePlates {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 1rem;
+  right: 1rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
 }
 
-.traySlot {
-  justify-content: center;
-  width: 100%;
-  min-height: 3rem;
-  border-radius: 0.95rem;
-  padding: 0.55rem;
+.defensePlates span {
+  height: 1.2rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--craft-edge);
+  background:
+    linear-gradient(160deg, var(--craft-fill), transparent),
+    var(--craft-glow-soft);
+  opacity: 0.45;
 }
 
-.perimeterNode,
-.curveNode {
-  border-radius: 0.85rem;
+/* ─── Lattice artisan rig — grid + core + struts ──────────────────────────── */
+
+.blockchainRig::before,
+.blockchainRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
 }
 
-@container (max-width: 30rem) {
+.blockchainRig::before {
+  inset: 1rem;
+  border-radius: 1.2rem;
+  border: 1px dashed var(--craft-line-faint);
+}
+
+.blockchainRig::after {
+  top: 50%;
+  left: 1.5rem;
+  right: 1.5rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--craft-edge), transparent);
+}
+
+.latticeGrid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.latticeGrid span {
+  position: absolute;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--craft-edge);
+  background:
+    radial-gradient(circle at center, var(--craft-glow-soft), transparent 70%),
+    var(--craft-line-faint);
+  box-shadow: 0 0 10px var(--craft-glow-soft);
+}
+
+.latticeGrid span:nth-child(1) {
+  top: 1.4rem;
+  left: 50%;
+  margin-left: -0.375rem;
+}
+
+.latticeGrid span:nth-child(2) {
+  top: 3.4rem;
+  left: 22%;
+}
+
+.latticeGrid span:nth-child(3) {
+  top: 3.4rem;
+  right: 22%;
+}
+
+.latticeGrid span:nth-child(4) {
+  bottom: 3.4rem;
+  left: 22%;
+}
+
+.latticeGrid span:nth-child(5) {
+  bottom: 3.4rem;
+  right: 22%;
+}
+
+.latticeGrid span:nth-child(6) {
+  bottom: 1.4rem;
+  left: 50%;
+  margin-left: -0.375rem;
+}
+
+.latticeCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.75rem 0 0 -0.75rem;
+  border-radius: 50%;
+  border: 1.5px solid var(--craft-edge);
+  background: radial-gradient(circle at center, var(--craft-glow-strong), transparent 65%);
+  box-shadow: 0 0 18px var(--craft-glow-soft);
+}
+
+.latticeStruts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.latticeStruts span {
+  position: absolute;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--craft-glow-strong), transparent);
+  border-radius: 1px;
+}
+
+.latticeStruts span:nth-child(1) {
+  top: 30%;
+  left: 24%;
+  width: 52%;
+  transform: rotate(18deg);
+}
+
+.latticeStruts span:nth-child(2) {
+  top: 50%;
+  left: 18%;
+  width: 64%;
+}
+
+.latticeStruts span:nth-child(3) {
+  bottom: 30%;
+  left: 24%;
+  width: 52%;
+  transform: rotate(-18deg);
+}
+
+/* ─── Frontier crafter rig — terrain + horizon + camp + trails ────────────── */
+
+.frontierRig::before,
+.frontierRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
+
+.frontierRig::before {
+  inset: 0.8rem 0.8rem auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--craft-line), transparent);
+}
+
+.frontierRig::after {
+  left: 1rem;
+  right: 1rem;
+  bottom: 2rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--craft-edge), transparent);
+}
+
+.frontierTerrain {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2rem;
+  height: 6.5rem;
+  clip-path: polygon(
+    0 100%, 0 72%, 8% 58%, 16% 68%, 26% 34%, 36% 48%,
+    48% 12%, 56% 32%, 64% 22%, 74% 46%, 84% 38%, 92% 55%,
+    100% 48%, 100% 100%
+  );
+  background:
+    linear-gradient(180deg, var(--craft-glow-soft) 0%, transparent 75%),
+    linear-gradient(160deg, var(--craft-fill-strong), var(--craft-fill));
+}
+
+.frontierHorizon {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 2rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--craft-edge), var(--craft-glow-strong), transparent);
+}
+
+.frontierCamp {
+  position: absolute;
+  bottom: 2rem;
+  right: 2.2rem;
+  width: 1.4rem;
+  height: 1.1rem;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  background: var(--craft-glow-strong);
+}
+
+.frontierTrails {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.frontierTrails span {
+  position: absolute;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, var(--craft-glow-strong), transparent);
+  border-radius: 1px;
+}
+
+.frontierTrails span:nth-child(1) {
+  bottom: 3.8rem;
+  left: 14%;
+  width: 28%;
+  transform: rotate(-14deg);
+}
+
+.frontierTrails span:nth-child(2) {
+  bottom: 4.6rem;
+  left: 32%;
+  width: 22%;
+  transform: rotate(12deg);
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────────── */
+
+.scene[data-motion='animated'] .iconBadge,
+.scene[data-motion='animated'] .alchemistFlask,
+.scene[data-motion='animated'] .holoVolume,
+.scene[data-motion='animated'] .defenseShield {
+  animation: craftedPulse 8s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .digitalBlock {
+  animation: craftedPulse 10s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .latticeCore {
+  animation: craftedPulse 6s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .digitalChisel {
+  animation: craftedChiselGlow 5s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .holoContours span {
+  animation: craftedContourBreathe 7s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .holoContours span:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.scene[data-motion='animated'] .holoContours span:nth-child(3) {
+  animation-delay: 1s;
+}
+
+.scene[data-motion='animated'] .holoContours span:nth-child(4) {
+  animation-delay: 1.5s;
+}
+
+.scene[data-motion='animated'] .frontierCamp {
+  animation: craftedCampBlink 4s ease-in-out infinite;
+}
+
+@keyframes craftedPulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.03);
+  }
+}
+
+@keyframes craftedChiselGlow {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes craftedContourBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes craftedCampBlink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.75;
+  }
+
+  90% {
+    opacity: 1;
+  }
+}
+
+/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 640px) {
   .deck {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 1fr;
     justify-items: start;
   }
 
@@ -748,82 +938,113 @@
     justify-self: start;
   }
 
-  .reactionGrid,
-  .monolithGrid,
-  .vaultGrid,
-  .manualGrid,
-  .atelierGrid,
-  .stressGrid,
-  .codeWindow,
-  .visorStage,
-  .inlineHero,
-  .prototypeHeader,
-  .securePanelTop,
-  .distillationBody {
-    grid-template-columns: minmax(0, 1fr);
+  .headlineWrap {
+    grid-template-columns: 1fr;
   }
 
-  .instrumentColumn,
-  .notchRail,
-  .stressCore {
+  .sceneBlockchain .sceneBody {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .sceneDigitalSculptor .sceneBody,
+  .sceneFrontier .sceneBody {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .sceneBlockchain .titleBlock {
+    padding: 0;
+    text-align: center;
+  }
+
+  .sceneDigitalSculptor .titleBlock,
+  .sceneFrontier .titleBlock {
+    justify-self: center;
+    max-width: none;
+    text-align: center;
+  }
+
+  .sceneBlockchain .titleBlock::after {
+    display: none;
+  }
+
+  .sceneBlockchain .headlineWrap {
+    justify-items: center;
+  }
+
+  .sceneDigitalSculptor .headlineWrap,
+  .sceneFrontier .headlineWrap {
+    justify-items: center;
+  }
+
+  .sceneBlockchain .titleLockup,
+  .sceneBlockchain .descriptor {
+    max-width: none;
+  }
+
+  .sceneDigitalSculptor .titleLockup,
+  .sceneDigitalSculptor .descriptor,
+  .sceneFrontier .titleLockup,
+  .sceneFrontier .descriptor {
+    max-width: none;
+  }
+
+  .sceneBlockchain .sceneRig {
+    min-height: 12rem;
+  }
+
+  .sceneDigitalSculptor .sceneRig,
+  .sceneFrontier .sceneRig {
     width: 100%;
+    min-height: 12rem;
   }
 
-  .stressCore {
-    min-height: 6.25rem;
+  .alchemistAlembic {
+    left: 1rem;
+    width: 2rem;
+    height: 4rem;
   }
 
-  .ledgerBlocks,
-  .traySlots {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@container (max-width: 22rem) {
-  .shellInner {
-    padding: 0.86rem;
+  .alchemistCrucible {
+    right: 0.8rem;
+    width: 4rem;
   }
 
-  .titleReaction,
-  .titleDistributed,
-  .titleCode,
-  .titleMonolith,
-  .titleVisor,
-  .titleResilience,
-  .titleRelief,
-  .titleExperience,
-  .titleAtelier,
-  .titleDefense,
-  .titleLedger,
-  .titleSecure,
-  .titleArchive,
-  .titleAssembly,
-  .titleEdge,
-  .titlePrototype {
-    font-size: clamp(1.05rem, 0.92rem + 1vw, 1.6rem);
+  .alchemistCoil {
+    right: 1.2rem;
+    width: 2.2rem;
+    height: 2.2rem;
   }
 
-  .ledgerBlocks,
-  .traySlots {
-    grid-template-columns: minmax(0, 1fr);
+  .digitalBlock {
+    left: 0.6rem;
+    width: 54%;
   }
 
-  .metricRail,
-  .footerRail,
-  .pathTrace,
-  .perimeterBand,
-  .chassisRail,
-  .secureStatus,
-  .strataBands,
-  .conduitRow,
-  .hudChrome,
-  .hashRail {
-    gap: 0.3rem;
+  .digitalChisel {
+    right: 1.2rem;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .focusFrame::before {
-    transition: none;
+  .holoContours span:nth-child(4) {
+    display: none;
+  }
+
+  .frontierTerrain {
+    height: 5rem;
+  }
+
+  .frontierCamp {
+    right: 1.6rem;
+  }
+
+  .latticeGrid span:nth-child(2),
+  .latticeGrid span:nth-child(4) {
+    left: 16%;
+  }
+
+  .latticeGrid span:nth-child(3),
+  .latticeGrid span:nth-child(5) {
+    right: 16%;
   }
 }

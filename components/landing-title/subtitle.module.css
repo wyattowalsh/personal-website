@@ -1005,9 +1005,6 @@
 
 .subtitleDeckCluster[data-surface-group='forged'] .signalDeck {
   border-radius: 1.05rem;
-}
-
-.subtitleDeckCluster[data-surface-group='forged'] .signalDeck {
   box-shadow:
     var(--subtitle-theme-panel-shadow, 0 0 0 transparent),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),

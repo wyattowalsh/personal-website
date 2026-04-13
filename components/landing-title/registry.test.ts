@@ -2,58 +2,40 @@ import { describe, expect, it } from 'vitest';
 
 import {
   DEFAULT_LANDING_TITLE_SUBTITLE_ID,
+  DEPRECATED_SUBTITLE_ALIASES,
   LANDING_TITLE_RENDERERS,
   LANDING_TITLE_SUBTITLE_OPTIONS,
+  getSubtitleOptionById,
+  getSubtitleOptionByText,
   getSubtitleRenderer,
   getSubtitleRendererById,
+  getSubtitleRendererByText,
   resolveSubtitleOption,
 } from '@/components/landing-title/registry';
 
 const EXPECTED_SUBTITLE_ORDER = [
   'cybernetic-architect',
-  'code-architect',
   'zero-trust-architect',
   'synthetic-intelligence-architect',
-  'data-sorcerer',
-  'technological-conjurer',
-  'innovation-mystic',
-  'systems-alchemist',
-  'distributed-systems-alchemist',
-  'code-alchemist',
   'quantum-designer',
-  'ecosystem-designer',
-  'behavioral-designer',
-  'adaptive-systems-designer',
-  'process-designer',
-  'quantum-systems-designer',
-  'machine-learning-designer',
-  'digital-sculptor',
-  'augmented-reality-sculptor',
-  'resilience-sculptor',
-  'information-sculptor',
-  'experience-sculptor',
-  'intelligence-artisan',
-  'cyber-defense-artisan',
-  'blockchain-artisan',
-  'cybersecurity-artisan',
-  'knowledge-craftsman',
-  'experience-crafter',
-  'edge-systems-crafter',
-  'future-systems-crafter',
-  'automation-virtuoso',
-  'robotics-artist',
-  'intelligent-systems-artist',
-  'scalability-artist',
-  'workflow-mage',
-  'algorithm-weaver',
-  'platform-visionary',
-  'systems-dreamer',
-  'digital-futurist',
-  'enterprise-dreamer',
   'cloud-shaper',
   'ai-cartographer',
-  'technological-mapper',
   'data-orchestrator',
+  'data-sorcerer',
+  'workflow-mage',
+  'algorithm-weaver',
+  'silicon-conjurer',
+  'emergence-mystic',
+  'signal-oracle',
+  'code-alchemist',
+  'digital-sculptor',
+  'holographic-sculptor',
+  'cyber-defense-artisan',
+  'blockchain-artisan',
+  'frontier-crafter',
+  'automation-virtuoso',
+  'robotics-artist',
+  'neural-artist',
 ] as const;
 
 describe('landing title registry contract', () => {
@@ -72,11 +54,11 @@ describe('landing title registry contract', () => {
     }
   });
 
-  it('preserves the exact 44-item subtitle order with unique display text', () => {
+  it('preserves the exact 22-item subtitle order with unique display text', () => {
     const ids = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id);
     const texts = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ text }) => text);
 
-    expect(ids).toHaveLength(44);
+    expect(ids).toHaveLength(22);
     expect(ids).toEqual(EXPECTED_SUBTITLE_ORDER);
     expect(new Set(texts).size).toBe(texts.length);
   });
@@ -98,5 +80,115 @@ describe('landing title registry contract', () => {
 
     expect(getSubtitleRenderer(renderer?.id ?? '')).toBe(renderer);
     expect(getSubtitleRenderer(renderer?.text ?? '')).toBe(renderer);
+  });
+});
+
+describe('deprecated subtitle alias compatibility', () => {
+  it('maps every alias to a valid current id', () => {
+    const currentIds = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id));
+    for (const [legacy, target] of Object.entries(DEPRECATED_SUBTITLE_ALIASES)) {
+      expect(currentIds.has(target), `alias "${legacy}" → "${target}" is not a current id`).toBe(true);
+    }
+  });
+
+  it('does not shadow any current id or text', () => {
+    const currentIds = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id));
+    const currentTexts = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ text }) => text));
+    for (const key of Object.keys(DEPRECATED_SUBTITLE_ALIASES)) {
+      expect(currentIds.has(key), `alias key "${key}" collides with a current id`).toBe(false);
+      expect(currentTexts.has(key), `alias key "${key}" collides with a current text`).toBe(false);
+    }
+  });
+
+  it('resolves renamed old display texts to the correct current entry', () => {
+    const cases: [string, string][] = [
+      ['data sorcerer', 'data-sorcerer'],
+      ['cyber defense artisan', 'cyber-defense-artisan'],
+      ['blockchain artisan', 'blockchain-artisan'],
+      ['workflow mage', 'workflow-mage'],
+    ];
+    for (const [oldText, expectedId] of cases) {
+      const renderer = getSubtitleRendererByText(oldText);
+      expect(renderer, `"${oldText}" should resolve via text alias`).not.toBeNull();
+      expect(renderer?.id).toBe(expectedId);
+
+      const option = getSubtitleOptionByText(oldText);
+      expect(option, `"${oldText}" should resolve option via text alias`).not.toBeNull();
+      expect(option?.id).toBe(expectedId);
+    }
+  });
+
+  it('resolves dropped old display texts to a consolidated current entry', () => {
+    const cases: [string, string][] = [
+      ['code architect', 'cybernetic-architect'],
+      ['ecosystem designer', 'quantum-designer'],
+      ['machine learning designer', 'quantum-designer'],
+      ['augmented reality sculptor', 'holographic-sculptor'],
+      ['resilience sculptor', 'digital-sculptor'],
+      ['cybersecurity artisan', 'cyber-defense-artisan'],
+      ['knowledge craftsman', 'frontier-crafter'],
+      ['intelligent systems artist', 'neural-artist'],
+      ['platform visionary', 'cloud-shaper'],
+      ['digital futurist', 'ai-cartographer'],
+      ['technological mapper', 'ai-cartographer'],
+    ];
+    for (const [oldText, expectedId] of cases) {
+      const renderer = getSubtitleRenderer(oldText);
+      expect(renderer, `"${oldText}" should resolve via alias`).not.toBeNull();
+      expect(renderer?.id).toBe(expectedId);
+    }
+  });
+
+  it('resolves old slugified pseudo-ids via getSubtitleRendererById', () => {
+    const cases: [string, string][] = [
+      ['code-architect', 'cybernetic-architect'],
+      ['innovation-mystic', 'emergence-mystic'],
+      ['distributed-systems-alchemist', 'code-alchemist'],
+      ['process-designer', 'quantum-designer'],
+      ['experience-sculptor', 'digital-sculptor'],
+      ['intelligence-artisan', 'blockchain-artisan'],
+      ['future-systems-crafter', 'frontier-crafter'],
+      ['scalability-artist', 'neural-artist'],
+      ['enterprise-dreamer', 'cloud-shaper'],
+    ];
+    for (const [oldId, expectedId] of cases) {
+      const renderer = getSubtitleRendererById(oldId);
+      expect(renderer, `"${oldId}" should resolve via id alias`).not.toBeNull();
+      expect(renderer?.id).toBe(expectedId);
+
+      const option = getSubtitleOptionById(oldId);
+      expect(option, `"${oldId}" should resolve option via id alias`).not.toBeNull();
+      expect(option?.id).toBe(expectedId);
+    }
+  });
+
+  it('resolves legacy values through resolveSubtitleOption without falling to default', () => {
+    const defaultOption = LANDING_TITLE_SUBTITLE_OPTIONS[0];
+
+    const renamedText = resolveSubtitleOption('data sorcerer');
+    expect(renamedText.id).toBe('data-sorcerer');
+    expect(renamedText.id).not.toBe(defaultOption.id === 'data-sorcerer' ? '__impossible__' : defaultOption.id);
+
+    const droppedText = resolveSubtitleOption('machine learning designer');
+    expect(droppedText.id).toBe('quantum-designer');
+
+    const oldSlug = resolveSubtitleOption('systems-alchemist');
+    expect(oldSlug.id).toBe('code-alchemist');
+  });
+
+  it('still falls back to default for truly unknown values', () => {
+    expect(resolveSubtitleOption('not-a-real-subtitle')).toEqual(
+      LANDING_TITLE_SUBTITLE_OPTIONS[0],
+    );
+    expect(resolveSubtitleOption(null)).toEqual(LANDING_TITLE_SUBTITLE_OPTIONS[0]);
+  });
+
+  it('preserves direct current id and text lookups unchanged', () => {
+    for (const option of LANDING_TITLE_SUBTITLE_OPTIONS) {
+      expect(getSubtitleRendererById(option.id)?.id).toBe(option.id);
+      expect(getSubtitleRendererByText(option.text)?.id).toBe(option.id);
+      expect(getSubtitleOptionById(option.id)?.id).toBe(option.id);
+      expect(getSubtitleOptionByText(option.text)?.id).toBe(option.id);
+    }
   });
 });

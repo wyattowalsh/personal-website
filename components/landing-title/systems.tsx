@@ -1,60 +1,35 @@
 'use client';
 
-import {
-  Atom,
-  Brain,
-  BrainCircuit,
-  Braces,
-  Cloud,
-  Cpu,
-  Fingerprint,
-  GitMerge,
-  Map as MapIcon,
-  Music,
-  Navigation,
-  Radar,
-  SlidersHorizontal,
-  Sprout,
-  type LucideIcon,
-} from 'lucide-react';
+import { motion } from 'motion/react';
+import { Atom, BrainCircuit, Cloud, Cpu, Fingerprint, Map as MapIcon, Music } from 'lucide-react';
 import type { CSSProperties } from 'react';
 
-import styles from '@/components/landing-title/systems.module.css';
-import type {
-  LandingTitleRendererEntry,
-  LandingTitleRendererContext,
-  SubtitleRendererShellProps,
+import styles from './systems.module.css';
+import {
+  theme,
+  typo,
+  type LandingTitleRendererEntry,
+  type SubtitleRendererShellProps,
+  type SubtitleTheme,
 } from '@/components/landing-title/shared';
 import type { SignalDeckMeta } from '@/lib/landing-title-sequence';
 import { cn } from '@/lib/utils';
 
-type MetaPlacement = 'top' | 'side' | 'inline' | 'footer';
-type IconSide = 'left' | 'right';
+type SystemsScene =
+  | 'cybernetic'
+  | 'zeroTrust'
+  | 'synthetic'
+  | 'quantum'
+  | 'cloud'
+  | 'cartographer'
+  | 'orchestrator';
 
-interface SystemsPalette {
-  gradient: string;
-  darkGradient: string;
-  glow: string;
-}
-
-interface SystemsVariant {
-  id: string;
-  text: string;
-  signalDeck: SignalDeckMeta;
-  icon: LucideIcon;
-  palette: SystemsPalette;
-  eyebrow: string;
-  titleLines: readonly string[];
-  chips: readonly string[];
-  footer: readonly string[];
-  caption: string;
-  shellClass: string;
-  titleClass: string;
-  deckClass: string;
-  metaPlacement: MetaPlacement;
-  iconSide: IconSide;
-  layoutClass?: string;
-  iconClass?: string;
+interface SystemsVariantConfig {
+  readonly scene: SystemsScene;
+  readonly theme: SubtitleTheme;
+  readonly kicker: string;
+  readonly descriptor: string;
+  readonly notes: readonly string[];
 }
 
 const systemsSubtitle = (
@@ -65,43 +40,233 @@ const systemsSubtitle = (
 ) => ({
   id,
   lane: 'systems' as const,
-  signalDeck: { family, descriptor },
   text,
+  signalDeck: { family, descriptor },
 });
 
+const CYBERNETIC_ARCHITECT_THEME = theme(
+  systemsSubtitle('cybernetic-architect', 'cybernetic architect', 'Architect', 'adaptive command mesh'),
+  {
+    gradient: 'linear-gradient(135deg, #67e8f9 0%, #38bdf8 40%, #818cf8 100%)',
+    darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #7dd3fc 42%, #c7d2fe 100%)',
+    glow: 'rgba(56, 189, 248, 0.54)',
+  },
+  { ...typo.architect, letterSpacing: '0.08em' },
+  Cpu,
+  'left',
+  '',
+  'blueprintFold',
+  '',
+  { border: '1px solid rgba(56, 189, 248, 0.22)', shadow: '0 22px 60px rgba(56, 189, 248, 0.14)' },
+);
+
+const ZERO_TRUST_ARCHITECT_THEME = theme(
+  systemsSubtitle('zero-trust-architect', 'zero trust architect', 'Architect', 'sealed trust fabric'),
+  {
+    gradient: 'linear-gradient(135deg, #93c5fd 0%, #6366f1 40%, #0f172a 100%)',
+    darkGradient: 'linear-gradient(135deg, #dbeafe 0%, #a5b4fc 42%, #334155 100%)',
+    glow: 'rgba(99, 102, 241, 0.48)',
+  },
+  { ...typo.architectBold, letterSpacing: '0.1em' },
+  Fingerprint,
+  'left',
+  '',
+  'lockdownSweep',
+  '',
+  { border: '1px solid rgba(99, 102, 241, 0.22)', shadow: '0 22px 60px rgba(99, 102, 241, 0.14)' },
+);
+
+const SYNTHETIC_INTELLIGENCE_ARCHITECT_THEME = theme(
+  systemsSubtitle('synthetic-intelligence-architect', 'synthetic intelligence architect', 'Architect', 'cognitive system framing'),
+  {
+    gradient: 'linear-gradient(135deg, #34d399 0%, #22d3ee 42%, #818cf8 100%)',
+    darkGradient: 'linear-gradient(135deg, #86efac 0%, #67e8f9 42%, #c7d2fe 100%)',
+    glow: 'rgba(34, 211, 238, 0.46)',
+  },
+  { ...typo.architectNeural, textTransform: 'none', letterSpacing: '0.045em' },
+  BrainCircuit,
+  'left',
+  '',
+  'springOvershoot',
+  '',
+  { border: '1px solid rgba(34, 211, 238, 0.2)', shadow: '0 22px 60px rgba(34, 211, 238, 0.13)' },
+);
+
+const QUANTUM_DESIGNER_THEME = theme(
+  systemsSubtitle('quantum-designer', 'quantum designer', 'Designer', 'probability framing'),
+  {
+    gradient: 'linear-gradient(135deg, #67e8f9 0%, #a855f7 42%, #f472b6 100%)',
+    darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #ddd6fe 42%, #fbcfe8 100%)',
+    glow: 'rgba(168, 85, 247, 0.5)',
+  },
+  { ...typo.designer, letterSpacing: '0.12em' },
+  Atom,
+  'left',
+  '',
+  'auroraBloom',
+  '',
+  { border: '1px solid rgba(168, 85, 247, 0.2)', shadow: '0 22px 60px rgba(168, 85, 247, 0.14)' },
+);
+
+const CLOUD_SHAPER_THEME = theme(
+  systemsSubtitle('cloud-shaper', 'cloud shaper', 'Cartographer', 'weathered compute terrain'),
+  {
+    gradient: 'linear-gradient(135deg, #f8fafc 0%, #bae6fd 35%, #38bdf8 100%)',
+    darkGradient: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 35%, #60a5fa 100%)',
+    glow: 'rgba(125, 211, 252, 0.46)',
+  },
+  { ...typo.visionary, fontWeight: 520, textTransform: 'uppercase' },
+  Cloud,
+  'left',
+  '',
+  'dreamFloat',
+  '',
+  { border: '1px solid rgba(125, 211, 252, 0.2)', shadow: '0 22px 60px rgba(125, 211, 252, 0.12)' },
+);
+
+const AI_CARTOGRAPHER_THEME = theme(
+  systemsSubtitle('ai-cartographer', 'AI cartographer', 'Cartographer', 'route intelligence'),
+  {
+    gradient: 'linear-gradient(135deg, #fbbf24 0%, #38bdf8 44%, #34d399 100%)',
+    darkGradient: 'linear-gradient(135deg, #fde68a 0%, #7dd3fc 44%, #86efac 100%)',
+    glow: 'rgba(56, 189, 248, 0.44)',
+  },
+  { ...typo.mapper, letterSpacing: '0.1em' },
+  MapIcon,
+  'left',
+  '',
+  'cartographyTilt',
+  '',
+  { border: '1px solid rgba(56, 189, 248, 0.2)', shadow: '0 22px 60px rgba(56, 189, 248, 0.14)' },
+);
+
+const DATA_ORCHESTRATOR_THEME = theme(
+  systemsSubtitle('data-orchestrator', 'data orchestrator', 'Orchestrator', 'coordinated signal traffic'),
+  {
+    gradient: 'linear-gradient(135deg, #f59e0b 0%, #fb7185 42%, #8b5cf6 100%)',
+    darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fda4af 42%, #c4b5fd 100%)',
+    glow: 'rgba(249, 115, 22, 0.48)',
+  },
+  { ...typo.orchestrator, letterSpacing: '0.08em' },
+  Music,
+  'left',
+  '',
+  'thunderExit',
+  '',
+  { border: '1px solid rgba(249, 115, 22, 0.22)', shadow: '0 22px 60px rgba(249, 115, 22, 0.14)' },
+);
+
+export const SYSTEMS_SHOWCASE_THEMES: SubtitleTheme[] = [
+  CYBERNETIC_ARCHITECT_THEME,
+  ZERO_TRUST_ARCHITECT_THEME,
+  SYNTHETIC_INTELLIGENCE_ARCHITECT_THEME,
+  QUANTUM_DESIGNER_THEME,
+  CLOUD_SHAPER_THEME,
+  AI_CARTOGRAPHER_THEME,
+  DATA_ORCHESTRATOR_THEME,
+];
+
+export const SYSTEMS_SUBTITLE_THEMES: SubtitleTheme[] = [
+  ...SYSTEMS_SHOWCASE_THEMES,
+];
+
+const SYSTEMS_VARIANTS: readonly SystemsVariantConfig[] = [
+  {
+    scene: 'cybernetic',
+    theme: CYBERNETIC_ARCHITECT_THEME,
+    kicker: 'Adaptive chassis',
+    descriptor: 'Docked actuator plates and a live command spine make the role feel like a wearable exoskeleton blueprint.',
+    notes: ['spine', 'relay', 'augment'],
+  },
+  {
+    scene: 'zeroTrust',
+    theme: ZERO_TRUST_ARCHITECT_THEME,
+    kicker: 'Sealed perimeter',
+    descriptor: 'Nested gates and a fingerprint core read as access control instead of another blue badge.',
+    notes: ['verify', 'seal', 'attest'],
+  },
+  {
+    scene: 'synthetic',
+    theme: SYNTHETIC_INTELLIGENCE_ARCHITECT_THEME,
+    kicker: 'Cortex scaffold',
+    descriptor: 'Offset cognition cells and a scaffolded core make the intelligence feel engineered instead of implied.',
+    notes: ['cortex', 'synth', 'adapt'],
+  },
+  {
+    scene: 'quantum',
+    theme: QUANTUM_DESIGNER_THEME,
+    kicker: 'Interference field',
+    descriptor: 'Orbit traces and split-state panels finally make the title feel quantum.',
+    notes: ['orbit', 'phase', 'superpose'],
+  },
+  {
+    scene: 'cloud',
+    theme: CLOUD_SHAPER_THEME,
+    kicker: 'Compute weather',
+    descriptor: 'Contour bands and floating cloud masses turn the phrase into shaped compute weather.',
+    notes: ['drift', 'shape', 'scale'],
+  },
+  {
+    scene: 'cartographer',
+    theme: AI_CARTOGRAPHER_THEME,
+    kicker: 'Route atlas',
+    descriptor: 'Tracked waypoints and a plotted sweep turn the title into a navigational scene.',
+    notes: ['plot', 'route', 'guide'],
+  },
+  {
+    scene: 'orchestrator',
+    theme: DATA_ORCHESTRATOR_THEME,
+    kicker: 'Traffic crescendo',
+    descriptor: 'Cue rails converge on a conductor node so the title reads like timed data traffic.',
+    notes: ['cue', 'merge', 'time'],
+  },
+];
+
 function withAlpha(color: string, alpha: number): string {
-  return color.replace(/rgba\(([^)]+),\s*[\d.]+\)/, 'rgba($1, ' + alpha + ')');
+  return color.replace(/[\d.]+\)\s*$/, `${alpha})`);
 }
 
-function createStyleVars(palette: SystemsPalette, isDark: boolean): CSSProperties {
-  const activeGradient = isDark ? palette.darkGradient : palette.gradient;
-
+function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSProperties {
   return {
-    '--systems-gradient': activeGradient,
-    '--systems-glow': palette.glow,
-    '--systems-border': withAlpha(palette.glow, isDark ? 0.42 : 0.22),
-    '--systems-shadow': withAlpha(palette.glow, isDark ? 0.34 : 0.16),
-    '--systems-shadow-strong': withAlpha(palette.glow, isDark ? 0.52 : 0.24),
-    '--systems-panel': isDark ? 'rgba(8, 14, 28, 0.86)' : 'rgba(255, 255, 255, 0.82)',
-    '--systems-panel-strong': isDark ? 'rgba(14, 21, 40, 0.92)' : 'rgba(244, 247, 252, 0.96)',
-    '--systems-muted': isDark ? 'rgba(148, 163, 184, 0.84)' : 'rgba(71, 85, 105, 0.82)',
-    '--systems-text': isDark ? 'rgba(248, 250, 252, 0.98)' : 'rgba(15, 23, 42, 0.96)',
+    '--sys-glow': themeConfig.glow,
+    '--sys-glow-soft': withAlpha(themeConfig.glow, isDark ? 0.18 : 0.15),
+    '--sys-glow-strong': withAlpha(themeConfig.glow, isDark ? 0.4 : 0.34),
+    '--sys-edge': withAlpha(themeConfig.glow, isDark ? 0.28 : 0.24),
+    '--sys-panel': isDark ? 'rgba(8, 12, 28, 0.9)' : 'rgba(255, 255, 255, 0.94)',
+    '--sys-panel-2': isDark ? 'rgba(18, 24, 44, 0.82)' : 'rgba(244, 247, 252, 0.96)',
+    '--sys-panel-3': isDark ? 'rgba(29, 35, 60, 0.62)' : 'rgba(225, 232, 245, 0.8)',
+    '--sys-text': isDark ? 'rgba(248, 250, 252, 0.98)' : 'rgba(15, 23, 42, 0.94)',
+    '--sys-muted': isDark ? 'rgba(177, 188, 205, 0.82)' : 'rgba(71, 85, 105, 0.8)',
+    '--sys-gradient': isDark ? themeConfig.darkGradient : themeConfig.gradient,
+    /* Structural overlays — flip white↔slate for light/dark panels */
+    '--sys-fill': isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(15, 23, 42, 0.1)',
+    '--sys-struct-strong': isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+    '--sys-struct': isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)',
+    '--sys-struct-faint': isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(15, 23, 42, 0.035)',
   } as CSSProperties;
 }
 
-function renderDeck(
-  variant: SystemsVariant,
-  positionLabel: string,
-  totalLabel: string,
-  compact: boolean,
-) {
+function SystemsDeck({
+  themeConfig,
+  notes,
+  positionLabel,
+  totalLabel,
+}: {
+  themeConfig: SubtitleTheme;
+  notes: readonly string[];
+  positionLabel: string;
+  totalLabel: string;
+}) {
   return (
-    <div className={cn(styles.deck, variant.deckClass, compact && styles.deckCompact)} aria-hidden="true">
-      <span className={styles.deckBadge}>
-        <span className={styles.deckSwatch} />
-        {variant.signalDeck.family}
-      </span>
-      <span className={styles.deckDescriptor}>{variant.signalDeck.descriptor}</span>
+    <div className={styles.deck} aria-hidden="true">
+      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
+      <div className={styles.deckNotes}>
+        {notes.map((note) => (
+          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
+            {note}
+          </span>
+        ))}
+      </div>
       <span className={styles.deckCounter}>
         {positionLabel}
         <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
@@ -110,28 +275,7 @@ function renderDeck(
   );
 }
 
-function renderTitle(variant: SystemsVariant, context: LandingTitleRendererContext) {
-  return (
-    <div className={styles.lockup}>
-      <div className={styles.eyebrowRow}>
-        <span className={styles.eyebrow}>{variant.eyebrow}</span>
-      </div>
-      <div className={cn(styles.title, variant.titleClass)} data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}>
-        {variant.titleLines.map((line, lineIndex) => (
-          <span key={`${variant.id}-${line}`} className={cn(styles.line, lineIndex === 0 ? styles.lineLead : styles.lineSupport)}>
-            {line.split(' ').map((word) => (
-              <span key={`${line}-${word}`} className={styles.word}>
-                {word}
-              </span>
-            ))}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SystemsSubtitleRenderer({
+function SystemsScene({
   config,
   context,
   hideSignalDeck,
@@ -142,436 +286,188 @@ function SystemsSubtitleRenderer({
   positionLabel,
   rotationStatusLabel,
   totalLabel,
-}: SubtitleRendererShellProps & { config: SystemsVariant }) {
-  const styleVars = createStyleVars(config.palette, context.isDark);
-  const deck = renderDeck(config, positionLabel, totalLabel, context.compact);
-  const Icon = config.icon;
-  const iconNode = (
-    <span
-      className={cn(
-        styles.iconWrap,
-        config.iconSide === 'right' ? 'justify-self-end' : 'justify-self-start',
-      )}
-      aria-hidden="true"
-    >
-      <Icon className={cn(styles.icon, config.iconClass)} />
-    </span>
-  );
+}: SubtitleRendererShellProps & { config: SystemsVariantConfig }) {
+  const themeConfig = config.theme;
+  const Icon = themeConfig.icon;
 
   return (
     <div
-      className={cn(
-        styles.cluster,
-        context.showName ? styles.clusterWithName : styles.clusterStandalone,
-        context.compact && styles.clusterCompact,
-      )}
-      style={styleVars}
-      data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
+      className={cn(styles.cluster, context.compact && styles.clusterCompact)}
       onMouseEnter={!context.prefersReducedMotion ? onMouseEnter : undefined}
       onMouseLeave={!context.prefersReducedMotion ? onMouseLeave : undefined}
+      style={getSceneVars(themeConfig, context.isDark)}
     >
-      {!hideSignalDeck && config.metaPlacement === 'top' ? deck : null}
-
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${config.text}. ${config.signalDeck.family} family, ${config.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
       >
-        <div
-          className={cn(styles.panel, config.shellClass, config.layoutClass)}
+        <motion.section
+          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
+          exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
+          transition={themeConfig.transition}
+          className={cn(styles.scene, {
+            [styles.sceneCybernetic]: config.scene === 'cybernetic',
+            [styles.sceneZeroTrust]: config.scene === 'zeroTrust',
+            [styles.sceneSynthetic]: config.scene === 'synthetic',
+            [styles.sceneQuantum]: config.scene === 'quantum',
+            [styles.sceneCloud]: config.scene === 'cloud',
+            [styles.sceneCartographer]: config.scene === 'cartographer',
+            [styles.sceneOrchestrator]: config.scene === 'orchestrator',
+          })}
           data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
         >
-          <span className={styles.aura} aria-hidden="true" />
-          <span className={styles.trace} aria-hidden="true" />
-          <span className={styles.nodes} aria-hidden="true" />
+          {!hideSignalDeck ? (
+            <SystemsDeck
+              themeConfig={themeConfig}
+              notes={config.notes}
+              positionLabel={positionLabel}
+              totalLabel={totalLabel}
+            />
+          ) : null}
 
-          <div className={styles.canvas}>
-            {!hideSignalDeck && config.metaPlacement === 'side' ? deck : null}
-
-            <div className={styles.body}>
-              <div className={styles.titleRow}>
-                {config.iconSide === 'left' ? iconNode : null}
-                {renderTitle(config, context)}
-                {config.iconSide === 'right' ? iconNode : null}
-              </div>
-
-              <div className={styles.chips} aria-hidden="true">
-                {config.chips.map((chip) => (
-                  <span key={`${config.id}-${chip}`} className={styles.chip}>
-                    {chip}
-                  </span>
-                ))}
-              </div>
-
-              <p className={styles.caption}>{config.caption}</p>
-
-              {!hideSignalDeck && config.metaPlacement === 'inline' ? deck : null}
-
-              <div className={styles.footerRail} aria-hidden="true">
-                {config.footer.map((item) => (
-                  <span key={`${config.id}-${item}`} className={styles.footerItem}>
-                    {item}
-                  </span>
-                ))}
+          <div className={styles.sceneBody}>
+            <div className={styles.titleBlock}>
+              <span className={styles.kicker}>{config.kicker}</span>
+              <div className={styles.headlineWrap}>
+                <span className={styles.iconBadge} aria-hidden="true">
+                  <Icon className={styles.icon} />
+                </span>
+                <div className={styles.titleLockup}>
+                  <h2 className={styles.title}>{themeConfig.text}</h2>
+                  <p className={styles.descriptor}>{config.descriptor}</p>
+                </div>
               </div>
             </div>
-          </div>
 
-          {!hideSignalDeck && config.metaPlacement === 'footer' ? deck : null}
-        </div>
+            <div
+              className={cn(styles.sceneRig, {
+                [styles.cyberneticRig]: config.scene === 'cybernetic',
+                [styles.zeroTrustRig]: config.scene === 'zeroTrust',
+                [styles.syntheticRig]: config.scene === 'synthetic',
+                [styles.quantumRig]: config.scene === 'quantum',
+                [styles.cloudRig]: config.scene === 'cloud',
+                [styles.cartographerRig]: config.scene === 'cartographer',
+                [styles.orchestratorRig]: config.scene === 'orchestrator',
+              })}
+              aria-hidden="true"
+            >
+              {config.scene === 'cybernetic' ? (
+                <>
+                  <span className={styles.cyberSpine} />
+                  <div className={styles.cyberNodes}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'zeroTrust' ? (
+                <>
+                  <span className={styles.zeroRing} />
+                  <span className={styles.zeroRingInner} />
+                  <span className={styles.zeroCore} />
+                </>
+              ) : null}
+
+              {config.scene === 'synthetic' ? (
+                <>
+                  <span className={styles.syntheticCore} />
+                  <div className={styles.syntheticDendrites}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'quantum' ? (
+                <>
+                  <span className={styles.quantumOrbit} />
+                  <span className={styles.quantumOrbitAlt} />
+                  <div className={styles.quantumStates}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'cloud' ? (
+                <>
+                  <div className={styles.cloudMasses}>
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.cloudRain}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'cartographer' ? (
+                <>
+                  <span className={styles.mapGrid} />
+                  <span className={styles.mapRoute} />
+                  <span className={styles.mapRouteAlt} />
+                  <div className={styles.mapPins}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.mapContours}>
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'orchestrator' ? (
+                <>
+                  <div className={styles.orchestratorScore}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.orchestratorBeats}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
+        </motion.section>
       </div>
     </div>
   );
 }
 
-function createSystemsRenderer(config: SystemsVariant): LandingTitleRendererEntry {
+function createSystemsRenderer(config: SystemsVariantConfig): LandingTitleRendererEntry {
   return {
-    id: config.id,
+    id: config.theme.id,
     lane: 'systems',
-    render: (props) => <SystemsSubtitleRenderer {...props} config={config} />,
-    signalDeck: config.signalDeck,
-    text: config.text,
-    theme: {
-      id: config.id,
-      lane: 'systems',
-      text: config.text,
-      signalDeck: config.signalDeck,
-      gradient: config.palette.gradient,
-      darkGradient: config.palette.darkGradient,
-      glow: config.palette.glow,
-      fontFamily: 'mono',
-      fontWeight: 500,
-      letterSpacing: '0.08em',
-      textTransform: 'none',
-      fontStyle: 'normal',
-      icon: config.icon,
-      iconPosition: config.iconSide,
-      iconClass: config.iconClass ?? '',
-      initial: { opacity: 0, y: 18, scale: 0.96 },
-      animate: { opacity: 1, y: 0, scale: 1 },
-      exit: { opacity: 0, y: -18, scale: 0.98 },
-      transition: { duration: 0.46, ease: [0.22, 1, 0.36, 1] },
-      effectClass: '',
-      renderMode: 'standard',
-      containerBorder: `1px solid ${withAlpha(config.palette.glow, 0.28)}`,
-      containerShadow: `0 0 18px ${withAlpha(config.palette.glow, 0.18)}`,
-    },
+    render: (props) => <SystemsScene {...props} config={config} />,
+    signalDeck: config.theme.signalDeck,
+    text: config.theme.text,
+    theme: config.theme,
   };
 }
 
-const SYSTEMS_VARIANTS: readonly SystemsVariant[] = [
-  {
-    ...systemsSubtitle('cybernetic-architect', 'cybernetic architect', 'Architect', 'systems precision'),
-    icon: Cpu,
-    palette: {
-      gradient: 'linear-gradient(135deg, #3b82f6 0%, #6366f1 55%, #22d3ee 100%)',
-      darkGradient: 'linear-gradient(135deg, #bfdbfe 0%, #c4b5fd 55%, #a5f3fc 100%)',
-      glow: 'rgba(99, 102, 241, 0.78)',
-    },
-    eyebrow: 'CORE BUS',
-    titleLines: ['CYBERNETIC', 'ARCHITECT'],
-    chips: ['feedback', 'actuators', 'signal core'],
-    footer: ['segmented chassis', 'neural relay'],
-    caption: 'A hardened neural chassis with a visible signal spine instead of generic glitch haze.',
-    shellClass: styles.shellChassis,
-    titleClass: styles.titleCybernetic,
-    deckClass: styles.deckSide,
-    metaPlacement: 'side',
-    iconSide: 'left',
-    layoutClass: styles.layoutSide,
-  },
-  {
-    ...systemsSubtitle('code-architect', 'code architect', 'Architect', 'systems precision'),
-    icon: Braces,
-    palette: {
-      gradient: 'linear-gradient(135deg, #2563eb 0%, #38bdf8 48%, #818cf8 100%)',
-      darkGradient: 'linear-gradient(135deg, #dbeafe 0%, #bae6fd 48%, #c7d2fe 100%)',
-      glow: 'rgba(59, 130, 246, 0.72)',
-    },
-    eyebrow: 'SPEC SHEET',
-    titleLines: ['code', 'architect'],
-    chips: ['modules', 'interfaces', 'contracts'],
-    footer: ['margin notes', 'folded blueprint'],
-    caption: 'A plan-sheet composition with measured margins, footer legend, and drafting discipline.',
-    shellClass: styles.shellBlueprint,
-    titleClass: styles.titleCode,
-    deckClass: styles.deckTop,
-    metaPlacement: 'top',
-    iconSide: 'right',
-  },
-  {
-    ...systemsSubtitle('zero-trust-architect', 'zero trust architect', 'Architect', 'systems precision'),
-    icon: Fingerprint,
-    palette: {
-      gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 42%, #f97316 100%)',
-      darkGradient: 'linear-gradient(135deg, #fecaca 0%, #fca5a5 42%, #fdba74 100%)',
-      glow: 'rgba(239, 68, 68, 0.76)',
-    },
-    eyebrow: 'VERIFY BEFORE ENTRY',
-    titleLines: ['ZERO TRUST', 'ARCHITECT'],
-    chips: ['identity', 'policy', 'containment'],
-    footer: ['clearance locked', 'every request challenged'],
-    caption: 'A layered access gate with explicit verification rails and no decorative excess.',
-    shellClass: styles.shellVault,
-    titleClass: styles.titleTrust,
-    deckClass: styles.deckTop,
-    metaPlacement: 'top',
-    iconSide: 'left',
-  },
-  {
-    ...systemsSubtitle('synthetic-intelligence-architect', 'synthetic intelligence architect', 'Architect', 'systems precision'),
-    icon: BrainCircuit,
-    palette: {
-      gradient: 'linear-gradient(135deg, #4f46e5 0%, #0ea5e9 52%, #38bdf8 100%)',
-      darkGradient: 'linear-gradient(135deg, #c7d2fe 0%, #93c5fd 52%, #bae6fd 100%)',
-      glow: 'rgba(79, 70, 229, 0.82)',
-    },
-    eyebrow: 'MODEL STACK',
-    titleLines: ['synthetic intelligence', 'architect'],
-    chips: ['inference lanes', 'memory seams', 'supervision'],
-    footer: ['tiered cognition schematic', 'mobile-safe hierarchy'],
-    caption: 'A vertically tiered cognition schematic built to keep the long phrase authoritative on small screens.',
-    shellClass: styles.shellCognition,
-    titleClass: styles.titleSynthetic,
-    deckClass: styles.deckInline,
-    metaPlacement: 'inline',
-    iconSide: 'left',
-    layoutClass: styles.layoutStack,
-  },
-  {
-    ...systemsSubtitle('quantum-designer', 'quantum designer', 'Designer', 'semantic motion'),
-    icon: Atom,
-    palette: {
-      gradient: 'linear-gradient(135deg, #14b8a6 0%, #0ea5e9 56%, #8b5cf6 100%)',
-      darkGradient: 'linear-gradient(135deg, #99f6e4 0%, #7dd3fc 56%, #c4b5fd 100%)',
-      glow: 'rgba(20, 184, 166, 0.74)',
-    },
-    eyebrow: 'STATE FIELD',
-    titleLines: ['QUANTUM', 'DESIGNER'],
-    chips: ['phase', 'orbit', 'collapse'],
-    footer: ['probability bands', 'offset wells'],
-    caption: 'A field instrument with orbital state markers instead of another drafted document shell.',
-    shellClass: styles.shellQuantum,
-    titleClass: styles.titleQuantum,
-    deckClass: styles.deckInline,
-    metaPlacement: 'inline',
-    iconSide: 'right',
-  },
-  {
-    ...systemsSubtitle('ecosystem-designer', 'ecosystem designer', 'Designer', 'semantic motion'),
-    icon: Sprout,
-    palette: {
-      gradient: 'linear-gradient(135deg, #16a34a 0%, #14b8a6 54%, #84cc16 100%)',
-      darkGradient: 'linear-gradient(135deg, #bbf7d0 0%, #99f6e4 54%, #d9f99d 100%)',
-      glow: 'rgba(34, 197, 94, 0.72)',
-    },
-    eyebrow: 'DEPENDENCY ECOLOGY',
-    titleLines: ['ecosystem', 'designer'],
-    chips: ['pods', 'flows', 'mutuals'],
-    footer: ['habitat diagram', 'linked corridors'],
-    caption: 'An interdependent habitat map that reads as systems ecology instead of a softened generic pill.',
-    shellClass: styles.shellHabitat,
-    titleClass: styles.titleEcosystem,
-    deckClass: styles.deckFooter,
-    metaPlacement: 'footer',
-    iconSide: 'left',
-  },
-  {
-    ...systemsSubtitle('behavioral-designer', 'behavioral designer', 'Designer', 'semantic motion'),
-    icon: Brain,
-    palette: {
-      gradient: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 55%, #8b5cf6 100%)',
-      darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #bfdbfe 55%, #ddd6fe 100%)',
-      glow: 'rgba(14, 165, 233, 0.76)',
-    },
-    eyebrow: 'FEEDBACK LOOP',
-    titleLines: ['behavioral', 'designer'],
-    chips: ['cue', 'response', 'reward'],
-    footer: ['iterative loop rail', 'sampled triggers'],
-    caption: 'A loop diagram shell with visible behavior phases rather than a flat analysis card.',
-    shellClass: styles.shellBehavior,
-    titleClass: styles.titleBehavior,
-    deckClass: styles.deckSide,
-    metaPlacement: 'side',
-    iconSide: 'right',
-    layoutClass: styles.layoutSide,
-  },
-  {
-    ...systemsSubtitle('adaptive-systems-designer', 'adaptive systems designer', 'Designer', 'semantic motion'),
-    icon: SlidersHorizontal,
-    palette: {
-      gradient: 'linear-gradient(135deg, #10b981 0%, #22c55e 42%, #38bdf8 100%)',
-      darkGradient: 'linear-gradient(135deg, #a7f3d0 0%, #bbf7d0 42%, #bae6fd 100%)',
-      glow: 'rgba(16, 185, 129, 0.8)',
-    },
-    eyebrow: 'PARAMETER STATES',
-    titleLines: ['adaptive systems', 'designer'],
-    chips: ['observe', 'shift', 'stabilize'],
-    footer: ['reflowing shell', 'hinged modules'],
-    caption: 'A modular frame that visibly adapts between wide and narrow layouts instead of simply wrapping.',
-    shellClass: styles.shellAdaptive,
-    titleClass: styles.titleAdaptive,
-    deckClass: styles.deckInline,
-    metaPlacement: 'inline',
-    iconSide: 'left',
-    layoutClass: styles.layoutStack,
-  },
-  {
-    ...systemsSubtitle('process-designer', 'process designer', 'Designer', 'semantic motion'),
-    icon: GitMerge,
-    palette: {
-      gradient: 'linear-gradient(135deg, #0ea5e9 0%, #14b8a6 54%, #22c55e 100%)',
-      darkGradient: 'linear-gradient(135deg, #bae6fd 0%, #99f6e4 54%, #bbf7d0 100%)',
-      glow: 'rgba(20, 184, 166, 0.74)',
-    },
-    eyebrow: 'ROUTE LOGIC',
-    titleLines: ['process', 'designer'],
-    chips: ['entry', 'merge', 'handoff'],
-    footer: ['pipeline board', 'directed lanes'],
-    caption: 'A routed pipeline board that keeps process designer as the flow benchmark for the lane.',
-    shellClass: styles.shellPipeline,
-    titleClass: styles.titleProcess,
-    deckClass: styles.deckTop,
-    metaPlacement: 'top',
-    iconSide: 'left',
-  },
-  {
-    ...systemsSubtitle('quantum-systems-designer', 'quantum systems designer', 'Designer', 'semantic motion'),
-    icon: Radar,
-    palette: {
-      gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 45%, #ec4899 100%)',
-      darkGradient: 'linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 45%, #fbcfe8 100%)',
-      glow: 'rgba(139, 92, 246, 0.82)',
-    },
-    eyebrow: 'PHASE CHANNELS',
-    titleLines: ['quantum systems', 'designer'],
-    chips: ['synchronized', 'bridged', 'stateful'],
-    footer: ['multi-band coordination', 'phase bridges'],
-    caption: 'A phase-band instrument focused on orchestrating states, not just showing a quantum symbol.',
-    shellClass: styles.shellPhase,
-    titleClass: styles.titlePhase,
-    deckClass: styles.deckFooter,
-    metaPlacement: 'footer',
-    iconSide: 'right',
-    layoutClass: styles.layoutStack,
-  },
-  {
-    ...systemsSubtitle('machine-learning-designer', 'machine learning designer', 'Designer', 'semantic motion'),
-    icon: Cpu,
-    palette: {
-      gradient: 'linear-gradient(135deg, #2563eb 0%, #0ea5e9 48%, #22d3ee 100%)',
-      darkGradient: 'linear-gradient(135deg, #bfdbfe 0%, #93c5fd 48%, #a5f3fc 100%)',
-      glow: 'rgba(14, 165, 233, 0.8)',
-    },
-    eyebrow: 'TRAINING BOARD',
-    titleLines: ['machine learning', 'designer'],
-    chips: ['epoch', 'gradient', 'loss'],
-    footer: ['error correction marks', 'tuning handles'],
-    caption: 'A training-board identity that separates machine learning from the architect neural treatments.',
-    shellClass: styles.shellTraining,
-    titleClass: styles.titleTraining,
-    deckClass: styles.deckTop,
-    metaPlacement: 'top',
-    iconSide: 'left',
-    layoutClass: styles.layoutStack,
-  },
-  {
-    ...systemsSubtitle('cloud-shaper', 'cloud shaper', 'Cartographer', 'route synthesis'),
-    icon: Cloud,
-    palette: {
-      gradient: 'linear-gradient(135deg, #38bdf8 0%, #67e8f9 46%, #c084fc 100%)',
-      darkGradient: 'linear-gradient(135deg, #bae6fd 0%, #cffafe 46%, #ddd6fe 100%)',
-      glow: 'rgba(56, 189, 248, 0.74)',
-    },
-    eyebrow: 'ELEVATION CURVES',
-    titleLines: ['cloud', 'shaper'],
-    chips: ['contours', 'density', 'altitude'],
-    footer: ['tiered weather layers', 'volumetric edge'],
-    caption: 'A contour-based cloud object that gives shaping real volume instead of a polite flat panel.',
-    shellClass: styles.shellCloud,
-    titleClass: styles.titleCloud,
-    deckClass: styles.deckSide,
-    metaPlacement: 'side',
-    iconSide: 'right',
-    layoutClass: styles.layoutSide,
-  },
-  {
-    ...systemsSubtitle('ai-cartographer', 'AI cartographer', 'Cartographer', 'route synthesis'),
-    icon: MapIcon,
-    palette: {
-      gradient: 'linear-gradient(135deg, #14b8a6 0%, #06b6d4 46%, #3b82f6 100%)',
-      darkGradient: 'linear-gradient(135deg, #99f6e4 0%, #a5f3fc 46%, #bfdbfe 100%)',
-      glow: 'rgba(20, 184, 166, 0.8)',
-    },
-    eyebrow: 'ATLAS LEGEND',
-    titleLines: ['AI', 'cartographer'],
-    chips: ['survey', 'routes', 'waypoints'],
-    footer: ['legend plate', 'plotted route'],
-    caption: 'A proper navigational plate with legend logic, plotted points, and AI route markings.',
-    shellClass: styles.shellAtlas,
-    titleClass: styles.titleAtlas,
-    deckClass: styles.deckTop,
-    metaPlacement: 'top',
-    iconSide: 'left',
-  },
-  {
-    ...systemsSubtitle('technological-mapper', 'technological mapper', 'Cartographer', 'route synthesis'),
-    icon: Navigation,
-    palette: {
-      gradient: 'linear-gradient(135deg, #0891b2 0%, #0ea5e9 44%, #22d3ee 100%)',
-      darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #bae6fd 44%, #cffafe 100%)',
-      glow: 'rgba(8, 145, 178, 0.78)',
-    },
-    eyebrow: 'TOPOLOGY BOUNDS',
-    titleLines: ['technological', 'mapper'],
-    chips: ['nodes', 'edges', 'surface'],
-    footer: ['locked extents', 'infrastructure overlay'],
-    caption: 'An infrastructural topology map that separates technological mapper from the atlas-style cartographer.',
-    shellClass: styles.shellTopology,
-    titleClass: styles.titleTopology,
-    deckClass: styles.deckSide,
-    metaPlacement: 'side',
-    iconSide: 'right',
-    layoutClass: styles.layoutSide,
-  },
-  {
-    ...systemsSubtitle('data-orchestrator', 'data orchestrator', 'Orchestrator', 'coordinated crescendo'),
-    icon: Music,
-    palette: {
-      gradient: 'linear-gradient(135deg, #a855f7 0%, #ec4899 45%, #f97316 100%)',
-      darkGradient: 'linear-gradient(135deg, #e9d5ff 0%, #fbcfe8 45%, #fdba74 100%)',
-      glow: 'rgba(168, 85, 247, 0.84)',
-    },
-    eyebrow: 'CHANNEL TIMELINE',
-    titleLines: ['DATA', 'ORCHESTRATOR'],
-    chips: ['queue', 'sync', 'tempo'],
-    footer: ['channel rack', 'coordinated pulses'],
-    caption: 'A compact console with multichannel timing cues instead of another centered hero pill.',
-    shellClass: styles.shellRack,
-    titleClass: styles.titleOrchestrator,
-    deckClass: styles.deckFooter,
-    metaPlacement: 'footer',
-    iconSide: 'left',
-  },
-] as const;
+export const SYSTEMS_SHOWCASE_RENDERERS: readonly LandingTitleRendererEntry[] =
+  SYSTEMS_VARIANTS.map(createSystemsRenderer);
 
-export const SYSTEMS_ARCHITECT_THEMES: LandingTitleRendererEntry[] = SYSTEMS_VARIANTS
-  .filter((variant) => variant.signalDeck.family === 'Architect')
-  .map(createSystemsRenderer);
-
-export const SYSTEMS_DESIGNER_THEMES: LandingTitleRendererEntry[] = SYSTEMS_VARIANTS
-  .filter((variant) => variant.signalDeck.family === 'Designer')
-  .map(createSystemsRenderer);
-
-export const SYSTEMS_NAVIGATION_THEMES: LandingTitleRendererEntry[] = SYSTEMS_VARIANTS
-  .filter((variant) => variant.signalDeck.family === 'Cartographer')
-  .map(createSystemsRenderer);
-
-export const SYSTEMS_ORCHESTRATOR_THEMES: LandingTitleRendererEntry[] = SYSTEMS_VARIANTS
-  .filter((variant) => variant.signalDeck.family === 'Orchestrator')
-  .map(createSystemsRenderer);
-
-export const SYSTEMS_SUBTITLE_THEMES: LandingTitleRendererEntry[] = SYSTEMS_VARIANTS.map(createSystemsRenderer);
+export const SYSTEMS_SUBTITLE_RENDERERS: readonly LandingTitleRendererEntry[] = [
+  ...SYSTEMS_SHOWCASE_RENDERERS,
+];

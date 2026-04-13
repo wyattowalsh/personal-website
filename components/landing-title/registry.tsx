@@ -6,22 +6,14 @@ import {
 } from '@/components/landing-title/shared';
 import type { SignalDeckMeta } from '@/lib/landing-title-sequence';
 import {
-  ARCANE_MAGE_RENDERERS,
-  ARCANE_SORCERER_RENDERERS,
-  ARCANE_VISIONARY_RENDERERS,
+  ARCANE_SHOWCASE_RENDERERS,
 } from '@/components/landing-title/arcane';
 import {
-  CRAFTED_ALCHEMIST_RENDERERS,
-  CRAFTED_ARTISAN_RENDERERS,
-  CRAFTED_CRAFTER_RENDERERS,
-  CRAFTED_SCULPTOR_RENDERERS,
+  CRAFTED_SHOWCASE_RENDERERS,
 } from '@/components/landing-title/crafted';
 import { PERFORMANCE_SHOWCASE_RENDERERS } from '@/components/landing-title/performance';
 import {
-  SYSTEMS_ARCHITECT_THEMES as SYSTEMS_ARCHITECT_RENDERERS,
-  SYSTEMS_DESIGNER_THEMES as SYSTEMS_DESIGNER_RENDERERS,
-  SYSTEMS_NAVIGATION_THEMES as SYSTEMS_NAVIGATION_RENDERERS,
-  SYSTEMS_ORCHESTRATOR_THEMES as SYSTEMS_ORCHESTRATOR_RENDERERS,
+  SYSTEMS_SHOWCASE_RENDERERS,
 } from '@/components/landing-title/systems';
 
 export type {
@@ -40,51 +32,137 @@ export interface LandingTitleSubtitleOption {
   readonly signalDeck: SignalDeckMeta;
 }
 
-const subtitleRendererEntries: LandingTitleRendererEntry[] = [
-  ...SYSTEMS_ARCHITECT_RENDERERS,
-  ...ARCANE_SORCERER_RENDERERS,
-  ...CRAFTED_ALCHEMIST_RENDERERS,
-  ...SYSTEMS_DESIGNER_RENDERERS,
-  ...CRAFTED_SCULPTOR_RENDERERS,
-  ...CRAFTED_ARTISAN_RENDERERS,
-  ...CRAFTED_CRAFTER_RENDERERS,
+export const LANDING_TITLE_RENDERERS: LandingTitleRendererEntry[] = [
+  ...SYSTEMS_SHOWCASE_RENDERERS,
+  ...ARCANE_SHOWCASE_RENDERERS,
+  ...CRAFTED_SHOWCASE_RENDERERS,
   ...PERFORMANCE_SHOWCASE_RENDERERS,
-  ...ARCANE_MAGE_RENDERERS,
-  ...ARCANE_VISIONARY_RENDERERS,
-  ...SYSTEMS_NAVIGATION_RENDERERS,
-  ...SYSTEMS_ORCHESTRATOR_RENDERERS,
 ];
-const subtitleRendererEntriesById = subtitleRendererEntries.map((entry) => [entry.id, entry] as const);
-const subtitleRendererEntriesByText = subtitleRendererEntries.map((entry) => [entry.text, entry] as const);
-
-const subtitleOptions = subtitleRendererEntries.map(({ id, lane, signalDeck, text }) => ({
-  id,
-  lane,
-  signalDeck,
-  text,
-})) as readonly LandingTitleSubtitleOption[];
 
 export const SUBTITLE_RENDERER_REGISTRY = Object.freeze(
-  Object.fromEntries(subtitleRendererEntriesById),
+  Object.fromEntries(LANDING_TITLE_RENDERERS.map((e) => [e.id, e])),
 ) as Readonly<Record<string, LandingTitleRendererEntry>>;
 
 export const SUBTITLE_RENDERER_TEXT_REGISTRY = Object.freeze(
-  Object.fromEntries(subtitleRendererEntriesByText),
+  Object.fromEntries(LANDING_TITLE_RENDERERS.map((e) => [e.text, e])),
 ) as Readonly<Record<string, LandingTitleRendererEntry>>;
 
-export const LANDING_TITLE_RENDERERS = subtitleRendererEntries;
-export const LANDING_TITLE_SUBTITLE_OPTIONS = subtitleOptions;
+export const LANDING_TITLE_SUBTITLE_OPTIONS: readonly LandingTitleSubtitleOption[] =
+  LANDING_TITLE_RENDERERS.map(({ id, lane, signalDeck, text }) => ({ id, lane, signalDeck, text }));
 export const DEFAULT_LANDING_TITLE_SUBTITLE = LANDING_TITLE_SUBTITLE_OPTIONS[0] ?? null;
 export const DEFAULT_LANDING_TITLE_SUBTITLE_ID = DEFAULT_LANDING_TITLE_SUBTITLE?.id ?? 'cybernetic-architect';
 export const LANDING_TITLE_SUBTITLE_IDS = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id) as readonly string[];
 export const LANDING_TITLE_THEME_TEXTS = LANDING_TITLE_RENDERERS.map(({ text }) => text) as readonly string[];
 
+/**
+ * @deprecated Alias map from old subtitle ids/texts (pre-redesign 44-entry
+ * inventory) to current 22-entry ids. Prevents silent fallback to default
+ * when callers use historical values that were renamed or consolidated.
+ *
+ * Keys are either old display texts (space-separated) or old slugified
+ * pseudo-ids (kebab-case). Values are always a current canonical id.
+ */
+export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
+  // ── Old display texts that no longer match any current text ──────────
+
+  // Architects (dropped)
+  'code architect': 'cybernetic-architect',
+
+  // Arcane (text changed or consolidated)
+  'data sorcerer': 'data-sorcerer',
+  'technological conjurer': 'silicon-conjurer',
+  'innovation mystic': 'emergence-mystic',
+  'workflow mage': 'workflow-mage',
+
+  // Alchemists (consolidated → code-alchemist)
+  'systems alchemist': 'code-alchemist',
+  'distributed systems alchemist': 'code-alchemist',
+
+  // Designers (consolidated → quantum-designer)
+  'ecosystem designer': 'quantum-designer',
+  'behavioral designer': 'quantum-designer',
+  'adaptive systems designer': 'quantum-designer',
+  'process designer': 'quantum-designer',
+  'quantum systems designer': 'quantum-designer',
+  'machine learning designer': 'quantum-designer',
+
+  // Sculptors (consolidated)
+  'augmented reality sculptor': 'holographic-sculptor',
+  'resilience sculptor': 'digital-sculptor',
+  'information sculptor': 'digital-sculptor',
+  'experience sculptor': 'digital-sculptor',
+
+  // Artisans (text changed or consolidated)
+  'intelligence artisan': 'blockchain-artisan',
+  'cyber defense artisan': 'cyber-defense-artisan',
+  'blockchain artisan': 'blockchain-artisan',
+  'cybersecurity artisan': 'cyber-defense-artisan',
+
+  // Crafters (consolidated → frontier-crafter)
+  'knowledge craftsman': 'frontier-crafter',
+  'experience crafter': 'frontier-crafter',
+  'edge systems crafter': 'frontier-crafter',
+  'future systems crafter': 'frontier-crafter',
+
+  // Artists (consolidated → neural-artist)
+  'intelligent systems artist': 'neural-artist',
+  'scalability artist': 'neural-artist',
+
+  // Visionaries / Dreamers (consolidated → navigation entries)
+  'platform visionary': 'cloud-shaper',
+  'systems dreamer': 'cloud-shaper',
+  'digital futurist': 'ai-cartographer',
+  'enterprise dreamer': 'cloud-shaper',
+
+  // Navigation (consolidated)
+  'technological mapper': 'ai-cartographer',
+
+  // ── Old slugified pseudo-ids that don't match any current id ─────────
+
+  'code-architect': 'cybernetic-architect',
+  'technological-conjurer': 'silicon-conjurer',
+  'innovation-mystic': 'emergence-mystic',
+  'systems-alchemist': 'code-alchemist',
+  'distributed-systems-alchemist': 'code-alchemist',
+  'ecosystem-designer': 'quantum-designer',
+  'behavioral-designer': 'quantum-designer',
+  'adaptive-systems-designer': 'quantum-designer',
+  'process-designer': 'quantum-designer',
+  'quantum-systems-designer': 'quantum-designer',
+  'machine-learning-designer': 'quantum-designer',
+  'augmented-reality-sculptor': 'holographic-sculptor',
+  'resilience-sculptor': 'digital-sculptor',
+  'information-sculptor': 'digital-sculptor',
+  'experience-sculptor': 'digital-sculptor',
+  'intelligence-artisan': 'blockchain-artisan',
+  'cybersecurity-artisan': 'cyber-defense-artisan',
+  'knowledge-craftsman': 'frontier-crafter',
+  'experience-crafter': 'frontier-crafter',
+  'edge-systems-crafter': 'frontier-crafter',
+  'future-systems-crafter': 'frontier-crafter',
+  'intelligent-systems-artist': 'neural-artist',
+  'scalability-artist': 'neural-artist',
+  'platform-visionary': 'cloud-shaper',
+  'systems-dreamer': 'cloud-shaper',
+  'digital-futurist': 'ai-cartographer',
+  'enterprise-dreamer': 'cloud-shaper',
+  'technological-mapper': 'ai-cartographer',
+});
+
+function resolveAlias(key: string): string | undefined {
+  return DEPRECATED_SUBTITLE_ALIASES[key];
+}
+
 export function getSubtitleRendererById(id: string): LandingTitleRendererEntry | null {
-  return SUBTITLE_RENDERER_REGISTRY[id] ?? null;
+  return SUBTITLE_RENDERER_REGISTRY[id]
+    ?? SUBTITLE_RENDERER_REGISTRY[resolveAlias(id) ?? '']
+    ?? null;
 }
 
 export function getSubtitleRendererByText(text: string): LandingTitleRendererEntry | null {
-  return SUBTITLE_RENDERER_TEXT_REGISTRY[text] ?? null;
+  return SUBTITLE_RENDERER_TEXT_REGISTRY[text]
+    ?? SUBTITLE_RENDERER_REGISTRY[resolveAlias(text) ?? '']
+    ?? null;
 }
 
 export function getSubtitleRenderer(selection: string): LandingTitleRendererEntry | null {
@@ -92,11 +170,17 @@ export function getSubtitleRenderer(selection: string): LandingTitleRendererEntr
 }
 
 export function getSubtitleOptionById(id: string): LandingTitleSubtitleOption | null {
-  return LANDING_TITLE_SUBTITLE_OPTIONS.find((option) => option.id === id) ?? null;
+  const direct = LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.id === id);
+  if (direct) return direct;
+  const target = resolveAlias(id);
+  return target ? LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.id === target) ?? null : null;
 }
 
 export function getSubtitleOptionByText(text: string): LandingTitleSubtitleOption | null {
-  return LANDING_TITLE_SUBTITLE_OPTIONS.find((option) => option.text === text) ?? null;
+  const direct = LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.text === text);
+  if (direct) return direct;
+  const target = resolveAlias(text);
+  return target ? LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.id === target) ?? null : null;
 }
 
 export function resolveSubtitleOption(selection: string | null | undefined): LandingTitleSubtitleOption {

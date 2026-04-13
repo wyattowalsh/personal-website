@@ -1,14 +1,11 @@
 'use client';
 
-import { AnimatePresence, motion, type Transition } from 'motion/react';
-import { Bot, BrainCircuit, Gauge, Zap } from 'lucide-react';
-import type { CSSProperties, ReactElement } from 'react';
+import { motion } from 'motion/react';
+import { Bot, BrainCircuit, Zap } from 'lucide-react';
+import type { CSSProperties } from 'react';
 
-import performanceStyles from './performance.module.css';
-import subtitleStyles from './subtitle.module.css';
+import styles from './performance.module.css';
 import {
-  ctr,
-  ic,
   theme,
   typo,
   type LandingTitleRendererEntry,
@@ -18,16 +15,14 @@ import {
 import type { SignalDeckMeta } from '@/lib/landing-title-sequence';
 import { cn } from '@/lib/utils';
 
-type PerformanceVariant = 'automation' | 'robotics' | 'intelligent' | 'scalability';
+type PerformanceScene = 'automation' | 'robotics' | 'neural';
 
-interface PerformanceRendererConfig {
-  variant: PerformanceVariant;
-  metrics: readonly string[];
-  deckLabel: string;
-  shellTransition: Transition;
-  shellInitial: Record<string, number | string>;
-  shellAnimate: Record<string, number | string | number[]>;
-  shellExit: Record<string, number | string | number[]>;
+interface PerformanceVariantConfig {
+  readonly scene: PerformanceScene;
+  readonly theme: SubtitleTheme;
+  readonly kicker: string;
+  readonly descriptor: string;
+  readonly notes: readonly string[];
 }
 
 const performanceSubtitle = (
@@ -42,376 +37,146 @@ const performanceSubtitle = (
   signalDeck: { family, descriptor },
 });
 
+// ─── Automation Virtuoso ─────────────────────────────────────────────────────
+// Warm amber/orange — stage VU-meter / timing-dial metaphor
 const AUTOMATION_THEME = theme(
-  performanceSubtitle('automation-virtuoso', 'automation virtuoso', 'Virtuoso', 'performance energy'),
+  performanceSubtitle('automation-virtuoso', 'automation virtuoso', 'Virtuoso', 'timed systems cadence'),
   {
-    gradient: 'linear-gradient(135deg, #fef08a 0%, #fb923c 38%, #ef4444 100%)',
-    darkGradient: 'linear-gradient(135deg, #fde68a 0%, #fdba74 40%, #fb7185 100%)',
-    glow: 'rgba(249, 115, 22, 0.62)',
+    gradient: 'linear-gradient(135deg, #fde68a 0%, #fb923c 40%, #ef4444 100%)',
+    darkGradient: 'linear-gradient(135deg, #fef3c7 0%, #fdba74 44%, #fb7185 100%)',
+    glow: 'rgba(249, 115, 22, 0.64)',
   },
   typo.virtuoso,
   Zap,
   'left',
-  ic.zap,
+  '',
   'thunderExit',
   '',
-  ctr.virtuosoShell,
-  'standard',
+  { border: '1px solid rgba(249, 115, 22, 0.24)', shadow: '0 22px 54px rgba(249, 115, 22, 0.18)' },
 );
 
+// ─── Robotics Artist ──────────────────────────────────────────────────────────
+// Cool industrial steel → brushed white — articulated crane / stage rigging
 const ROBOTICS_THEME = theme(
-  performanceSubtitle('robotics-artist', 'robotics artist', 'Virtuoso', 'performance energy'),
+  performanceSubtitle('robotics-artist', 'robotics artist', 'Virtuoso', 'articulated performance'),
   {
-    gradient: 'linear-gradient(135deg, #93c5fd 0%, #a78bfa 36%, #f472b6 100%)',
-    darkGradient: 'linear-gradient(135deg, #bfdbfe 0%, #c4b5fd 36%, #f9a8d4 100%)',
-    glow: 'rgba(168, 85, 247, 0.56)',
+    gradient: 'linear-gradient(135deg, #475569 0%, #64748b 40%, #94a3b8 100%)',
+    darkGradient: 'linear-gradient(135deg, #94a3b8 0%, #cbd5e1 42%, #f1f5f9 100%)',
+    glow: 'rgba(148, 163, 184, 0.52)',
   },
-  { ...typo.virtuosoBold, letterSpacing: '0.045em', textTransform: 'uppercase' },
+  typo.artisanMono,
   Bot,
   'left',
-  ic.pulse,
+  '',
   'blueprintFold',
   '',
-  ctr.virtuosoShell,
-  'standard',
+  { border: '1px solid rgba(148, 163, 184, 0.24)', shadow: '0 22px 54px rgba(148, 163, 184, 0.18)' },
 );
 
-const INTELLIGENT_THEME = theme(
-  performanceSubtitle('intelligent-systems-artist', 'intelligent systems artist', 'Virtuoso', 'performance energy'),
+// ─── Neural Artist ────────────────────────────────────────────────────────────
+// Hot fuchsia → magenta → rose — synaptic bloom / radiant pulses
+const NEURAL_THEME = theme(
+  performanceSubtitle('neural-artist', 'neural artist', 'Virtuoso', 'synaptic expression'),
   {
-    gradient: 'linear-gradient(135deg, #c4b5fd 0%, #f472b6 42%, #67e8f9 100%)',
-    darkGradient: 'linear-gradient(135deg, #ddd6fe 0%, #f9a8d4 44%, #a5f3fc 100%)',
-    glow: 'rgba(217, 70, 239, 0.46)',
+    gradient: 'linear-gradient(135deg, #d946ef 0%, #ec4899 44%, #fb7185 100%)',
+    darkGradient: 'linear-gradient(135deg, #e879f9 0%, #f9a8d4 46%, #fda4af 100%)',
+    glow: 'rgba(217, 70, 239, 0.50)',
   },
-  { ...typo.virtuosoBold, letterSpacing: '0.02em' },
+  typo.visionaryItalic,
   BrainCircuit,
   'left',
-  ic.orbit,
+  '',
   'auroraBloom',
   '',
-  ctr.virtuosoShell,
-  'standard',
-);
-
-const SCALABILITY_THEME = theme(
-  performanceSubtitle('scalability-artist', 'scalability artist', 'Virtuoso', 'performance energy'),
-  {
-    gradient: 'linear-gradient(135deg, #f9a8d4 0%, #c084fc 35%, #38bdf8 100%)',
-    darkGradient: 'linear-gradient(135deg, #fbcfe8 0%, #d8b4fe 38%, #7dd3fc 100%)',
-    glow: 'rgba(56, 189, 248, 0.54)',
-  },
-  { ...typo.virtuoso, letterSpacing: '0.01em' },
-  Gauge,
-  'left',
-  ic.none,
-  'cartographyTilt',
-  '',
-  ctr.virtuosoShell,
-  'standard',
+  { border: '1px solid rgba(217, 70, 239, 0.22)', shadow: '0 22px 54px rgba(217, 70, 239, 0.16)' },
 );
 
 export const PERFORMANCE_SHOWCASE_THEMES: SubtitleTheme[] = [
   AUTOMATION_THEME,
   ROBOTICS_THEME,
-  INTELLIGENT_THEME,
-  SCALABILITY_THEME,
+  NEURAL_THEME,
 ];
 
 export const PERFORMANCE_SUBTITLE_THEMES: SubtitleTheme[] = [
   ...PERFORMANCE_SHOWCASE_THEMES,
 ];
 
-const PERFORMANCE_RENDERER_CONFIG: Record<PerformanceVariant, PerformanceRendererConfig> = {
-  automation: {
-    variant: 'automation',
-    metrics: ['queue depth 12', 'cue sync 18ms', 'handoff live'],
-    deckLabel: 'sequencer rig',
-    shellInitial: { opacity: 0, y: 22, scale: 0.94 },
-    shellAnimate: { opacity: 1, y: 0, scale: 1 },
-    shellExit: { opacity: 0, y: -18, scale: 1.02 },
-    shellTransition: { duration: 0.42, ease: [0.16, 1, 0.3, 1] },
+const PERFORMANCE_VARIANTS: readonly PerformanceVariantConfig[] = [
+  {
+    scene: 'automation',
+    theme: AUTOMATION_THEME,
+    kicker: 'Cue conductor',
+    descriptor: 'A radial timing gauge and cue indicators frame the title like a stage console.',
+    notes: ['tempo dial', 'cue lock', 'repeatable'],
   },
-  robotics: {
-    variant: 'robotics',
-    metrics: ['servo settle 32ms', 'actuators x12', 'dock ready'],
-    deckLabel: 'diagnostic dock',
-    shellInitial: { opacity: 0, rotateX: 28, y: 20 },
-    shellAnimate: { opacity: 1, rotateX: 0, y: 0 },
-    shellExit: { opacity: 0, rotateX: -18, y: -18 },
-    shellTransition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+  {
+    scene: 'robotics',
+    theme: ROBOTICS_THEME,
+    kicker: 'Actuated canvas',
+    descriptor: 'An articulated crane mast and jointed boom frame the title like stage rigging.',
+    notes: ['jointed', 'mechanical', 'precision'],
   },
-  intelligent: {
-    variant: 'intelligent',
-    metrics: ['router 97%', 'memory warm', 'ensemble aligned'],
-    deckLabel: 'systems score',
-    shellInitial: { opacity: 0, scale: 0.96, y: 18 },
-    shellAnimate: { opacity: 1, scale: 1, y: 0 },
-    shellExit: { opacity: 0, scale: 1.02, y: -14 },
-    shellTransition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] },
+  {
+    scene: 'neural',
+    theme: NEURAL_THEME,
+    kicker: 'Cognitive bloom',
+    descriptor: 'Concentric pulse rings radiate from a synaptic core around the title.',
+    notes: ['expressive', 'adaptive', 'networked'],
   },
-  scalability: {
-    variant: 'scalability',
-    metrics: ['burst 240%', 'regions x8', 'latency flat'],
-    deckLabel: 'capacity ledger',
-    shellInitial: { opacity: 0, scaleX: 0.9, y: 18 },
-    shellAnimate: { opacity: 1, scaleX: 1, y: 0 },
-    shellExit: { opacity: 0, scaleX: 1.03, y: -12 },
-    shellTransition: { duration: 0.46, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
-const PERFORMANCE_VARIANT_CLASSES: Record<PerformanceVariant, { shell: string; deck: string }> = {
-  automation: {
-    shell: performanceStyles.shellAutomation,
-    deck: performanceStyles.deckAutomation,
-  },
-  robotics: {
-    shell: performanceStyles.shellRobotics,
-    deck: performanceStyles.deckRobotics,
-  },
-  intelligent: {
-    shell: performanceStyles.shellIntelligent,
-    deck: performanceStyles.deckIntelligent,
-  },
-  scalability: {
-    shell: performanceStyles.shellScalability,
-    deck: performanceStyles.deckScalability,
-  },
-};
+];
 
 function withAlpha(color: string, alpha: number): string {
   return color.replace(/[\d.]+\)\s*$/, `${alpha})`);
 }
 
-function getSignalStyle(themeConfig: SubtitleTheme, isDark: boolean): CSSProperties {
+function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSProperties {
   return {
-    '--perf-shell-edge': withAlpha(themeConfig.glow, isDark ? 0.34 : 0.2),
-    '--perf-shell-soft': withAlpha(themeConfig.glow, isDark ? 0.2 : 0.12),
-    '--perf-shell-strong': withAlpha(themeConfig.glow, isDark ? 0.46 : 0.24),
-    '--perf-panel': isDark ? 'rgba(9, 13, 28, 0.88)' : 'rgba(255, 255, 255, 0.86)',
-    '--perf-panel-2': isDark ? 'rgba(18, 28, 54, 0.78)' : 'rgba(241, 245, 249, 0.92)',
-    '--perf-panel-3': isDark ? 'rgba(30, 41, 68, 0.52)' : 'rgba(226, 232, 240, 0.72)',
-    '--perf-text': isDark ? 'rgba(248, 250, 252, 0.98)' : 'rgba(15, 23, 42, 0.95)',
-    '--perf-muted': isDark ? 'rgba(148, 163, 184, 0.84)' : 'rgba(71, 85, 105, 0.76)',
+    '--perf-glow': themeConfig.glow,
+    '--perf-glow-soft': withAlpha(themeConfig.glow, isDark ? 0.18 : 0.15),
+    '--perf-glow-strong': withAlpha(themeConfig.glow, isDark ? 0.4 : 0.34),
+    '--perf-edge': withAlpha(themeConfig.glow, isDark ? 0.32 : 0.26),
+    '--perf-panel': isDark ? 'rgba(7, 12, 28, 0.88)' : 'rgba(255, 255, 255, 0.9)',
+    '--perf-panel-2': isDark ? 'rgba(16, 22, 44, 0.8)' : 'rgba(240, 245, 252, 0.94)',
+    '--perf-panel-3': isDark ? 'rgba(23, 33, 58, 0.62)' : 'rgba(225, 233, 246, 0.78)',
+    '--perf-text': isDark ? 'rgba(248, 250, 252, 0.98)' : 'rgba(15, 23, 42, 0.94)',
+    '--perf-muted': isDark ? 'rgba(148, 163, 184, 0.84)' : 'rgba(51, 65, 85, 0.88)',
     '--perf-gradient': isDark ? themeConfig.darkGradient : themeConfig.gradient,
-    '--perf-shell-shadow': isDark
-      ? `0 20px 56px ${withAlpha(themeConfig.glow, 0.2)}`
-      : `0 18px 48px ${withAlpha(themeConfig.glow, 0.16)}`,
-    '--subtitle-shell-edge': withAlpha(themeConfig.glow, isDark ? 0.3 : 0.18),
-    '--subtitle-shell-glow-soft': withAlpha(themeConfig.glow, isDark ? 0.22 : 0.12),
-    '--subtitle-shell-glow-strong': withAlpha(themeConfig.glow, isDark ? 0.42 : 0.2),
+    '--perf-highlight': isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)',
+    '--perf-subtle-fill': isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(0, 0, 0, 0.035)',
+    '--perf-tick': isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)',
   } as CSSProperties;
 }
 
-function getHeadlineStyle(themeConfig: SubtitleTheme, isDark: boolean): CSSProperties {
-  return {
-    backgroundImage: isDark ? themeConfig.darkGradient : themeConfig.gradient,
-    WebkitBackgroundClip: 'text',
-    backgroundClip: 'text',
-    color: 'transparent',
-    textShadow: `0 0 ${isDark ? 18 : 12}px ${withAlpha(themeConfig.glow, isDark ? 0.32 : 0.18)}`,
-  };
-}
-
-function PerformanceIcon({ themeConfig, animated, className }: { themeConfig: SubtitleTheme; animated: boolean; className?: string }) {
-  const Icon = themeConfig.icon;
-  const iconNode = (
-    <span className={cn(performanceStyles.iconFrame, className)}>
-      <Icon
-        className={performanceStyles.iconGlyph}
-        aria-hidden="true"
-        style={{ color: 'var(--perf-text)', filter: `drop-shadow(0 0 14px ${themeConfig.glow})` }}
-      />
-    </span>
-  );
-
-  if (!animated) {
-    return iconNode;
-  }
-
-  return (
-    <motion.span
-      initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
-      animate={{ opacity: 1, scale: 1, rotate: 0 }}
-      exit={{ opacity: 0, scale: 0.86, rotate: 6 }}
-      transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
-    >
-      {iconNode}
-    </motion.span>
-  );
-}
-
-function renderDecorativeNodes(count: number, className?: string) {
-  return Array.from({ length: count }, (_, index) => (
-    <span key={`${className ?? 'node'}-${index}`} className={cn(performanceStyles.utilityNode, className)} />
-  ));
-}
-
-function renderAutomationLayout(themeConfig: SubtitleTheme, animated: boolean, headlineStyle: CSSProperties) {
-  return (
-    <div className={performanceStyles.automationGrid}>
-      <div className={performanceStyles.flowRow} aria-hidden="true">
-        {['trigger', 'route', 'handoff'].map((label, index) => (
-          animated ? (
-            <motion.span
-              key={label}
-              className={performanceStyles.flowStep}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.24, delay: index * 0.06, ease: 'easeOut' }}
-            >
-              {label}
-            </motion.span>
-          ) : (
-            <span key={label} className={performanceStyles.flowStep}>{label}</span>
-          )
-        ))}
-      </div>
-      <div className={performanceStyles.heroBand}>
-        <PerformanceIcon themeConfig={themeConfig} animated={animated} />
-        <div className={performanceStyles.copyBlock}>
-          <span className={performanceStyles.overline}>sequencer live</span>
-          <span className={performanceStyles.primaryLine} style={headlineStyle}>automation</span>
-          <span className={performanceStyles.roleChip}>virtuoso</span>
-        </div>
-      </div>
-      <div className={performanceStyles.utilityBarRow} aria-hidden="true">
-        {['queued', 'executing', 'clear'].map((label, index) => (
-          <span key={label} className={performanceStyles.utilityBarWrap}>
-            <span className={performanceStyles.utilityBarLabel}>{label}</span>
-            {animated ? (
-              <motion.span
-                className={performanceStyles.utilityBar}
-                initial={{ scaleX: 0.35, opacity: 0.5 }}
-                animate={{ scaleX: [0.5, 1, 0.78], opacity: 1 }}
-                exit={{ scaleX: 0.4, opacity: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.08, repeat: Infinity, repeatType: 'mirror' }}
-              />
-            ) : (
-              <span className={performanceStyles.utilityBar} />
-            )}
-          </span>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function renderRoboticsLayout(themeConfig: SubtitleTheme, animated: boolean, headlineStyle: CSSProperties) {
-  return (
-    <div className={performanceStyles.roboticsGrid}>
-      <div className={performanceStyles.roboticsBracket} aria-hidden="true">
-        {renderDecorativeNodes(3)}
-      </div>
-      <div className={performanceStyles.roboticsCore}>
-        <span className={performanceStyles.overline}>assembly dock</span>
-        <div className={performanceStyles.roboticsHeadline}>
-          <PerformanceIcon themeConfig={themeConfig} animated={animated} className={performanceStyles.iconFrameLarge} />
-          <div className={performanceStyles.copyBlock}>
-            <span className={performanceStyles.primaryLine} style={headlineStyle}>robotics</span>
-            <span className={performanceStyles.secondaryLine}>artist</span>
-          </div>
-        </div>
-      </div>
-      <div className={performanceStyles.servoStack} aria-hidden="true">
-        {renderDecorativeNodes(3, performanceStyles.utilityNodeSquare)}
-        <span className={performanceStyles.utilityBeam} />
-      </div>
-    </div>
-  );
-}
-
-function renderIntelligentLayout(themeConfig: SubtitleTheme, animated: boolean, headlineStyle: CSSProperties) {
-  return (
-    <div className={performanceStyles.intelligentGrid}>
-      <div className={performanceStyles.systemBand}>
-        <PerformanceIcon themeConfig={themeConfig} animated={animated} />
-        <div className={performanceStyles.copyBlock}>
-          <span className={performanceStyles.overline}>cognitive score</span>
-          <span className={performanceStyles.systemLine} style={headlineStyle}>intelligent systems</span>
-        </div>
-      </div>
-      <div className={performanceStyles.artistBand}>
-        <span className={performanceStyles.artistWord}>artist</span>
-        <div className={performanceStyles.utilityMatrix} aria-hidden="true">
-          {renderDecorativeNodes(6)}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function renderScalabilityLayout(themeConfig: SubtitleTheme, animated: boolean, headlineStyle: CSSProperties) {
-  return (
-    <div className={performanceStyles.scalabilityGrid}>
-      <div className={performanceStyles.fanoutRow} aria-hidden="true">
-        {Array.from({ length: 5 }, (_, index) => (
-          <span key={`fan-${index}`} className={performanceStyles.fanoutNode}>
-            {animated ? (
-              <motion.span
-                className={performanceStyles.fanoutStem}
-                initial={{ scaleY: 0.2, opacity: 0.4 }}
-                animate={{ scaleY: [0.4, 1, 0.66], opacity: 1 }}
-                exit={{ scaleY: 0.3, opacity: 0 }}
-                transition={{ duration: 1, delay: index * 0.07, repeat: Infinity, repeatType: 'mirror' }}
-              />
-            ) : (
-              <span className={performanceStyles.fanoutStem} />
-            )}
-          </span>
-        ))}
-      </div>
-      <div className={performanceStyles.scalabilityCore}>
-        <PerformanceIcon themeConfig={themeConfig} animated={animated} className={performanceStyles.iconFrameLarge} />
-        <div className={performanceStyles.copyBlock}>
-          <span className={performanceStyles.overline}>elastic capacity</span>
-          <span className={performanceStyles.primaryLine} style={headlineStyle}>scalability</span>
-          <span className={performanceStyles.roleChip}>artist</span>
-        </div>
-      </div>
-      <div className={performanceStyles.capacityRow} aria-hidden="true">
-        {[0.55, 0.82, 1].map((width, index) => (
-          animated ? (
-            <motion.span
-              key={`capacity-${width}`}
-              className={performanceStyles.capacityBar}
-              initial={{ scaleX: 0.35, opacity: 0.45 }}
-              animate={{ scaleX: [width * 0.7, width, width * 0.86], opacity: 1 }}
-              exit={{ scaleX: 0.3, opacity: 0 }}
-              transition={{ duration: 0.92, delay: index * 0.08, repeat: Infinity, repeatType: 'mirror' }}
-              style={{ ['--capacity-target' as const]: width } as CSSProperties}
-            />
-          ) : (
-            <span
-              key={`capacity-${width}`}
-              className={performanceStyles.capacityBar}
-              style={{ ['--capacity-target' as const]: width } as CSSProperties}
-            />
-          )
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function renderVariantLayout(variant: PerformanceVariant, themeConfig: SubtitleTheme, animated: boolean, headlineStyle: CSSProperties) {
-  switch (variant) {
-    case 'automation':
-      return renderAutomationLayout(themeConfig, animated, headlineStyle);
-    case 'robotics':
-      return renderRoboticsLayout(themeConfig, animated, headlineStyle);
-    case 'intelligent':
-      return renderIntelligentLayout(themeConfig, animated, headlineStyle);
-    case 'scalability':
-      return renderScalabilityLayout(themeConfig, animated, headlineStyle);
-    default:
-      return null;
-  }
-}
-
-function PerformanceSubtitleRenderer({
+function PerformanceDeck({
   themeConfig,
+  notes,
+  positionLabel,
+  totalLabel,
+}: {
+  themeConfig: SubtitleTheme;
+  notes: readonly string[];
+  positionLabel: string;
+  totalLabel: string;
+}) {
+  return (
+    <div className={styles.deck} aria-hidden="true">
+      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
+      <div className={styles.deckNotes}>
+        {notes.map((note) => (
+          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
+            {note}
+          </span>
+        ))}
+      </div>
+      <span className={styles.deckCounter}>
+        {positionLabel}
+        <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
+      </span>
+    </div>
+  );
+}
+
+function PerformanceScene({
   config,
   context,
   hideSignalDeck,
@@ -422,119 +187,119 @@ function PerformanceSubtitleRenderer({
   positionLabel,
   rotationStatusLabel,
   totalLabel,
-}: SubtitleRendererShellProps & { themeConfig: SubtitleTheme; config: PerformanceRendererConfig }) {
-  const { compact, isDark, prefersReducedMotion, shouldAnimateTagline, showName } = context;
-  const animated = shouldAnimateTagline && !prefersReducedMotion;
-  const sharedStyle = getSignalStyle(themeConfig, isDark);
-  const headlineStyle = getHeadlineStyle(themeConfig, isDark);
-  const shell = renderVariantLayout(config.variant, themeConfig, animated, headlineStyle);
-  const variantClasses = PERFORMANCE_VARIANT_CLASSES[config.variant];
-
-  const shellNode = (
-    <div
-      aria-hidden="true"
-      className={cn(
-        performanceStyles.shell,
-        variantClasses.shell,
-      )}
-      style={sharedStyle}
-    >
-      <span className={performanceStyles.shellBackdrop} />
-      <span className={performanceStyles.shellGlow} />
-      <div className={performanceStyles.shellInner}>{shell}</div>
-    </div>
-  );
+}: SubtitleRendererShellProps & { config: PerformanceVariantConfig }) {
+  const themeConfig = config.theme;
+  const Icon = themeConfig.icon;
+  const sceneVars = getSceneVars(themeConfig, context.isDark);
 
   return (
     <div
-      className={cn(
-        'flex w-full min-w-0 flex-col items-center',
-        showName
-          ? 'mt-2 max-w-[85vw] gap-2 sm:mt-3 sm:max-w-2xl lg:max-w-[44rem] xl:max-w-[46rem]'
-          : compact
-            ? 'mt-0 max-w-full gap-1.5'
-            : 'mt-0 max-w-[85vw] gap-2 sm:max-w-2xl lg:max-w-[44rem]',
-        performanceStyles.cluster,
-        animated ? performanceStyles.motionActive : performanceStyles.motionReduced,
-      )}
-      data-performance-variant={config.variant}
-      onMouseEnter={animated ? onMouseEnter : undefined}
-      onMouseLeave={animated ? onMouseLeave : undefined}
-      style={sharedStyle}
+      className={cn(styles.cluster, context.compact && styles.clusterCompact)}
+      onMouseEnter={!context.prefersReducedMotion ? onMouseEnter : undefined}
+      onMouseLeave={!context.prefersReducedMotion ? onMouseLeave : undefined}
+      style={sceneVars}
     >
-      {!hideSignalDeck ? (
-        <div className={cn(performanceStyles.deck, variantClasses.deck)} aria-hidden="true">
-          <div className={performanceStyles.deckLeading}>
-            <span className={performanceStyles.deckBadge}>
-              <span className={performanceStyles.deckBadgeSwatch} />
-              {themeConfig.signalDeck.family}
-            </span>
-            <span className={performanceStyles.deckQualifier}>{config.deckLabel}</span>
-          </div>
-          <div className={performanceStyles.deckMeta}>
-            <span className={performanceStyles.deckDescriptor}>{themeConfig.signalDeck.descriptor}</span>
-            <div className={performanceStyles.metricRow}>
-              {config.metrics.map((metric) => (
-                <span key={metric} className={performanceStyles.metricChip}>{metric}</span>
-              ))}
-            </div>
-          </div>
-          <span className={performanceStyles.counter}>
-            {positionLabel}
-            <span className={performanceStyles.counterTotal}>/ {totalLabel}</span>
-          </span>
-        </div>
-      ) : null}
-
       <div
         tabIndex={0}
         role="group"
         aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
-        className={cn('w-full', subtitleStyles.subtitleBorderGlow, subtitleStyles.subtitleControl, performanceStyles.control)}
+        className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
       >
-        {!animated ? (
-          shellNode
-        ) : (
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={themeConfig.id}
-              initial={config.shellInitial}
-              animate={config.shellAnimate}
-              exit={config.shellExit}
-              transition={config.shellTransition}
-            >
-              {shellNode}
-            </motion.div>
-          </AnimatePresence>
-        )}
+        <motion.section
+          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
+          exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
+          transition={themeConfig.transition}
+          className={cn(styles.scene, {
+            [styles.sceneAutomation]: config.scene === 'automation',
+            [styles.sceneRobotics]: config.scene === 'robotics',
+            [styles.sceneNeural]: config.scene === 'neural',
+          })}
+          data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
+        >
+          {!hideSignalDeck ? (
+            <PerformanceDeck
+              themeConfig={themeConfig}
+              notes={config.notes}
+              positionLabel={positionLabel}
+              totalLabel={totalLabel}
+            />
+          ) : null}
+
+          <div className={styles.sceneBody}>
+            <div className={styles.titleBlock}>
+              <span className={styles.kicker}>{config.kicker}</span>
+              <div className={styles.headlineWrap}>
+                <span className={styles.iconBadge} aria-hidden="true">
+                  <Icon className={styles.icon} />
+                </span>
+                <div className={styles.titleLockup}>
+                  <h2 className={styles.title}>{themeConfig.text}</h2>
+                  <p className={styles.descriptor}>{config.descriptor}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.sceneRig} aria-hidden="true">
+              {config.scene === 'automation' ? (
+                <>
+                  <span className={styles.automationGauge} />
+                  <span className={styles.automationNeedle} />
+                  <div className={styles.automationCues}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+
+              {config.scene === 'robotics' ? (
+                <>
+                  <span className={styles.roboticsMast} />
+                  <span className={styles.roboticsBoom} />
+                  <span className={styles.roboticsHoist} />
+                  <span className={styles.roboticsPayload} />
+                </>
+              ) : null}
+
+              {config.scene === 'neural' ? (
+                <>
+                  <span className={styles.neuralRingOuter} />
+                  <span className={styles.neuralRingMiddle} />
+                  <span className={styles.neuralRingInner} />
+                  <span className={styles.neuralCore} />
+                  <div className={styles.neuralSynapses}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </>
+              ) : null}
+            </div>
+          </div>
+        </motion.section>
       </div>
     </div>
   );
 }
 
-function createPerformanceRenderer(themeConfig: SubtitleTheme, config: PerformanceRendererConfig): LandingTitleRendererEntry {
-  const signalDeck = themeConfig.signalDeck;
-
+function createPerformanceRenderer(config: PerformanceVariantConfig): LandingTitleRendererEntry {
   return {
-    id: themeConfig.id,
-    lane: themeConfig.lane,
-    render: (props): ReactElement => (
-      <PerformanceSubtitleRenderer {...props} config={config} themeConfig={themeConfig} />
-    ),
-    signalDeck,
-    text: themeConfig.text,
-    theme: themeConfig,
+    id: config.theme.id,
+    lane: 'performance',
+    render: (props) => <PerformanceScene {...props} config={config} />,
+    signalDeck: config.theme.signalDeck,
+    text: config.theme.text,
+    theme: config.theme,
   };
 }
 
-export const PERFORMANCE_SHOWCASE_RENDERERS: readonly LandingTitleRendererEntry[] = [
-  createPerformanceRenderer(AUTOMATION_THEME, PERFORMANCE_RENDERER_CONFIG.automation),
-  createPerformanceRenderer(ROBOTICS_THEME, PERFORMANCE_RENDERER_CONFIG.robotics),
-  createPerformanceRenderer(INTELLIGENT_THEME, PERFORMANCE_RENDERER_CONFIG.intelligent),
-  createPerformanceRenderer(SCALABILITY_THEME, PERFORMANCE_RENDERER_CONFIG.scalability),
-];
+export const PERFORMANCE_SHOWCASE_RENDERERS: readonly LandingTitleRendererEntry[] =
+  PERFORMANCE_VARIANTS.map(createPerformanceRenderer);
 
 export const PERFORMANCE_SUBTITLE_RENDERERS: readonly LandingTitleRendererEntry[] = [
   ...PERFORMANCE_SHOWCASE_RENDERERS,
