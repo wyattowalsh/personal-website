@@ -37,12 +37,15 @@
   border-radius: 2rem;
   border: 1px solid var(--sys-edge);
   background:
-    radial-gradient(circle at top right, var(--sys-glow-soft), transparent 58%),
+    radial-gradient(ellipse 120% 80% at top right, var(--sys-glow-soft), transparent 62%),
+    radial-gradient(ellipse 100% 100% at bottom left, var(--sys-glow-soft) 0%, transparent 65%),
     linear-gradient(160deg, var(--sys-panel), var(--sys-panel-2) 58%, var(--sys-panel-3));
   color: var(--sys-text);
   box-shadow:
     inset 0 1px 0 var(--sys-struct-strong),
-    0 24px 60px var(--sys-glow-soft);
+    inset 0 0 40px var(--sys-glow-soft),
+    0 24px 60px var(--sys-glow-soft),
+    0 0 80px var(--sys-glow-soft);
   transition:
     transform 220ms ease,
     box-shadow 220ms ease,
@@ -412,21 +415,39 @@
   width: 3rem;
   height: 3rem;
   border-radius: 1rem;
-  border: 1px solid var(--sys-edge);
+  border: 1.5px solid var(--sys-edge);
   background:
     linear-gradient(160deg, var(--sys-struct-strong), var(--sys-struct-faint)),
     var(--sys-gradient);
-  box-shadow: 0 18px 34px var(--sys-glow-soft);
+  box-shadow:
+    0 0 24px var(--sys-glow-soft),
+    0 18px 40px var(--sys-glow-soft),
+    inset 0 1px 0 var(--sys-struct-strong),
+    inset 0 0 12px var(--sys-glow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.iconBadge::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 30%, var(--sys-glow-soft), transparent 60%);
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .icon {
   width: 1.35rem;
   height: 1.35rem;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 8px var(--sys-glow-soft));
 }
 
 .titleLockup {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.6rem;
 }
 
 .title {
@@ -435,6 +456,11 @@
   line-height: 0.96;
   letter-spacing: -0.03em;
   text-wrap: balance;
+  background: linear-gradient(135deg, var(--sys-text), var(--sys-text) 70%, var(--sys-glow-strong) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
 }
 
 .descriptor {
@@ -453,9 +479,13 @@
   border-radius: 1.55rem;
   border: 1px solid var(--sys-edge);
   background:
+    radial-gradient(ellipse 100% 100% at center, var(--sys-glow-soft) 0%, transparent 65%),
     linear-gradient(160deg, var(--sys-struct), var(--sys-struct-faint)),
     rgba(10, 14, 26, 0.24);
   overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    inset 0 0 24px var(--sys-glow-soft);
 }
 
 .cyberneticRig,
@@ -490,7 +520,10 @@
   inset: 0.8rem auto 0.6rem 52%;
   width: 3px;
   background: linear-gradient(180deg, transparent, var(--sys-glow-strong) 12%, var(--sys-glow-strong) 88%, transparent);
-  box-shadow: 0 0 22px var(--sys-glow-soft);
+  box-shadow:
+    0 0 22px var(--sys-glow-soft),
+    0 0 40px var(--sys-glow-soft),
+    0 0 60px var(--sys-glow-soft);
 }
 
 /* Relay dots along spine */
@@ -504,7 +537,10 @@
   border-radius: 999px;
   border: 1px solid var(--sys-edge);
   background: var(--sys-glow-strong);
-  box-shadow: 0 0 10px var(--sys-glow-soft);
+  box-shadow:
+    0 0 10px var(--sys-glow-soft),
+    0 0 18px var(--sys-glow-soft),
+    inset 0 0 8px var(--sys-glow-soft);
   transform: translateX(-50%);
 }
 
@@ -524,7 +560,10 @@
     linear-gradient(180deg, var(--sys-glow-soft), transparent 58%);
   box-shadow:
     inset 0 1px 0 var(--sys-struct-strong),
-    0 14px 28px var(--sys-glow-soft);
+    inset 0 0 18px var(--sys-glow-soft),
+    0 14px 28px var(--sys-glow-soft),
+    0 0 32px var(--sys-glow-soft);
+  border: 1px solid var(--sys-edge);
 }
 
 /* Connector lines from plate to spine */
@@ -598,8 +637,11 @@
   width: 1.5rem;
   height: 1.5rem;
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 72%);
-  box-shadow: 0 0 20px var(--sys-glow-soft);
+  background: radial-gradient(circle at center, var(--sys-glow-strong) 0%, var(--sys-glow-soft) 60%, transparent 72%);
+  box-shadow:
+    0 0 20px var(--sys-glow-soft),
+    0 0 40px var(--sys-glow-soft),
+    inset 0 0 16px var(--sys-glow-soft);
   transform: translate(-50%, -50%);
 }
 
