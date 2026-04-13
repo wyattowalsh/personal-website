@@ -240,13 +240,6 @@ function CraftedDeck({
   return (
     <div className={styles.deck} aria-hidden="true">
       <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
-      <div className={styles.deckNotes}>
-        {notes.map((note) => (
-          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
-            {note}
-          </span>
-        ))}
-      </div>
       <span className={styles.deckCounter}>
         {positionLabel}
         <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
@@ -311,7 +304,6 @@ function CraftedScene({
 
           <div className={styles.sceneBody}>
             <div className={styles.titleBlock}>
-              <span className={styles.kicker}>{config.kicker}</span>
               <div className={styles.headlineWrap}>
                 <span className={styles.iconBadge} aria-hidden="true">
                   <Icon className={styles.icon} />
