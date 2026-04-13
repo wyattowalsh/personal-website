@@ -114,36 +114,31 @@ export function SocialLink({ link }: SocialLinkProps): JSX.Element {
     dark: adjustColorForMode(baseColor, true),
   };
 
-  // Update the icon container class names and styles
+  // Icon container - more refined, less heavy
   const iconContainerClassName = cn(
     "relative flex items-center justify-center",
-    "w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24",
+    "w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16",
     "rounded-xl",
-    // Enhanced contrast background
-    "bg-white/95 dark:bg-white/5", // Adjusted opacity for dark mode
-    // Border and shadow for depth
-    "border border-black/5 dark:border-white/10",
-    "shadow-md dark:shadow-black/25",
-    // Animations
-    "motion-safe:transform-gpu motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out",
-    "motion-safe:group-hover:scale-105 motion-reduce:transform-none motion-reduce:transition-none",
-    // Additional contrast
-    "after:absolute after:inset-0 after:rounded-xl",
-    "after:bg-gradient-to-br",
-    "after:from-white/50 after:to-transparent dark:after:from-white/10 dark:after:to-transparent",
-    "after:opacity-0 group-hover:after:opacity-100",
+    // Subtle background
+    "bg-white/80 dark:bg-white/[0.06]",
+    // Refined border
+    "border border-black/[0.04] dark:border-white/[0.08]",
+    // Lighter shadow
+    "shadow-sm dark:shadow-black/20",
+    // Smooth transitions
+    "motion-safe:transform-gpu motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out",
+    "motion-safe:group-hover:scale-105 motion-safe:group-hover:shadow-md",
+    "motion-reduce:transform-none motion-reduce:transition-none",
   );
 
-  // Update the label class names
+  // Label - refined typography
   const labelClassName = cn(
-    "mt-4 text-sm md:text-base lg:text-lg",
-    "font-medium text-center",
+    "mt-2.5 sm:mt-3 text-xs sm:text-sm",
+    "font-medium text-center tracking-wide",
     "motion-safe:transition-colors motion-safe:duration-300",
     "motion-reduce:transition-none",
-    // Ensure text contrast and remove underline
     "no-underline",
-    "text-slate-900 dark:text-slate-100",
-    "drop-shadow-sm dark:drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+    "text-slate-700 dark:text-slate-300",
   );
 
   const linkContent = (
@@ -151,21 +146,17 @@ export function SocialLink({ link }: SocialLinkProps): JSX.Element {
       className={cn(
         // Base layout
         "group relative flex flex-col items-center justify-center",
-        "w-full h-full p-4 md:p-6 lg:p-8",
-        "rounded-2xl overflow-hidden",
+        "w-full h-full p-3 sm:p-4",
+        "rounded-xl overflow-hidden",
         "[--link-hover-color:var(--link-hover-color-light)] dark:[--link-hover-color:var(--link-hover-color-dark)]",
         "[--link-icon-color:var(--link-icon-color-light)] dark:[--link-icon-color:var(--link-icon-color-dark)]",
         "[--link-icon-bg:var(--link-icon-bg-light)] dark:[--link-icon-bg:var(--link-icon-bg-dark)]",
-        // Enhanced glass morphism
-        "bg-white/5 dark:bg-black/20",
-        "border border-black/5 dark:border-white/10",
-        // Hover and animation
-        "motion-safe:transform-gpu motion-safe:transition-[transform,box-shadow] motion-safe:duration-300 motion-safe:ease-out",
-        "motion-safe:hover:-translate-y-1 motion-safe:hover:scale-[1.02]",
+        // Clean, minimal background
+        "bg-transparent",
+        // Hover animation
+        "motion-safe:transform-gpu motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out",
+        "motion-safe:hover:-translate-y-0.5",
         "motion-reduce:transform-none motion-reduce:transition-none",
-        // Shadows
-        "shadow-lg hover:shadow-xl",
-        "shadow-black/5 dark:shadow-white/5"
       )}
       style={{
         '--link-hover-color-light': colors.light.bgHoverStyle,
@@ -176,7 +167,7 @@ export function SocialLink({ link }: SocialLinkProps): JSX.Element {
         '--link-icon-bg-dark': colors.dark.iconBgColor,
       } as CSSProperties}
     >
-      {/* Icon Container with guaranteed contrast */}
+      {/* Icon Container */}
       <div
         className={iconContainerClassName}
         style={{
@@ -184,43 +175,39 @@ export function SocialLink({ link }: SocialLinkProps): JSX.Element {
         }}
       >
         <div
-          className={cn(
-            "relative z-10",
-          )}
+          className="relative z-10"
           style={{ color: 'var(--link-icon-color)' }}
         >
           <link.icon
             className={cn(
-              "w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12",
-              // Enhanced visibility
-              "drop-shadow-md dark:drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]",
-              "group-hover:drop-shadow-lg"
+              "w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7",
+              "motion-safe:transition-transform motion-safe:duration-300",
+              "motion-safe:group-hover:scale-110",
             )}
           />
         </div>
       </div>
 
       {/* Label */}
-      <span
-        className={labelClassName}
-      >
+      <span className={labelClassName}>
         {link.name}
       </span>
 
-      {/* Enhanced hover effect */}
+      {/* Subtle hover glow */}
       <div
         className={cn(
           "absolute inset-0 -z-10",
           "opacity-0 group-hover:opacity-100",
           "motion-safe:transition-opacity motion-safe:duration-300",
           "motion-reduce:transition-none",
-          "pointer-events-none"
+          "pointer-events-none",
+          "rounded-xl",
         )}
         style={{
           background: `radial-gradient(
-            420px circle at 50% 50%,
+            100px circle at 50% 40%,
             var(--link-hover-color),
-            transparent 40%
+            transparent 70%
           )`,
         }}
       />

@@ -61,31 +61,27 @@ export function Links() {
     <div
       className={cn(
         "relative isolate",
-        // Grid layout
-        "grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4",
-        "gap-4 sm:gap-6 md:gap-8 lg:gap-10",
-        "p-4 sm:p-6 md:p-8 lg:p-10",
+        // Grid layout - tighter, more editorial
+        "grid grid-cols-2 sm:grid-cols-4",
+        "gap-3 sm:gap-4 md:gap-5 lg:gap-6",
+        "p-4 sm:p-5 md:p-6 lg:p-8",
         // Container dimensions
-        "w-full max-w-[95vw] md:max-w-6xl mx-auto",
+        "w-full max-w-[95vw] md:max-w-4xl mx-auto",
         "rounded-2xl",
-        // Enhanced glass effect with proper contrast
-        "bg-white/5 dark:bg-slate-900/10",
-        // Themed borders
-        "border border-primary/10 dark:border-primary-light/10",
-        // Dynamic shadows
-        "shadow-xl shadow-black/5 dark:shadow-black/20",
-        "hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary-light/20",
-        // Enhanced gradients using theme colors
-        "bg-gradient-to-br",
-        "from-primary/5 via-transparent to-accent/5",
-        "dark:from-primary-light/5 dark:via-transparent dark:to-accent/5",
+        // Refined glass effect - lighter, more premium
+        "bg-white/40 dark:bg-slate-900/30",
+        "backdrop-blur-sm",
+        // Subtle border with gradient
+        "border border-black/[0.04] dark:border-white/[0.06]",
+        // Refined shadows - less heavy, more refined
+        "shadow-lg shadow-black/[0.03] dark:shadow-black/30",
         // Smooth transitions
-        "motion-safe:transition-shadow motion-safe:duration-300 motion-safe:ease-out",
+        "motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out",
         "motion-reduce:transition-none",
-        // Lightweight background effects
+        // Inner highlight for depth
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-2xl",
-        "before:bg-gradient-to-br before:from-white/10 before:to-primary/5",
-        "before:opacity-70 dark:before:from-primary-light/5 dark:before:to-transparent",
+        "before:bg-gradient-to-b before:from-white/60 before:to-transparent",
+        "dark:before:from-white/[0.02] dark:before:to-transparent",
       )}
     >
       {links.map((link) => (
@@ -93,9 +89,8 @@ export function Links() {
           key={link.name}
           className={cn(
             "w-full",
-            "min-h-[100px] sm:min-h-[120px]",
+            "min-h-[90px] sm:min-h-[100px]",
             "hover:z-10",
-            // Ensure proper stacking
             "relative isolate",
           )}
         >

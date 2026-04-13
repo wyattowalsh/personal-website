@@ -45,17 +45,25 @@ export const PostCard = ({ post, className: _className }: PostCardProps) => {
 	return (
 		<article className="block h-full relative group">
 			<Card
-				className="overflow-hidden bg-card hover:shadow-glow transition-shadow duration-300 cursor-pointer rounded-xl h-full flex flex-col"
+				className={cn(
+					"overflow-hidden bg-card cursor-pointer h-full flex flex-col",
+					"rounded-2xl border-0",
+					"shadow-md hover:shadow-xl",
+					"dark:shadow-black/20 dark:hover:shadow-black/40",
+					"motion-safe:transition-all motion-safe:duration-300 motion-safe:ease-out",
+					"motion-safe:hover:-translate-y-1",
+					"motion-reduce:transition-none motion-reduce:transform-none",
+				)}
 			>
-				<div className="relative aspect-video w-full">
+				<div className="relative aspect-[16/10] w-full overflow-hidden">
 					{image === "/riso-hero.svg" ? (
 						<RisoHero
-							className="absolute inset-0 w-full h-full transition-transform duration-500 hover:scale-105"
+							className="absolute inset-0 w-full h-full motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
 						/>
 					) : heroConfig ? (
 						<ThemeAwareHero
 							config={heroConfig}
-							className="absolute inset-0 w-full h-full transition-transform duration-500 hover:scale-105"
+							className="absolute inset-0 w-full h-full motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
 						/>
 					) : isSvg ? (
 						<>
@@ -63,7 +71,7 @@ export const PostCard = ({ post, className: _className }: PostCardProps) => {
 							<img
 								src={image}
 								alt={title}
-								className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+								className="absolute inset-0 w-full h-full object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
 							/>
 						</>
 					) : (
@@ -72,20 +80,20 @@ export const PostCard = ({ post, className: _className }: PostCardProps) => {
 							alt={title}
 							fill
 							sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-							className="object-cover transition-transform duration-500 hover:scale-105"
+							className="object-cover motion-safe:transition-transform motion-safe:duration-500 motion-safe:group-hover:scale-105"
 							placeholder="blur"
 							blurDataURL="/logo.webp"
 						/>
 					)}
-					{/* Updated gradient overlay */}
-					<div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-black/90"></div>
+					{/* Refined gradient overlay - less heavy */}
+					<div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
 					{/* Title and summary section */}
 					<div className="absolute bottom-0 left-0 right-0 p-4 z-[1]">
 						<h2
 							className={cn(
-								"text-xl font-semibold leading-tight mb-2",
-								"text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+								"text-lg sm:text-xl font-semibold leading-snug mb-1.5",
+								"text-white",
 								"tracking-tight"
 							)}
 						>
@@ -99,7 +107,7 @@ export const PostCard = ({ post, className: _className }: PostCardProps) => {
 						<p
 							className={cn(
 								"text-sm line-clamp-2",
-								"text-gray-100 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]",
+								"text-white/80",
 								"leading-relaxed"
 							)}
 						>
@@ -108,45 +116,43 @@ export const PostCard = ({ post, className: _className }: PostCardProps) => {
 					</div>
 				</div>
 
-				{/* Metadata section - Updated styles */}
-				<div className="relative p-4 flex flex-col flex-grow bg-background/95 z-[2] pointer-events-none">
-					<div className="flex items-center justify-between mb-2 text-sm !text-muted-foreground">
+				{/* Metadata section - refined styling */}
+				<div className="relative p-4 flex flex-col flex-grow bg-card z-[2] pointer-events-none">
+					<div className="flex items-center justify-between mb-3 text-xs text-muted-foreground">
 						{created && (
-							<span className="flex items-center gap-2">
-								<Calendar className="h-4 w-4" />
-								<time
-									dateTime={created}
-									className="font-medium !text-muted-foreground"
-								>
+							<span className="flex items-center gap-1.5">
+								<Calendar className="h-3.5 w-3.5" />
+								<time dateTime={created} className="font-medium">
 									{formatDate(created)}
 								</time>
 							</span>
 						)}
 						{readingTime && (
-							<span className="flex items-center gap-2">
-								<Clock className="h-4 w-4" />
-								<span className="!text-muted-foreground">{readingTime}</span>
+							<span className="flex items-center gap-1.5">
+								<Clock className="h-3.5 w-3.5" />
+								<span>{readingTime}</span>
 							</span>
 						)}
 					</div>
-					<Separator className="my-2" />
 					{tags.length > 0 && (
-						<div className="flex flex-wrap gap-1.5 sm:gap-2 mt-2">
-							{/* Sort tags case-insensitively but preserve original case for display */}
-							{[...tags]
-								.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
-								.map((tag) => (
-									<TagPill
-										key={tag}
-										tag={tag}
-										href={`/blog/tags/${tag}`}
-										onClick={(e) => {
-											e.stopPropagation();
-										}}
-										className="pointer-events-auto"
-									/>
-								))}
-						</div>
+						<>
+							<Separator className="mb-3" />
+							<div className="flex flex-wrap gap-1.5">
+								{[...tags]
+									.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+									.map((tag) => (
+										<TagPill
+											key={tag}
+											tag={tag}
+											href={`/blog/tags/${tag}`}
+											onClick={(e) => {
+												e.stopPropagation();
+											}}
+											className="pointer-events-auto"
+										/>
+									))}
+							</div>
+						</>
 					)}
 				</div>
 			</Card>

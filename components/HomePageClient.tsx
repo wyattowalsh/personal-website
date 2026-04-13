@@ -12,6 +12,7 @@ import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
 import type { PostMetadata } from "@/lib/types";
 import styles from "@/app/page.module.css";
+import { ArrowRight } from "lucide-react";
 
 const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground').then(mod => mod.ParticlesBackground), { ssr: false });
 
@@ -36,11 +37,9 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
     return () => window.clearTimeout(timeoutId);
   }, []);
 
-  const imageScale = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.85]);
-  const imageOpacity = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.8]);
-  const imageRotate = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [0, 0] : [0, -5]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.92]);
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.85]);
 
-  // Enhanced animations
   // Content starts visible — no hidden state that delays FCP/LCP
   const pageVariants: Variants = {
     visible: {
@@ -54,12 +53,10 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
     visible: {
       scale: 1,
       opacity: 1,
-      rotate: 0,
     },
     hover: prefersReducedMotion ? {} : {
-      scale: 1.05,
-      rotate: 5,
-      transition: { type: "spring", stiffness: 400, damping: 10 }
+      scale: 1.03,
+      transition: { type: "spring", stiffness: 300, damping: 20 }
     }
   };
 
@@ -70,92 +67,117 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
       variants={pageVariants}
       className={cn(
         "relative min-h-screen overflow-hidden -mt-14 sm:-mt-16",
-        "bg-gradient-to-b from-background/50 via-background/50 to-background/50",
-        "dark:from-background/50 dark:via-background/50 dark:to-background/50",
         styles.mainContainer
       )}
     >
+      {/* Ambient gradient layer */}
+      <div className={styles.ambientGradient} aria-hidden="true" />
+      
       {showParticles && (
         <div aria-hidden="true">
           <ParticlesBackground />
         </div>
       )}
 
-        <motion.div
-          className={cn(
-            "relative z-10 flex flex-col justify-center min-h-screen",
-            "px-4 sm:px-6 lg:px-8",
-            "pt-20 sm:pt-24 pb-12 sm:pb-16 lg:pb-20",
-            "max-w-7xl mx-auto w-full",
-            styles.heroViewportFrame
-          )}
-        >
+      <motion.div
+        className={cn(
+          "relative z-10 flex flex-col justify-center min-h-screen",
+          "px-4 sm:px-6 lg:px-8",
+          "pt-20 sm:pt-24 pb-16 sm:pb-20 lg:pb-24",
+          "max-w-7xl mx-auto w-full",
+          styles.heroViewportFrame
+        )}
+      >
         <motion.div
           className={cn("flex flex-col items-center justify-center", styles.heroStack)}
         >
-            <motion.div
-              className={cn(styles.imageContainer, "relative group")}
-              variants={imageContainerVariants}
-              whileHover="hover"
-              style={{
-                scale: imageScale,
-                opacity: imageOpacity,
-                rotate: imageRotate
-              }}
-            >
-              <div className={styles.imageGlow} aria-hidden="true" />
-              <Image
-                className={cn(
-                  "rounded-full shadow-2xl transition-all duration-300",
-                  "border-4 border-white/90 dark:border-gray-800/90",
-                  styles.profileImage
-                )}
-                src="/logo.webp"
-                alt="Logo — Wyatt Walsh"
-                width={240}
-                height={240}
-                sizes="(max-width: 640px) 160px,
-                       (max-width: 768px) 180px,
-                       (max-width: 1024px) 200px,
-                       (max-width: 1280px) 220px,
-                       240px"
-                priority
-                fetchPriority="high"
-                quality={85}
-              />
-            </motion.div>
+          {/* Profile Image with premium treatment */}
+          <motion.div
+            className={cn(styles.imageContainer, "relative group")}
+            variants={imageContainerVariants}
+            whileHover="hover"
+            style={{
+              scale: imageScale,
+              opacity: imageOpacity,
+            }}
+          >
+            {/* Outer glow ring */}
+            <div className={styles.imageOuterRing} aria-hidden="true" />
+            {/* Inner glow */}
+            <div className={styles.imageGlow} aria-hidden="true" />
+            {/* Accent light streak */}
+            <div className={styles.imageLightStreak} aria-hidden="true" />
+            <Image
+              className={cn(
+                "rounded-full transition-all duration-500",
+                styles.profileImage
+              )}
+              src="/logo.webp"
+              alt="Logo — Wyatt Walsh"
+              width={240}
+              height={240}
+              sizes="(max-width: 640px) 160px,
+                     (max-width: 768px) 180px,
+                     (max-width: 1024px) 200px,
+                     (max-width: 1280px) 220px,
+                     240px"
+              priority
+              fetchPriority="high"
+              quality={90}
+            />
+          </motion.div>
 
+          {/* Landing Title with enhanced spacing */}
+          <div className={styles.titleWrapper}>
             <LandingTitle hideSignalDeck framed={false} />
+          </div>
 
+          {/* Links section with visual connector */}
+          <div className={styles.linksWrapper}>
             <Links />
+          </div>
 
-            {/* Latest Writing Section */}
-            {recentPosts.length > 0 && (
-              <section
-                className="w-full max-w-6xl mx-auto mt-12 px-4"
-              >
-                <h2 className="text-2xl font-semibold mb-6 text-center bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+          {/* Latest Writing Section - Editorial treatment */}
+          {recentPosts.length > 0 && (
+            <section className={styles.writingSection}>
+              {/* Section header with accent line */}
+              <div className={styles.sectionHeader}>
+                <div className={styles.sectionAccentLine} aria-hidden="true" />
+                <h2 className={styles.sectionTitle}>
                   Latest Writing
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {recentPosts.map((post) => (
-                    <div key={post.slug}>
-                      <PostCard post={post} />
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href="/blog"
-                  className={cn(
-                    "block text-center mt-8 text-primary hover:text-primary/80",
-                    "transition-colors duration-200",
-                    "text-sm font-medium tracking-wide"
-                  )}
-                >
-                  View all posts →
-                </Link>
-              </section>
-            )}
+                <div className={styles.sectionAccentLine} aria-hidden="true" />
+              </div>
+              
+              {/* Post cards grid with staggered reveal potential */}
+              <div className={styles.postsGrid}>
+                {recentPosts.map((post, index) => (
+                  <div 
+                    key={post.slug} 
+                    className={styles.postCardWrapper}
+                    style={{ '--card-index': index } as React.CSSProperties}
+                  >
+                    <PostCard post={post} />
+                  </div>
+                ))}
+              </div>
+              
+              {/* View all link with premium styling */}
+              <Link
+                href="/blog"
+                className={cn(
+                  "group inline-flex items-center gap-2 mt-10",
+                  "text-sm font-medium tracking-wide",
+                  "text-foreground/70 hover:text-foreground",
+                  "transition-all duration-300",
+                  styles.viewAllLink
+                )}
+              >
+                <span>View all posts</span>
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+            </section>
+          )}
         </motion.div>
       </motion.div>
     </motion.div>
