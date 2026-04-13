@@ -2,10 +2,8 @@ import { describe, it, expect, vi } from 'vitest';
 import type { Post } from '@/lib/types';
 
 // Mock getConfig before importing schema module
-vi.mock('@/lib/core', async () => {
-  const actual = await vi.importActual('@/lib/core');
+vi.mock('@/lib/config', () => {
   return {
-    ...actual,
     getConfig: () => ({
       site: {
         url: 'https://test.example.com',
@@ -20,7 +18,6 @@ vi.mock('@/lib/core', async () => {
         },
       },
       blog: { postsPerPage: 10, featuredLimit: 3 },
-      cache: { ttl: 3600000, maxSize: 500 },
     }),
   };
 });

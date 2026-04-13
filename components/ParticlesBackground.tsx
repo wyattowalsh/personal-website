@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef, type FC } from "react";
-import { getRandomConfigUrl } from "@/components/particles/particlesConfig";
+import { getAllConfigUrls, getRandomConfigUrl } from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
-import { AnimatePresence } from "motion/react";
 import { motion } from "motion/react";
 import { type Container } from "@tsparticles/engine";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
@@ -14,6 +13,8 @@ import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 interface ParticlesBackgroundProps {
   className?: string;
 }
+
+const PARTICLES_ID = 'tsparticles-homepage';
 
 export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) => {
   const [init, setInit] = useState(false);
@@ -29,18 +30,51 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   const [density, setDensity] = useState<DensityLevel>('full');
 
   // Initialize theme
-  const currentTheme = resolvedTheme as "light" | "dark" || "light";
+  const currentTheme: "light" | "dark" = resolvedTheme === 'dark' ? 'dark' : 'light';
+
+  const removeStaleParticleNodes = useCallback(() => {
+    if (typeof document === 'undefined') return;
+
+    document.querySelectorAll<HTMLElement>('[id^="tsparticles-"]').forEach((node) => {
+      if (node.id !== PARTICLES_ID) {
+        node.remove();
+      }
+    });
+  }, []);
+
+  const resetParticles = useCallback(() => {
+    if (containerRef.current) {
+      containerRef.current.destroy();
+      containerRef.current = null;
+    }
+
+    removeStaleParticleNodes();
+  }, [removeStaleParticleNodes]);
+
+  const getPreferredConfigUrl = useCallback((theme: "light" | "dark", currentUrl: string) => {
+    const configs = getAllConfigUrls(theme);
+    if (!configs.length) return '';
+    if (configs.some((config) => config.url === currentUrl)) return currentUrl;
+
+    const currentName = currentUrl.split('/').pop()?.replace('.json', '');
+    const matchedConfig = currentName
+      ? configs.find((config) => config.url.endsWith(`/${currentName}.json`))
+      : undefined;
+
+    return matchedConfig?.url ?? configs[0]?.url ?? '';
+  }, []);
 
   // Density change handler
   const handleDensityChange = useCallback((newDensity: DensityLevel) => {
     setDensity(newDensity);
-    // Refresh particles when density changes
-    if (newDensity !== 'off') {
-      const newConfigUrl = getRandomConfigUrl(currentTheme);
-      setCurrentConfigUrl(newConfigUrl);
+    if (newDensity === 'off') {
+      resetParticles();
       setIsPaused(false);
+      return;
     }
-  }, [currentTheme]);
+
+    setIsPaused(false);
+  }, [resetParticles]);
 
   // Calculate density multiplier
   const getDensityMultiplier = (level: DensityLevel): number => {
@@ -67,10 +101,6 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
         });
 
         setInit(true);
-
-        // Set initial config after engine is initialized
-        const initialConfig = getRandomConfigUrl(currentTheme);
-        setCurrentConfigUrl(initialConfig);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to initialize particles");
         console.error("Particles initialization failed:", err);
@@ -90,20 +120,24 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
     return () => {
       cleanup?.();
       setMounted(false);
-      if (containerRef.current) {
-        containerRef.current.destroy();
-      }
+      resetParticles();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- init once, theme changes handled below
+  }, [resetParticles]);
 
-  // Update theme effect
+  // Keep the selected style valid for the current theme without re-randomizing on every sync.
   useEffect(() => {
-    if (!mounted || !init || !resolvedTheme) return;
+    if (!mounted || !init) return;
 
-    const theme = resolvedTheme as "light" | "dark";
-    const newConfigUrl = getRandomConfigUrl(theme);
-    setCurrentConfigUrl(newConfigUrl); // eslint-disable-line react-hooks/set-state-in-effect -- sync config on theme change
-  }, [resolvedTheme, init, mounted]);
+    const preferredConfigUrl = getPreferredConfigUrl(currentTheme, currentConfigUrl);
+    if (preferredConfigUrl && preferredConfigUrl !== currentConfigUrl) {
+      resetParticles();
+      setCurrentConfigUrl(preferredConfigUrl); // eslint-disable-line react-hooks/set-state-in-effect -- sync selected config when the theme changes
+      setIsPaused(false); // keep controls aligned with the live container
+      return;
+    }
+
+    removeStaleParticleNodes();
+  }, [currentConfigUrl, currentTheme, getPreferredConfigUrl, init, mounted, removeStaleParticleNodes, resetParticles]);
 
   const particlesLoaded = useCallback(async (container?: Container) => {
     if (container) {
@@ -112,14 +146,16 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
         containerRef.current.destroy();
       }
       containerRef.current = container;
+      removeStaleParticleNodes();
       setIsPaused(false);
     }
-  }, []);
+  }, [removeStaleParticleNodes]);
 
   const handleConfigChange = useCallback((configUrl: string) => {
+    resetParticles();
     setCurrentConfigUrl(configUrl);
     setIsPaused(false);
-  }, []);
+  }, [resetParticles]);
 
   const handlePause = useCallback(() => {
     if (containerRef.current) {
@@ -136,22 +172,29 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   }, []);
 
   const handleRefresh = useCallback(() => {
-    const newConfigUrl = getRandomConfigUrl(currentTheme);
+    resetParticles();
+
+    const availableConfigs = getAllConfigUrls(currentTheme);
+    const alternateConfigs = availableConfigs.filter((config) => config.url !== currentConfigUrl);
+    const newConfigUrl = alternateConfigs.length
+      ? alternateConfigs[Math.floor(Math.random() * alternateConfigs.length)]?.url ?? getRandomConfigUrl(currentTheme)
+      : getRandomConfigUrl(currentTheme);
+
     setCurrentConfigUrl(newConfigUrl);
     setIsPaused(false);
-  }, [currentTheme]);
+  }, [currentConfigUrl, currentTheme, resetParticles]);
 
   if (!mounted || !init) return null;
   if (error) {
     console.error("Particles error:", error);
-    return <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20" />;
+    return <div className="fixed inset-0 -z-10 bg-linear-to-br from-background via-background to-muted/20" />;
   }
 
   // Show static gradient for users who prefer reduced motion or density is off
   if (prefersReducedMotion || density === 'off') {
     return (
       <>
-        <div className="fixed inset-0 -z-10 bg-gradient-to-br from-background via-background to-muted/20" />
+        <div className="fixed inset-0 -z-10 bg-linear-to-br from-background via-background to-muted/20" />
         <ParticleControls
           onConfigChange={handleConfigChange}
           onPause={handlePause}
@@ -175,42 +218,40 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
         exit={{ opacity: 0 }}
         className="fixed inset-0 -z-10"
       >
-        <AnimatePresence mode="wait">
-          {currentConfigUrl && (
-            <Particles
-              key={`${currentConfigUrl}-${density}`}
-              id={`tsparticles-${currentConfigUrl}-${density}`}
-              className="absolute inset-0"
-              url={currentConfigUrl}
-              particlesLoaded={particlesLoaded}
-              options={{
-                fpsLimit: 30,
-                pauseOnBlur: true,
-                pauseOnOutsideViewport: true,
-                particles: {
-                  number: {
-                    value: Math.round(80 * getDensityMultiplier(density)),
-                    density: {
-                      enable: true,
-                    }
+        {currentConfigUrl ? (
+          <Particles
+            key={`${currentConfigUrl}-${density}`}
+            id={PARTICLES_ID}
+            className="absolute inset-0"
+            url={currentConfigUrl}
+            particlesLoaded={particlesLoaded}
+            options={{
+              fpsLimit: 30,
+              pauseOnBlur: true,
+              pauseOnOutsideViewport: true,
+              particles: {
+                number: {
+                  value: Math.round(80 * getDensityMultiplier(density)),
+                  density: {
+                    enable: true,
                   }
-                },
-                responsive: [
-                  {
-                    maxWidth: 768,
-                    options: {
-                      particles: {
-                        number: {
-                          value: Math.round(30 * getDensityMultiplier(density))
-                        }
+                }
+              },
+              responsive: [
+                {
+                  maxWidth: 768,
+                  options: {
+                    particles: {
+                      number: {
+                        value: Math.round(30 * getDensityMultiplier(density))
                       }
                     }
                   }
-                ]
-              }}
-            />
-          )}
-        </AnimatePresence>
+                }
+              ]
+            }}
+          />
+        ) : null}
       </motion.div>
 
       <ParticleControls

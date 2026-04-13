@@ -1,6 +1,21 @@
 import path from 'path';
 import * as fs from 'fs/promises';
 import { describe, it, expect, vi, beforeAll, afterEach } from 'vitest';
+
+const globMockState: { extraFiles: string[] } = { extraFiles: [] };
+
+vi.mock('glob', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('glob')>();
+
+  return {
+    ...actual,
+    glob: async (...args: Parameters<typeof actual.glob>) => {
+      const files = await actual.glob(...args);
+      return [...files, ...globMockState.extraFiles];
+    },
+  };
+});
+
 import { BackendService, jsonResponse } from '../server';
 
 describe('BackendService', () => {
@@ -400,42 +415,17 @@ describe('BackendService', () => {
   describe('preprocess validation', () => {
     const invalidSlug = '__vitest-invalid-date';
     const validSlug = '__vitest-valid-post';
-
-    async function writePost(slug: string, content: string) {
-      const postDir = path.join(process.cwd(), 'content/posts', slug);
-      await fs.mkdir(postDir, { recursive: true });
-      await fs.writeFile(path.join(postDir, 'index.mdx'), content, 'utf-8');
-    }
-
-    afterEach(async () => {
-      vi.restoreAllMocks();
-      await fs.rm(path.join(process.cwd(), 'content/posts', invalidSlug), { recursive: true, force: true });
-      await fs.rm(path.join(process.cwd(), 'content/posts', validSlug), { recursive: true, force: true });
-      await BackendService.getInstance().preprocess(false);
-    });
-
-    it('rejects invalid production content without replacing the last good snapshot', async () => {
-      const backend = BackendService.getInstance();
-      const baselinePosts = await backend.getAllPosts();
-
-      await writePost(invalidSlug, `---
+    const postsDir = path.join(process.cwd(), 'content/posts');
+    const fixtureRoot = path.join(process.cwd(), '.cache', '__vitest-post-fixtures');
+    const invalidPostContent = `---
 title: "Invalid Date"
 created: "2024-02-30"
 updated: "2024-02-30"
 tags: ["Test"]
 ---
 
-Broken content`);
-
-      await expect(backend.preprocess(false)).rejects.toThrow('Preprocessing failed');
-      expect(await backend.getAllPosts()).toBe(baselinePosts);
-    });
-
-    it('continues with valid posts in development while counting invalid content errors', async () => {
-      const backend = BackendService.getInstance();
-      const baselineCount = (await backend.getAllPosts()).length;
-
-      await writePost(validSlug, `---
+Broken content`;
+    const validPostContent = `---
 title: "Valid Post"
 created: "2024-02-29"
 updated: "2024-03-01"
@@ -444,15 +434,41 @@ tags: ["Test"]
 
 # Heading
 
-**Hello** [world](https://example.com)`);
-      await writePost(invalidSlug, `---
-title: "Invalid Date"
-created: "2024-02-30"
-updated: "2024-02-30"
-tags: ["Test"]
----
+**Hello** [world](https://example.com)`;
 
-Broken content`);
+    async function writeMockPost(slug: string, content: string) {
+      const postDir = path.join(fixtureRoot, slug);
+      const filePath = path.join(postDir, 'index.mdx');
+      await fs.mkdir(postDir, { recursive: true });
+      await fs.writeFile(filePath, content, 'utf-8');
+      return filePath;
+    }
+
+    afterEach(async () => {
+      globMockState.extraFiles = [];
+      vi.restoreAllMocks();
+      await fs.rm(fixtureRoot, { recursive: true, force: true });
+      await BackendService.getInstance().preprocess(false);
+    });
+
+    it('rejects invalid production content without replacing the last good snapshot', async () => {
+      const backend = BackendService.getInstance();
+      const baselinePosts = await backend.getAllPosts();
+      const invalidFilePath = await writeMockPost(invalidSlug, invalidPostContent);
+
+      globMockState.extraFiles = [invalidFilePath];
+
+      await expect(backend.preprocess(false)).rejects.toThrow('Preprocessing failed');
+      expect(await backend.getAllPosts()).toBe(baselinePosts);
+    });
+
+    it('continues with valid posts in development while counting invalid content errors', async () => {
+      const backend = BackendService.getInstance();
+      const baselineCount = (await backend.getAllPosts()).length;
+      const validFilePath = await writeMockPost(validSlug, validPostContent);
+      const invalidFilePath = await writeMockPost(invalidSlug, invalidPostContent);
+
+      globMockState.extraFiles = [validFilePath, invalidFilePath];
 
       const stats = await backend.preprocess(true);
       const validPost = await backend.getPost(validSlug);

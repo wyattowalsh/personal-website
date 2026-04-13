@@ -1154,7 +1154,8 @@ $RECYCLE.BIN/
 .
 *storybook.log
 
-# Playwright
+# Playwright / local browser audit artifacts
 test-results/
 playwright-report/
 e2e/.auth/
+.playwright-mcp/

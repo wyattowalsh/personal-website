@@ -412,36 +412,16 @@ logger.error('Failed to parse frontmatter', error);
 logger.setLevel(LogLevel.DEBUG);
 logger.debug('Raw post data', rawPost);
 
-// Progress tracking
-logger.group('Processing posts');
-for (let i = 0; i < posts.length; i++) {
-  logger.progress(i + 1, posts.length, `Processing ${posts[i].slug}`);
-}
-logger.groupEnd();
-
 // Performance timing
 const start = performance.now();
 await processPost();
 logger.timing('Post processing', performance.now() - start);
-
-// File operations
-logger.file('Read', '/path/to/post.mdx', { size: '12KB' });
-
-// Memory usage
-logger.memory(); // Logs heap usage, RSS, etc.
-
-// Tabular data
-logger.table([
-  { slug: 'post-1', wordCount: 1200 },
-  { slug: 'post-2', wordCount: 850 }
-]);
 ```
 
 **Output format:**
-- All logs are color-coded with chalk
-- Icons indicate log type (✓, ✖, ⚠, ℹ, etc.)
-- Structured data is pretty-printed
-- Stack traces are indented and dimmed
+- Logs are prefixed with level tags (`[INFO]`, `[WARN]`, `[ERROR]`, etc.)
+- Structured data is passed as a second argument to console methods
+- Error stack traces are logged via `console.error`
 
 ---
 
@@ -499,24 +479,6 @@ return Response.json(data, {
 ---
 
 ## Configuration Management
-
-### ConfigManager
-
-Singleton class managing site configuration.
-
-```typescript
-class ConfigManager {
-  private static instance: ConfigManager;
-  private config: Config;
-
-  static getInstance(): ConfigManager;
-  getConfig(): Config;
-}
-```
-
-**Note:** Use the exported `getConfig()` function instead of accessing ConfigManager directly.
-
----
 
 ### getConfig
 

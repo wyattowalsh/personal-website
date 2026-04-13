@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getConfig } from './core';
+import { getConfig } from './config';
 import { generateArticleSchema, generateBreadcrumbSchema } from './schema';
 import type { Post } from './types';
 

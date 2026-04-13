@@ -24,12 +24,12 @@ vi.mock('@/lib/core', () => ({
   },
 }));
 
-function makeLoginRequest(password: string): Request {
+function makeLoginRequest(password: string, headers: HeadersInit = {}): Request {
   return new Request('http://localhost/api/admin/auth', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-real-ip': '127.0.0.1',
+      ...headers,
     },
     body: JSON.stringify({ password }),
   });
@@ -94,11 +94,34 @@ describe('admin auth session cookies', () => {
         headers: {
           'Content-Type': 'application/json',
           origin: 'https://evil.example',
-          'x-real-ip': '127.0.0.1',
         },
         body: JSON.stringify({ password: process.env.ADMIN_PASSWORD! }),
       }))
     ).rejects.toMatchObject({ statusCode: 403, code: 'FORBIDDEN_ORIGIN' });
+  });
+
+  it('rate limits login attempts even when proxy headers change between requests', async () => {
+    const { POST } = await import('@/app/api/admin/auth/route');
+
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await expect(
+        POST(
+          makeLoginRequest('wrong-password', {
+            'x-real-ip': `127.0.0.${attempt + 1}`,
+            'x-forwarded-for': `198.51.100.${attempt + 1}, 203.0.113.${attempt + 1}`,
+          })
+        )
+      ).rejects.toMatchObject({ statusCode: 401 });
+    }
+
+    await expect(
+      POST(
+        makeLoginRequest('wrong-password', {
+          'x-real-ip': '127.0.0.99',
+          'x-forwarded-for': '198.51.100.99, 203.0.113.99',
+        })
+      )
+    ).rejects.toMatchObject({ statusCode: 429, code: 'RATE_LIMITED' });
   });
 
   it('rejects cross-origin logout requests in production', async () => {

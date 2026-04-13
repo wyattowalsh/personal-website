@@ -1,7 +1,6 @@
 "use client";
 
 import { track as vercelTrack } from '@vercel/analytics';
-import { getDeviceContextSlim } from '@/lib/device';
 
 // ---------- Event types ----------
 
@@ -16,8 +15,6 @@ export type EventProperties = {
   link_click: { url: string; href: string; external: boolean };
   code_copied: { language?: string };
   theme_changed: { to: string };
-  diagram_download: { type?: string };
-  web_vital: { name: string; value: number; rating?: string };
 };
 
 export type EventName = keyof EventProperties;
@@ -79,15 +76,10 @@ export function track<E extends EventName>(
     }
   }
 
-  // Enrich with slim device context for Vercel (property size limit)
-  const deviceSlim = getDeviceContextSlim();
-  const enriched = {
-    ...deviceSlim,
-    ...(properties as Record<string, string | number | boolean> | undefined),
-  };
+  const flat = properties as Record<string, string | number | boolean> | undefined;
 
   if (process.env.NODE_ENV === 'development') {
-    console.debug('[Analytics]', event, enriched);
+    console.debug('[Analytics]', event, flat);
   }
-  vercelTrack(event, enriched);
+  vercelTrack(event, flat);
 }

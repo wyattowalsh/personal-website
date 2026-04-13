@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getConfig } from '@/lib/core';
+import { getConfig } from '@/lib/config';
 
 export const runtime = 'nodejs';
 export const alt = 'Wyatt Walsh';

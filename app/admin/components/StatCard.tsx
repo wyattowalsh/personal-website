@@ -2,22 +2,35 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { BookOpen, Clock, FileText, Hash } from 'lucide-react';
+import { Activity, AlertTriangle, BookOpen, Clock, FileText, Gauge, Hash, Shield } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
 const statCardIcons = {
+  activity: Activity,
+  alertTriangle: AlertTriangle,
   bookOpen: BookOpen,
   clock: Clock,
   fileText: FileText,
+  gauge: Gauge,
   hash: Hash,
+  shield: Shield,
 };
+
+const toneClasses = {
+  default: 'bg-primary/10 text-primary',
+  warning: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  danger: 'bg-destructive/10 text-destructive',
+  success: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+} as const;
 
 interface StatCardProps {
   label: string;
   value: number | string;
   icon: keyof typeof statCardIcons;
   description?: string;
+  tone?: keyof typeof toneClasses;
 }
 
 function parseValue(value: number | string): { numeric: number; suffix: string } {
@@ -31,7 +44,7 @@ function parseValue(value: number | string): { numeric: number; suffix: string }
   return { numeric: 0, suffix: value };
 }
 
-export function StatCard({ label, value, icon, description }: StatCardProps) {
+export function StatCard({ label, value, icon, description, tone = 'default' }: StatCardProps) {
   const { numeric, suffix } = parseValue(value);
   const Icon = statCardIcons[icon];
   const prefersReducedMotion = useReducedMotion();
@@ -73,16 +86,16 @@ export function StatCard({ label, value, icon, description }: StatCardProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: prefersReducedMotion ? 0 : 0.3 }}
     >
-      <Card className="hover:shadow-lg transition-all duration-200">
+      <Card className="transition-colors duration-200 hover:bg-card/80">
         <CardContent className="flex items-center gap-4 p-6">
-          <div className="rounded-lg bg-primary/10 p-3">
-            <Icon className="h-5 w-5 text-primary" />
+          <div className={cn('rounded-lg p-3', toneClasses[tone])}>
+            <Icon className="size-5" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">{label}</p>
-            <p className="text-2xl font-bold tracking-tight">{formattedDisplay}</p>
+            <p className="text-sm font-medium text-muted-foreground text-pretty">{label}</p>
+            <p className="text-2xl font-bold tabular-nums">{formattedDisplay}</p>
             {description && (
-              <p className="text-xs text-muted-foreground">{description}</p>
+              <p className="text-xs text-muted-foreground text-pretty">{description}</p>
             )}
           </div>
         </CardContent>

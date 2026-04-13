@@ -9,21 +9,6 @@ vi.mock('@vercel/analytics', () => ({
   track: mockVercelTrack,
 }));
 
-vi.mock('@/lib/device', () => ({
-  getDeviceContextSlim: vi.fn(() => ({
-    screen: '1920x1080',
-    dpr: 2,
-    viewport: '1024x768',
-    orientation: 'landscape',
-    language: 'en-US',
-    timezone: 'America/Los_Angeles',
-    touchPoints: 0,
-    cores: 8,
-    connection: '4g',
-    platform: 'MacIntel',
-  })),
-}));
-
 // Must import after mocks are set up
 import {
   track,
@@ -70,18 +55,13 @@ afterEach(() => {
 // ---------- track() ----------
 
 describe('track()', () => {
-  it('calls vercelTrack with enriched properties (device slim context merged)', () => {
+  it('calls vercelTrack with provided properties', () => {
     track('share_click', { platform: 'twitter' });
 
     expect(mockVercelTrack).toHaveBeenCalledOnce();
     const [event, props] = mockVercelTrack.mock.calls[0];
     expect(event).toBe('share_click');
-    expect(props).toMatchObject({
-      screen: '1920x1080',
-      dpr: 2,
-      platform: 'twitter',
-      language: 'en-US',
-    });
+    expect(props).toMatchObject({ platform: 'twitter' });
   });
 
   it('respects opt-out', () => {

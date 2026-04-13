@@ -1,5 +1,5 @@
 import type { Post } from './types';
-import { getConfig } from './core';
+import { getConfig } from './config';
 import { cache } from 'react';
 
 export interface BreadcrumbItem {

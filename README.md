@@ -93,7 +93,6 @@
 - Custom 404 page with more particles!
 - Predev + Prebuild scripts for pre-computation of data for faster builds.
 - Light + Dark mode theme toggling with local storage persistence.
-- Linkshortener with [YOURLS](https://yourls.org/).
 
 ---
 

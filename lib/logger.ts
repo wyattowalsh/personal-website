@@ -1,177 +1,93 @@
 import 'server-only';
-import chalk from "chalk";
+import type { LogEntry, TelemetryLogLevel } from './types';
 
-// Log levels
-export enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  SUCCESS = 2,
-  WARNING = 3,
-  ERROR = 4
+const MAX_RECENT_ENTRIES = 120;
+let logSequence = 0;
+const recentEntries: LogEntry[] = [];
+
+function scoped(message: string, source?: string): string {
+  return source ? `[${source}] ${message}` : message;
 }
 
-// Log formatting utilities
-export const formatters = {
-  // Format duration in a human readable way
-  duration: (ms: number): string => {
-    if (ms < 1000) return `${ms.toFixed(2)}ms`;
-    const seconds = ms / 1000;
-    if (seconds < 60) return `${seconds.toFixed(2)}s`;
-    const minutes = seconds / 60;
-    return `${minutes.toFixed(2)}m`;
-  },
+function serialize(data: unknown): string | undefined {
+  if (data === undefined) return undefined;
+  if (typeof data === 'string') return data;
+  if (data instanceof Error) return data.message;
+  try { return JSON.stringify(data); } catch { return String(data); }
+}
 
-  // Format file size
-  fileSize: (bytes: number): string => {
-    const units = ['B', 'KB', 'MB', 'GB'];
-    let size = bytes;
-    let unitIndex = 0;
-    while (size >= 1024 && unitIndex < units.length - 1) {
-      size /= 1024;
-      unitIndex++;
-    }
-    return `${size.toFixed(2)}${units[unitIndex]}`;
-  },
-
-  // Format path relative to project root
-  path: (fullPath: string): string => {
-    return fullPath.replace(process.cwd(), '').replace(/^\//, '');
+function record(level: TelemetryLogLevel, message: string, data?: unknown, source?: string) {
+  recentEntries.push({
+    id: `${Date.now()}-${logSequence++}`,
+    timestamp: new Date().toISOString(),
+    level, message, source,
+    data: serialize(data),
+  });
+  if (recentEntries.length > MAX_RECENT_ENTRIES) {
+    recentEntries.splice(0, recentEntries.length - MAX_RECENT_ENTRIES);
   }
+}
+
+export enum LogLevel { DEBUG = 0, INFO = 1, SUCCESS = 2, WARNING = 3, ERROR = 4 }
+
+export const formatters = {
+  duration(ms: number): string {
+    if (ms < 1000) return `${ms.toFixed(2)}ms`;
+    const s = ms / 1000;
+    return s < 60 ? `${s.toFixed(2)}s` : `${(s / 60).toFixed(2)}m`;
+  },
+  fileSize(bytes: number): string {
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let size = bytes, i = 0;
+    while (size >= 1024 && i < units.length - 1) { size /= 1024; i++; }
+    return `${size.toFixed(2)}${units[i]}`;
+  },
+  path(fullPath: string): string {
+    return fullPath.replace(process.cwd(), '').replace(/^\//, '');
+  },
 };
 
-// Enhanced logger implementation
 export const logger = {
-  info: (msg: string, data?: unknown) => {
-    console.log(
-      chalk.blue('ℹ'),
-      chalk.blue.dim('[INFO]'),
-      chalk.gray('→'),
-      msg,
-      data ? '\n' + chalk.dim(JSON.stringify(data, null, 2)) : ''
-    );
-  },
+  level: LogLevel.INFO,
+  setLevel(level: LogLevel) { this.level = level; },
 
-  success: (msg: string, data?: unknown) => {
-    console.log(
-      chalk.green('✓'),
-      chalk.green.dim('[SUCCESS]'),
-      chalk.gray('→'),
-      msg,
-      data ? '\n' + chalk.dim(JSON.stringify(data, null, 2)) : ''
-    );
+  info(msg: string, data?: unknown, source?: string) {
+    record('info', msg, data, source);
+    console.log(`[INFO] ${scoped(msg, source)}`, data !== undefined ? data : '');
   },
-
-  warning: (msg: string, data?: unknown) => {
-    console.log(
-      chalk.yellow('⚠'),
-      chalk.yellow.dim('[WARN]'),
-      chalk.gray('→'),
-      msg,
-      data ? '\n' + chalk.dim(JSON.stringify(data, null, 2)) : ''
-    );
+  success(msg: string, data?: unknown, source?: string) {
+    record('success', msg, data, source);
+    console.log(`[SUCCESS] ${scoped(msg, source)}`, data !== undefined ? data : '');
   },
-
-  error: (msg: string, error?: Error) => {
-    console.error(
-      chalk.red('✖'),
-      chalk.red.dim('[ERROR]'),
-      chalk.gray('→'),
-      msg
-    );
-    if (error?.stack) {
-      console.error(chalk.dim(
-        error.stack.split('\n')
-          .map(line => '  ' + line)
-          .join('\n')
-      ));
-    }
+  warning(msg: string, data?: unknown, source?: string) {
+    record('warning', msg, data, source);
+    console.warn(`[WARN] ${scoped(msg, source)}`, data !== undefined ? data : '');
   },
-
-  debug: (msg: string, data?: unknown) => {
+  error(msg: string, error?: Error, source?: string) {
+    record('error', msg, error, source);
+    console.error(`[ERROR] ${scoped(msg, source)}`);
+    if (error?.stack) console.error(error.stack);
+  },
+  debug(msg: string, data?: unknown, source?: string) {
     if (logger.level <= LogLevel.DEBUG) {
-      console.log(
-        chalk.magenta('🔍'),
-        chalk.magenta.dim('[DEBUG]'),
-        chalk.gray('→'),
-        msg,
-        data ? '\n' + chalk.dim(JSON.stringify(data, null, 2)) : ''
-      );
+      record('debug', msg, data, source);
+      console.log(`[DEBUG] ${scoped(msg, source)}`, data !== undefined ? data : '');
     }
   },
-
-  step: (msg: string, current?: number, total?: number) => {
-    const progress = current && total ? ` (${current}/${total})` : '';
-    console.log(
-      chalk.cyan('→'),
-      chalk.cyan.dim('[STEP]'),
-      chalk.gray('→'),
-      `${msg}${progress}`
-    );
+  timing(label: string, duration: number, source?: string) {
+    const message = `${label}: ${formatters.duration(duration)}`;
+    record('timing', message, { duration }, source);
+    console.log(`[TIME] ${scoped(message, source)}`);
   },
 
-  timing: (label: string, duration: number) => {
-    console.log(
-      chalk.magenta('⏱'),
-      chalk.magenta.dim('[TIME]'),
-      chalk.gray('→'),
-      `${label}: ${formatters.duration(duration)}`
-    );
+  getRecentEntries(limit = 25, options?: { levels?: TelemetryLogLevel[]; source?: string }) {
+    const filtered = recentEntries.filter((entry) => {
+      if (options?.source && entry.source !== options.source) return false;
+      if (options?.levels && !options.levels.includes(entry.level)) return false;
+      return true;
+    });
+    return filtered.slice(-limit).toReversed();
   },
 
-  group: (label: string) => {
-    console.group(
-      chalk.blue('◆'),
-      chalk.blue.dim('[GROUP]'),
-      chalk.gray('→'),
-      label
-    );
-  },
-
-  groupEnd: () => console.groupEnd(),
-
-  table: (data: unknown[], columns?: string[]) => {
-    console.log(chalk.blue('▤'), chalk.blue.dim('[TABLE]'));
-    console.table(data, columns);
-  },
-
-  level: LogLevel.INFO, // Default level
-
-  setLevel(level: LogLevel) {
-    this.level = level;
-  },
-
-  progress: (current: number, total: number, msg: string) => {
-    const percentage = (current / total * 100).toFixed(1);
-    const bar = '█'.repeat(Math.floor(current / total * 20)).padEnd(20, '░');
-    console.log(
-      chalk.blue('↳'),
-      chalk.blue.dim('[PROGRESS]'),
-      chalk.gray('→'),
-      `${bar} ${percentage}% | ${msg}`
-    );
-  },
-
-  memory: () => {
-    const used = process.memoryUsage();
-    console.log(
-      chalk.cyan('📊'),
-      chalk.cyan.dim('[MEMORY]'),
-      chalk.gray('→'),
-      Object.entries(used).map(([key, value]) =>
-        `${key}: ${formatters.fileSize(value)}`
-      ).join(', ')
-    );
-  },
-
-  file: (action: string, filePath: string, details?: unknown) => {
-    console.log(
-      chalk.yellow('📄'),
-      chalk.yellow.dim('[FILE]'),
-      chalk.gray('→'),
-      `${action}: ${formatters.path(filePath)}`,
-      details ? chalk.dim(`(${JSON.stringify(details)})`) : ''
-    );
-  },
-
-  formatters
+  formatters,
 };

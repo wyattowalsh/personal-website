@@ -9,8 +9,7 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
   const startTime = Date.now();
   
   try {
-    logger.group('Build Process Started');
-    logger.memory();
+    logger.info('Build Process Started');
     logger.info(`Environment: ${isDev ? 'Development' : 'Production'}`);
 
     // Set log level based on environment
@@ -20,25 +19,23 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
     const backend = BackendService.getInstance();
 
     // Generate particle configs first
-    logger.step('Generating particle configurations');
+    logger.info('Generating particle configurations');
     let particleConfigPath: string | undefined;
-    
+
     try {
       particleConfigPath = await generateParticleConfigs();
-      logger.file('Generated', particleConfigPath);
+      logger.info(`Generated: ${particleConfigPath}`);
     } catch (error) {
       logger.error('Failed to generate particle configs:', error as Error);
       // Continue with other preprocessing even if particle config fails
     }
 
     // Run preprocessing tasks
-    logger.step('Running preprocessing pipeline');
+    logger.info('Running preprocessing pipeline');
     const stats = await backend.preprocess(isDev);
 
     const duration = Date.now() - startTime;
     logger.timing('Total build time', duration);
-    logger.memory();
-    logger.groupEnd();
 
     const result: PreprocessStats = {
       ...stats,
@@ -48,8 +45,6 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
     return result;
   } catch (error) {
     logger.error(`Build failed for ${isDev ? 'development' : 'production'}`, error as Error);
-    logger.memory();
-    logger.groupEnd();
     throw error;
   }
 }

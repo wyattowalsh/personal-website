@@ -394,7 +394,7 @@ export async function generateParticleConfigs(): Promise<string> {
   const startTime = Date.now();
   
   try {
-    logger.group('Generating particle configurations');
+    logger.info('Generating particle configurations');
     
     const publicDir = path.join(process.cwd(), 'public');
     const particlesDir = path.join(publicDir, 'particles');
@@ -409,7 +409,7 @@ export async function generateParticleConfigs(): Promise<string> {
     };
 
     for (const theme of themes) {
-      logger.step(`Processing ${theme} theme`);
+      logger.info(`Processing ${theme} theme`);
       const themeDir = path.join(particlesDir, theme);
       
       try {
@@ -420,7 +420,7 @@ export async function generateParticleConfigs(): Promise<string> {
 
         for (const [index, file] of jsonFiles.entries()) {
           try {
-            logger.step(`Validating ${file}`, index + 1, jsonFiles.length);
+            logger.info(`Validating ${file} (${index + 1}/${jsonFiles.length})`);
             const filePath = path.join(themeDir, file);
 
             try {
@@ -483,12 +483,9 @@ export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = $
       light: configs.light.length,
       dark: configs.dark.length
     });
-    logger.groupEnd();
-
     return outputPath;
   } catch (error) {
     logger.error('Failed to generate particle configs:', error as Error);
-    logger.groupEnd();
     throw error;
   }
 }

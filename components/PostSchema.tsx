@@ -5,7 +5,7 @@
  */
 
 import { generateWebSiteSchema } from '@/lib/schema';
-import { getConfig } from '@/lib/core';
+import { getConfig } from '@/lib/config';
 
 const SOCIAL_LINKS = [
   'https://github.com/wyattowalsh',

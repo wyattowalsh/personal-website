@@ -1,7 +1,7 @@
 import { BackendService } from "@/lib/server";
 import { HomePageClient } from "@/components/HomePageClient";
 import { Metadata } from 'next';
-import { getConfig } from '@/lib/core';
+import { getConfig } from '@/lib/config';
 import { PersonJsonLd } from '@/components/PostSchema';
 
 const config = getConfig();

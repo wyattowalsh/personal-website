@@ -1,5 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+vi.mock('@/lib/server', () => {
+  throw new Error('GET /api/health must remain decoupled from BackendService');
+});
+
+vi.mock('@/lib/admin-auth', () => {
+  throw new Error('GET /api/health must not expose admin telemetry');
+});
+
 vi.mock('@sentry/nextjs', () => ({
   withScope: vi.fn(),
   captureException: vi.fn(),
@@ -12,24 +20,31 @@ describe('GET /api/health', () => {
     vi.clearAllMocks();
   });
 
-  it('returns 200 with status ok', async () => {
+  it('returns the minimal public health payload', async () => {
     const request = new Request('http://localhost/api/health');
     const response = await GET(request);
 
     expect(response.status).toBe(200);
 
     const body = await response.json();
-    expect(body.status).toBe('ok');
+    expect(body).toEqual({
+      status: 'ok',
+      timestamp: expect.any(String),
+      uptimeSeconds: expect.any(Number),
+    });
+
+    expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
+    expect(body.uptimeSeconds).toBeGreaterThanOrEqual(0);
   });
 
-  it('includes a timestamp in ISO format', async () => {
+  it('does not expose privileged telemetry fields', async () => {
     const request = new Request('http://localhost/api/health');
     const response = await GET(request);
     const body = await response.json();
 
-    expect(body.timestamp).toBeDefined();
-    // Verify it's a valid ISO date string
-    expect(new Date(body.timestamp).toISOString()).toBe(body.timestamp);
+    for (const field of ['security', 'memory', 'preprocess', 'content']) {
+      expect(body).not.toHaveProperty(field);
+    }
   });
 
   it('includes a correlation id header', async () => {

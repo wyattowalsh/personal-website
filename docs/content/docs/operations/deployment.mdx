@@ -39,33 +39,12 @@ The root `package.json` serves as the default build target. To deploy the docs s
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_SITE_URL` | Full site URL for meta tags, sitemaps, feeds | `https://w4w.dev` |
 
-### Studio Auth Required (if `/studio` sign-in is enabled)
+### Required if `/admin` is enabled
 
 | Variable | Description | Example |
 | :--- | :--- | :--- |
-| `AUTH_SECRET` | Auth.js signing/encryption secret | `openssl rand -base64 32` |
-| `AUTH_URL` | Canonical external auth URL (no trailing slash) | `https://w4w.dev` |
-| `AUTH_GOOGLE_ID` | Google OAuth client ID | `<google-client-id>` |
-| `AUTH_GOOGLE_SECRET` | Google OAuth client secret | `<google-client-secret>` |
-| `AUTH_GITHUB_ID` | GitHub OAuth client ID | `<github-client-id>` |
-| `AUTH_GITHUB_SECRET` | GitHub OAuth client secret | `<github-client-secret>` |
-
-Auth runtime also accepts these aliases for compatibility: `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`.
-
-OAuth callback URIs must exactly match your canonical domain:
-
-- Google redirect URI: `https://w4w.dev/api/auth/callback/google`
-- GitHub callback URL: `https://w4w.dev/api/auth/callback/github`
-
-If you serve both apex and `www`, register the same callback host in providers and `AUTH_URL` to avoid mismatch failures.
-
-#### OAuth Login Troubleshooting
-
-If login fails with provider `redirect_uri_mismatch` or NextAuth `error=Configuration`, verify:
-
-- **Google**: Authorized redirect URIs include `https://w4w.dev/api/auth/callback/google` (and `https://www.w4w.dev/api/auth/callback/google` if serving `www`).
-- **GitHub**: Authorization callback URL uses the canonical host with `/api/auth/callback/github`.
-- **Host parity**: `AUTH_URL` matches the canonical host and the host used in provider callback settings.
+| `ADMIN_PASSWORD` | Password accepted by the admin auth route | `use-a-long-random-password` |
+| `SESSION_SIGNING_KEY` | HMAC signing key for admin session cookies | `openssl rand -base64 32` |
 
 **Usage in code:**
 
@@ -86,8 +65,11 @@ This value is used for:
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
+| `NEXT_PUBLIC_GA_ID` | Google Analytics property ID | unset |
+| `NEXT_PUBLIC_GTM_ID` | Google Tag Manager container ID | unset |
+| `SENTRY_DSN` | Server/edge Sentry DSN | unset |
+| `NEXT_PUBLIC_SENTRY_DSN` | Browser Sentry DSN | unset |
 | `ANALYZE` | Enable webpack bundle analyzer | `false` |
-| `LINK_REWRITE_TARGET` | Upstream origin/base URL for `/l/:path*` rewrite | unset (rewrite disabled) |
 | `NODE_ENV` | Build environment | `production` |
 | `DEBUG` | Enable verbose logging | `false` |
 | `LOG_LEVEL` | Logging level (`debug`, `info`, `warn`, `error`) | `info` |
@@ -116,7 +98,7 @@ The analyzer generates interactive HTML reports in `.next/analyze/`.
 No `.env.local` file is required for local development. All variables have sensible defaults:
 
 - `NEXT_PUBLIC_SITE_URL` defaults to `https://w4w.dev`
-- `/l/:path*` rewrite is disabled unless `LINK_REWRITE_TARGET` is set
+- `/admin` works locally without env vars, but production should set `ADMIN_PASSWORD` and `SESSION_SIGNING_KEY`
 - `NODE_ENV` is automatically set to `development` by Next.js
 - `DEBUG` and `LOG_LEVEL` are optional
 
@@ -242,17 +224,15 @@ Before deploying to production:
 
 ### 1. Environment Variables
 
-Set `NEXT_PUBLIC_SITE_URL` in Vercel dashboard:
+Set these values in the Vercel dashboard:
 
 ```
-NEXT_PUBLIC_SITE_URL=https://yourdomain.com
-AUTH_SECRET=...
-AUTH_URL=https://yourdomain.com
-AUTH_GOOGLE_ID=...
-AUTH_GOOGLE_SECRET=...
-AUTH_GITHUB_ID=...
-AUTH_GITHUB_SECRET=...
+NEXT_PUBLIC_SITE_URL=https://w4w.dev
+ADMIN_PASSWORD=<long-random-password>
+SESSION_SIGNING_KEY=<openssl-rand-base64-32>
 ```
+
+If you do not expose `/admin` in production, the admin-specific variables can remain unset.
 
 ### 2. Analytics
 
@@ -345,9 +325,8 @@ Executed locally on `2026-03-02` using closure-wave rerun outcomes.
 | Gate | Status | Verification | Evidence |
 | :--- | :--- | :--- | :--- |
 | Typecheck + Build blocker | ✅ Pass | `pnpm typecheck`, `pnpm build` | Both commands exited `0`; build completed successfully after preprocess and TypeScript stages. |
-| Smoke E2E determinism | ✅ Pass | `CI=1 pnpm e2e -- --project=no-auth e2e/smoke.spec.ts --reporter=line` (run twice) | Run 1: `1 passed (21.9s)`; Run 2: `1 passed (21.5s)` with the Playwright web server booting on port `3101`. |
 | Dependency governance command validity | ❌ Fail | `pnpm audit --audit-level high` | Command is valid and executed (no unknown-option error) but exited `1` with `53 vulnerabilities found` (`21 high`, `5 critical`). |
-| Lighthouse gate (perf/a11y/SEO) | ❌ Fail | `pnpm exec lhci autorun --config=./lighthouserc.js` | Assertions failed across 3 URLs: performance (`/` 0.79, `/blog` 0.55, `/studio/new` 0.52), accessibility (`/blog` 0.88, `/studio/new` 0.75), SEO (`/studio/new` 0.66). |
+| Lighthouse gate (perf/a11y) | ❌ Fail | `pnpm exec lhci autorun --config=./lighthouserc.cjs` | Assertions failed on the audited routes: performance (`/` 0.79, `/blog` 0.55) and accessibility (`/blog` 0.88). |
 | Release drill artifacts | ✅ Pass | `pnpm drill:canary --scenario rollback`, `pnpm drill:canary --scenario pass` | Artifacts generated: `.cache/drills/canary-rollback-2026-03-02T08-51-53-545Z.json`, `.cache/drills/canary-rollback-2026-03-02T08-51-54-263Z.json`. |
 
 **Readiness decision:** ❌ **NO-GO** (do not promote to production).
@@ -355,7 +334,7 @@ Executed locally on `2026-03-02` using closure-wave rerun outcomes.
 **Residual risks:**
 
 - High/critical dependency vulnerabilities remain in the governance audit gate.
-- Lighthouse thresholds are not met for performance, accessibility, and SEO (especially `/studio/new`).
+- Lighthouse thresholds are not met for performance and accessibility.
 
 ## Deployment Workflow
 
