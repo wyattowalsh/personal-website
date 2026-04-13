@@ -929,75 +929,52 @@
 /* ─── Responsive ──────────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-  .deck {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-
-  .deckCounter {
-    justify-self: start;
-  }
-
   .headlineWrap {
-    grid-template-columns: 1fr;
+    align-items: center !important;
+    text-align: center !important;
   }
 
-  .sceneBlockchain .sceneBody {
-    grid-template-columns: 1fr;
-    gap: 0.85rem;
-  }
-
+  /* All scenes: single column */
+  .sceneAlchemist .sceneBody,
   .sceneDigitalSculptor .sceneBody,
+  .sceneHolographicSculptor .sceneBody,
+  .sceneCyberDefense .sceneBody,
+  .sceneBlockchain .sceneBody,
   .sceneFrontier .sceneBody {
     grid-template-columns: 1fr;
-    gap: 0.85rem;
+    gap: 2rem;
   }
 
+  .sceneAlchemist .titleBlock,
+  .sceneCyberDefense .titleBlock,
   .sceneBlockchain .titleBlock {
-    padding: 0;
-    text-align: center;
+    order: 1; /* Title above rig on mobile */
   }
 
-  .sceneDigitalSculptor .titleBlock,
-  .sceneFrontier .titleBlock {
+  .sceneAlchemist .sceneRig,
+  .sceneCyberDefense .sceneRig,
+  .sceneBlockchain .sceneRig {
+    order: 2;
+  }
+
+  /* All titles: centered */
+  .titleBlock {
     justify-self: center;
     max-width: none;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
   }
 
-  .sceneBlockchain .titleBlock::after {
-    display: none;
-  }
-
-  .sceneBlockchain .headlineWrap {
-    justify-items: center;
-  }
-
-  .sceneDigitalSculptor .headlineWrap,
-  .sceneFrontier .headlineWrap {
-    justify-items: center;
-  }
-
-  .sceneBlockchain .titleLockup,
-  .sceneBlockchain .descriptor {
-    max-width: none;
-  }
-
-  .sceneDigitalSculptor .titleLockup,
-  .sceneDigitalSculptor .descriptor,
-  .sceneFrontier .titleLockup,
-  .sceneFrontier .descriptor {
-    max-width: none;
-  }
-
-  .sceneBlockchain .sceneRig {
-    min-height: 12rem;
-  }
-
+  /* All rigs: full width, compact */
+  .sceneAlchemist .sceneRig,
   .sceneDigitalSculptor .sceneRig,
+  .sceneHolographicSculptor .sceneRig,
+  .sceneCyberDefense .sceneRig,
+  .sceneBlockchain .sceneRig,
   .sceneFrontier .sceneRig {
     width: 100%;
-    min-height: 12rem;
+    min-height: 14rem;
   }
 
   .alchemistAlembic {
