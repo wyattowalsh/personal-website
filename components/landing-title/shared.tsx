@@ -969,7 +969,6 @@ function ThemeSubtitleRenderer({
             <span className={styles.signalDeckBadgeSwatch} />
             {signalDeck.family}
           </span>
-          <span className={styles.signalDeckDescriptor}>{signalDeck.descriptor}</span>
           <span className={styles.signalDeckCounter}>
             {positionLabel}
             <span className={styles.signalDeckCounterTotal}>/ {totalLabel}</span>
@@ -980,7 +979,7 @@ function ThemeSubtitleRenderer({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${theme.text}. ${signalDeck.family} family, ${signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${theme.text}. ${signalDeck.family} family. ${rotationStatusLabel}`}
         className={cn('w-full', styles.subtitleBorderGlow, styles.subtitleControl)}
         onFocus={onFocus}
         onBlur={onBlur}
