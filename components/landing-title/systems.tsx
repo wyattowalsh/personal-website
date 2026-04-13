@@ -300,7 +300,7 @@ function SystemsScene({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family. ${rotationStatusLabel}`}
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -339,7 +339,6 @@ function SystemsScene({
                 </span>
                 <div className={styles.titleLockup}>
                   <h2 className={styles.title}>{themeConfig.text}</h2>
-                  <p className={styles.descriptor}>{config.descriptor}</p>
                 </div>
               </div>
             </div>
