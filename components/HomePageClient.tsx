@@ -123,7 +123,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
                      240px"
               priority
               fetchPriority="high"
-              quality={90}
+              quality={75}
             />
           </motion.div>
 
