@@ -842,79 +842,52 @@
 }
 
 @media (max-width: 640px) {
-  .deck {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-
-  .deckCounter {
-    justify-self: start;
-  }
-
   .headlineWrap {
-    grid-template-columns: 1fr;
+    align-items: center !important;
+    text-align: center !important;
   }
 
-  .sceneMystic .sceneBody {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-  }
-
+  /* All scenes: single column */
   .sceneSorcerer .sceneBody,
-  .sceneMage .sceneBody {
+  .sceneMage .sceneBody,
+  .sceneWeaver .sceneBody,
+  .sceneConjurer .sceneBody,
+  .sceneMystic .sceneBody,
+  .sceneOracle .sceneBody {
     grid-template-columns: 1fr;
-    gap: 0.8rem;
+    gap: 2rem;
   }
 
   .sceneSorcerer .titleBlock,
-  .sceneMage .titleBlock {
-    justify-self: center;
-    max-width: none;
-    padding: 0;
-    text-align: center;
-  }
-
-  .sceneSorcerer .headlineWrap,
-  .sceneMage .headlineWrap,
-  .sceneMystic .headlineWrap {
-    justify-items: center;
-  }
-
-  .sceneSorcerer .titleLockup,
-  .sceneSorcerer .descriptor,
-  .sceneMage .titleLockup,
-  .sceneMage .descriptor {
-    max-width: none;
+  .sceneMage .titleBlock,
+  .sceneConjurer .titleBlock {
+    order: 1; /* Title above rig on mobile */
   }
 
   .sceneSorcerer .sceneRig,
-  .sceneMage .sceneRig {
-    width: 100%;
-    min-height: 12rem;
+  .sceneMage .sceneRig,
+  .sceneConjurer .sceneRig {
+    order: 2;
   }
 
-  .sceneMystic .titleBlock {
-    padding: 0;
+  /* All titles: centered */
+  .titleBlock {
+    justify-self: center;
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
     text-align: center;
   }
 
-  .sceneMystic .titleBlock::after {
-    display: none;
-  }
-
-  .sceneMystic .headlineWrap {
-    justify-items: center;
-  }
-
-  .sceneMystic .titleLockup,
-  .sceneMystic .descriptor {
-    max-width: none;
-  }
-
-  .sceneMystic .sceneRig {
+  /* All rigs: full width, compact */
+  .sceneSorcerer .sceneRig,
+  .sceneMage .sceneRig,
+  .sceneWeaver .sceneRig,
+  .sceneConjurer .sceneRig,
+  .sceneMystic .sceneRig,
+  .sceneOracle .sceneRig {
     width: 100%;
-    justify-self: center;
-    min-height: 12rem;
+    min-height: 14rem;
   }
 
   .sorcererTablet:nth-child(1) {

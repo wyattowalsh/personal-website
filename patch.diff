@@ -1,0 +1,289 @@
+--- components/landing-title/performance.module.css
++++ components/landing-title/performance.module.css
+@@ -53,91 +53,30 @@
+
+ /* ─── Scene-specific padding & layout ────────────────────────────────────────── */
+
+-.sceneAutomation,
+-.sceneRobotics,
+-.sceneNeural {
+-  padding: 1rem 1rem 1.15rem;
++/* Scene grids focus entirely on visual impact */
++.sceneBody {
++  display: grid;
++  align-items: center;
++  min-height: 16rem; /* Enlarge slightly to let design shine */
++  gap: 2rem;
+ }
+
+-/* Automation: title LEFT, rig RIGHT */
+-
+-.sceneAutomation .sceneBody {
+-  grid-template-columns: minmax(0, 10.5rem) minmax(0, 1fr);
+-  align-items: center;
+-  min-height: 15rem;
+-  gap: 0.55rem;
+-}
+-
+-.sceneAutomation .titleBlock {
+-  max-width: 10.2rem;
+-  padding-left: 0.1rem;
+-  z-index: 2;
+-}
+-
+-.sceneAutomation .headlineWrap {
+-  grid-template-columns: 1fr;
+-  justify-items: start;
+-}
+-
+-.sceneAutomation .iconBadge {
+-  width: 2.5rem;
+-  height: 2.5rem;
+-  border-radius: 0.85rem;
+-}
+-
+-.sceneAutomation .titleLockup,
+-.sceneAutomation .descriptor {
+-  max-width: 10rem;
+-}
+-
+-.sceneAutomation .sceneRig {
+-  min-height: 14rem;
+-  border: none;
+-  background:
+-    radial-gradient(circle at 50% 44%, var(--perf-glow-soft), transparent 44%),
+-    linear-gradient(160deg, var(--perf-subtle-fill), transparent);
+-  overflow: visible;
+-}
+-
+-/* Robotics: rig LEFT, title RIGHT */
+-
+-.sceneRobotics .sceneBody {
+-  grid-template-columns: minmax(0, 1fr) minmax(0, 10rem);
+-  align-items: center;
+-  min-height: 15rem;
+-  gap: 0.55rem;
+-}
++.sceneAutomation .sceneBody { grid-template-columns: 1fr 1.5fr; }
++.sceneRobotics .sceneBody { grid-template-columns: 1fr 1.5fr; }
++.sceneNeural .sceneBody { grid-template-columns: 1.5fr 1fr; }
+
++/* In automation, robotics: text is second element in code, rig is first */
++.sceneAutomation .titleBlock,
+ .sceneRobotics .titleBlock {
+   order: 2;
+-  max-width: 9.8rem;
+-  justify-self: end;
+-  z-index: 2;
+-}
+-
+-.sceneRobotics .headlineWrap {
+-  grid-template-columns: 1fr;
+-  justify-items: start;
+-}
+-
+-.sceneRobotics .iconBadge {
+-  width: 2.5rem;
+-  height: 2.5rem;
+-  border-radius: 0.85rem;
+-}
+-
+-.sceneRobotics .titleLockup,
+-.sceneRobotics .descriptor {
+-  max-width: 9.6rem;
+ }
+
++.sceneAutomation .sceneRig,
+ .sceneRobotics .sceneRig {
+   order: 1;
+-  min-height: 14rem;
+-  border: none;
+-  background: none;
+-  overflow: visible;
+ }
+
+-/* Neural: title LEFT (narrow), rig RIGHT (wider) */
+-
+-.sceneNeural .sceneBody {
+-  grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr);
+-  align-items: center;
+-  min-height: 15rem;
+-  gap: 0.5rem;
++/* ─── Scene body / title block ─────────────────────────────────────────── */
++
++.titleBlock {
++  display: flex;
++  flex-direction: column;
++  justify-content: center;
++  z-index: 2;
+ }
+
+-.sceneNeural .titleBlock {
+-  max-width: 9.2rem;
+-  padding-left: 0.1rem;
+-  z-index: 2;
+-}
+-
+-.sceneNeural .headlineWrap {
+-  grid-template-columns: 1fr;
+-  justify-items: start;
+-}
+-
+-.sceneNeural .iconBadge {
+-  display: none;
+-}
+-
+-.sceneNeural .titleLockup,
+-.sceneNeural .descriptor {
+-  max-width: 9rem;
++.headlineWrap {
++  display: flex;
++  flex-direction: column;
++  align-items: center;
++  text-align: center;
++  gap: 1.5rem;
+ }
+
+-.sceneNeural .sceneRig {
+-  min-height: 14rem;
+-  border: none;
+-  background: none;
+-  overflow: visible;
+-  display: grid;
+-  place-items: center;
++/* Adjustments for layouts with rig left/right */
++.sceneAutomation .headlineWrap,
++.sceneRobotics .headlineWrap {
++  align-items: flex-start;
++  text-align: left;
+ }
+
+-/* ─── Deck ───────────────────────────────────────────────────────────────────── */
+-
+-.deck {
+-  display: grid;
+-  grid-template-columns: auto 1fr auto;
+-  align-items: center;
+-  gap: 0.8rem;
+-  margin-bottom: 0.95rem;
+-  color: var(--perf-muted);
+-  font-size: 0.62rem;
+-  letter-spacing: 0.22em;
+-  text-transform: uppercase;
+-}
+-
+-.deckFamily,
+-.deckCounter {
+-  white-space: nowrap;
+-}
+-
+-.deckCounter {
+-  justify-self: end;
+-}
+-
+-.deckCounterTotal {
+-  opacity: 0.65;
+-}
+-
+-.deckNotes {
+-  display: flex;
+-  flex-wrap: wrap;
+-  justify-content: center;
+-  gap: 0.38rem;
+-}
+-
+-.deckNote {
+-  border-radius: 999px;
+-  border: 1px solid var(--perf-edge);
+-  background: var(--perf-subtle-fill);
+-  padding: 0.22rem 0.5rem;
+-}
+-
+-/* ─── Scene body / title block ───────────────────────────────────────────────── */
+-
+-.sceneBody {
+-  display: grid;
+-  gap: 1rem;
+-}
+-
+-.titleBlock {
+-  display: grid;
+-  gap: 0.55rem;
+-}
+-
+-.kicker {
+-  color: var(--perf-muted);
+-  font-size: 0.66rem;
+-  letter-spacing: 0.24em;
+-  text-transform: uppercase;
+-}
+-
+-.headlineWrap {
+-  display: grid;
+-  grid-template-columns: auto 1fr;
+-  gap: 0.85rem;
+-  align-items: start;
++.sceneNeural .headlineWrap {
++  align-items: flex-start;
++  text-align: left;
+ }
+
+ .iconBadge {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+-  width: 3rem;
+-  height: 3rem;
+-  border-radius: 1rem;
++  width: 4.5rem; /* much larger */
++  height: 4.5rem;
++  border-radius: 1.25rem;
+   border: 1px solid var(--perf-edge);
+   background:
+     linear-gradient(160deg, var(--perf-fill-strong), var(--perf-fill)),
+     var(--perf-gradient);
+-  box-shadow: 0 18px 34px var(--perf-glow-soft);
++  box-shadow: 0 24px 48px var(--perf-glow-soft);
++  margin-bottom: 0.5rem;
+ }
+
+ .icon {
+-  width: 1.35rem;
+-  height: 1.35rem;
+-  color: var(--perf-text);
++  width: 2.2rem;
++  height: 2.2rem;
++  color: #fff;
++  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+ }
+
+ .titleLockup {
+-  display: grid;
+-  gap: 0.4rem;
++  display: flex;
++  flex-direction: column;
+ }
+
+ .title {
+   margin: 0;
+-  font-size: clamp(1.42rem, 3vw, 2.16rem);
+-  line-height: 0.96;
+-  letter-spacing: -0.035em;
++  font-size: clamp(2rem, 4.5vw, 3.2rem); /* Significantly enlarged */
++  line-height: 1.05;
++  letter-spacing: -0.04em;
+   text-wrap: balance;
+-}
+-
+-.descriptor {
+-  margin: 0;
+-  max-width: 30rem;
+-  color: var(--perf-muted);
+-  font-size: 0.87rem;
+-  line-height: 1.5;
++  text-shadow: 0 10px 30px var(--perf-glow-soft), 0 2px 4px rgba(0,0,0,0.5); /* Glowing and poppy text */
++  font-weight: 800;
++  background: linear-gradient(to bottom right, #fff, var(--perf-edge));
++  -webkit-background-clip: text;
++  -webkit-text-fill-color: transparent;
+ }
