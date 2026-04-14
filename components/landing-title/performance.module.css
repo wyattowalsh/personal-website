@@ -991,6 +991,7 @@
   .sceneRobotics .titleBlock {
     order: 0;
     justify-self: center;
+    margin-left: 0;
   }
 
   .titleBlock {

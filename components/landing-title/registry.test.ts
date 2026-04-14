@@ -74,6 +74,10 @@ const EXPECTED_RENDERER_OBJECTS = [
   ...PERFORMANCE_SHOWCASE_RENDERERS,
 ] as const;
 
+function normalizeSelection(value: string): string {
+  return value.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
 describe('landing title registry contract', () => {
   it('keeps subtitle ids unique and aligned with registry entries', () => {
     const ids = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id);
@@ -137,11 +141,14 @@ describe('deprecated subtitle alias compatibility', () => {
   });
 
   it('does not shadow any current id or text', () => {
-    const currentIds = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id));
-    const currentTexts = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ text }) => text));
+    const currentIds = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => normalizeSelection(id)));
+    const currentTexts = new Set(LANDING_TITLE_SUBTITLE_OPTIONS.map(({ text }) => normalizeSelection(text)));
+
     for (const key of Object.keys(DEPRECATED_SUBTITLE_ALIASES)) {
-      expect(currentIds.has(key), `alias key "${key}" collides with a current id`).toBe(false);
-      expect(currentTexts.has(key), `alias key "${key}" collides with a current text`).toBe(false);
+      const normalizedKey = normalizeSelection(key);
+
+      expect(currentIds.has(normalizedKey), `alias key "${key}" collides with a current id`).toBe(false);
+      expect(currentTexts.has(normalizedKey), `alias key "${key}" collides with a current text`).toBe(false);
     }
   });
 

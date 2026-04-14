@@ -9,7 +9,13 @@
 }
 
 .control {
+  border-radius: 2rem;
   outline: none;
+}
+
+.control:focus-visible {
+  outline: 2px solid var(--sys-glow-strong);
+  outline-offset: 6px;
 }
 
 .control:focus-visible .scene {
