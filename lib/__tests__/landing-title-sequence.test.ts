@@ -8,15 +8,12 @@ import {
 } from '@/lib/landing-title-sequence';
 
 const SAMPLE_THEMES = [
-  { text: 'experience sculptor' },
   { text: 'digital sculptor' },
-  { text: 'experience crafter' },
+  { text: 'frontier forger' },
   { text: 'quantum designer' },
-  { text: 'behavioral designer' },
-  { text: 'data orchestrator' },
-  { text: 'systems dreamer' },
+  { text: 'signal orchestrator' },
   { text: 'cloud shaper' },
-  { text: 'code architect' },
+  { text: 'cognitive architect' },
 ];
 
 function deterministicRandom() {
@@ -30,12 +27,12 @@ function deterministicRandom() {
 
 describe('deriveSignalDeckMeta', () => {
   it('classifies known tagline families', () => {
-    expect(deriveSignalDeckMeta('experience sculptor')).toEqual({
+    expect(deriveSignalDeckMeta('digital sculptor')).toEqual({
       family: 'Sculptor',
       descriptor: 'tactile systems',
     });
 
-    expect(deriveSignalDeckMeta('data orchestrator')).toEqual({
+    expect(deriveSignalDeckMeta('signal orchestrator')).toEqual({
       family: 'Orchestrator',
       descriptor: 'coordinated crescendo',
     });
@@ -45,30 +42,33 @@ describe('deriveSignalDeckMeta', () => {
 describe('hasThemeAdjacencyConflict', () => {
   it('flags repeated lead words, role words, and families', () => {
     expect(hasThemeAdjacencyConflict(
-      { text: 'experience sculptor' },
-      { text: 'experience crafter' },
+      { text: 'signal orchestrator' },
+      { text: 'signal oracle' },
     )).toBe(true);
 
     expect(hasThemeAdjacencyConflict(
+      {
+        text: 'holosculptor',
+        signalDeck: { family: 'Sculptor', descriptor: 'volumetric material' },
+      },
       { text: 'digital sculptor' },
-      { text: 'resilience sculptor' },
     )).toBe(true);
 
     expect(hasThemeAdjacencyConflict(
-      { text: 'code architect' },
-      { text: 'cybernetic architect' },
+      { text: 'cognitive architect' },
+      { text: 'cyber architect' },
     )).toBe(true);
 
     expect(hasThemeAdjacencyConflict(
       { text: 'cloud shaper' },
-      { text: 'data orchestrator' },
+      { text: 'frontier forger' },
     )).toBe(false);
   });
 
   it('prefers stable ids and signal deck metadata over mutable display text', () => {
     expect(hasThemeAdjacencyConflict(
       {
-        id: 'code-architect',
+        id: 'synthetic-intelligence-architect',
         text: 'software chassis',
         signalDeck: { family: 'Architect', descriptor: 'systems precision' },
       },
@@ -81,7 +81,7 @@ describe('hasThemeAdjacencyConflict', () => {
 
     expect(hasThemeAdjacencyConflict(
       {
-        id: 'code-architect',
+        id: 'synthetic-intelligence-architect',
         text: 'software chassis',
         signalDeck: { family: 'Architect', descriptor: 'systems precision' },
       },
@@ -102,7 +102,7 @@ describe('buildRotationSequence', () => {
   it('builds a sequence without adjacent collisions and respects the anchor theme', () => {
     vi.spyOn(Math, 'random').mockImplementation(deterministicRandom());
 
-    const anchorTheme = { text: 'cybernetic architect' };
+    const anchorTheme = { text: 'cyber architect' };
     const sequence = buildRotationSequence(SAMPLE_THEMES, anchorTheme);
 
     expect(sequence.map((theme) => theme.text).sort()).toEqual(

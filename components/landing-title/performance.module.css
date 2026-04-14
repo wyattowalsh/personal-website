@@ -16,7 +16,7 @@
   transform: translateY(-1px);
   box-shadow:
     0 0 0 1px var(--perf-edge),
-    0 26px 64px var(--perf-glow-soft);
+    0 28px 72px var(--perf-glow-soft);
 }
 
 .scene {
@@ -25,11 +25,12 @@
   border-radius: 2rem;
   border: 1px solid var(--perf-edge);
   background:
-    radial-gradient(circle at top right, var(--perf-glow-soft), transparent 58%),
-    linear-gradient(160deg, var(--perf-panel), var(--perf-panel-2) 58%, var(--perf-panel-3));
+    radial-gradient(circle at 12% 12%, var(--perf-glow-soft), transparent 34%),
+    radial-gradient(circle at 88% 8%, var(--perf-glow-soft), transparent 28%),
+    linear-gradient(155deg, var(--perf-panel) 0%, var(--perf-panel-2) 42%, var(--perf-panel-3) 100%);
   color: var(--perf-text);
   box-shadow:
-    inset 0 1px 0 var(--perf-highlight),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 24px 60px var(--perf-glow-soft);
   transition:
     transform 220ms ease,
@@ -41,526 +42,746 @@
 .scene::after {
   content: '';
   position: absolute;
-  inset: 1rem;
-  border-radius: 1.5rem;
   pointer-events: none;
 }
 
 .scene::before {
-  border: 1px solid var(--perf-highlight);
+  inset: 0.8rem;
+  border-radius: 1.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16);
 }
 
 .scene::after {
-  inset: auto 1.25rem 1.1rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--perf-edge), transparent);
+  inset: auto 1.2rem 0.8rem;
+  height: 1.25rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--perf-glow-soft), transparent 72%);
+  opacity: 0.75;
 }
-
-/* ─── Scene-specific padding & layout ────────────────────────────────────────── */
 
 .sceneAutomation,
 .sceneRobotics,
 .sceneNeural {
-  padding: 1rem 1rem 1.15rem;
+  padding: 1rem 1rem 1.1rem;
 }
 
-/* Automation: title LEFT, rig RIGHT */
+.sceneBody {
+  position: relative;
+  display: grid;
+  gap: 0.9rem;
+  min-height: 15rem;
+}
 
 .sceneAutomation .sceneBody {
-  grid-template-columns: minmax(0, 10.5rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 10.25rem) minmax(0, 1fr);
   align-items: center;
-  min-height: 15rem;
-  gap: 0.55rem;
 }
-
-.sceneAutomation .titleBlock {
-  max-width: 10.2rem;
-  padding-left: 0.1rem;
-  z-index: 2;
-}
-
-.sceneAutomation .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneAutomation .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
-}
-
-.sceneAutomation .titleLockup,
-.sceneAutomation .descriptor {
-  max-width: 10rem;
-}
-
-.sceneAutomation .sceneRig {
-  min-height: 14rem;
-  border: none;
-  background:
-    radial-gradient(circle at 50% 44%, var(--perf-glow-soft), transparent 44%),
-    linear-gradient(160deg, var(--perf-subtle-fill), transparent);
-  overflow: visible;
-}
-
-/* Robotics: rig LEFT, title RIGHT */
 
 .sceneRobotics .sceneBody {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 10rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 10.8rem);
   align-items: center;
-  min-height: 15rem;
-  gap: 0.55rem;
+}
+
+.sceneNeural .sceneBody {
+  grid-template-columns: minmax(0, 9.4rem) minmax(0, 1fr);
+  align-items: center;
+}
+
+/* ─── Title ──────────────────────────────────────────────────────────────────── */
+
+.titleBlock {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  align-content: center;
 }
 
 .sceneRobotics .titleBlock {
   order: 2;
-  max-width: 9.8rem;
   justify-self: end;
-  z-index: 2;
+  margin-left: -1.1rem;
 }
 
-.sceneRobotics .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneRobotics .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
-}
-
-.sceneRobotics .titleLockup,
-.sceneRobotics .descriptor {
-  max-width: 9.6rem;
-}
-
-.sceneRobotics .sceneRig {
-  order: 1;
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
-}
-
-/* Neural: title LEFT (narrow), rig RIGHT (wider) */
-
-.sceneNeural .sceneBody {
-  grid-template-columns: minmax(0, 9.5rem) minmax(0, 1fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.5rem;
-}
-
-.sceneNeural .titleBlock {
-  max-width: 9.2rem;
-  padding-left: 0.1rem;
-  z-index: 2;
-}
-
-.sceneNeural .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneNeural .iconBadge {
-  display: none;
-}
-
-.sceneNeural .titleLockup,
-.sceneNeural .descriptor {
-  max-width: 9rem;
-}
-
-.sceneNeural .sceneRig {
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
-  display: grid;
-  place-items: center;
-}
-
-/* ─── Deck ───────────────────────────────────────────────────────────────────── */
-
-.deck {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.95rem;
-  color: var(--perf-muted);
-  font-size: 0.63rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.deckFamily,
-.deckCounter {
-  white-space: nowrap;
-}
-
-.deckCounter {
-  justify-self: end;
-}
-
-.deckCounterTotal {
-  opacity: 0.65;
-}
-
-.deckNotes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.38rem;
-}
-
-.deckNote {
-  border-radius: 999px;
+.sceneRobotics .titleLockup::after {
+  content: '';
+  position: absolute;
+  left: -1.05rem;
+  top: 50%;
+  width: 1.3rem;
+  height: 0.8rem;
+  transform: translateY(-50%);
+  border-radius: 999px 0 0 999px;
   border: 1px solid var(--perf-edge);
-  background: var(--perf-subtle-fill);
-  padding: 0.2rem 0.5rem;
-}
-
-/* ─── Title & content ────────────────────────────────────────────────────────── */
-
-.sceneBody {
-  display: grid;
-  gap: 1rem;
-}
-
-.titleBlock {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.kicker {
-  color: var(--perf-muted);
-  font-size: 0.66rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+  border-right: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+    linear-gradient(160deg, var(--perf-panel), rgba(255, 255, 255, 0.02));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .headlineWrap {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.85rem;
-  align-items: start;
+  gap: 0.8rem;
+  justify-items: start;
 }
 
 .iconBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1rem;
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 0.95rem;
   border: 1px solid var(--perf-edge);
   background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02)),
     var(--perf-gradient);
-  box-shadow: 0 18px 34px var(--perf-glow-soft);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 14px 30px var(--perf-glow-soft);
 }
 
 .icon {
-  width: 1.4rem;
-  height: 1.4rem;
+  width: 1.35rem;
+  height: 1.35rem;
 }
 
 .titleLockup {
+  position: relative;
   display: grid;
-  gap: 0.42rem;
+  gap: 0.3rem;
+  padding: 0.95rem 1rem 1rem;
+  border-radius: 1.3rem;
+  border: 1px solid var(--perf-edge);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02)),
+    linear-gradient(160deg, var(--perf-panel), rgba(255, 255, 255, 0.02));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 16px 30px rgba(0, 0, 0, 0.12);
+}
+
+.titleLockup::before {
+  content: '';
+  position: absolute;
+  inset: 0.5rem;
+  border-radius: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  pointer-events: none;
 }
 
 .title {
   margin: 0;
-  font-size: clamp(1.45rem, 3vw, 2.2rem);
-  line-height: 0.94;
-  letter-spacing: -0.035em;
+  font-size: clamp(1.42rem, 3vw, 2.18rem);
+  line-height: 0.92;
+  letter-spacing: -0.04em;
   text-wrap: balance;
+  text-shadow: 0 4px 18px var(--perf-glow-soft);
 }
 
-.descriptor {
-  margin: 0;
-  max-width: 30rem;
-  color: var(--perf-muted);
-  font-size: 0.87rem;
-  line-height: 1.5;
-}
-
-/* ─── Scene rig (base) ───────────────────────────────────────────────────────── */
+/* ─── Rig Housing ────────────────────────────────────────────────────────────── */
 
 .sceneRig {
   position: relative;
-  min-height: 7.5rem;
-  border-radius: 1.55rem;
+  overflow: hidden;
+  min-height: 13.8rem;
+  border-radius: 1.75rem;
   border: 1px solid var(--perf-edge);
   background:
-    linear-gradient(160deg, var(--perf-highlight), var(--perf-subtle-fill)),
-    var(--perf-panel-3);
-  overflow: hidden;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 16%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 30%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+    var(--perf-panel-2);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -14px 28px rgba(0, 0, 0, 0.12);
 }
 
-/* ─── Automation rig — VU gauge dial ─────────────────────────────────────────── */
+.sceneRig::before,
+.sceneRig::after {
+  content: '';
+  position: absolute;
+  pointer-events: none;
+}
 
-/* Semicircular gauge arc with radial tick marks */
+.sceneRig::before {
+  inset: 0.75rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sceneRig::after {
+  inset: auto 1rem 0.85rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.22), transparent 75%);
+}
+
+.shellRailTop,
+.shellRailBottom,
+.shellBracketLeft,
+.shellBracketRight {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.shellRailTop,
+.shellRailBottom {
+  left: 1.1rem;
+  right: 1.1rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
+    linear-gradient(90deg, transparent, var(--perf-edge), transparent);
+}
+
+.shellRailTop {
+  top: 0.7rem;
+}
+
+.shellRailBottom {
+  bottom: 0.7rem;
+}
+
+.shellBracketLeft,
+.shellBracketRight {
+  top: 1.3rem;
+  bottom: 1.3rem;
+  width: 0.95rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
+    linear-gradient(180deg, transparent, var(--perf-edge), transparent);
+}
+
+.shellBracketLeft {
+  left: 0.7rem;
+}
+
+.shellBracketRight {
+  right: 0.7rem;
+}
+
+.shellBolts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.shellBolts span {
+  position: absolute;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02) 48%),
+    var(--perf-panel);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.16);
+}
+
+.shellBolts span:nth-child(1) {
+  top: 0.95rem;
+  left: 1.2rem;
+}
+
+.shellBolts span:nth-child(2) {
+  top: 0.95rem;
+  right: 1.2rem;
+}
+
+.shellBolts span:nth-child(3) {
+  bottom: 0.95rem;
+  left: 1.2rem;
+}
+
+.shellBolts span:nth-child(4) {
+  bottom: 0.95rem;
+  right: 1.2rem;
+}
+
+/* ─── Automation Virtuoso ────────────────────────────────────────────────────── */
+
+.sceneAutomation .sceneRig {
+  background:
+    radial-gradient(circle at 50% 32%, var(--perf-glow-soft), transparent 36%),
+    linear-gradient(180deg, rgba(250, 204, 21, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.2), transparent 30%),
+    var(--perf-panel-2);
+}
+
+.automationStage {
+  position: absolute;
+  inset: 1.1rem 1.3rem;
+}
+
+.automationArch {
+  position: absolute;
+  inset: 0.35rem 1rem 2.2rem;
+  border-radius: 5rem 5rem 1.3rem 1.3rem;
+  border: 1px solid var(--perf-edge);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(251, 146, 60, 0.12), transparent 34%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.03), transparent);
+  box-shadow:
+    inset 0 -14px 24px rgba(0, 0, 0, 0.18),
+    0 16px 36px var(--perf-glow-soft);
+}
+
+.automationArch::before,
+.automationArch::after {
+  content: '';
+  position: absolute;
+  top: 1rem;
+  bottom: 1.1rem;
+  width: 1.1rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent);
+}
+
+.automationArch::before {
+  left: 0.75rem;
+}
+
+.automationArch::after {
+  right: 0.75rem;
+}
+
 .automationGauge {
   position: absolute;
-  top: 1.2rem;
+  top: 2rem;
   left: 50%;
-  transform: translateX(-50%);
-  width: 10rem;
+  width: 9.8rem;
   height: 5rem;
-  border-radius: 10rem 10rem 0 0;
+  transform: translateX(-50%);
+  border-radius: 9.8rem 9.8rem 0 0;
   border: 1px solid var(--perf-edge);
   border-bottom: none;
   background:
     repeating-conic-gradient(
-      from -90deg at 50% 100%,
-      transparent 0deg 17deg,
-      var(--perf-tick) 17deg 19deg
+      from -88deg at 50% 100%,
+      transparent 0deg 14deg,
+      rgba(255, 255, 255, 0.18) 14deg 16deg
     ),
-    radial-gradient(circle at 50% 100%, var(--perf-glow-strong), transparent 58%);
+    radial-gradient(circle at 50% 100%, var(--perf-glow-strong), transparent 60%);
 }
 
-/* Inner concentric arc */
 .automationGauge::before {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 7rem;
-  height: 3.5rem;
-  border-radius: 7rem 7rem 0 0;
-  border: 1px solid var(--perf-edge);
+  inset: auto 1.7rem 0;
+  height: 3.35rem;
+  border-radius: 8rem 8rem 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-bottom: none;
 }
 
-/* Pivot dot at gauge center */
 .automationGauge::after {
   content: '';
   position: absolute;
-  bottom: -0.35rem;
+  bottom: -0.4rem;
   left: 50%;
-  transform: translateX(-50%);
-  width: 0.7rem;
-  height: 0.7rem;
-  border-radius: 999px;
-  background: var(--perf-glow-strong);
-  box-shadow: 0 0 14px var(--perf-glow);
-}
-
-/* Needle sweeping inside the gauge */
-.automationNeedle {
-  position: absolute;
-  top: 2.6rem;
-  left: 50%;
-  width: 2px;
-  height: 3.6rem;
-  background: linear-gradient(180deg, transparent, var(--perf-glow-strong));
-  transform-origin: bottom center;
-  transform: translateX(-50%) rotate(-20deg);
-}
-
-/* Cue indicator dots at bottom */
-.automationCues {
-  position: absolute;
-  bottom: 1.4rem;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 1.4rem;
-}
-
-.automationCues span {
-  width: 0.55rem;
-  height: 0.55rem;
-  border-radius: 999px;
-  border: 1px solid var(--perf-edge);
-  background: var(--perf-glow-strong);
-  box-shadow: 0 0 10px var(--perf-glow-soft);
-}
-
-/* ─── Robotics rig — articulated crane mast ──────────────────────────────────── */
-
-/* Vertical mast with top and mid joint dots */
-.roboticsMast {
-  position: absolute;
-  left: 2.2rem;
-  top: 1.2rem;
-  bottom: 1.6rem;
-  width: 0.45rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, var(--perf-glow-strong), var(--perf-highlight));
-}
-
-.roboticsMast::before {
-  content: '';
-  position: absolute;
-  top: -0.3rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 1.1rem;
-  height: 1.1rem;
-  border-radius: 999px;
-  border: 1px solid var(--perf-edge);
-  background: var(--perf-panel);
-  box-shadow: 0 0 14px var(--perf-glow-soft);
-}
-
-.roboticsMast::after {
-  content: '';
-  position: absolute;
-  top: 48%;
-  left: 50%;
-  transform: translate(-50%, -50%);
   width: 0.85rem;
   height: 0.85rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--perf-glow-strong);
+  box-shadow: 0 0 16px var(--perf-glow);
+}
+
+.automationNeedle {
+  position: absolute;
+  top: 3.3rem;
+  left: 50%;
+  width: 0.22rem;
+  height: 3.45rem;
+  transform: translateX(-50%) rotate(-26deg);
+  transform-origin: center bottom;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), var(--perf-glow-strong));
+  box-shadow: 0 0 16px var(--perf-glow-soft);
+}
+
+.automationBars {
+  position: absolute;
+  inset: auto 2.4rem 2.5rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  align-items: end;
+  gap: 0.55rem;
+  height: 3.9rem;
+}
+
+.automationBars span {
+  border-radius: 999px 999px 0.5rem 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), transparent 22%),
+    linear-gradient(180deg, var(--perf-glow-strong), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 10px 18px var(--perf-glow-soft);
+}
+
+.automationBars span:nth-child(1) {
+  height: 44%;
+}
+
+.automationBars span:nth-child(2) {
+  height: 74%;
+}
+
+.automationBars span:nth-child(3) {
+  height: 92%;
+}
+
+.automationBars span:nth-child(4) {
+  height: 60%;
+}
+
+.automationPedals {
+  position: absolute;
+  inset: auto 3.2rem 1.2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.automationPedals span {
+  width: 1.2rem;
+  height: 0.68rem;
   border-radius: 999px;
   border: 1px solid var(--perf-edge);
-  background: var(--perf-panel);
-  box-shadow: 0 0 10px var(--perf-glow-soft);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.02)),
+    var(--perf-panel);
 }
 
-/* Horizontal boom arm from mast top */
-.roboticsBoom {
+/* ─── Kinetic Machinist ──────────────────────────────────────────────────────── */
+
+.sceneRobotics .sceneRig {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 20%),
+    linear-gradient(135deg, rgba(148, 163, 184, 0.15), transparent 34%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 34%),
+    var(--perf-panel-2);
+}
+
+.roboticsMachine {
   position: absolute;
-  top: 1.65rem;
-  left: 2.2rem;
-  width: 68%;
-  height: 0.4rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--perf-glow-strong), transparent);
-  transform-origin: left center;
+  inset: 1.2rem 1.35rem 1.1rem 1.25rem;
 }
 
-.roboticsBoom::after {
+.roboticsWheelLarge,
+.roboticsWheelSmall {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px solid var(--perf-edge);
+  background:
+    radial-gradient(circle at center, transparent 48%, rgba(255, 255, 255, 0.08) 48%, transparent 57%),
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255, 255, 255, 0.18) 0deg 10deg,
+      transparent 10deg 28deg
+    ),
+    radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.12), transparent 55%);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.22);
+}
+
+.roboticsWheelLarge {
+  left: 0.7rem;
+  bottom: 1.15rem;
+  width: 5.8rem;
+  height: 5.8rem;
+}
+
+.roboticsWheelLarge::before,
+.roboticsWheelSmall::before {
+  content: '';
+  position: absolute;
+  inset: 1.2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.roboticsWheelLarge::after,
+.roboticsWheelSmall::after {
   content: '';
   position: absolute;
   top: 50%;
-  right: -0.15rem;
-  width: 0.8rem;
-  height: 0.8rem;
+  left: 50%;
+  width: 0.95rem;
+  height: 0.95rem;
+  transform: translate(-50%, -50%);
   border-radius: 999px;
-  border: 1px solid var(--perf-edge);
-  background: var(--perf-panel);
+  background: var(--perf-glow-strong);
+  box-shadow: 0 0 14px var(--perf-glow-soft);
+}
+
+.roboticsWheelSmall {
+  right: 1rem;
+  top: 1.5rem;
+  width: 3.15rem;
+  height: 3.15rem;
+}
+
+.roboticsBelt {
+  position: absolute;
+  top: 3rem;
+  left: 4.9rem;
+  width: 6.9rem;
+  height: 0.7rem;
+  transform: rotate(-24deg);
+  transform-origin: left center;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03)),
+    linear-gradient(90deg, var(--perf-glow-strong), rgba(255, 255, 255, 0.08));
+  box-shadow: 0 0 18px var(--perf-glow-soft);
+}
+
+.roboticsCrank {
+  position: absolute;
+  left: 5.3rem;
+  bottom: 4rem;
+  width: 4.8rem;
+  height: 0.42rem;
+  transform-origin: left center;
+  transform: rotate(-14deg);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.22), var(--perf-glow-strong));
+}
+
+.roboticsCrank::after {
+  content: '';
+  position: absolute;
+  right: -0.2rem;
+  top: 50%;
+  width: 0.78rem;
+  height: 0.78rem;
   transform: translateY(-50%);
+  border-radius: 999px;
+  background: var(--perf-panel);
+  border: 1px solid var(--perf-edge);
 }
 
-/* Hoist cable descending from boom tip */
-.roboticsHoist {
+.roboticsPiston {
   position: absolute;
-  top: 2.1rem;
-  right: 2.8rem;
-  width: 2px;
-  height: 6rem;
-  background: linear-gradient(180deg, var(--perf-glow-strong), transparent);
+  right: 2.1rem;
+  bottom: 2.3rem;
+  width: 1rem;
+  height: 4.6rem;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.02)),
+    linear-gradient(180deg, var(--perf-glow-strong), rgba(255, 255, 255, 0.04));
 }
 
-/* Payload rectangle at cable end */
-.roboticsPayload {
+.roboticsPiston::before {
+  content: '';
   position: absolute;
-  right: 1.6rem;
-  bottom: 2rem;
-  width: 3.4rem;
-  height: 4rem;
+  inset: auto -0.6rem -0.25rem;
+  height: 1.35rem;
   border-radius: 0.8rem;
   border: 1px solid var(--perf-edge);
   background:
-    radial-gradient(circle at center, var(--perf-glow-soft), transparent 58%),
-    linear-gradient(160deg, var(--perf-highlight), var(--perf-subtle-fill));
-  box-shadow: 0 14px 28px var(--perf-glow-soft);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02)),
+    var(--perf-panel);
 }
 
-/* ─── Neural rig — concentric pulse rings ────────────────────────────────────── */
+.roboticsAnvil {
+  position: absolute;
+  left: 1.5rem;
+  right: 1.5rem;
+  bottom: 0.85rem;
+  height: 1.25rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
+    linear-gradient(90deg, transparent 0 8%, rgba(255, 255, 255, 0.12) 8% 12%, transparent 12% 88%, rgba(255, 255, 255, 0.12) 88% 92%, transparent 92% 100%),
+    var(--perf-panel);
+}
 
-/* Grid stacking for concentric elements */
+/* ─── Cortex Diviner ─────────────────────────────────────────────────────────── */
+
+.sceneNeural .sceneRig {
+  background:
+    radial-gradient(circle at 50% 28%, rgba(236, 72, 153, 0.14), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 18%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.24), transparent 34%),
+    var(--perf-panel-2);
+}
+
+.neuralCabinet {
+  position: absolute;
+  inset: 1rem 1.2rem 1.15rem;
+  display: grid;
+  place-items: center;
+}
+
+.neuralCurtainLeft,
+.neuralCurtainRight {
+  position: absolute;
+  top: 0.5rem;
+  bottom: 1.25rem;
+  width: 2.35rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent 22%),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.03) 0 0.42rem,
+      rgba(0, 0, 0, 0.08) 0.42rem 0.84rem
+    ),
+    linear-gradient(180deg, rgba(190, 24, 93, 0.7), rgba(91, 33, 182, 0.3));
+}
+
+.neuralCurtainLeft {
+  left: 0.25rem;
+  transform: perspective(10rem) rotateY(14deg);
+}
+
+.neuralCurtainRight {
+  right: 0.25rem;
+  transform: perspective(10rem) rotateY(-14deg);
+}
+
+.neuralHalo,
+.neuralDome,
 .neuralCore,
-.neuralRingOuter,
-.neuralRingMiddle,
-.neuralRingInner,
-.neuralSynapses {
+.neuralCards,
+.neuralRods {
   grid-area: 1 / 1;
 }
 
-/* Bright core */
-.neuralCore {
-  width: 1.8rem;
-  height: 1.8rem;
+.neuralHalo {
+  width: 10.4rem;
+  height: 10.4rem;
   border-radius: 999px;
-  background: radial-gradient(circle at center, var(--perf-glow-strong), var(--perf-glow-soft) 68%, transparent);
-  box-shadow: 0 0 28px var(--perf-glow);
-  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    radial-gradient(circle, transparent 52%, rgba(255, 255, 255, 0.12) 52%, transparent 62%),
+    radial-gradient(circle, transparent 70%, rgba(255, 255, 255, 0.06) 70%, transparent 77%);
+  box-shadow: 0 0 36px var(--perf-glow-soft);
 }
 
-/* Concentric rings */
-.neuralRingOuter,
-.neuralRingMiddle,
-.neuralRingInner {
+.neuralDome {
+  width: 6.7rem;
+  height: 6.7rem;
   border-radius: 999px;
   border: 1px solid var(--perf-edge);
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.26), transparent 28%),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.08), transparent 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    0 18px 36px var(--perf-glow-soft);
 }
 
-.neuralRingOuter {
-  width: 12rem;
-  height: 12rem;
-  background: radial-gradient(circle at center, transparent 52%, var(--perf-highlight) 52%, transparent 68%);
+.neuralCore {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 46% 54% 48% 52% / 42% 48% 52% 58%;
+  background:
+    radial-gradient(circle at 35% 32%, rgba(255, 255, 255, 0.22), transparent 30%),
+    radial-gradient(circle at center, var(--perf-glow-strong), rgba(255, 255, 255, 0.02) 72%);
+  box-shadow: 0 0 30px var(--perf-glow);
 }
 
-.neuralRingMiddle {
-  width: 8.4rem;
-  height: 8.4rem;
-  background: radial-gradient(circle at center, transparent 48%, var(--perf-highlight) 48%, transparent 65%);
-}
-
-.neuralRingInner {
-  width: 4.8rem;
-  height: 4.8rem;
-  background: radial-gradient(circle at center, var(--perf-glow-soft), transparent 60%);
-}
-
-/* Orbital synapse dots */
-.neuralSynapses {
+.neuralCards {
   position: relative;
-  width: 12rem;
-  height: 12rem;
+  width: 10.4rem;
+  height: 10.4rem;
   pointer-events: none;
 }
 
-.neuralSynapses span {
+.neuralCards span {
   position: absolute;
-  width: 0.5rem;
-  height: 0.5rem;
+  width: 1.3rem;
+  height: 1.8rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.04)),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.06), transparent),
+    var(--perf-panel);
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+}
+
+.neuralCards span:nth-child(1) {
+  top: 1.5rem;
+  left: 1.3rem;
+  transform: rotate(-18deg);
+}
+
+.neuralCards span:nth-child(2) {
+  top: 0.7rem;
+  right: 2.2rem;
+  transform: rotate(12deg);
+}
+
+.neuralCards span:nth-child(3) {
+  bottom: 1.55rem;
+  right: 1.1rem;
+  transform: rotate(20deg);
+}
+
+.neuralCards span::before {
+  content: '';
+  position: absolute;
+  inset: 0.28rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.neuralRods {
+  position: relative;
+  width: 10.4rem;
+  height: 10.4rem;
+  pointer-events: none;
+}
+
+.neuralRods span {
+  position: absolute;
+  bottom: 1.15rem;
+  width: 0.2rem;
+  height: 2.85rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.16), var(--perf-glow-strong));
+}
+
+.neuralRods span:nth-child(1) {
+  left: 3.1rem;
+  transform: rotate(18deg);
+  transform-origin: bottom center;
+}
+
+.neuralRods span:nth-child(2) {
+  right: 3.1rem;
+  transform: rotate(-18deg);
+  transform-origin: bottom center;
+}
+
+.neuralRods span::after {
+  content: '';
+  position: absolute;
+  top: -0.2rem;
+  left: 50%;
+  width: 0.58rem;
+  height: 0.58rem;
+  transform: translateX(-50%);
   border-radius: 999px;
   background: var(--perf-glow-strong);
-  box-shadow: 0 0 8px var(--perf-glow-soft);
-}
-
-.neuralSynapses span:nth-child(1) {
-  top: 10%;
-  left: 58%;
-}
-
-.neuralSynapses span:nth-child(2) {
-  top: 32%;
-  right: 6%;
-}
-
-.neuralSynapses span:nth-child(3) {
-  bottom: 16%;
-  right: 20%;
-}
-
-.neuralSynapses span:nth-child(4) {
-  bottom: 26%;
-  left: 12%;
-}
-
-.neuralSynapses span:nth-child(5) {
-  top: 20%;
-  left: 16%;
+  box-shadow: 0 0 10px var(--perf-glow-soft);
 }
 
 /* ─── Animations ─────────────────────────────────────────────────────────────── */
@@ -569,77 +790,97 @@
   animation: performancePulse 7.5s ease-in-out infinite;
 }
 
-/* Automation: needle sweep + cue blink */
 .scene[data-motion='animated'] .automationNeedle {
-  animation: gaugeSweep 6s ease-in-out infinite;
+  animation: gaugeSweep 5.6s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .automationCues span:nth-child(2) {
-  animation: cueBlink 2.4s ease-in-out infinite;
+.scene[data-motion='animated'] .automationBars span:nth-child(2),
+.scene[data-motion='animated'] .automationBars span:nth-child(4) {
+  animation: consoleBeat 2.8s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .automationCues span:nth-child(3) {
-  animation: cueBlink 2.4s ease-in-out infinite 0.4s;
+.scene[data-motion='animated'] .automationPedals span:nth-child(2) {
+  animation: pedalBlink 2s ease-in-out infinite;
 }
 
-/* Robotics: payload bob + boom pivot */
-.scene[data-motion='animated'] .roboticsPayload {
-  animation: hoistBob 5.6s ease-in-out infinite;
+.scene[data-motion='animated'] .roboticsWheelLarge {
+  animation: wheelSpinLarge 8s linear infinite;
 }
 
-.scene[data-motion='animated'] .roboticsBoom {
-  animation: boomPivot 7s ease-in-out infinite;
+.scene[data-motion='animated'] .roboticsWheelSmall {
+  animation: wheelSpinSmall 4.5s linear infinite;
 }
 
-/* Neural: core pulse + staggered ring expansion + synapse blink */
+.scene[data-motion='animated'] .roboticsCrank {
+  animation: crankThrum 4.8s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .roboticsPiston {
+  animation: pistonPump 2.4s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .neuralHalo {
+  animation: haloHum 7s ease-in-out infinite;
+}
+
 .scene[data-motion='animated'] .neuralCore {
   animation: neuralPulse 4.2s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .neuralRingOuter {
-  animation: ringExpand 6s ease-in-out infinite;
+.scene[data-motion='animated'] .neuralCards span:nth-child(1),
+.scene[data-motion='animated'] .neuralCards span:nth-child(3) {
+  animation: cardSway 5.4s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .neuralRingMiddle {
-  animation: ringExpand 6s ease-in-out infinite 0.8s;
-}
-
-.scene[data-motion='animated'] .neuralRingInner {
-  animation: ringExpand 6s ease-in-out infinite 1.6s;
-}
-
-.scene[data-motion='animated'] .neuralSynapses span:nth-child(odd) {
-  animation: synapseBlink 3.8s ease-in-out infinite;
+.scene[data-motion='animated'] .neuralRods span {
+  animation: rodTwitch 4.8s ease-in-out infinite;
 }
 
 @keyframes performancePulse {
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 18px 34px var(--perf-glow-soft);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 14px 30px var(--perf-glow-soft);
   }
 
   50% {
-    transform: scale(1.03);
-    box-shadow: 0 24px 46px var(--perf-glow-strong);
+    transform: scale(1.04);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      0 18px 42px var(--perf-glow-strong);
   }
 }
 
 @keyframes gaugeSweep {
   0%,
   100% {
-    transform: translateX(-50%) rotate(-20deg);
+    transform: translateX(-50%) rotate(-26deg);
   }
 
   50% {
-    transform: translateX(-50%) rotate(20deg);
+    transform: translateX(-50%) rotate(26deg);
   }
 }
 
-@keyframes cueBlink {
+@keyframes consoleBeat {
   0%,
   100% {
-    opacity: 0.45;
+    transform: scaleY(1);
+    opacity: 0.82;
+  }
+
+  50% {
+    transform: scaleY(1.16);
+    opacity: 1;
+  }
+}
+
+@keyframes pedalBlink {
+  0%,
+  100% {
+    opacity: 0.4;
   }
 
   50% {
@@ -647,25 +888,58 @@
   }
 }
 
-@keyframes hoistBob {
+@keyframes wheelSpinLarge {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes wheelSpinSmall {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes crankThrum {
+  0%,
+  100% {
+    transform: rotate(-14deg);
+  }
+
+  50% {
+    transform: rotate(12deg);
+  }
+}
+
+@keyframes pistonPump {
   0%,
   100% {
     transform: translateY(0);
   }
 
   50% {
-    transform: translateY(0.3rem);
+    transform: translateY(-0.45rem);
   }
 }
 
-@keyframes boomPivot {
+@keyframes haloHum {
   0%,
   100% {
-    transform: rotate(0deg);
+    transform: scale(1);
+    opacity: 0.78;
   }
 
   50% {
-    transform: rotate(1.5deg);
+    transform: scale(1.05);
+    opacity: 1;
   }
 }
 
@@ -673,56 +947,40 @@
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 28px var(--perf-glow);
+    box-shadow: 0 0 30px var(--perf-glow);
   }
 
   50% {
-    transform: scale(1.15);
-    box-shadow: 0 0 42px var(--perf-glow);
+    transform: scale(1.18);
+    box-shadow: 0 0 44px var(--perf-glow);
   }
 }
 
-@keyframes ringExpand {
+@keyframes cardSway {
   0%,
   100% {
-    transform: scale(1);
-    opacity: 0.7;
+    translate: 0 0;
   }
 
   50% {
-    transform: scale(1.04);
-    opacity: 1;
+    translate: 0.12rem -0.22rem;
   }
 }
 
-@keyframes synapseBlink {
+@keyframes rodTwitch {
   0%,
   100% {
-    opacity: 0.5;
+    scale: 1;
   }
 
   50% {
-    opacity: 1;
-    transform: scale(1.3);
+    scale: 1.04 0.96;
   }
 }
 
 /* ─── Mobile ─────────────────────────────────────────────────────────────────── */
 
 @media (max-width: 640px) {
-  .deck {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-
-  .deckCounter {
-    justify-self: start;
-  }
-
-  .headlineWrap {
-    grid-template-columns: 1fr;
-  }
-
   .sceneAutomation .sceneBody,
   .sceneRobotics .sceneBody,
   .sceneNeural .sceneBody {
@@ -730,34 +988,68 @@
     gap: 0.85rem;
   }
 
-  .sceneAutomation .titleBlock,
-  .sceneRobotics .titleBlock,
-  .sceneNeural .titleBlock {
+  .sceneRobotics .titleBlock {
+    order: 0;
     justify-self: center;
-    max-width: none;
-    padding-left: 0;
+  }
+
+  .titleBlock {
+    justify-self: center;
+    width: 100%;
     text-align: center;
   }
 
-  .sceneAutomation .headlineWrap,
-  .sceneRobotics .headlineWrap,
-  .sceneNeural .headlineWrap {
+  .headlineWrap {
     justify-items: center;
   }
 
-  .sceneAutomation .titleLockup,
-  .sceneAutomation .descriptor,
-  .sceneRobotics .titleLockup,
-  .sceneRobotics .descriptor,
-  .sceneNeural .titleLockup,
-  .sceneNeural .descriptor {
-    max-width: none;
+  .titleLockup {
+    width: 100%;
   }
 
-  .sceneAutomation .sceneRig,
-  .sceneRobotics .sceneRig,
-  .sceneNeural .sceneRig {
-    width: 100%;
-    min-height: 12rem;
+  .sceneRig {
+    min-height: 12.5rem;
+  }
+
+  .automationStage,
+  .roboticsMachine,
+  .neuralCabinet {
+    inset: 1rem;
+  }
+
+  .automationGauge {
+    width: 8.6rem;
+    height: 4.4rem;
+  }
+
+  .automationBars {
+    inset: auto 1.9rem 2.35rem;
+  }
+
+  .roboticsWheelLarge {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .roboticsWheelSmall {
+    width: 2.8rem;
+    height: 2.8rem;
+  }
+
+  .roboticsBelt {
+    left: 4.2rem;
+    width: 5.8rem;
+  }
+
+  .neuralHalo,
+  .neuralCards,
+  .neuralRods {
+    width: 9.2rem;
+    height: 9.2rem;
+  }
+
+  .neuralDome {
+    width: 6rem;
+    height: 6rem;
   }
 }

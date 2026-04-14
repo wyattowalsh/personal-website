@@ -41,7 +41,7 @@ const arcaneSubtitle = (
 });
 
 const DATA_SORCERER_THEME = theme(
-  arcaneSubtitle('data-sorcerer', 'archive sorcerer', 'Mystic', 'spellbound archives'),
+  arcaneSubtitle('data-sorcerer', 'data sorcerer', 'Mystic', 'spellbound archives'),
   {
     gradient: 'linear-gradient(135deg, #5eead4 0%, #14b8a6 38%, #0f766e 100%)',
     darkGradient: 'linear-gradient(135deg, #99f6e4 0%, #2dd4bf 40%, #14b8a6 100%)',
@@ -57,7 +57,7 @@ const DATA_SORCERER_THEME = theme(
 );
 
 const WORKFLOW_MAGE_THEME = theme(
-  arcaneSubtitle('workflow-mage', 'sigil mage', 'Weaver', 'ritual sigil-craft'),
+  arcaneSubtitle('workflow-mage', 'workflow mage', 'Weaver', 'ritual sigil-craft'),
   {
     gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 40%, #f59e0b 100%)',
     darkGradient: 'linear-gradient(135deg, #ddd6fe 0%, #a78bfa 42%, #fcd34d 100%)',
@@ -73,7 +73,7 @@ const WORKFLOW_MAGE_THEME = theme(
 );
 
 const ALGORITHM_WEAVER_THEME = theme(
-  arcaneSubtitle('algorithm-weaver', 'algorithm weaver', 'Weaver', 'threaded logic'),
+  arcaneSubtitle('algorithm-weaver', 'logic weaver', 'Weaver', 'threaded logic'),
   {
     gradient: 'linear-gradient(135deg, #f472b6 0%, #c084fc 44%, #67e8f9 100%)',
     darkGradient: 'linear-gradient(135deg, #fbcfe8 0%, #ddd6fe 44%, #a5f3fc 100%)',
@@ -105,7 +105,7 @@ const SILICON_CONJURER_THEME = theme(
 );
 
 const SYSTEMS_SEER_THEME = theme(
-  arcaneSubtitle('systems-seer', 'systems seer', 'Seer', 'systems foresight'),
+  arcaneSubtitle('systems-seer', 'circuit seer', 'Seer', 'systems foresight'),
   {
     gradient: 'linear-gradient(135deg, #f9a8d4 0%, #c084fc 42%, #818cf8 100%)',
     darkGradient: 'linear-gradient(135deg, #fbcfe8 0%, #ddd6fe 42%, #c7d2fe 100%)',
@@ -246,6 +246,8 @@ function ArcaneScene({
           })}
           data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
         >
+          <span className={styles.shellSeal} aria-hidden="true" />
+          <span className={styles.shellHalo} aria-hidden="true" />
           <div className={styles.sceneBody}>
             <div className={styles.titleBlock}>
               <div className={styles.headlineWrap}>
@@ -274,17 +276,20 @@ function ArcaneScene({
                   <span className={styles.sorcererTablet} />
                   <span className={styles.sorcererTablet} />
                   <span className={styles.sorcererTablet} />
+                  <span className={styles.sorcererSeal} />
+                  <span className={styles.sorcererSeal} />
+                  <span className={styles.sorcererNeedle} />
                 </>
               ) : null}
 
               {config.scene === 'mage' ? (
                 <>
-                  <span className={styles.mageSigil} />
-                  <span className={styles.mageInscription} />
-                  <span className={styles.mageInscription} />
-                  <span className={styles.mageRune} />
-                  <span className={styles.mageRune} />
-                  <span className={styles.mageRune} />
+                  <span className={styles.mageTrack} />
+                  <span className={styles.mageSeal} />
+                  <span className={styles.mageSeal} />
+                  <span className={styles.mageSeal} />
+                  <span className={styles.mageCharm} />
+                  <span className={styles.mageCharm} />
                 </>
               ) : null}
 
@@ -303,11 +308,13 @@ function ArcaneScene({
                     <span />
                   </div>
                   <span className={styles.weaverShuttle} />
+                  <span className={styles.weaverSeal} />
                 </div>
               ) : null}
 
               {config.scene === 'conjurer' ? (
                 <>
+                  <span className={styles.conjurerWafer} />
                   <span className={styles.conjurerCore} />
                   <span className={styles.conjurerTrace} />
                   <span className={styles.conjurerTrace} />
@@ -318,9 +325,16 @@ function ArcaneScene({
 
               {config.scene === 'mystic' ? (
                 <>
+                  <span className={styles.mysticScale} />
                   <span className={styles.mysticHalo} />
-                  <div className={styles.mysticPetals}>
+                  <div className={styles.mysticPips}>
                     <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.mysticPetals}>
                     <span />
                     <span />
                     <span />
@@ -334,6 +348,7 @@ function ArcaneScene({
 
               {config.scene === 'oracle' ? (
                 <>
+                  <span className={styles.oraclePlate} />
                   <span className={styles.oracleRing} />
                   <span className={styles.oracleRing} />
                   <span className={styles.oracleDial} />

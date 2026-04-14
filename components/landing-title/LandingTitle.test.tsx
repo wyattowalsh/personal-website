@@ -61,11 +61,11 @@ describe('LandingTitle locked previews', () => {
     );
   });
 
-  it('supports locked previews via legacy theme text lookup', () => {
-    render(<LandingTitle forcedThemeText="emergence mystic" disableRotation />);
+  it('supports locked previews via retired visible title lookup', () => {
+    render(<LandingTitle forcedThemeText="systems seer" disableRotation />);
 
     expect(
-      screen.getByRole('group', { name: /systems seer/i }),
+      screen.getByRole('group', { name: /circuit seer/i }),
     ).toBeTruthy();
   });
 });

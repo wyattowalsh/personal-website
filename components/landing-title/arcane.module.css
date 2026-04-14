@@ -14,21 +14,27 @@
   transform: translateY(-1px);
   box-shadow:
     0 0 0 1px var(--arc-edge),
-    0 26px 66px var(--arc-glow-soft);
+    0 26px 68px var(--arc-glow-soft),
+    inset 0 1px 0 var(--arc-overlay);
 }
 
 .scene {
+  --shell-radius: 2rem;
   position: relative;
   overflow: hidden;
-  border-radius: 2rem;
+  min-height: 15rem;
+  padding: 1rem 1rem 1.1rem;
   border: 1px solid var(--arc-edge);
+  border-radius: var(--shell-radius);
   background:
-    radial-gradient(circle at top right, var(--arc-glow-soft), transparent 58%),
-    linear-gradient(160deg, var(--arc-panel), var(--arc-panel-2) 58%, var(--arc-panel-3));
+    radial-gradient(circle at top right, var(--arc-glow-soft), transparent 42%),
+    radial-gradient(circle at bottom left, var(--arc-overlay), transparent 36%),
+    linear-gradient(156deg, var(--arc-panel), var(--arc-panel-2) 56%, var(--arc-panel-3));
   color: var(--arc-text);
   box-shadow:
+    0 24px 60px var(--arc-glow-soft),
     inset 0 1px 0 var(--arc-overlay),
-    0 24px 60px var(--arc-glow-soft);
+    inset 0 -16px 28px rgba(0, 0, 0, 0.08);
   transition:
     transform 220ms ease,
     box-shadow 220ms ease,
@@ -39,229 +45,130 @@
 .scene::after {
   content: '';
   position: absolute;
-  inset: 1rem;
-  border-radius: 1.6rem;
   pointer-events: none;
 }
 
 .scene::before {
+  inset: 0.55rem;
   border: 1px solid var(--arc-overlay);
+  border-radius: 1.35rem;
 }
 
 .scene::after {
-  inset: auto 1.25rem 1.1rem;
-  height: 1px;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.85rem;
+  height: 0.22rem;
+  border-radius: 999px;
   background: linear-gradient(90deg, transparent, var(--arc-edge), transparent);
+  opacity: 0.7;
 }
 
-.sceneSorcerer,
-.sceneMage,
-.sceneWeaver,
-.sceneConjurer,
-.sceneMystic,
+.sceneSorcerer {
+  --shell-radius: 2.2rem 1.65rem 2.25rem 1.8rem;
+  border-radius: 2.2rem 1.65rem 2.25rem 1.8rem;
+}
+
+.sceneMage {
+  --shell-radius: 1.55rem 2.2rem 1.8rem 2.45rem;
+  border-radius: 1.55rem 2.2rem 1.8rem 2.45rem;
+}
+
+.sceneWeaver {
+  --shell-radius: 1.9rem 1.7rem 2.4rem 1.55rem;
+  border-radius: 1.9rem 1.7rem 2.4rem 1.55rem;
+}
+
+.sceneConjurer {
+  --shell-radius: 1.65rem 2.45rem 1.7rem 2.15rem;
+  border-radius: 1.65rem 2.45rem 1.7rem 2.15rem;
+}
+
+.sceneMystic {
+  --shell-radius: 2.35rem 1.7rem 1.95rem 2.2rem;
+  border-radius: 2.35rem 1.7rem 1.95rem 2.2rem;
+}
+
 .sceneOracle {
-  padding: 1rem 1rem 1.15rem;
+  --shell-radius: 1.75rem 2.35rem 2.1rem 1.65rem;
+  border-radius: 1.75rem 2.35rem 2.1rem 1.65rem;
 }
 
-.sceneMystic .sceneBody {
-  grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.45rem;
+.shellSeal,
+.shellHalo {
+  position: absolute;
+  pointer-events: none;
 }
 
-.sceneMystic .titleBlock {
-  position: relative;
-  align-self: stretch;
-  display: grid;
-  align-content: center;
-  z-index: 2;
-  max-width: none;
-  padding: 1rem 0.8rem 1rem 0.15rem;
-  text-align: left;
+.shellSeal {
+  top: 0.8rem;
+  right: 0.8rem;
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 1rem 1.2rem 1rem 1.35rem;
+  border: 1px solid var(--arc-edge);
+  background:
+    radial-gradient(circle at 50% 50%, var(--arc-glow-soft), transparent 56%),
+    linear-gradient(150deg, var(--arc-overlay), transparent 72%);
+  box-shadow: inset 0 1px 0 var(--arc-overlay);
+  opacity: 0.88;
 }
 
-.sceneMystic .titleBlock::after {
+.shellSeal::after {
   content: '';
   position: absolute;
-  top: 1rem;
-  right: 0;
-  bottom: 1rem;
-  width: 1px;
-  background: linear-gradient(180deg, transparent, var(--arc-edge), transparent);
-}
-
-.sceneMystic .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneMystic .titleLockup {
-  max-width: 10.5rem;
-}
-
-.sceneMystic .descriptor {
-  max-width: 11rem;
-}
-
-.sceneMystic .iconBadge {
-  display: none;
-}
-
-.sceneMystic .sceneRig {
-  min-height: 14rem;
-  width: min(100%, 18rem);
-  justify-self: end;
-  border: none;
-  background: none;
-}
-
-.sceneSorcerer .sceneBody {
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.55rem;
-}
-
-.sceneSorcerer .titleBlock {
-  order: 2;
-  max-width: 10.8rem;
-  justify-self: end;
-  z-index: 2;
-}
-
-.sceneSorcerer .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneSorcerer .iconBadge {
-  display: none;
-}
-
-.sceneSorcerer .titleLockup,
-.sceneSorcerer .descriptor {
-  max-width: 10.5rem;
-}
-
-.sceneSorcerer .sceneRig {
-  order: 1;
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
-}
-
-.sceneMage .sceneBody {
-  grid-template-columns: minmax(0, 8.4rem) minmax(0, 1fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.55rem;
-}
-
-.sceneMage .titleBlock {
-  max-width: 8.2rem;
-  padding-left: 0.1rem;
-  z-index: 2;
-}
-
-.sceneMage .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneMage .iconBadge {
-  display: none;
-}
-
-.sceneMage .titleLockup,
-.sceneMage .descriptor {
-  max-width: 8rem;
-}
-
-.sceneMage .sceneRig {
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: hidden;
-}
-
-.deck {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.95rem;
-  color: var(--arc-muted);
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.deckFamily,
-.deckCounter {
-  white-space: nowrap;
-}
-
-.deckCounter {
-  justify-self: end;
-}
-
-.deckCounterTotal {
-  opacity: 0.65;
-}
-
-.deckNotes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.38rem;
-}
-
-.deckNote,
-.oracleTag {
+  inset: 0.5rem;
   border-radius: 999px;
-  border: 1px solid var(--arc-edge);
-  background: var(--arc-overlay);
-  padding: 0.22rem 0.5rem;
+  border: 1px solid var(--arc-overlay-bold);
+}
+
+.shellHalo {
+  top: -2.7rem;
+  right: -1.2rem;
+  width: 9rem;
+  height: 9rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-overlay);
+  opacity: 0.3;
 }
 
 .sceneBody {
+  position: relative;
+  z-index: 1;
   display: grid;
-  gap: 1rem;
+  grid-template-columns: minmax(0, 8.6rem) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 12.9rem;
 }
 
 .titleBlock {
+  position: relative;
+  z-index: 2;
   display: grid;
-  gap: 0.55rem;
-}
-
-.kicker {
-  color: var(--arc-muted);
-  font-size: 0.66rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
+  align-content: start;
 }
 
 .headlineWrap {
   display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.85rem;
-  align-items: start;
+  gap: 0.65rem;
+  justify-items: start;
 }
 
 .iconBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1rem;
+  width: 2.85rem;
+  height: 2.85rem;
+  border-radius: 0.95rem 1.2rem 0.95rem 1.05rem;
   border: 1px solid var(--arc-edge);
   background:
-    linear-gradient(160deg, var(--arc-overlay), transparent),
+    linear-gradient(150deg, var(--arc-overlay), transparent 68%),
     var(--arc-gradient);
-  box-shadow: 0 18px 34px var(--arc-glow-soft);
+  box-shadow:
+    0 14px 28px var(--arc-glow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .icon {
@@ -271,33 +178,19 @@
 
 .titleLockup {
   display: grid;
-  gap: 0.4rem;
 }
 
 .title {
   margin: 0;
   font-size: clamp(1.42rem, 3vw, 2.12rem);
-  line-height: 0.96;
+  line-height: 0.94;
   letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
-.descriptor {
-  margin: 0;
-  max-width: 30rem;
-  color: var(--arc-muted);
-  font-size: 0.87rem;
-  line-height: 1.5;
-}
-
 .sceneRig {
   position: relative;
-  min-height: 7.4rem;
-  border-radius: 1.55rem;
-  border: 1px solid var(--arc-edge);
-  background:
-    linear-gradient(160deg, var(--arc-overlay), transparent),
-    var(--arc-inlay);
+  min-height: 12.7rem;
   overflow: hidden;
 }
 
@@ -307,471 +200,758 @@
 .conjurerRig,
 .mysticRig,
 .oracleRig {
-  display: grid;
-  place-items: center;
-  padding: 1rem;
+  position: relative;
+  border-radius: 1.5rem;
+  border: 1px solid var(--arc-overlay);
+  background:
+    linear-gradient(165deg, var(--arc-overlay), transparent 62%),
+    var(--arc-inlay);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.sorcererRig {
-  position: relative;
-  display: block;
-  padding: 0;
+.sceneSorcerer .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 9.4rem);
+}
+
+.sceneSorcerer .titleBlock {
+  order: 2;
+  justify-self: end;
+  max-width: 9rem;
+}
+
+.sceneSorcerer .sceneRig {
+  order: 1;
+}
+
+.sceneMage .titleBlock {
+  max-width: 8.2rem;
+}
+
+.sceneWeaver .sceneBody {
+  grid-template-columns: minmax(0, 9.1rem) minmax(0, 1fr);
+}
+
+.sceneWeaver .titleBlock {
+  max-width: 8.9rem;
+}
+
+.sceneConjurer .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 9rem);
+}
+
+.sceneConjurer .titleBlock {
+  order: 2;
+  justify-self: end;
+  max-width: 8.7rem;
+}
+
+.sceneConjurer .sceneRig {
+  order: 1;
+}
+
+.sceneMystic .sceneBody {
+  grid-template-columns: minmax(0, 8.7rem) minmax(0, 1fr);
+}
+
+.sceneMystic .titleBlock {
+  max-width: 8.4rem;
+}
+
+.sceneOracle .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 8.8rem);
+}
+
+.sceneOracle .titleBlock {
+  order: 2;
+  justify-self: end;
+  max-width: 8.5rem;
+}
+
+.sceneOracle .sceneRig {
+  order: 1;
 }
 
 .sorcererRig::before,
-.sorcererRig::after,
 .mageRig::before,
-.mageRig::after {
+.weaverRig::before,
+.conjurerRig::before,
+.mysticRig::before,
+.oracleRig::before,
+.sorcererRig::after,
+.mageRig::after,
+.weaverRig::after,
+.conjurerRig::after,
+.mysticRig::after,
+.oracleRig::after {
   content: '';
   position: absolute;
   pointer-events: none;
 }
 
 .sorcererRig::before {
-  left: 1rem;
-  right: 1rem;
-  bottom: 1rem;
-  height: 4.8rem;
-  border-radius: 999px;
+  inset: 1.1rem 1rem 1rem 1.2rem;
+  border-radius: 1.35rem 1.95rem 1.2rem 1.65rem;
   border: 1px solid var(--arc-edge);
-  background: radial-gradient(circle at center, var(--arc-glow-soft), transparent 66%);
-  box-shadow: inset 0 1px 0 var(--arc-overlay);
+  background:
+    linear-gradient(160deg, var(--arc-overlay), transparent 72%),
+    rgba(61, 45, 28, 0.18);
+  transform: rotate(-4deg);
 }
 
 .sorcererRig::after {
-  inset: 1.45rem 2.2rem auto;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--arc-glow-strong), transparent);
+  top: 1.1rem;
+  right: 0.9rem;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-overlay);
+  opacity: 0.4;
+}
+
+.sorcererTablet,
+.sorcererSeal,
+.sorcererNeedle,
+.mageTrack,
+.mageSeal,
+.mageCharm,
+.weaverShuttle,
+.weaverSeal,
+.conjurerWafer,
+.conjurerCore,
+.conjurerTrace,
+.mysticScale,
+.mysticHalo,
+.oraclePlate,
+.oracleRing,
+.oracleDial,
+.oracleSweep {
+  position: absolute;
 }
 
 .sorcererTablet {
-  position: absolute;
-  width: 3.2rem;
-  min-height: 5.5rem;
-  border-radius: 1rem;
+  width: 3rem;
+  min-height: 5rem;
+  border-radius: 0.8rem 1.1rem 0.7rem 1rem;
   border: 1px solid var(--arc-edge);
   background:
-    repeating-linear-gradient(
-      180deg,
-      var(--arc-overlay) 0 0.48rem,
-      transparent 0.48rem 0.86rem
-    ),
-    linear-gradient(180deg, var(--arc-overlay), transparent);
+    radial-gradient(circle at 50% 1rem, var(--arc-overlay-bold) 0 0.28rem, transparent 0.3rem),
+    repeating-linear-gradient(180deg, var(--arc-overlay) 0 0.42rem, transparent 0.42rem 0.84rem),
+    linear-gradient(180deg, rgba(88, 62, 37, 0.34), transparent 78%);
   box-shadow:
-    inset 0 1px 0 var(--arc-overlay),
-    0 14px 28px var(--arc-glow-soft);
+    0 12px 24px var(--arc-glow-soft),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-.sorcererTablet:nth-child(1) {
-  top: 2.8rem;
-  left: 1rem;
-  transform: rotate(-5deg);
+.sorcererTablet:nth-of-type(1) {
+  top: 2.2rem;
+  left: 1.3rem;
+  transform: rotate(-10deg);
 }
 
-.sorcererTablet:nth-child(2) {
+.sorcererTablet:nth-of-type(2) {
   top: 1.25rem;
-  left: 50%;
-  margin-left: -1.6rem;
-  min-height: 6.6rem;
+  left: 4.9rem;
+  min-height: 6.2rem;
+  width: 3.2rem;
 }
 
-.sorcererTablet:nth-child(3) {
-  top: 3.05rem;
-  right: 1rem;
-  transform: rotate(6deg);
+.sorcererTablet:nth-of-type(3) {
+  top: 3.5rem;
+  right: 1.6rem;
+  transform: rotate(8deg);
 }
 
-.mageRig {
-  position: relative;
-  display: block;
-  padding: 0;
+.sorcererSeal {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background:
+    radial-gradient(circle at 45% 40%, rgba(255, 255, 255, 0.22), transparent 45%),
+    linear-gradient(160deg, var(--arc-glow-strong), var(--arc-overlay));
+}
+
+.sorcererSeal:nth-of-type(4) {
+  left: 2rem;
+  bottom: 2rem;
+}
+
+.sorcererSeal:nth-of-type(5) {
+  right: 2.9rem;
+  top: 2.2rem;
+}
+
+.sorcererNeedle {
+  --needle-start: -28deg;
+  --needle-end: -22deg;
+  right: 1.4rem;
+  bottom: 1.6rem;
+  width: 5.6rem;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--arc-glow-strong) 30%, var(--arc-edge));
+  transform: rotate(-28deg);
+  transform-origin: right center;
+}
+
+.sorcererNeedle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -0.2rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background: var(--arc-panel);
+  transform: translateY(-50%);
 }
 
 .mageRig::before {
-  inset: 1rem;
-  border-radius: 1.8rem;
+  inset: 1rem 1.25rem 1.05rem 0.95rem;
+  border-radius: 1rem 1.6rem 1.3rem 1.95rem;
   border: 1px solid var(--arc-edge);
-  opacity: 0.25;
+  background: linear-gradient(160deg, rgba(88, 45, 76, 0.18), transparent 72%);
 }
 
 .mageRig::after {
-  left: 50%;
-  bottom: 0.8rem;
-  transform: translateX(-50%);
-  width: 55%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--arc-glow-strong), transparent);
+  top: 0.95rem;
+  right: 1rem;
+  width: 3.4rem;
+  height: 0.24rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--arc-edge));
 }
 
-.mageSigil {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 4.6rem;
-  height: 4.6rem;
-  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+.mageTrack {
+  inset: 2rem 1.5rem 2rem 1.4rem;
+  border-radius: 0.9rem 1.45rem 1rem 1.6rem;
+  border: 1px solid var(--arc-overlay);
   background:
-    radial-gradient(circle at center, var(--arc-glow-strong), transparent 60%),
-    linear-gradient(160deg, var(--arc-overlay), transparent);
-  z-index: 2;
+    linear-gradient(135deg, transparent 0 18%, var(--arc-overlay-bold) 18% 21%, transparent 21% 45%, var(--arc-overlay-bold) 45% 48%, transparent 48% 72%, var(--arc-overlay-bold) 72% 75%, transparent 75%),
+    linear-gradient(160deg, var(--arc-overlay), transparent 78%);
 }
 
-.mageInscription {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.mageSeal {
+  width: 2.3rem;
+  height: 2.3rem;
   border-radius: 999px;
   border: 1px solid var(--arc-edge);
-  background: none;
-  z-index: 1;
+  background:
+    radial-gradient(circle at 38% 35%, rgba(255, 255, 255, 0.26), transparent 36%),
+    linear-gradient(160deg, var(--arc-glow-strong), var(--arc-overlay));
+  box-shadow: 0 10px 20px var(--arc-glow-soft);
 }
 
-.mageInscription:nth-of-type(2) {
-  width: 7.4rem;
-  height: 7.4rem;
-}
-
-.mageInscription:nth-of-type(3) {
-  width: 10.4rem;
-  height: 10.4rem;
-  border-style: dashed;
-  opacity: 0.45;
-}
-
-.mageRune {
+.mageSeal::after {
+  content: '';
   position: absolute;
-  width: 0.65rem;
-  height: 0.65rem;
-  border-radius: 0.14rem;
+  inset: 0.45rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+.mageSeal:nth-of-type(2) {
+  top: 1.4rem;
+  left: 1.35rem;
+}
+
+.mageSeal:nth-of-type(3) {
+  top: 4.5rem;
+  left: 5.2rem;
+}
+
+.mageSeal:nth-of-type(4) {
+  right: 1.45rem;
+  bottom: 1.45rem;
+}
+
+.mageCharm {
+  width: 0.95rem;
+  height: 3rem;
+  border-radius: 999px;
   border: 1px solid var(--arc-edge);
-  background: var(--arc-glow-soft);
-  transform: rotate(45deg);
-  z-index: 3;
+  background: linear-gradient(180deg, var(--arc-overlay-bold), transparent 86%);
 }
 
-.mageRune:nth-of-type(4) {
-  top: 0.9rem;
-  left: 50%;
-  margin-left: -0.325rem;
+.mageCharm:nth-of-type(5) {
+  top: 1.3rem;
+  right: 2.6rem;
+  transform: rotate(18deg);
 }
 
-.mageRune:nth-of-type(5) {
-  bottom: 1.2rem;
-  left: 1.8rem;
+.mageCharm:nth-of-type(6) {
+  bottom: 1.4rem;
+  left: 3.2rem;
+  transform: rotate(-18deg);
 }
 
-.mageRune:nth-of-type(6) {
-  bottom: 1.2rem;
-  right: 1.8rem;
+.weaverRig::before {
+  inset: 1rem;
+  border-radius: 1.4rem 1rem 1.7rem 1rem;
+  border: 1px solid var(--arc-edge);
+}
+
+.weaverRig::after {
+  top: 0.95rem;
+  left: 1.4rem;
+  width: 0.35rem;
+  bottom: 0.95rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, transparent, var(--arc-edge), transparent);
 }
 
 .weaverLoom {
-  position: relative;
-  width: 100%;
-  min-height: inherit;
+  position: absolute;
+  inset: 0.95rem;
 }
 
 .weaverWarp {
   position: absolute;
-  inset: 0.7rem 1.4rem;
+  inset: 0.7rem 1.5rem 0.7rem 1.9rem;
   display: flex;
   justify-content: space-between;
 }
 
 .weaverWarp span {
-  width: 2px;
-  background: linear-gradient(
-    180deg,
-    transparent 0%,
-    var(--arc-glow-strong) 15%,
-    var(--arc-glow-strong) 85%,
-    transparent 100%
-  );
+  width: 0.16rem;
   border-radius: 999px;
+  background: linear-gradient(180deg, transparent, var(--arc-glow-strong) 16%, var(--arc-glow-strong) 84%, transparent);
 }
 
 .weaverWeft {
   position: absolute;
-  inset: 1.6rem 0.5rem;
+  inset: 1.45rem 0.95rem 1.45rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .weaverWeft span {
-  height: 3px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--arc-overlay) 10%,
-    var(--arc-glow-soft) 50%,
-    var(--arc-overlay) 90%,
-    transparent 100%
-  );
+  height: 0.24rem;
   border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--arc-overlay-bold) 14%, var(--arc-glow-soft) 50%, var(--arc-overlay-bold) 86%, transparent);
 }
 
 .weaverShuttle {
-  position: absolute;
-  top: 50%;
-  left: 56%;
-  transform: translate(-50%, -50%) rotate(45deg);
-  width: 1.2rem;
-  height: 0.5rem;
-  border-radius: 0.24rem;
-  background: var(--arc-gradient);
+  --shuttle-start: -14deg;
+  --shuttle-end: -9deg;
+  top: 4.95rem;
+  right: 2.15rem;
+  width: 3.8rem;
+  height: 0.95rem;
+  border-radius: 999px;
   border: 1px solid var(--arc-edge);
-  box-shadow: 0 0 12px var(--arc-glow);
-  z-index: 2;
+  background: linear-gradient(90deg, var(--arc-overlay-bold), var(--arc-glow-strong), var(--arc-overlay));
+  transform: rotate(-14deg);
+  box-shadow: 0 10px 20px var(--arc-glow-soft);
 }
 
-.conjurerRig {
-  min-height: 7.8rem;
+.weaverShuttle::before,
+.weaverShuttle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background: var(--arc-panel);
+  transform: translateY(-50%);
+}
+
+.weaverShuttle::before {
+  left: 0.25rem;
+}
+
+.weaverShuttle::after {
+  right: 0.25rem;
+}
+
+.weaverSeal {
+  left: 1rem;
+  bottom: 1rem;
+  width: 1.35rem;
+  height: 3.35rem;
+  border-radius: 0.9rem;
+  border: 1px solid var(--arc-edge);
+  background: linear-gradient(180deg, var(--arc-overlay-bold), transparent 82%);
+}
+
+.conjurerRig::before {
+  inset: 1rem 1rem 1.1rem 1.3rem;
+  border-radius: 1rem 1.8rem 1rem 1.7rem;
+  border: 1px solid var(--arc-edge);
+}
+
+.conjurerRig::after {
+  top: 50%;
+  left: 1rem;
+  right: 1rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--arc-overlay-bold), transparent);
+  transform: translateY(-50%);
+}
+
+.conjurerWafer {
+  inset: 1.6rem 3.1rem 1.8rem 1.45rem;
+  border: 1px solid var(--arc-edge);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(135deg, transparent 0 9%, var(--arc-overlay) 9% 10%, transparent 10% 18%, var(--arc-overlay) 18% 19%, transparent 19%),
+    linear-gradient(160deg, rgba(86, 66, 35, 0.18), transparent 78%);
+  clip-path: polygon(0.7rem 0, 100% 0, 100% calc(100% - 0.7rem), calc(100% - 0.7rem) 100%, 0 100%, 0 0.7rem);
 }
 
 .conjurerCore {
-  width: 5.6rem;
-  height: 5.6rem;
-  border-radius: 1.4rem;
+  top: 3.45rem;
+  left: 5.15rem;
+  width: 4.25rem;
+  height: 4.25rem;
+  border-radius: 1rem;
   border: 1px solid var(--arc-edge);
   background:
-    radial-gradient(circle at center, var(--arc-glow-strong), transparent 55%),
-    linear-gradient(160deg, var(--arc-overlay), transparent);
+    radial-gradient(circle at 50% 50%, var(--arc-glow-strong), transparent 56%),
+    linear-gradient(160deg, var(--arc-overlay), transparent 76%),
+    rgba(16, 16, 20, 0.24);
+  box-shadow: 0 16px 28px var(--arc-glow-soft);
+}
+
+.conjurerCore::before {
+  content: '';
+  position: absolute;
+  inset: 0.7rem;
+  border: 1px dashed var(--arc-overlay-bold);
+  border-radius: 0.6rem;
 }
 
 .conjurerTrace {
-  position: absolute;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--arc-edge);
-  border-radius: 0.9rem;
-}
-
-.conjurerTrace:nth-of-type(2) {
-  top: 1rem;
-  left: 1rem;
+  background: linear-gradient(160deg, var(--arc-overlay-bold), transparent 72%);
 }
 
 .conjurerTrace:nth-of-type(3) {
-  top: 1rem;
-  right: 1rem;
+  top: 1.5rem;
+  left: 1.55rem;
 }
 
 .conjurerTrace:nth-of-type(4) {
-  bottom: 1rem;
-  left: 1rem;
+  top: 1.5rem;
+  right: 1.45rem;
 }
 
 .conjurerTrace:nth-of-type(5) {
-  bottom: 1rem;
-  right: 1rem;
+  bottom: 1.45rem;
+  left: 2.7rem;
 }
 
-.mysticHalo,
-.oracleDial {
-  position: absolute;
-  width: 10.5rem;
-  aspect-ratio: 1;
-  border-radius: 999px;
+.conjurerTrace:nth-of-type(6) {
+  bottom: 1.2rem;
+  right: 1.7rem;
+}
+
+.mysticRig::before {
+  inset: 1rem 1.1rem 1rem 0.95rem;
+  border-radius: 1.8rem 1.1rem 1.25rem 1.6rem;
   border: 1px solid var(--arc-edge);
 }
 
-.mysticHalo {
-  top: 50%;
-  left: 56%;
-  transform: translate(-50%, -50%);
+.mysticRig::after {
+  top: 1.2rem;
+  right: 1rem;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-overlay);
+  opacity: 0.36;
+}
+
+.mysticScale {
+  left: 1.2rem;
+  bottom: 1.2rem;
+  width: 8.8rem;
+  height: 6rem;
+  border-radius: 6rem 6rem 0 0;
+  border: 1px solid var(--arc-edge);
+  border-bottom: none;
   background:
-    radial-gradient(circle at center, var(--arc-glow-soft), transparent 60%),
-    radial-gradient(circle at center, transparent 48%, var(--arc-overlay) 48%, transparent 68%);
-  width: 13rem;
-  box-shadow: 0 0 40px var(--arc-glow-soft);
+    radial-gradient(circle at 50% 100%, var(--arc-glow-soft), transparent 62%),
+    linear-gradient(180deg, var(--arc-overlay), transparent 78%);
+}
+
+.mysticScale::before {
+  content: '';
+  position: absolute;
+  left: 0.85rem;
+  right: 0.85rem;
+  bottom: 0.65rem;
+  top: 0.85rem;
+  border-top: 1px dashed var(--arc-overlay-bold);
+  border-radius: inherit;
+}
+
+.mysticHalo {
+  top: 3rem;
+  right: 2.1rem;
+  width: 5.4rem;
+  height: 5.4rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background:
+    radial-gradient(circle at center, var(--arc-glow-soft), transparent 54%),
+    radial-gradient(circle at center, transparent 43%, var(--arc-overlay-bold) 43% 47%, transparent 47%);
+  box-shadow: 0 0 32px var(--arc-glow-soft);
+}
+
+.mysticPips {
+  position: absolute;
+  inset: 0;
+}
+
+.mysticPips span {
+  position: absolute;
+  width: 0.2rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  background: var(--arc-edge);
+}
+
+.mysticPips span:nth-child(1) {
+  left: 2.25rem;
+  bottom: 4.4rem;
+  transform: rotate(-38deg);
+}
+
+.mysticPips span:nth-child(2) {
+  left: 3.65rem;
+  bottom: 5.2rem;
+  transform: rotate(-18deg);
+}
+
+.mysticPips span:nth-child(3) {
+  left: 5.35rem;
+  bottom: 5.45rem;
+}
+
+.mysticPips span:nth-child(4) {
+  left: 6.95rem;
+  bottom: 5.1rem;
+  transform: rotate(18deg);
+}
+
+.mysticPips span:nth-child(5) {
+  left: 8.35rem;
+  bottom: 4.15rem;
+  transform: rotate(38deg);
 }
 
 .mysticPetals {
-  position: relative;
-  width: 13rem;
-  aspect-ratio: 1;
-  justify-self: end;
-  margin-inline-end: 0.35rem;
+  position: absolute;
+  inset: 0;
 }
 
 .mysticPetals span {
   position: absolute;
-  inset: 50% auto auto 50%;
-  width: 2.2rem;
-  height: 6.2rem;
+  right: 4.6rem;
+  bottom: 2.4rem;
+  width: 4.8rem;
+  height: 0.16rem;
   border-radius: 999px;
-  background: linear-gradient(180deg, var(--arc-overlay-bold), var(--arc-glow-strong), transparent);
-  opacity: 0.82;
-  filter: blur(0.2px);
-  transform-origin: top center;
+  background: linear-gradient(90deg, var(--arc-glow-strong), transparent);
+  transform-origin: right center;
 }
 
 .mysticPetals span:nth-child(1) {
-  transform: translate(-50%, -50%) rotate(0deg);
+  transform: rotate(-44deg);
 }
 
 .mysticPetals span:nth-child(2) {
-  transform: translate(-50%, -50%) rotate(36deg);
+  transform: rotate(-24deg);
 }
 
 .mysticPetals span:nth-child(3) {
-  transform: translate(-50%, -50%) rotate(72deg);
+  transform: rotate(-6deg);
 }
 
 .mysticPetals span:nth-child(4) {
-  transform: translate(-50%, -50%) rotate(108deg);
+  transform: rotate(12deg);
 }
 
 .mysticPetals span:nth-child(5) {
-  transform: translate(-50%, -50%) rotate(144deg);
+  transform: rotate(30deg);
 }
 
 .mysticPetals span:nth-child(6) {
-  transform: translate(-50%, -50%) rotate(180deg);
+  transform: rotate(48deg);
 }
 
 .mysticPetals span:nth-child(7) {
-  transform: translate(-50%, -50%) rotate(216deg);
+  transform: rotate(66deg);
 }
 
-.mysticPetals span:nth-child(8) {
-  transform: translate(-50%, -50%) rotate(252deg);
+.oracleRig::before {
+  inset: 1rem 1rem 1rem 1.25rem;
+  border-radius: 1.05rem 1.75rem 1.45rem 1.7rem;
+  border: 1px solid var(--arc-edge);
+}
+
+.oracleRig::after {
+  left: 1.1rem;
+  right: 1.1rem;
+  top: 1.1rem;
+  height: 0.24rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--arc-edge), transparent);
+}
+
+.oraclePlate {
+  inset: 1.35rem 1.8rem 1.55rem 1.4rem;
+  border-radius: 1rem 1.85rem 1.15rem 1.7rem;
+  border: 1px solid var(--arc-overlay);
+  background: linear-gradient(165deg, rgba(31, 70, 82, 0.18), transparent 78%);
 }
 
 .oracleRing {
-  position: absolute;
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 48%;
+  aspect-ratio: 1;
   border-radius: 999px;
   border: 1px solid var(--arc-edge);
-  aspect-ratio: 1;
-}
-
-.oracleRing:nth-of-type(1) {
-  width: 7rem;
-  background: radial-gradient(circle at center, var(--arc-glow-soft), transparent 70%);
+  transform: translate(-50%, -50%);
 }
 
 .oracleRing:nth-of-type(2) {
-  width: 14rem;
+  width: 6rem;
+}
+
+.oracleRing:nth-of-type(3) {
+  width: 9.9rem;
   border-style: dashed;
-  opacity: 0.35;
+  opacity: 0.36;
 }
 
 .oracleDial {
   top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
+  left: 48%;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
   background:
-    radial-gradient(circle at center, transparent 44%, var(--arc-overlay) 44%, transparent 60%),
-    radial-gradient(circle at center, var(--arc-glow-soft), transparent 62%);
+    radial-gradient(circle at center, var(--arc-glow-strong), transparent 58%),
+    radial-gradient(circle at center, transparent 42%, var(--arc-overlay-bold) 42% 48%, transparent 48%);
+  transform: translate(-50%, -50%);
+  z-index: 2;
 }
 
 .oracleSweep {
-  position: absolute;
-  top: calc(50% - 2.5rem);
-  left: 50%;
-  width: 10rem;
-  height: 5rem;
-  background: linear-gradient(90deg, transparent, var(--arc-glow-strong));
-  clip-path: polygon(0 100%, 100% 50%, 0 0);
-  opacity: 0.6;
+  --oracle-sweep-start: 24deg;
+  --oracle-sweep-end: 31deg;
+  top: 50%;
+  left: 48%;
+  width: 5.6rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--arc-edge), var(--arc-glow-strong), transparent);
+  transform: translate(0, -50%) rotate(24deg);
   transform-origin: left center;
-  z-index: 2;
+  z-index: 3;
+}
+
+.oracleSweep::after {
+  content: '';
+  position: absolute;
+  right: -0.1rem;
+  top: 50%;
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--arc-edge);
+  background: var(--arc-panel);
+  transform: translateY(-50%);
 }
 
 .oraclePips {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
 }
 
 .oraclePips span {
   position: absolute;
-  width: 0.35rem;
-  height: 0.35rem;
+  width: 0.34rem;
+  height: 0.34rem;
   border-radius: 999px;
   background: var(--arc-glow);
   box-shadow: 0 0 6px var(--arc-glow);
 }
 
 .oraclePips span:nth-child(1) {
-  top: 14%;
-  left: 28%;
+  top: 2rem;
+  left: 3rem;
 }
 
 .oraclePips span:nth-child(2) {
-  top: 22%;
-  right: 18%;
+  top: 2.8rem;
+  right: 2.15rem;
 }
 
 .oraclePips span:nth-child(3) {
-  top: 50%;
-  right: 8%;
-  opacity: 0.6;
+  top: 5rem;
+  right: 1.2rem;
+  opacity: 0.65;
 }
 
 .oraclePips span:nth-child(4) {
-  bottom: 28%;
-  left: 14%;
+  bottom: 2.4rem;
+  left: 2rem;
   opacity: 0.5;
 }
 
 .oraclePips span:nth-child(5) {
-  bottom: 16%;
-  right: 28%;
-}
-
-.oracleTags {
-  position: relative;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.55rem;
-  margin-top: 4.5rem;
-}
-
-.oracleTag {
-  color: var(--arc-text);
-  font-size: 0.65rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  bottom: 1.55rem;
+  right: 3.25rem;
 }
 
 .scene[data-motion='animated'] .iconBadge,
-.scene[data-motion='animated'] .oracleDial,
-.scene[data-motion='animated'] .oracleRing:nth-of-type(1),
 .scene[data-motion='animated'] .conjurerCore,
-.scene[data-motion='animated'] .mageSigil {
+.scene[data-motion='animated'] .mysticHalo {
   animation: arcanePulse 8s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .mysticHalo {
-  animation: mysticHaloPulse 8s ease-in-out infinite;
+.scene[data-motion='animated'] .oracleDial {
+  animation: centeredPulse 8s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .sorcererTablet:nth-child(2),
-.scene[data-motion='animated'] .weaverShuttle,
+.scene[data-motion='animated'] .sorcererNeedle {
+  animation: arcaneNeedle 6.4s ease-in-out infinite;
+}
+
+.scene[data-motion='animated'] .weaverShuttle {
+  animation: shuttleDrift 6.4s ease-in-out infinite;
+}
+
 .scene[data-motion='animated'] .oracleSweep {
-  animation: arcaneDrift 5.8s ease-in-out infinite;
+  animation: oracleSweepDrift 6.4s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .weaverWeft span:nth-child(2n),
+.scene[data-motion='animated'] .mageCharm,
 .scene[data-motion='animated'] .mysticPetals span:nth-child(odd) {
   animation: arcaneShimmer 4.6s ease-in-out infinite;
 }
 
-.scene[data-motion='animated'] .mageInscription:nth-of-type(3) {
-  animation: sigilSpin 24s linear infinite;
+.scene[data-motion='animated'] .oracleRing:nth-of-type(3) {
+  animation: arcaneOrbit 22s linear infinite;
 }
 
-.scene[data-motion='animated'] .oraclePips span:nth-child(odd) {
-  animation: oraclePipBlink 3.2s ease-in-out infinite;
+.scene[data-motion='animated'] .oraclePips span:nth-child(odd),
+.scene[data-motion='animated'] .sorcererSeal,
+.scene[data-motion='animated'] .mageSeal:nth-of-type(3) {
+  animation: oracleBlink 3.2s ease-in-out infinite;
 }
 
 @keyframes arcanePulse {
@@ -785,27 +965,16 @@
   }
 }
 
-@keyframes mysticHaloPulse {
+@keyframes arcaneNeedle {
   0%,
   100% {
-    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.72;
+    transform: rotate(var(--needle-start, -28deg));
   }
 
   50% {
-    transform: translate(-50%, -50%) scale(1.03);
-  }
-}
-
-@keyframes arcaneDrift {
-  0%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.6;
-  }
-
-  50% {
-    transform: translateY(-0.25rem);
     opacity: 1;
+    transform: rotate(var(--needle-end, -22deg));
   }
 }
 
@@ -820,7 +989,18 @@
   }
 }
 
-@keyframes sigilSpin {
+@keyframes centeredPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+}
+
+@keyframes arcaneOrbit {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
   }
@@ -830,10 +1010,36 @@
   }
 }
 
-@keyframes oraclePipBlink {
+@keyframes shuttleDrift {
   0%,
   100% {
-    opacity: 0.35;
+    opacity: 0.82;
+    transform: rotate(var(--shuttle-start));
+  }
+
+  50% {
+    opacity: 1;
+    transform: rotate(var(--shuttle-end));
+  }
+}
+
+@keyframes oracleSweepDrift {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: translate(0, -50%) rotate(var(--oracle-sweep-start));
+  }
+
+  50% {
+    opacity: 1;
+    transform: translate(0, -50%) rotate(var(--oracle-sweep-end));
+  }
+}
+
+@keyframes oracleBlink {
+  0%,
+  100% {
+    opacity: 0.45;
   }
 
   50% {
@@ -842,91 +1048,59 @@
 }
 
 @media (max-width: 640px) {
-  .deck {
-    grid-template-columns: 1fr;
-    justify-items: start;
-  }
-
-  .deckCounter {
-    justify-self: start;
-  }
-
-  .headlineWrap {
-    grid-template-columns: 1fr;
-  }
-
-  .sceneMystic .sceneBody {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
-  }
-
+  .sceneBody,
   .sceneSorcerer .sceneBody,
-  .sceneMage .sceneBody {
+  .sceneWeaver .sceneBody,
+  .sceneConjurer .sceneBody,
+  .sceneMystic .sceneBody,
+  .sceneOracle .sceneBody {
     grid-template-columns: 1fr;
     gap: 0.8rem;
   }
 
   .sceneSorcerer .titleBlock,
-  .sceneMage .titleBlock {
+  .sceneMage .titleBlock,
+  .sceneWeaver .titleBlock,
+  .sceneConjurer .titleBlock,
+  .sceneMystic .titleBlock,
+  .sceneOracle .titleBlock {
+    order: 1;
     justify-self: center;
     max-width: none;
-    padding: 0;
     text-align: center;
-  }
-
-  .sceneSorcerer .headlineWrap,
-  .sceneMage .headlineWrap,
-  .sceneMystic .headlineWrap {
-    justify-items: center;
-  }
-
-  .sceneSorcerer .titleLockup,
-  .sceneSorcerer .descriptor,
-  .sceneMage .titleLockup,
-  .sceneMage .descriptor {
-    max-width: none;
   }
 
   .sceneSorcerer .sceneRig,
-  .sceneMage .sceneRig {
-    width: 100%;
-    min-height: 12rem;
+  .sceneConjurer .sceneRig,
+  .sceneOracle .sceneRig {
+    order: 2;
   }
 
-  .sceneMystic .titleBlock {
-    padding: 0;
-    text-align: center;
-  }
-
-  .sceneMystic .titleBlock::after {
-    display: none;
-  }
-
-  .sceneMystic .headlineWrap {
+  .headlineWrap {
     justify-items: center;
   }
 
-  .sceneMystic .titleLockup,
-  .sceneMystic .descriptor {
-    max-width: none;
+  .sceneRig {
+    min-height: 11.8rem;
   }
 
-  .sceneMystic .sceneRig {
-    width: 100%;
-    justify-self: center;
-    min-height: 12rem;
+  .shellSeal {
+    width: 2.35rem;
+    height: 2.35rem;
   }
 
-  .sorcererTablet:nth-child(1) {
-    left: 0.7rem;
+  .sorcererTablet:nth-of-type(2) {
+    left: calc(50% - 1.6rem);
   }
 
-  .sorcererTablet:nth-child(3) {
-    right: 0.7rem;
+  .conjurerCore {
+    left: calc(50% - 2.125rem);
   }
 
-  .sorcererRig,
-  .mageRig {
-    grid-template-columns: 1fr;
+  .mysticHalo,
+  .oracleRing,
+  .oracleDial,
+  .oracleSweep {
+    left: 50%;
   }
 }

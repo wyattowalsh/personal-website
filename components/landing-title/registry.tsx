@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  createSubtitleRenderer,
   type LandingTitleRendererEntry,
   type SubtitleLane,
 } from '@/components/landing-title/shared';
@@ -32,12 +33,50 @@ export interface LandingTitleSubtitleOption {
   readonly signalDeck: SignalDeckMeta;
 }
 
+const CANONICAL_SUBTITLE_TEXT_BY_ID: Readonly<Record<string, string>> = Object.freeze({
+  'cybernetic-architect'            : 'cyber architect',
+  'zero-trust-architect'            : 'zero trust architect',
+  'synthetic-intelligence-architect': 'cognitive architect',
+  'quantum-designer'                : 'quantum designer',
+  'cloud-shaper'                    : 'cloud shaper',
+  'ai-cartographer'                 : 'AI cartographer',
+  'data-orchestrator'               : 'signal orchestrator',
+  'data-sorcerer'                   : 'data sorcerer',
+  'workflow-mage'                   : 'workflow mage',
+  'algorithm-weaver'                : 'logic weaver',
+  'silicon-conjurer'                : 'silicon conjurer',
+  'systems-seer'                    : 'circuit seer',
+  'signal-oracle'                   : 'signal oracle',
+  'code-alchemist'                  : 'code alchemist',
+  'digital-sculptor'                : 'digital sculptor',
+  'holographic-sculptor'            : 'holosculptor',
+  'cyber-defense-artisan'           : 'cyber defense artisan',
+  'blockchain-artisan'              : 'blockchain artisan',
+  'frontier-forger'                 : 'frontier forger',
+  'automation-virtuoso'             : 'automation virtuoso',
+  'kinetic-machinist'               : 'kinetic machinist',
+  'cortex-diviner'                  : 'cortex diviner',
+});
+
+function reconcileRendererText(entry: LandingTitleRendererEntry): LandingTitleRendererEntry {
+  const canonicalText = CANONICAL_SUBTITLE_TEXT_BY_ID[entry.id];
+
+  if (!canonicalText || canonicalText === entry.text) {
+    return entry;
+  }
+
+  return createSubtitleRenderer({
+    ...entry.theme,
+    text: canonicalText,
+  });
+}
+
 export const LANDING_TITLE_RENDERERS: LandingTitleRendererEntry[] = [
   ...SYSTEMS_SHOWCASE_RENDERERS,
   ...ARCANE_SHOWCASE_RENDERERS,
   ...CRAFTED_SHOWCASE_RENDERERS,
   ...PERFORMANCE_SHOWCASE_RENDERERS,
-];
+].map(reconcileRendererText);
 
 export const SUBTITLE_RENDERER_REGISTRY = Object.freeze(
   Object.fromEntries(LANDING_TITLE_RENDERERS.map((e) => [e.id, e])),
@@ -73,15 +112,25 @@ function normalizeSubtitleSelection(value: string): string {
 export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   // ── Old display texts that no longer match any current text ──────────
 
+  // Current normalization pass (visible text changed, ids retained)
+  'cybernetic architect'            : 'cybernetic-architect',
+  'synthetic intelligence architect': 'synthetic-intelligence-architect',
+  'data orchestrator'               : 'data-orchestrator',
+  'archive sorcerer'                : 'data-sorcerer',
+  'sigil mage'                      : 'workflow-mage',
+  'algorithm weaver'                : 'algorithm-weaver',
+  'systems seer'                    : 'systems-seer',
+  'holographic sculptor'            : 'holographic-sculptor',
+  'bastion artisan'                 : 'cyber-defense-artisan',
+  'lattice artisan'                 : 'blockchain-artisan',
+
   // Architects (dropped)
   'code architect': 'cybernetic-architect',
 
   // Arcane (text changed or consolidated)
-  'data sorcerer': 'data-sorcerer',
   'technological conjurer': 'silicon-conjurer',
   'innovation mystic': 'systems-seer',
   'emergence mystic': 'systems-seer',
-  'workflow mage': 'workflow-mage',
 
   // Alchemists (consolidated → code-alchemist)
   'systems alchemist': 'code-alchemist',
@@ -103,8 +152,6 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
 
   // Artisans (text changed or consolidated)
   'intelligence artisan': 'blockchain-artisan',
-  'cyber defense artisan': 'cyber-defense-artisan',
-  'blockchain artisan': 'blockchain-artisan',
   'cybersecurity artisan': 'cyber-defense-artisan',
 
   // Crafters (consolidated → frontier-forger)
@@ -214,6 +261,6 @@ export function resolveSubtitleOption(selection: string | null | undefined): Lan
       id: DEFAULT_LANDING_TITLE_SUBTITLE_ID,
       lane: 'systems',
       signalDeck: { family: 'Architect', descriptor: 'systems precision' },
-      text: 'cybernetic architect',
+      text: 'cyber architect',
     };
 }

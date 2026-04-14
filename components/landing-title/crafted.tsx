@@ -73,7 +73,7 @@ const DIGITAL_SCULPTOR_THEME = theme(
 );
 
 const HOLOGRAPHIC_SCULPTOR_THEME = theme(
-  craftedSubtitle('holographic-sculptor', 'holographic sculptor', 'Sculptor', 'volumetric material'),
+  craftedSubtitle('holographic-sculptor', 'holosculptor', 'Sculptor', 'volumetric material'),
   {
     gradient: 'linear-gradient(135deg, #a855f7 0%, #3b82f6 42%, #22d3ee 100%)',
     darkGradient: 'linear-gradient(135deg, #e9d5ff 0%, #bfdbfe 42%, #a5f3fc 100%)',
@@ -89,7 +89,7 @@ const HOLOGRAPHIC_SCULPTOR_THEME = theme(
 );
 
 const CYBER_DEFENSE_ARTISAN_THEME = theme(
-  craftedSubtitle('cyber-defense-artisan', 'bastion artisan', 'Artisan', 'forged reliability'),
+  craftedSubtitle('cyber-defense-artisan', 'cyber defense artisan', 'Artisan', 'forged reliability'),
   {
     gradient: 'linear-gradient(135deg, #16a34a 0%, #0ea5e9 42%, #0f172a 100%)',
     darkGradient: 'linear-gradient(135deg, #86efac 0%, #7dd3fc 42%, #334155 100%)',
@@ -105,7 +105,7 @@ const CYBER_DEFENSE_ARTISAN_THEME = theme(
 );
 
 const BLOCKCHAIN_ARTISAN_THEME = theme(
-  craftedSubtitle('blockchain-artisan', 'lattice artisan', 'Artisan', 'lattice forge'),
+  craftedSubtitle('blockchain-artisan', 'blockchain artisan', 'Artisan', 'lattice forge'),
   {
     gradient: 'linear-gradient(135deg, #d97706 0%, #ea580c 38%, #0ea5e9 100%)',
     darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fdba74 40%, #7dd3fc 100%)',

@@ -188,41 +188,64 @@ function PerformanceScene({
             </div>
 
             <div className={styles.sceneRig} aria-hidden="true">
+              <span className={styles.shellRailTop} />
+              <span className={styles.shellRailBottom} />
+              <span className={styles.shellBracketLeft} />
+              <span className={styles.shellBracketRight} />
+              <div className={styles.shellBolts}>
+                <span />
+                <span />
+                <span />
+                <span />
+              </div>
+
               {config.scene === 'automation' ? (
-                <>
+                <div className={styles.automationStage}>
+                  <span className={styles.automationArch} />
                   <span className={styles.automationGauge} />
                   <span className={styles.automationNeedle} />
-                  <div className={styles.automationCues}>
+                  <div className={styles.automationBars}>
+                    <span />
                     <span />
                     <span />
                     <span />
                   </div>
-                </>
+                  <div className={styles.automationPedals}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                </div>
               ) : null}
 
               {config.scene === 'robotics' ? (
-                <>
-                  <span className={styles.roboticsMast} />
-                  <span className={styles.roboticsBoom} />
-                  <span className={styles.roboticsHoist} />
-                  <span className={styles.roboticsPayload} />
-                </>
+                <div className={styles.roboticsMachine}>
+                  <span className={styles.roboticsWheelLarge} />
+                  <span className={styles.roboticsWheelSmall} />
+                  <span className={styles.roboticsBelt} />
+                  <span className={styles.roboticsCrank} />
+                  <span className={styles.roboticsPiston} />
+                  <span className={styles.roboticsAnvil} />
+                </div>
               ) : null}
 
               {config.scene === 'neural' ? (
-                <>
-                  <span className={styles.neuralRingOuter} />
-                  <span className={styles.neuralRingMiddle} />
-                  <span className={styles.neuralRingInner} />
+                <div className={styles.neuralCabinet}>
+                  <span className={styles.neuralCurtainLeft} />
+                  <span className={styles.neuralCurtainRight} />
+                  <span className={styles.neuralHalo} />
+                  <span className={styles.neuralDome} />
                   <span className={styles.neuralCore} />
-                  <div className={styles.neuralSynapses}>
-                    <span />
-                    <span />
+                  <div className={styles.neuralCards}>
                     <span />
                     <span />
                     <span />
                   </div>
-                </>
+                  <div className={styles.neuralRods}>
+                    <span />
+                    <span />
+                  </div>
+                </div>
               ) : null}
             </div>
           </div>

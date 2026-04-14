@@ -42,7 +42,7 @@ const systemsSubtitle = (
 });
 
 const CYBERNETIC_ARCHITECT_THEME = theme(
-  systemsSubtitle('cybernetic-architect', 'cybernetic architect', 'Architect', 'adaptive command mesh'),
+  systemsSubtitle('cybernetic-architect', 'cyber architect', 'Architect', 'adaptive command mesh'),
   {
     gradient: 'linear-gradient(135deg, #67e8f9 0%, #38bdf8 40%, #818cf8 100%)',
     darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #7dd3fc 42%, #c7d2fe 100%)',
@@ -74,7 +74,7 @@ const ZERO_TRUST_ARCHITECT_THEME = theme(
 );
 
 const SYNTHETIC_INTELLIGENCE_ARCHITECT_THEME = theme(
-  systemsSubtitle('synthetic-intelligence-architect', 'synthetic intelligence architect', 'Architect', 'cognitive system framing'),
+  systemsSubtitle('synthetic-intelligence-architect', 'cognitive architect', 'Architect', 'cognitive system framing'),
   {
     gradient: 'linear-gradient(135deg, #34d399 0%, #22d3ee 42%, #818cf8 100%)',
     darkGradient: 'linear-gradient(135deg, #86efac 0%, #67e8f9 42%, #c7d2fe 100%)',
@@ -138,7 +138,7 @@ const AI_CARTOGRAPHER_THEME = theme(
 );
 
 const DATA_ORCHESTRATOR_THEME = theme(
-  systemsSubtitle('data-orchestrator', 'data orchestrator', 'Orchestrator', 'coordinated signal traffic'),
+  systemsSubtitle('data-orchestrator', 'signal orchestrator', 'Orchestrator', 'coordinated signal traffic'),
   {
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #fb7185 42%, #8b5cf6 100%)',
     darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fda4af 42%, #c4b5fd 100%)',

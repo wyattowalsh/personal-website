@@ -38,6 +38,31 @@ const EXPECTED_SUBTITLE_ORDER = [
   'cortex-diviner',
 ] as const;
 
+const EXPECTED_VISIBLE_TITLES = [
+  'cyber architect',
+  'zero trust architect',
+  'cognitive architect',
+  'quantum designer',
+  'cloud shaper',
+  'AI cartographer',
+  'signal orchestrator',
+  'data sorcerer',
+  'workflow mage',
+  'logic weaver',
+  'silicon conjurer',
+  'circuit seer',
+  'signal oracle',
+  'code alchemist',
+  'digital sculptor',
+  'holosculptor',
+  'cyber defense artisan',
+  'blockchain artisan',
+  'frontier forger',
+  'automation virtuoso',
+  'kinetic machinist',
+  'cortex diviner',
+] as const;
+
 describe('landing title registry contract', () => {
   it('keeps subtitle ids unique and aligned with registry entries', () => {
     const ids = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id);
@@ -60,6 +85,7 @@ describe('landing title registry contract', () => {
 
     expect(ids).toHaveLength(22);
     expect(ids).toEqual(EXPECTED_SUBTITLE_ORDER);
+    expect(texts).toEqual(EXPECTED_VISIBLE_TITLES);
     expect(new Set(texts).size).toBe(texts.length);
   });
 
@@ -102,14 +128,17 @@ describe('deprecated subtitle alias compatibility', () => {
 
   it('resolves renamed old display texts to the correct current entry', () => {
     const cases: [string, string][] = [
-      ['data sorcerer', 'data-sorcerer'],
+      ['cybernetic architect', 'cybernetic-architect'],
+      ['synthetic intelligence architect', 'synthetic-intelligence-architect'],
+      ['data orchestrator', 'data-orchestrator'],
+      ['archive sorcerer', 'data-sorcerer'],
+      ['sigil mage', 'workflow-mage'],
+      ['algorithm weaver', 'algorithm-weaver'],
+      ['systems seer', 'systems-seer'],
+      ['holographic sculptor', 'holographic-sculptor'],
+      ['bastion artisan', 'cyber-defense-artisan'],
+      ['lattice artisan', 'blockchain-artisan'],
       ['emergence mystic', 'systems-seer'],
-      ['cyber defense artisan', 'cyber-defense-artisan'],
-      ['blockchain artisan', 'blockchain-artisan'],
-      ['frontier crafter', 'frontier-forger'],
-      ['robotics artist', 'kinetic-machinist'],
-      ['neural artist', 'cortex-diviner'],
-      ['workflow mage', 'workflow-mage'],
     ];
     for (const [oldText, expectedId] of cases) {
       const renderer = getSubtitleRendererByText(oldText);
@@ -124,6 +153,8 @@ describe('deprecated subtitle alias compatibility', () => {
 
   it('normalizes whitespace and casing for current and legacy text lookups', () => {
     expect(getSubtitleRenderer('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleRenderer('  Signal   Orchestrator ')?.id).toBe('data-orchestrator');
+    expect(getSubtitleRenderer('  Systems   Seer ')?.id).toBe('systems-seer');
     expect(getSubtitleRenderer('  Emergence   Mystic ')?.id).toBe('systems-seer');
   });
 
@@ -178,9 +209,12 @@ describe('deprecated subtitle alias compatibility', () => {
   it('resolves legacy values through resolveSubtitleOption without falling to default', () => {
     const defaultOption = LANDING_TITLE_SUBTITLE_OPTIONS[0];
 
-    const renamedText = resolveSubtitleOption('data sorcerer');
+    const renamedText = resolveSubtitleOption('archive sorcerer');
     expect(renamedText.id).toBe('data-sorcerer');
     expect(renamedText.id).not.toBe(defaultOption.id === 'data-sorcerer' ? '__impossible__' : defaultOption.id);
+
+    const retiredVisibleText = resolveSubtitleOption('systems seer');
+    expect(retiredVisibleText.id).toBe('systems-seer');
 
     const droppedText = resolveSubtitleOption('machine learning designer');
     expect(droppedText.id).toBe('quantum-designer');

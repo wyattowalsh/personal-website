@@ -1,16 +1,4 @@
-/* ═══════════════════════════════════════════════════════════════════════════
-   Systems lane – 7 subtitle rigs
-   Silhouette key:
-     cybernetic  → vertical spine + angular armor plates
-     zeroTrust   → concentric gate rings + crosshair
-     synthetic   → radial cortex node + dendrite branches
-     quantum     → tilted orbit ellipses + split-state panels
-     cloud       → billowing cumulus masses + vertical data rain
-     cartographer→ grid + crossing routes + contour rings
-     orchestrator→ musical staff lines + beat markers + conductor node
-   ═══════════════════════════════════════════════════════════════════════════ */
-
-/* ─── Shell ─────────────────────────────────────────────────────────────── */
+/* Systems lane: control-bay chassis with sharper, plated silhouettes. */
 
 .cluster {
   width: 100%;
@@ -26,690 +14,535 @@
 
 .control:focus-visible .scene {
   transform: translateY(-1px);
+  border-color: var(--sys-glow-strong);
   box-shadow:
-    0 0 0 1px var(--sys-edge),
-    0 26px 66px var(--sys-glow-soft);
+    0 0 0 1px var(--sys-glow-strong),
+    0 28px 66px var(--sys-glow-soft);
 }
 
 .scene {
   position: relative;
   overflow: hidden;
-  border-radius: 2rem;
-  border: 1px solid var(--sys-edge);
-  background:
-    radial-gradient(circle at top right, var(--sys-glow-soft), transparent 58%),
-    linear-gradient(160deg, var(--sys-panel), var(--sys-panel-2) 58%, var(--sys-panel-3));
+  padding: 1rem;
   color: var(--sys-text);
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(
+    0 18px,
+    18px 0,
+    calc(100% - 32px) 0,
+    100% 32px,
+    100% calc(100% - 14px),
+    calc(100% - 14px) 100%,
+    16px 100%,
+    0 calc(100% - 16px)
+  );
+  background:
+    linear-gradient(180deg, var(--sys-panel), var(--sys-panel-2) 56%, var(--sys-panel-3)),
+    linear-gradient(90deg, var(--sys-struct-faint) 1px, transparent 1px),
+    linear-gradient(0deg, var(--sys-struct-faint) 1px, transparent 1px);
+  background-size: auto, 24px 24px, 24px 24px;
   box-shadow:
     inset 0 1px 0 var(--sys-struct-strong),
-    0 24px 60px var(--sys-glow-soft);
+    inset 0 -1px 0 var(--sys-struct),
+    0 22px 56px var(--sys-glow-soft);
   transition:
     transform 220ms ease,
     box-shadow 220ms ease,
     border-color 220ms ease;
 }
 
-.scene::before,
-.scene::after {
+.scene::before {
   content: '';
   position: absolute;
-  inset: 1rem;
-  border-radius: 1.6rem;
+  inset: 0.55rem;
+  border: 1px solid var(--sys-struct-strong);
+  clip-path: polygon(
+    0 12px,
+    12px 0,
+    calc(100% - 20px) 0,
+    100% 20px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    12px 100%,
+    0 calc(100% - 12px)
+  );
   pointer-events: none;
 }
 
-.scene::before {
-  border: 1px solid var(--sys-struct-strong);
-}
-
 .scene::after {
-  inset: auto 1.25rem 1.1rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
+  content: '';
+  position: absolute;
+  top: 0.85rem;
+  left: 1rem;
+  right: 3rem;
+  height: 0.42rem;
+  background:
+    repeating-linear-gradient(90deg, var(--sys-edge) 0 14px, transparent 14px 28px),
+    linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+  opacity: 0.42;
+  pointer-events: none;
 }
 
-.sceneCybernetic,
-.sceneZeroTrust,
-.sceneSynthetic,
-.sceneQuantum,
-.sceneCloud,
-.sceneCartographer,
-.sceneOrchestrator {
-  padding: 1rem 1rem 1.15rem;
-}
-
-/* ─── Scene body layout overrides ──────────────────────────────────────── */
-
-/* Cybernetic: title left, armor rig right */
-.sceneCybernetic .sceneBody {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 7.2rem);
+.sceneBody {
+  position: relative;
+  z-index: 1;
+  display: grid;
   align-items: center;
-  min-height: 15rem;
-  gap: 0.45rem;
+  gap: 0.8rem;
+  min-height: 14.9rem;
+  isolation: isolate;
+}
+
+.sceneBody::after {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  right: 0.15rem;
+  bottom: 0.05rem;
+  height: 0.4rem;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 16px, var(--sys-edge) 16px 18px, transparent 18px 31px),
+    linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.titleBlock {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 0.65rem;
+  align-self: center;
+}
+
+.headlineWrap {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.iconBadge {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.65rem;
+  height: 2.65rem;
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  background: linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel-3));
+  box-shadow: inset 0 1px 0 var(--sys-struct-strong);
+}
+
+.iconBadge::before {
+  content: '';
+  position: absolute;
+  inset: 0.24rem;
+  border: 1px solid var(--sys-struct-strong);
+  clip-path: inherit;
+  opacity: 0.82;
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.titleLockup {
+  position: relative;
+  min-width: 0;
+  padding: 0.92rem 1rem 0.82rem;
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
+  background:
+    linear-gradient(180deg, var(--sys-panel-2), rgba(0, 0, 0, 0) 160%),
+    linear-gradient(135deg, var(--sys-struct), transparent 58%);
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    0 12px 28px var(--sys-glow-soft);
+}
+
+.titleLockup::before {
+  content: '';
+  position: absolute;
+  left: 0.9rem;
+  right: 1.4rem;
+  top: 0.5rem;
+  height: 0.18rem;
+  background: repeating-linear-gradient(90deg, var(--sys-edge) 0 18px, transparent 18px 28px);
+  opacity: 0.5;
+}
+
+.titleLockup::after {
+  content: '';
+  position: absolute;
+  top: 0.52rem;
+  right: 0.62rem;
+  width: 0.92rem;
+  height: 0.92rem;
+  border-top: 1px solid var(--sys-struct-strong);
+  border-right: 1px solid var(--sys-struct-strong);
+  opacity: 0.7;
+}
+
+.title {
+  margin: 0;
+  color: var(--sys-text);
+  font-size: clamp(1.24rem, 2.1vw, 2rem);
+  line-height: 0.86;
+  font-weight: 650;
+  letter-spacing: 0.065em;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+.sceneRig {
+  position: relative;
+  min-height: 13.8rem;
+  align-self: stretch;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 16px, 16px 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  background:
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel) 46%, var(--sys-panel-3)),
+    linear-gradient(90deg, transparent 0 14%, var(--sys-struct-faint) 14% 15%, transparent 15% 85%, var(--sys-struct-faint) 85% 86%, transparent 86% 100%);
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    inset 0 0 0 1px var(--sys-struct-faint);
+}
+
+.sceneRig::before {
+  content: '';
+  position: absolute;
+  inset: 0.55rem;
+  border: 1px solid var(--sys-struct-strong);
+  clip-path: polygon(0 10px, 10px 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.sceneRig::after {
+  content: '';
+  position: absolute;
+  left: 0.7rem;
+  right: 0.7rem;
+  top: 0.68rem;
+  height: 0.28rem;
+  background: repeating-linear-gradient(90deg, var(--sys-edge) 0 12px, transparent 12px 24px);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.sceneCybernetic .sceneBody {
+  grid-template-columns: minmax(0, 1fr) 7.1rem;
 }
 
 .sceneCybernetic .titleBlock {
-  max-width: 10.6rem;
-  padding-left: 0.1rem;
-  z-index: 2;
+  max-width: 12.2rem;
 }
 
-.sceneCybernetic .titleLockup,
-.sceneCybernetic .descriptor {
-  max-width: 10rem;
+.sceneCybernetic .titleLockup {
+  max-width: 11.6rem;
 }
 
-.sceneCybernetic .sceneRig {
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
-}
-
-/* Zero Trust: title left, vault rig right */
 .sceneZeroTrust .sceneBody {
-  grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 11.1rem) minmax(0, 1fr);
 }
 
 .sceneZeroTrust .titleBlock {
-  max-width: 9.6rem;
-  padding-left: 0.1rem;
-  z-index: 2;
+  max-width: 10.8rem;
 }
 
-.sceneZeroTrust .headlineWrap {
+.sceneZeroTrust .headlineWrap,
+.sceneSynthetic .headlineWrap,
+.sceneQuantum .headlineWrap,
+.sceneCloud .headlineWrap,
+.sceneCartographer .headlineWrap,
+.sceneOrchestrator .headlineWrap {
   grid-template-columns: 1fr;
-  justify-items: start;
+  gap: 0.62rem;
 }
 
-.sceneZeroTrust .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
+.sceneZeroTrust .titleLockup {
+  max-width: 10.3rem;
 }
 
-.sceneZeroTrust .titleLockup,
-.sceneZeroTrust .descriptor {
-  max-width: 9.2rem;
-}
-
-.sceneZeroTrust .sceneRig {
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
-}
-
-/* Synthetic: cortex rig left, title right */
 .sceneSynthetic .sceneBody {
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.9fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 0.98fr) minmax(0, 0.9fr);
 }
 
 .sceneSynthetic .titleBlock {
   order: 2;
-  max-width: 10.8rem;
   justify-self: end;
-  z-index: 2;
-}
-
-.sceneSynthetic .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneSynthetic .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
-}
-
-.sceneSynthetic .titleLockup,
-.sceneSynthetic .descriptor {
   max-width: 10.4rem;
+}
+
+.sceneSynthetic .titleLockup {
+  max-width: 10rem;
 }
 
 .sceneSynthetic .sceneRig {
   order: 1;
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
 }
 
-/* Quantum: orbit rig left, title right */
 .sceneQuantum .sceneBody {
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.55rem;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
 }
 
 .sceneQuantum .titleBlock {
   order: 2;
-  position: relative;
-  z-index: 2;
-  max-width: 13.75rem;
   justify-self: end;
-  padding-right: 0.1rem;
-  text-align: left;
+  max-width: 12.8rem;
 }
 
-.sceneQuantum .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneQuantum .titleLockup,
-.sceneQuantum .descriptor {
-  max-width: 13rem;
-}
-
-.sceneQuantum .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
+.sceneQuantum .titleLockup {
+  max-width: 12.3rem;
 }
 
 .sceneQuantum .sceneRig {
   order: 1;
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
 }
 
-/* Cloud: title left, cumulus rig right */
 .sceneCloud .sceneBody {
-  grid-template-columns: minmax(0, 8.8rem) minmax(0, 1fr);
-  align-items: stretch;
-  min-height: 15rem;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 8.65rem) minmax(0, 1fr);
 }
 
 .sceneCloud .titleBlock {
-  align-self: center;
-  max-width: 8.6rem;
-  padding-left: 0.1rem;
-  z-index: 2;
+  max-width: 8.5rem;
 }
 
-.sceneCloud .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
+.sceneCloud .titleLockup {
+  max-width: 8.25rem;
 }
 
 .sceneCloud .iconBadge {
   display: none;
 }
 
-.sceneCloud .titleLockup,
-.sceneCloud .descriptor {
-  max-width: 8.2rem;
-}
-
-.sceneCloud .sceneRig {
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
-}
-
-/* Cartographer: atlas rig left, title right */
 .sceneCartographer .sceneBody {
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
 }
 
 .sceneCartographer .titleBlock {
   order: 2;
-  max-width: 10rem;
   justify-self: end;
-  z-index: 2;
+  max-width: 10rem;
 }
 
-.sceneCartographer .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneCartographer .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
-}
-
-.sceneCartographer .titleLockup,
-.sceneCartographer .descriptor {
-  max-width: 9.6rem;
+.sceneCartographer .titleLockup {
+  max-width: 9.65rem;
 }
 
 .sceneCartographer .sceneRig {
   order: 1;
-  min-height: 14rem;
-  border: none;
-  background: none;
-  overflow: visible;
 }
 
-/* Orchestrator: score rig left, title right */
 .sceneOrchestrator .sceneBody {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
-  align-items: center;
-  min-height: 15rem;
-  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
 }
 
 .sceneOrchestrator .titleBlock {
   order: 2;
-  max-width: 10rem;
   justify-self: end;
-  z-index: 2;
+  max-width: 10rem;
 }
 
-.sceneOrchestrator .headlineWrap {
-  grid-template-columns: 1fr;
-  justify-items: start;
-}
-
-.sceneOrchestrator .iconBadge {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.85rem;
-}
-
-.sceneOrchestrator .titleLockup,
-.sceneOrchestrator .descriptor {
-  max-width: 9.8rem;
+.sceneOrchestrator .titleLockup {
+  max-width: 9.65rem;
 }
 
 .sceneOrchestrator .sceneRig {
   order: 1;
-  min-height: 13.8rem;
-  border: none;
-  background: none;
-  overflow: visible;
 }
 
-/* ─── Deck ─────────────────────────────────────────────────────────────── */
-
-.deck {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 0.95rem;
-  color: var(--sys-muted);
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.deckFamily,
-.deckCounter {
-  white-space: nowrap;
-}
-
-.deckCounter {
-  justify-self: end;
-}
-
-.deckCounterTotal {
-  opacity: 0.65;
-}
-
-.deckNotes {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.38rem;
-}
-
-.deckNote {
-  border-radius: 999px;
-  border: 1px solid var(--sys-edge);
-  background: var(--sys-struct);
-  padding: 0.22rem 0.5rem;
-}
-
-/* ─── Scene body / title block ─────────────────────────────────────────── */
-
-.sceneBody {
-  display: grid;
-  gap: 1rem;
-}
-
-.titleBlock {
-  display: grid;
-  gap: 0.55rem;
-}
-
-.kicker {
-  color: var(--sys-muted);
-  font-size: 0.66rem;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-}
-
-.headlineWrap {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 0.85rem;
-  align-items: start;
-}
-
-.iconBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 3rem;
-  height: 3rem;
-  border-radius: 1rem;
-  border: 1px solid var(--sys-edge);
+.cyberneticRig {
   background:
-    linear-gradient(160deg, var(--sys-struct-strong), var(--sys-struct-faint)),
-    var(--sys-gradient);
-  box-shadow: 0 18px 34px var(--sys-glow-soft);
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel-3)),
+    repeating-linear-gradient(0deg, transparent 0 20px, var(--sys-struct-faint) 20px 21px),
+    linear-gradient(90deg, transparent 0 18%, var(--sys-struct) 18% 22%, transparent 22% 78%, var(--sys-struct) 78% 82%, transparent 82% 100%);
 }
-
-.icon {
-  width: 1.35rem;
-  height: 1.35rem;
-}
-
-.titleLockup {
-  display: grid;
-  gap: 0.4rem;
-}
-
-.title {
-  margin: 0;
-  font-size: clamp(1.42rem, 3vw, 2.16rem);
-  line-height: 0.96;
-  letter-spacing: -0.03em;
-  text-wrap: balance;
-}
-
-.descriptor {
-  margin: 0;
-  max-width: 30rem;
-  color: var(--sys-muted);
-  font-size: 0.87rem;
-  line-height: 1.5;
-}
-
-/* ─── Rig base ─────────────────────────────────────────────────────────── */
-
-.sceneRig {
-  position: relative;
-  min-height: 7.5rem;
-  border-radius: 1.55rem;
-  border: 1px solid var(--sys-edge);
-  background:
-    linear-gradient(160deg, var(--sys-struct), var(--sys-struct-faint)),
-    rgba(10, 14, 26, 0.24);
-  overflow: hidden;
-}
-
-.cyberneticRig,
-.zeroTrustRig,
-.syntheticRig,
-.quantumRig,
-.cloudRig,
-.cartographerRig,
-.orchestratorRig {
-  display: grid;
-  place-items: center;
-  padding: 1rem;
-}
-
-.cyberneticRig,
-.zeroTrustRig,
-.syntheticRig,
-.cloudRig,
-.cartographerRig,
-.orchestratorRig {
-  position: relative;
-  padding: 0;
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   1 · CYBERNETIC ARCHITECT — Armor Chassis
-   Silhouette: vertical command spine + angular armor plates + relay dots
-   ═══════════════════════════════════════════════════════════════════════════ */
 
 .cyberSpine {
   position: absolute;
-  inset: 0.8rem auto 0.6rem 52%;
-  width: 3px;
-  background: linear-gradient(180deg, transparent, var(--sys-glow-strong) 12%, var(--sys-glow-strong) 88%, transparent);
-  box-shadow: 0 0 22px var(--sys-glow-soft);
+  inset: 1.6rem auto 1.35rem;
+  left: 50%;
+  width: 1.25rem;
+  transform: translateX(-50%);
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%);
+  background: linear-gradient(180deg, var(--sys-fill), transparent 30%, var(--sys-fill));
+  box-shadow: 0 0 0 1px var(--sys-struct-faint);
 }
 
-/* Relay dots along spine */
 .cyberSpine::before,
 .cyberSpine::after {
   content: '';
   position: absolute;
   left: 50%;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--sys-edge);
-  background: var(--sys-glow-strong);
-  box-shadow: 0 0 10px var(--sys-glow-soft);
+  width: 3.6rem;
+  height: 0.34rem;
   transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
 }
 
-.cyberSpine::before { top: 22%; }
-.cyberSpine::after  { top: 68%; }
+.cyberSpine::before {
+  top: 26%;
+}
+
+.cyberSpine::after {
+  top: 68%;
+}
 
 .cyberNodes {
   position: absolute;
   inset: 0;
 }
 
-/* Angular armor plates via clip-path */
 .cyberNodes span {
   position: absolute;
-  background:
-    linear-gradient(160deg, var(--sys-struct-strong), var(--sys-struct-faint) 70%),
-    linear-gradient(180deg, var(--sys-glow-soft), transparent 58%);
-  box-shadow:
-    inset 0 1px 0 var(--sys-struct-strong),
-    0 14px 28px var(--sys-glow-soft);
+  height: 1.15rem;
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  background: linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3));
+  box-shadow: inset 0 1px 0 var(--sys-struct-strong);
 }
 
-/* Connector lines from plate to spine */
 .cyberNodes span::after {
   content: '';
   position: absolute;
   top: 50%;
-  width: 1.8rem;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--sys-glow-strong));
+  width: 1.5rem;
+  height: 0.22rem;
+  transform: translateY(-50%);
 }
 
-/* Plate 1: top-left — large command plate */
 .cyberNodes span:nth-child(1) {
-  top: 0.7rem;
-  left: 0;
-  width: 5.4rem;
-  height: 4.2rem;
-  clip-path: polygon(6% 0, 100% 0, 100% 72%, 91% 100%, 0 100%, 0 20%);
+  top: 2.55rem;
+  left: 0.95rem;
+  width: 3.15rem;
 }
 
-.cyberNodes span:nth-child(1)::after {
-  right: -1.4rem;
+.cyberNodes span:nth-child(1)::after,
+.cyberNodes span:nth-child(3)::after {
+  right: -1.45rem;
+  background: linear-gradient(90deg, var(--sys-edge), transparent);
 }
 
-/* Plate 2: mid-right — medium shoulder plate */
 .cyberNodes span:nth-child(2) {
-  top: 5.4rem;
-  right: 0;
-  width: 4.6rem;
-  height: 3.6rem;
-  clip-path: polygon(0 0, 92% 0, 100% 22%, 100% 100%, 8% 100%, 0 78%);
+  top: 5.75rem;
+  right: 0.95rem;
+  width: 3.55rem;
 }
 
 .cyberNodes span:nth-child(2)::after {
-  left: -1.3rem;
-  background: linear-gradient(90deg, var(--sys-glow-strong), transparent);
+  left: -1.45rem;
+  background: linear-gradient(90deg, transparent, var(--sys-edge));
 }
 
-/* Plate 3: bottom-left — compact actuator plate */
 .cyberNodes span:nth-child(3) {
-  bottom: 0.5rem;
-  left: 0.3rem;
-  width: 3.8rem;
-  height: 2.8rem;
-  clip-path: polygon(10% 0, 100% 0, 100% 80%, 88% 100%, 0 100%, 0 22%);
+  bottom: 2.05rem;
+  left: 1.35rem;
+  width: 2.85rem;
 }
 
-.cyberNodes span:nth-child(3)::after {
-  right: -1.5rem;
+.zeroTrustRig {
+  background:
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel)),
+    repeating-linear-gradient(90deg, transparent 0 22px, var(--sys-struct-faint) 22px 23px);
 }
-
-/* Chassis dashed outline */
-.cyberneticRig::before,
-.cyberneticRig::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-}
-
-.cyberneticRig::before {
-  inset: 0.6rem;
-  border-radius: 1.3rem;
-  border: 1px dashed var(--sys-struct);
-}
-
-/* Command hub — hexagonal center node */
-.cyberneticRig::after {
-  top: 50%;
-  left: 52%;
-  width: 1.5rem;
-  height: 1.5rem;
-  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 72%);
-  box-shadow: 0 0 20px var(--sys-glow-soft);
-  transform: translate(-50%, -50%);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   2 · ZERO TRUST ARCHITECT — Vault Gates
-   Silhouette: concentric ring sectors + crosshair scanlines + locked core
-   ═══════════════════════════════════════════════════════════════════════════ */
 
 .zeroRing,
 .zeroRingInner,
 .zeroCore {
   position: absolute;
-  border-radius: 999px;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
-/* Outer ring — gate sectors via conic gradient */
 .zeroRing {
-  width: 10.4rem;
-  aspect-ratio: 1;
-  border: 2px solid var(--sys-edge);
-  background: conic-gradient(
-    from 30deg,
-    transparent 0deg 52deg,
-    var(--sys-glow-soft) 52deg 68deg,
-    transparent 68deg 142deg,
-    var(--sys-glow-soft) 142deg 158deg,
-    transparent 158deg 232deg,
-    var(--sys-glow-soft) 232deg 248deg,
-    transparent 248deg 322deg,
-    var(--sys-glow-soft) 322deg 338deg,
-    transparent 338deg 360deg
-  );
+  width: 7.1rem;
+  height: 7.1rem;
+  border: 1px solid var(--sys-edge);
+  border-radius: 999px;
+  box-shadow:
+    0 0 0 0.55rem var(--sys-struct-faint),
+    inset 0 0 0 0.1rem var(--sys-struct-strong);
 }
 
-/* Inner ring — solid lockdown band */
-.zeroRingInner {
-  width: 6.8rem;
-  aspect-ratio: 1;
-  border: 1.5px solid var(--sys-edge);
-  box-shadow: inset 0 0 22px var(--sys-glow-soft);
-}
-
-/* Core — locked identity node */
-.zeroCore {
-  width: 2.8rem;
-  aspect-ratio: 1;
-  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 56%);
-  border: 1.5px solid var(--sys-edge);
-  box-shadow: 0 0 30px var(--sys-glow-soft);
-}
-
-/* Crosshair scanlines */
-.zeroTrustRig::before,
-.zeroTrustRig::after {
+.zeroRing::before,
+.zeroRing::after {
   content: '';
   position: absolute;
-  pointer-events: none;
-}
-
-.zeroTrustRig::before {
-  width: 100%;
-  height: 1px;
-  top: 50%;
-  left: 0;
-  background: linear-gradient(
-    90deg,
-    transparent 4%,
-    var(--sys-edge) 18%,
-    transparent 42%,
-    transparent 58%,
-    var(--sys-edge) 82%,
-    transparent 96%
-  );
-}
-
-.zeroTrustRig::after {
-  width: 1px;
-  height: 100%;
   left: 50%;
-  top: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 4%,
-    var(--sys-edge) 18%,
-    transparent 42%,
-    transparent 58%,
-    var(--sys-edge) 82%,
-    transparent 96%
-  );
+  top: 50%;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   3 · SYNTHETIC INTELLIGENCE ARCHITECT — Cortex Network
-   Silhouette: central cortex node + radiating dendrite branches + synapse dots
-   ═══════════════════════════════════════════════════════════════════════════ */
+.zeroRing::before {
+  width: 8.8rem;
+  height: 0.26rem;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
+}
 
-/* Central cortex node — positioned via calc to avoid transform conflict with animation */
+.zeroRing::after {
+  width: 0.26rem;
+  height: 8.8rem;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(180deg, transparent, var(--sys-edge), transparent);
+}
+
+.zeroRingInner {
+  width: 4.75rem;
+  height: 4.75rem;
+  border: 1px dashed var(--sys-glow-strong);
+  border-radius: 999px;
+  opacity: 0.84;
+}
+
+.zeroCore {
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  background: linear-gradient(180deg, var(--sys-fill), var(--sys-panel));
+  box-shadow: 0 0 0 0.35rem var(--sys-struct-faint);
+}
+
+.syntheticRig {
+  background:
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel)),
+    radial-gradient(circle at center, var(--sys-glow-soft), transparent 58%),
+    repeating-linear-gradient(90deg, transparent 0 19px, var(--sys-struct-faint) 19px 20px);
+}
+
 .syntheticCore {
   position: absolute;
-  top: calc(50% - 1.6rem);
-  left: calc(42% - 1.6rem);
-  width: 3.2rem;
-  height: 3.2rem;
-  border-radius: 999px;
-  border: 1.5px solid var(--sys-edge);
-  background: radial-gradient(circle at 38% 32%, var(--sys-glow-strong) 0%, var(--sys-glow-soft) 42%, transparent 68%);
+  left: 50%;
+  top: 50%;
+  width: 5.4rem;
+  height: 5.4rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(50% 0, 88% 12%, 100% 50%, 88% 88%, 50% 100%, 12% 88%, 0 50%, 12% 12%);
+  background:
+    radial-gradient(circle at 40% 40%, var(--sys-fill), transparent 42%),
+    linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3));
   box-shadow:
-    0 0 32px var(--sys-glow-soft),
-    inset 0 0 14px var(--sys-glow-soft);
-  z-index: 2;
+    0 0 0 0.55rem var(--sys-struct-faint),
+    inset 0 0 0 1px var(--sys-struct-strong);
+}
+
+.syntheticCore::before {
+  content: '';
+  position: absolute;
+  inset: 1rem;
+  border: 1px solid var(--sys-glow-strong);
+  clip-path: inherit;
+  opacity: 0.8;
 }
 
 .syntheticDendrites {
@@ -717,738 +550,409 @@
   inset: 0;
 }
 
-/* Dendrite branches — thin radiating lines */
 .syntheticDendrites span {
   position: absolute;
-  height: 2px;
-  background: linear-gradient(90deg, var(--sys-glow-strong) 10%, transparent 92%);
-  transform-origin: left center;
+  left: 50%;
+  top: 50%;
+  width: 4.4rem;
+  height: 0.28rem;
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--sys-glow-strong), transparent);
 }
 
-/* Synapse endpoint dots */
 .syntheticDendrites span::before {
   content: '';
   position: absolute;
-  right: -0.25rem;
+  right: -0.35rem;
   top: 50%;
-  width: 0.6rem;
-  height: 0.6rem;
-  border-radius: 999px;
-  border: 1px solid var(--sys-edge);
-  background: var(--sys-glow-strong);
-  box-shadow: 0 0 12px var(--sys-glow-soft);
+  width: 0.82rem;
+  height: 0.82rem;
   transform: translateY(-50%);
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 6px, 6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+  background: var(--sys-panel);
+  box-shadow: 0 0 0 0.2rem var(--sys-struct-faint);
 }
 
-/* Mid-branch relay node */
 .syntheticDendrites span::after {
   content: '';
   position: absolute;
-  left: 35%;
+  left: -1.35rem;
   top: 50%;
-  width: 0.32rem;
-  height: 0.32rem;
-  border-radius: 999px;
-  background: var(--sys-glow-soft);
+  width: 1.35rem;
+  height: 0.18rem;
   transform: translateY(-50%);
+  background: linear-gradient(90deg, transparent, var(--sys-edge));
 }
 
-/* Dendrite 1: upper-right */
 .syntheticDendrites span:nth-child(1) {
-  top: 2.4rem;
-  left: 50%;
-  width: 44%;
-  transform: rotate(-30deg);
+  transform: translate(0.2rem, -0.15rem) rotate(-32deg);
 }
 
-/* Dendrite 2: right-center */
 .syntheticDendrites span:nth-child(2) {
-  top: calc(50% - 1px);
-  left: 54%;
-  width: 40%;
-  transform: rotate(4deg);
+  width: 4.85rem;
+  transform: translate(0.35rem, -0.15rem) rotate(0deg);
 }
 
-/* Dendrite 3: lower-right */
 .syntheticDendrites span:nth-child(3) {
-  bottom: 2.6rem;
-  left: 46%;
-  width: 48%;
-  transform: rotate(34deg);
+  transform: translate(0.2rem, -0.15rem) rotate(34deg);
 }
 
-/* Scaffold ring */
-.syntheticRig::before,
-.syntheticRig::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 42%;
-  border-radius: 999px;
-  pointer-events: none;
+.quantumRig {
+  background:
+    linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3)),
+    linear-gradient(90deg, transparent 49%, var(--sys-struct) 49% 51%, transparent 51%),
+    repeating-linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
 }
-
-.syntheticRig::before {
-  width: 9rem;
-  height: 9rem;
-  border: 1px dashed var(--sys-struct);
-  transform: translate(-50%, -50%);
-}
-
-/* Inner orbital halo */
-.syntheticRig::after {
-  width: 5.4rem;
-  height: 5.4rem;
-  border: 1px solid var(--sys-struct-faint);
-  transform: translate(-50%, -50%);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   4 · QUANTUM DESIGNER — Probability Field
-   Silhouette: tilted orbit ellipses + split-state panels with interference
-   ═══════════════════════════════════════════════════════════════════════════ */
 
 .quantumOrbit,
 .quantumOrbitAlt {
   position: absolute;
-  border-radius: 999px;
-  border: 1px solid var(--sys-edge);
+  left: 50%;
   top: 50%;
-  left: 42%;
-  transform: translate(-50%, -50%);
+  border: 1px solid var(--sys-edge);
+  border-radius: 999px;
 }
 
 .quantumOrbit {
-  width: 10.6rem;
-  aspect-ratio: 1;
-  background: radial-gradient(circle at center, transparent 52%, var(--sys-struct) 52%, transparent 68%);
+  width: 7rem;
+  height: 3rem;
+  transform: translate(-50%, -50%) rotate(20deg);
 }
 
 .quantumOrbitAlt {
-  width: 7.4rem;
-  aspect-ratio: 1;
-  background: radial-gradient(circle at center, transparent 52%, var(--sys-struct) 52%, transparent 68%);
-  transform: translate(-50%, -50%) rotate(62deg);
+  width: 6.2rem;
+  height: 6.6rem;
+  transform: translate(-50%, -50%) rotate(-24deg);
 }
 
-/* Split-state panels */
 .quantumStates {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0.65rem;
-  width: 6.4rem;
   position: absolute;
-  inset: 50% 0.2rem auto auto;
-  transform: translateY(-50%);
-  align-items: center;
+  inset: 0;
 }
 
 .quantumStates span {
-  position: relative;
-  min-height: 4.5rem;
-  border-radius: 1.2rem;
+  position: absolute;
+  width: 3.1rem;
+  height: 1.4rem;
   border: 1px solid var(--sys-edge);
-  background:
-    linear-gradient(
-      135deg,
-      var(--sys-glow-soft) 0%,
-      transparent 48%,
-      var(--sys-struct-faint) 52%,
-      var(--sys-struct-strong) 100%
-    );
-  box-shadow: inset 0 1px 0 var(--sys-struct-strong);
+  clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
+  background: linear-gradient(180deg, var(--sys-fill), var(--sys-panel-3));
+  box-shadow: 0 0 0 0.2rem var(--sys-struct-faint);
 }
 
-/* Interference fringe overlay */
 .quantumStates span::before {
   content: '';
   position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0 0.38rem,
-    var(--sys-struct-faint) 0.38rem 0.44rem
-  );
-  pointer-events: none;
+  left: 0.45rem;
+  right: 0.45rem;
+  top: 0.42rem;
+  height: 0.18rem;
+  background: linear-gradient(90deg, var(--sys-edge), transparent);
 }
 
 .quantumStates span:nth-child(1) {
-  width: 82%;
-  justify-self: end;
-  transform: rotate(-10deg);
+  left: 16%;
+  top: 27%;
+  transform: rotate(-12deg);
 }
 
 .quantumStates span:nth-child(2) {
-  min-height: 3.8rem;
-  width: 100%;
-  justify-self: start;
-  transform: translateX(-0.35rem);
+  left: 50%;
+  top: 44%;
+  transform: translateX(-50%) rotate(6deg);
 }
 
 .quantumStates span:nth-child(3) {
-  width: 72%;
-  justify-self: end;
-  transform: rotate(8deg);
+  right: 14%;
+  bottom: 25%;
+  transform: rotate(-10deg);
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   5 · CLOUD SHAPER — Compute Weather
-   Silhouette: billowing cumulus masses + vertical data-rain lines + terrain
-   ═══════════════════════════════════════════════════════════════════════════ */
+.cloudRig {
+  background:
+    linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3)),
+    linear-gradient(0deg, transparent 0 74%, var(--sys-struct-faint) 74% 75%, transparent 75%),
+    repeating-linear-gradient(90deg, transparent 0 24px, var(--sys-struct-faint) 24px 25px);
+}
 
 .cloudMasses {
   position: absolute;
-  inset: 0;
+  inset: 2.1rem 1rem 3.7rem 1rem;
 }
 
-/* Cumulus cloud shapes — organic border-radius */
 .cloudMasses span {
   position: absolute;
-  background:
-    radial-gradient(ellipse at 32% 36%, var(--sys-fill), transparent 52%),
-    linear-gradient(180deg, var(--sys-struct-strong), var(--sys-struct-faint));
+  bottom: 0;
+  border: 1px solid var(--sys-edge);
+  background: linear-gradient(180deg, var(--sys-fill), var(--sys-panel-2));
   box-shadow:
-    inset 0 2px 0 var(--sys-struct-strong),
-    0 20px 40px var(--sys-glow-soft);
-  border: 1px solid var(--sys-struct);
+    inset 0 1px 0 var(--sys-struct-strong),
+    0 0.2rem 0 var(--sys-struct-faint);
+  clip-path: polygon(0 18px, 18px 18px, 18px 0, 62% 0, 62% 16px, 100% 16px, 100% 100%, 0 100%);
 }
 
-/* Cloud 1: large cumulus — top */
 .cloudMasses span:nth-child(1) {
-  top: 0.6rem;
-  left: 0.4rem;
-  width: 74%;
-  height: 5.4rem;
-  border-radius: 52% 42% 38% 58% / 68% 52% 48% 32%;
+  left: 0.8rem;
+  width: 4.5rem;
+  height: 4.15rem;
 }
 
-/* Cloud 2: medium cumulus — overlapping lower-right */
 .cloudMasses span:nth-child(2) {
-  top: 3.6rem;
-  right: 0.2rem;
-  width: 60%;
-  height: 4.2rem;
-  border-radius: 42% 54% 48% 42% / 58% 48% 42% 52%;
+  right: 0.6rem;
+  width: 5.2rem;
+  height: 5.25rem;
 }
 
-/* Data rain lines */
 .cloudRain {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
+  left: 1.3rem;
+  right: 1.3rem;
+  bottom: 1.2rem;
+  height: 4.7rem;
 }
 
 .cloudRain span {
   position: absolute;
-  bottom: 0.5rem;
-  width: 1.5px;
+  bottom: 0;
+  width: 0.34rem;
   background: linear-gradient(180deg, var(--sys-glow-strong), transparent);
+  box-shadow: 0 0 0 1px var(--sys-struct-faint);
 }
 
-.cloudRain span:nth-child(1) { left: 16%; height: 3.6rem; opacity: 0.75; }
-.cloudRain span:nth-child(2) { left: 29%; height: 4.8rem; opacity: 0.55; }
-.cloudRain span:nth-child(3) { left: 44%; height: 3rem;  opacity: 0.65; }
-.cloudRain span:nth-child(4) { left: 60%; height: 4.2rem; opacity: 0.45; }
-
-/* Cloud halo outline */
-.cloudRig::before,
-.cloudRig::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
+.cloudRain span:nth-child(1) {
+  left: 16%;
+  height: 3.6rem;
 }
 
-.cloudRig::before {
-  top: 0.4rem;
-  right: 0.6rem;
-  width: 10.8rem;
-  height: 6.8rem;
-  border-radius: 50% 46% 40% 50% / 62% 54% 38% 40%;
-  border: 1px solid var(--sys-struct);
+.cloudRain span:nth-child(2) {
+  left: 33%;
+  height: 4.85rem;
 }
 
-/* Terrain contour at base */
-.cloudRig::after {
-  bottom: 0.3rem;
-  left: 0.6rem;
-  right: 0.6rem;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 3%,
-    var(--sys-edge) 22%,
-    var(--sys-edge) 78%,
-    transparent 97%
-  );
+.cloudRain span:nth-child(3) {
+  left: 52%;
+  height: 3.2rem;
 }
 
-/* ═══════════════════════════════════════════════════════════════════════════
-   6 · AI CARTOGRAPHER — Route Atlas
-   Silhouette: grid + crossing routes + varying waypoint pins + contour rings
-   ═══════════════════════════════════════════════════════════════════════════ */
+.cloudRain span:nth-child(4) {
+  left: 71%;
+  height: 4.2rem;
+}
+
+.cartographerRig {
+  background:
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel)),
+    linear-gradient(90deg, transparent 0 11%, var(--sys-struct-faint) 11% 12%, transparent 12% 88%, var(--sys-struct-faint) 88% 89%, transparent 89% 100%);
+}
 
 .mapGrid {
   position: absolute;
-  width: 11rem;
-  aspect-ratio: 1;
-  border-radius: 999px;
-  border: 1px solid var(--sys-edge);
+  inset: 1rem;
+  clip-path: polygon(0 10px, 10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%);
   background:
-    linear-gradient(90deg, transparent 48%, var(--sys-struct) 48%, var(--sys-struct) 52%, transparent 52%),
-    linear-gradient(transparent 48%, var(--sys-struct) 48%, var(--sys-struct) 52%, transparent 52%);
+    linear-gradient(90deg, var(--sys-struct) 1px, transparent 1px),
+    linear-gradient(0deg, var(--sys-struct) 1px, transparent 1px);
+  background-size: 1.08rem 1.08rem;
+  opacity: 0.56;
 }
 
-/* Primary route: L-bend path */
-.mapRoute {
-  position: absolute;
-  width: 7.5rem;
-  height: 4.2rem;
-  border-bottom: 1.5px solid var(--sys-glow-strong);
-  border-left: 1.5px solid var(--sys-glow-strong);
-  border-radius: 0 0 0 0.4rem;
-  transform: rotate(-12deg);
-}
-
-/* Secondary route: diagonal crossing */
+.mapRoute,
 .mapRouteAlt {
   position: absolute;
-  width: 6.8rem;
-  height: 0;
-  border-top: 1.5px dashed var(--sys-glow-strong);
-  opacity: 0.45;
-  top: 36%;
-  left: 10%;
-  transform: rotate(28deg);
+  height: 0.32rem;
+  transform-origin: left center;
 }
 
-/* Waypoint pins */
+.mapRoute {
+  top: 3.25rem;
+  left: 1.1rem;
+  right: 2.2rem;
+  transform: rotate(18deg);
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+}
+
+.mapRouteAlt {
+  left: 2rem;
+  right: 1.1rem;
+  bottom: 3.8rem;
+  transform: rotate(-14deg);
+  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
+}
+
 .mapPins {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 2.4rem;
-  z-index: 2;
+  position: absolute;
+  inset: 0;
 }
 
 .mapPins span {
-  border-radius: 999px;
+  position: absolute;
   border: 1px solid var(--sys-edge);
-  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 60%);
-  box-shadow: 0 0 12px var(--sys-glow-soft);
-  justify-self: center;
+  clip-path: polygon(50% 0, 100% 46%, 50% 100%, 0 46%);
+  background: var(--sys-panel);
+  box-shadow: 0 0 0 0.18rem var(--sys-struct-faint);
 }
 
-/* Different pin sizes for waypoint hierarchy */
-.mapPins span:nth-child(1) { width: 1.15rem; min-height: 1.15rem; }
-.mapPins span:nth-child(2) { width: 0.7rem;  min-height: 0.7rem;  align-self: end; }
-.mapPins span:nth-child(3) { width: 0.9rem;  min-height: 0.9rem; }
+.mapPins span:nth-child(1) {
+  top: 2.85rem;
+  left: 1.85rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
 
-/* Topographic contour rings */
+.mapPins span:nth-child(2) {
+  top: 6rem;
+  left: 4.6rem;
+  width: 0.78rem;
+  height: 0.78rem;
+}
+
+.mapPins span:nth-child(3) {
+  right: 1.8rem;
+  bottom: 2.55rem;
+  width: 0.94rem;
+  height: 0.94rem;
+}
+
 .mapContours {
   position: absolute;
   inset: 0;
-  pointer-events: none;
 }
 
 .mapContours span {
   position: absolute;
+  border: 1px solid var(--sys-struct-strong);
   border-radius: 999px;
-  border: 1px solid var(--sys-edge);
-  opacity: 0.3;
 }
 
 .mapContours span:nth-child(1) {
-  top: 0.8rem;
-  left: 0.6rem;
-  width: 3.6rem;
-  height: 3.6rem;
+  inset: 2rem 1.4rem 4.1rem 2.7rem;
 }
 
 .mapContours span:nth-child(2) {
-  bottom: 1.2rem;
-  right: 1rem;
-  width: 2.6rem;
-  height: 2.6rem;
+  inset: 4rem 2.8rem 2rem 1.4rem;
 }
 
-/* Compass rose */
-.cartographerRig::before,
-.cartographerRig::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  z-index: 3;
+.orchestratorRig {
+  background:
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel-3)),
+    repeating-linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
 }
-
-.cartographerRig::before {
-  top: 0.7rem;
-  right: 0.7rem;
-  width: 1.5rem;
-  height: 1.5rem;
-  border-radius: 999px;
-  border: 1px solid var(--sys-edge);
-  background: radial-gradient(circle at center, var(--sys-glow-soft), transparent 68%);
-}
-
-/* Compass needle */
-.cartographerRig::after {
-  top: calc(0.7rem + 0.1rem);
-  right: calc(0.7rem + 0.68rem);
-  width: 1px;
-  height: 1.3rem;
-  background: linear-gradient(180deg, var(--sys-glow-strong), transparent);
-}
-
-/* ═══════════════════════════════════════════════════════════════════════════
-   7 · DATA ORCHESTRATOR — Conductor Score
-   Silhouette: 5 staff lines + note heads + 3 beat markers + conductor node
-   ═══════════════════════════════════════════════════════════════════════════ */
 
 .orchestratorScore {
   position: absolute;
-  inset: 0;
+  inset: 1.85rem 1rem 1.7rem;
 }
 
-/* Staff lines */
 .orchestratorScore span {
   position: absolute;
   left: 0;
-  right: 2.8rem;
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 2%,
-    var(--sys-edge) 12%,
-    var(--sys-glow-strong) 55%,
-    transparent 82%
-  );
+  right: 0;
+  height: 0.2rem;
+  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
 }
 
-.orchestratorScore span:nth-child(1) { top: 1.8rem; }
-.orchestratorScore span:nth-child(2) { top: 4rem; }
-.orchestratorScore span:nth-child(3) { top: 6.2rem; }
-.orchestratorScore span:nth-child(4) { top: 8.4rem; }
-.orchestratorScore span:nth-child(5) { top: 10.6rem; }
-
-/* Note heads on staff lines */
-.orchestratorScore span::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  width: 0.62rem;
-  height: 0.46rem;
-  border-radius: 50%;
-  background: var(--sys-glow-strong);
-  box-shadow: 0 0 8px var(--sys-glow-soft);
-  transform: translateY(-50%) rotate(-14deg);
+.orchestratorScore span:nth-child(1) {
+  top: 1.55rem;
 }
 
-.orchestratorScore span:nth-child(1)::after { right: 6%; }
-.orchestratorScore span:nth-child(2)::after { right: 20%; }
-.orchestratorScore span:nth-child(3)::after { right: 12%; }
-.orchestratorScore span:nth-child(4)::after { right: 26%; }
-.orchestratorScore span:nth-child(5)::after { right: 4%; }
+.orchestratorScore span:nth-child(2) {
+  top: 3.15rem;
+}
 
-/* Beat marker container */
+.orchestratorScore span:nth-child(3) {
+  top: 4.75rem;
+}
+
+.orchestratorScore span:nth-child(4) {
+  top: 6.35rem;
+}
+
+.orchestratorScore span:nth-child(5) {
+  top: 7.95rem;
+}
+
 .orchestratorBeats {
   position: absolute;
   inset: 0;
-  pointer-events: none;
 }
 
-/* Vertical bar lines */
 .orchestratorBeats span {
   position: absolute;
-  top: 1.2rem;
-  bottom: 1.2rem;
-  width: 1.5px;
-  background: linear-gradient(180deg, transparent, var(--sys-edge) 15%, var(--sys-edge) 85%, transparent);
-  opacity: 0.45;
+  bottom: 2rem;
+  width: 1rem;
+  border: 1px solid var(--sys-edge);
+  clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+  background: linear-gradient(180deg, var(--sys-fill), var(--sys-panel));
+  box-shadow: 0 0 0 0.2rem var(--sys-struct-faint);
 }
 
-.orchestratorBeats span:nth-child(1) { left: 26%; }
-.orchestratorBeats span:nth-child(2) { left: 50%; }
-.orchestratorBeats span:nth-child(3) { left: 72%; }
-
-/* Conductor focal node */
-.orchestratorRig::before,
-.orchestratorRig::after {
+.orchestratorBeats span::before {
   content: '';
   position: absolute;
-  pointer-events: none;
+  left: 50%;
+  top: -1.45rem;
+  width: 0.22rem;
+  height: 1.45rem;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, var(--sys-edge));
 }
 
-.orchestratorRig::before {
-  top: 50%;
-  right: 0.5rem;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 999px;
+.orchestratorBeats span::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -2.08rem;
+  width: 0.98rem;
+  height: 0.98rem;
+  transform: translateX(-50%);
   border: 1px solid var(--sys-edge);
-  background: radial-gradient(circle at center, var(--sys-glow-strong), transparent 60%);
-  box-shadow: 0 0 26px var(--sys-glow-soft);
-  transform: translateY(-50%);
-  z-index: 2;
+  border-radius: 999px;
+  background: var(--sys-panel);
 }
 
-/* Baton trail from conductor */
-.orchestratorRig::after {
-  top: 50%;
-  right: 2.5rem;
-  width: 3.2rem;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--sys-glow-strong));
+.orchestratorBeats span:nth-child(1) {
+  left: 19%;
+  height: 4rem;
 }
 
-/* ─── Animations ───────────────────────────────────────────────────────── */
-
-.scene[data-motion='animated'] .iconBadge,
-.scene[data-motion='animated'] .zeroCore,
-.scene[data-motion='animated'] .syntheticCore {
-  animation: systemsPulse 8s ease-in-out infinite;
+.orchestratorBeats span:nth-child(2) {
+  left: 48%;
+  height: 6rem;
 }
 
-.scene[data-motion='animated'] .quantumOrbit {
-  animation: quantumOrbitPulse 8s ease-in-out infinite;
+.orchestratorBeats span:nth-child(3) {
+  left: 75%;
+  height: 4.9rem;
 }
 
-.scene[data-motion='animated'] .quantumOrbitAlt {
-  animation: quantumOrbitAltPulse 8s ease-in-out infinite;
-}
-
-/* Sweep — elements without base transforms */
-.scene[data-motion='animated'] .cyberNodes span:nth-child(2),
-.scene[data-motion='animated'] .mapRoute,
-.scene[data-motion='animated'] .orchestratorScore span:nth-child(3) {
-  animation: systemsSweep 5.6s ease-in-out infinite;
-}
-
-/* Dendrite fire — staggered opacity pulse */
-.scene[data-motion='animated'] .syntheticDendrites span {
-  animation: dendritePulse 5s ease-in-out infinite;
-}
-
-.scene[data-motion='animated'] .syntheticDendrites span:nth-child(2) {
-  animation-delay: 0.7s;
-}
-
-.scene[data-motion='animated'] .syntheticDendrites span:nth-child(3) {
-  animation-delay: 1.4s;
-}
-
-/* Cloud drift */
-.scene[data-motion='animated'] .cloudMasses span:nth-child(1) {
-  animation: cloudDrift 11s ease-in-out infinite;
-}
-
-.scene[data-motion='animated'] .cloudMasses span:nth-child(2) {
-  animation: cloudDrift 13s ease-in-out infinite reverse;
-}
-
-/* Data rain pulse */
-.scene[data-motion='animated'] .cloudRain span {
-  animation: rainPulse 3.2s ease-in-out infinite;
-}
-
-.scene[data-motion='animated'] .cloudRain span:nth-child(2) { animation-delay: 0.45s; }
-.scene[data-motion='animated'] .cloudRain span:nth-child(3) { animation-delay: 0.9s; }
-.scene[data-motion='animated'] .cloudRain span:nth-child(4) { animation-delay: 1.35s; }
-
-/* Vault gate rotation */
-.scene[data-motion='animated'] .zeroRing {
-  animation: gateRotate 22s linear infinite;
-}
-
-@keyframes systemsPulse {
-  0%, 100% { transform: scale(1); }
-  50%      { transform: scale(1.03); }
-}
-
-@keyframes systemsSweep {
-  0%, 100% { opacity: 0.55; transform: translateY(0); }
-  50%      { opacity: 1;    transform: translateY(-0.2rem); }
-}
-
-@keyframes quantumOrbitPulse {
-  0%, 100% { transform: translate(-50%, -50%) scale(1); }
-  50%      { transform: translate(-50%, -50%) scale(1.03); }
-}
-
-@keyframes quantumOrbitAltPulse {
-  0%, 100% { transform: translate(-50%, -50%) rotate(62deg) scale(1); }
-  50%      { transform: translate(-50%, -50%) rotate(62deg) scale(1.03); }
-}
-
-@keyframes dendritePulse {
-  0%, 100% { opacity: 0.55; }
-  50%      { opacity: 1; }
-}
-
-@keyframes cloudDrift {
-  0%, 100% { transform: translateX(0); }
-  50%      { transform: translateX(0.45rem); }
-}
-
-@keyframes rainPulse {
-  0%, 100% { opacity: 0.25; }
-  50%      { opacity: 0.85; }
-}
-
-@keyframes gateRotate {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-
-/* ─── Mobile ───────────────────────────────────────────────────────────── */
-
-@media (max-width: 640px) {
-  .deck {
-    grid-template-columns: 1fr;
-    justify-items: start;
+@media (max-width: 720px) {
+  .title {
+    font-size: clamp(1.28rem, 6vw, 1.92rem);
   }
 
-  .deckCounter {
-    justify-self: start;
+  .scene {
+    padding: 0.92rem;
   }
 
-  .headlineWrap {
-    grid-template-columns: 1fr;
+  .sceneBody {
+    gap: 0.7rem;
+    min-height: 14.2rem;
   }
 
-  /* All scenes: single column */
-  .sceneCybernetic .sceneBody,
+  .sceneCybernetic .sceneBody {
+    grid-template-columns: minmax(0, 1fr) 7rem;
+  }
+
   .sceneZeroTrust .sceneBody,
-  .sceneSynthetic .sceneBody,
-  .sceneQuantum .sceneBody,
-  .sceneCloud .sceneBody,
-  .sceneCartographer .sceneBody,
-  .sceneOrchestrator .sceneBody {
-    grid-template-columns: 1fr;
-    gap: 0.8rem;
+  .sceneCloud .sceneBody {
+    grid-template-columns: minmax(0, 8.4rem) minmax(0, 1fr);
   }
+}
 
-  /* All titles: centered */
-  .sceneCybernetic .titleBlock,
-  .sceneZeroTrust .titleBlock,
-  .sceneSynthetic .titleBlock,
-  .sceneQuantum .titleBlock,
-  .sceneCloud .titleBlock,
-  .sceneCartographer .titleBlock,
-  .sceneOrchestrator .titleBlock {
-    justify-self: center;
-    max-width: none;
-    padding-left: 0;
-    padding-right: 0;
-    text-align: center;
-  }
-
-  .sceneCybernetic .headlineWrap,
-  .sceneZeroTrust .headlineWrap,
-  .sceneSynthetic .headlineWrap,
-  .sceneQuantum .headlineWrap,
-  .sceneCloud .headlineWrap,
-  .sceneCartographer .headlineWrap,
-  .sceneOrchestrator .headlineWrap {
-    justify-items: center;
-  }
-
-  .sceneCybernetic .titleLockup,
-  .sceneCybernetic .descriptor,
-  .sceneZeroTrust .titleLockup,
-  .sceneZeroTrust .descriptor,
-  .sceneSynthetic .titleLockup,
-  .sceneSynthetic .descriptor,
-  .sceneQuantum .titleLockup,
-  .sceneQuantum .descriptor,
-  .sceneCloud .titleLockup,
-  .sceneCloud .descriptor,
-  .sceneCartographer .titleLockup,
-  .sceneCartographer .descriptor,
-  .sceneOrchestrator .titleLockup,
-  .sceneOrchestrator .descriptor {
-    max-width: none;
-  }
-
-  /* All rigs: full width, compact */
-  .sceneCybernetic .sceneRig,
-  .sceneZeroTrust .sceneRig,
-  .sceneSynthetic .sceneRig,
-  .sceneQuantum .sceneRig,
-  .sceneCloud .sceneRig,
-  .sceneCartographer .sceneRig,
-  .sceneOrchestrator .sceneRig {
-    width: 100%;
-    min-height: 12rem;
-  }
-
-  /* Cybernetic mobile */
-  .cyberSpine {
-    inset: 0.8rem auto 0.8rem 50%;
-  }
-
-  .cyberNodes span:nth-child(1) {
-    top: 0.5rem;
-    left: 0.4rem;
-    width: 4.8rem;
-    height: 3.6rem;
-  }
-
-  .cyberNodes span:nth-child(2) {
-    top: 4.2rem;
-    right: 0.4rem;
-    width: 4.2rem;
-    height: 3.2rem;
-  }
-
-  .cyberNodes span:nth-child(3) {
-    bottom: 0.4rem;
-    left: 0.6rem;
-    width: 3.4rem;
-    height: 2.4rem;
-  }
-
-  /* Synthetic mobile */
-  .syntheticCore {
-    top: calc(50% - 1.6rem);
-    left: calc(50% - 1.6rem);
-  }
-
-  .syntheticRig::before,
-  .syntheticRig::after {
-    left: 50%;
-  }
-
-  /* Quantum mobile */
-  .sceneQuantum .quantumOrbit,
-  .sceneQuantum .quantumOrbitAlt {
-    left: 50%;
-    top: 45%;
-  }
-
-  .sceneQuantum .quantumStates {
-    inset: auto 0 0;
-    width: 100%;
-    transform: none;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  /* Cloud mobile */
-  .cloudRig::before {
-    width: auto;
-    inset-inline: 0.6rem;
-    top: 0.3rem;
-    right: 0.6rem;
-    height: 5.8rem;
-  }
-
-  /* Orchestrator mobile */
-  .orchestratorScore span {
-    right: 2rem;
-  }
-
-  .orchestratorBeats span {
-    top: 1rem;
-    bottom: 1rem;
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .control:focus-visible .scene {
+    transition: none;
   }
 }
