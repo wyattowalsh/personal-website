@@ -12,7 +12,7 @@ interface ShareButtonsProps {
   className?: string;
 }
 
-export function ShareButtons({ url, title, description, className }: ShareButtonsProps) {
+export function ShareButtons({ url, title, description: _description, className }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopyLink = async () => {

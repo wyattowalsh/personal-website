@@ -415,7 +415,6 @@ describe('BackendService', () => {
   describe('preprocess validation', () => {
     const invalidSlug = '__vitest-invalid-date';
     const validSlug = '__vitest-valid-post';
-    const postsDir = path.join(process.cwd(), 'content/posts');
     const fixtureRoot = path.join(process.cwd(), '.cache', '__vitest-post-fixtures');
     const invalidPostContent = `---
 title: "Invalid Date"
