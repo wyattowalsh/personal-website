@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { ARCANE_SHOWCASE_RENDERERS } from '@/components/landing-title/arcane';
+import { CRAFTED_SHOWCASE_RENDERERS } from '@/components/landing-title/crafted';
+import { PERFORMANCE_SHOWCASE_RENDERERS } from '@/components/landing-title/performance';
 import {
   DEFAULT_LANDING_TITLE_SUBTITLE_ID,
   DEPRECATED_SUBTITLE_ALIASES,
@@ -12,6 +15,7 @@ import {
   getSubtitleRendererByText,
   resolveSubtitleOption,
 } from '@/components/landing-title/registry';
+import { SYSTEMS_SHOWCASE_RENDERERS } from '@/components/landing-title/systems';
 
 const EXPECTED_SUBTITLE_ORDER = [
   'cybernetic-architect',
@@ -63,6 +67,13 @@ const EXPECTED_VISIBLE_TITLES = [
   'cortex diviner',
 ] as const;
 
+const EXPECTED_RENDERER_OBJECTS = [
+  ...SYSTEMS_SHOWCASE_RENDERERS,
+  ...ARCANE_SHOWCASE_RENDERERS,
+  ...CRAFTED_SHOWCASE_RENDERERS,
+  ...PERFORMANCE_SHOWCASE_RENDERERS,
+] as const;
+
 describe('landing title registry contract', () => {
   it('keeps subtitle ids unique and aligned with registry entries', () => {
     const ids = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id);
@@ -106,6 +117,14 @@ describe('landing title registry contract', () => {
 
     expect(getSubtitleRenderer(renderer?.id ?? '')).toBe(renderer);
     expect(getSubtitleRenderer(renderer?.text ?? '')).toBe(renderer);
+  });
+
+  it('keeps registry entries bound to the bespoke lane renderers', () => {
+    expect(LANDING_TITLE_RENDERERS).toEqual(EXPECTED_RENDERER_OBJECTS);
+
+    for (const renderer of EXPECTED_RENDERER_OBJECTS) {
+      expect(getSubtitleRendererById(renderer.id)).toBe(renderer);
+    }
   });
 });
 
@@ -156,6 +175,17 @@ describe('deprecated subtitle alias compatibility', () => {
     expect(getSubtitleRenderer('  Signal   Orchestrator ')?.id).toBe('data-orchestrator');
     expect(getSubtitleRenderer('  Systems   Seer ')?.id).toBe('systems-seer');
     expect(getSubtitleRenderer('  Emergence   Mystic ')?.id).toBe('systems-seer');
+
+    expect(getSubtitleOptionByText('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleOptionByText('  Signal   Orchestrator ')?.id).toBe('data-orchestrator');
+    expect(getSubtitleOptionByText('  Systems   Seer ')?.id).toBe('systems-seer');
+    expect(getSubtitleOptionByText('  Emergence   Mystic ')?.id).toBe('systems-seer');
+  });
+
+  it('normalizes casing and whitespace for current ids as well as text', () => {
+    expect(getSubtitleOptionById('  DATA-ORCHESTRATOR  ')?.id).toBe('data-orchestrator');
+    expect(getSubtitleOptionById('  AI-CARTOGRAPHER  ')?.id).toBe('ai-cartographer');
+    expect(resolveSubtitleOption('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
   });
 
   it('resolves dropped old display texts to a consolidated current entry', () => {

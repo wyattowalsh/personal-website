@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  createSubtitleRenderer,
   type LandingTitleRendererEntry,
   type SubtitleLane,
 } from '@/components/landing-title/shared';
@@ -33,50 +32,12 @@ export interface LandingTitleSubtitleOption {
   readonly signalDeck: SignalDeckMeta;
 }
 
-const CANONICAL_SUBTITLE_TEXT_BY_ID: Readonly<Record<string, string>> = Object.freeze({
-  'cybernetic-architect'            : 'cyber architect',
-  'zero-trust-architect'            : 'zero trust architect',
-  'synthetic-intelligence-architect': 'cognitive architect',
-  'quantum-designer'                : 'quantum designer',
-  'cloud-shaper'                    : 'cloud shaper',
-  'ai-cartographer'                 : 'AI cartographer',
-  'data-orchestrator'               : 'signal orchestrator',
-  'data-sorcerer'                   : 'data sorcerer',
-  'workflow-mage'                   : 'workflow mage',
-  'algorithm-weaver'                : 'logic weaver',
-  'silicon-conjurer'                : 'silicon conjurer',
-  'systems-seer'                    : 'circuit seer',
-  'signal-oracle'                   : 'signal oracle',
-  'code-alchemist'                  : 'code alchemist',
-  'digital-sculptor'                : 'digital sculptor',
-  'holographic-sculptor'            : 'holosculptor',
-  'cyber-defense-artisan'           : 'cyber defense artisan',
-  'blockchain-artisan'              : 'blockchain artisan',
-  'frontier-forger'                 : 'frontier forger',
-  'automation-virtuoso'             : 'automation virtuoso',
-  'kinetic-machinist'               : 'kinetic machinist',
-  'cortex-diviner'                  : 'cortex diviner',
-});
-
-function reconcileRendererText(entry: LandingTitleRendererEntry): LandingTitleRendererEntry {
-  const canonicalText = CANONICAL_SUBTITLE_TEXT_BY_ID[entry.id];
-
-  if (!canonicalText || canonicalText === entry.text) {
-    return entry;
-  }
-
-  return createSubtitleRenderer({
-    ...entry.theme,
-    text: canonicalText,
-  });
-}
-
 export const LANDING_TITLE_RENDERERS: LandingTitleRendererEntry[] = [
   ...SYSTEMS_SHOWCASE_RENDERERS,
   ...ARCANE_SHOWCASE_RENDERERS,
   ...CRAFTED_SHOWCASE_RENDERERS,
   ...PERFORMANCE_SHOWCASE_RENDERERS,
-].map(reconcileRendererText);
+];
 
 export const SUBTITLE_RENDERER_REGISTRY = Object.freeze(
   Object.fromEntries(LANDING_TITLE_RENDERERS.map((e) => [e.id, e])),
@@ -96,6 +57,22 @@ export const DEFAULT_LANDING_TITLE_SUBTITLE = LANDING_TITLE_SUBTITLE_OPTIONS[0] 
 export const DEFAULT_LANDING_TITLE_SUBTITLE_ID = DEFAULT_LANDING_TITLE_SUBTITLE?.id ?? 'cybernetic-architect';
 export const LANDING_TITLE_SUBTITLE_IDS = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id) as readonly string[];
 export const LANDING_TITLE_THEME_TEXTS = LANDING_TITLE_RENDERERS.map(({ text }) => text) as readonly string[];
+
+const SUBTITLE_OPTION_ID_REGISTRY = Object.freeze(
+  Object.fromEntries(LANDING_TITLE_SUBTITLE_OPTIONS.map((option) => [option.id, option])),
+) as Readonly<Record<string, LandingTitleSubtitleOption>>;
+
+const NORMALIZED_SUBTITLE_OPTION_ID_REGISTRY = Object.freeze(
+  Object.fromEntries(LANDING_TITLE_SUBTITLE_OPTIONS.map((option) => [normalizeSubtitleSelection(option.id), option])),
+) as Readonly<Record<string, LandingTitleSubtitleOption>>;
+
+const SUBTITLE_OPTION_TEXT_REGISTRY = Object.freeze(
+  Object.fromEntries(LANDING_TITLE_SUBTITLE_OPTIONS.map((option) => [option.text, option])),
+) as Readonly<Record<string, LandingTitleSubtitleOption>>;
+
+const NORMALIZED_SUBTITLE_OPTION_TEXT_REGISTRY = Object.freeze(
+  Object.fromEntries(LANDING_TITLE_SUBTITLE_OPTIONS.map((option) => [normalizeSubtitleSelection(option.text), option])),
+) as Readonly<Record<string, LandingTitleSubtitleOption>>;
 
 function normalizeSubtitleSelection(value: string): string {
   return value.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -240,17 +217,21 @@ export function getSubtitleRenderer(selection: string): LandingTitleRendererEntr
 }
 
 export function getSubtitleOptionById(id: string): LandingTitleSubtitleOption | null {
-  const direct = LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.id === id);
-  if (direct) return direct;
-  const target = resolveAlias(id);
-  return target ? LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.id === target) ?? null : null;
+  const normalizedId = normalizeSubtitleSelection(id);
+
+  return SUBTITLE_OPTION_ID_REGISTRY[id]
+    ?? NORMALIZED_SUBTITLE_OPTION_ID_REGISTRY[normalizedId]
+    ?? SUBTITLE_OPTION_ID_REGISTRY[resolveAlias(normalizedId) ?? '']
+    ?? null;
 }
 
 export function getSubtitleOptionByText(text: string): LandingTitleSubtitleOption | null {
-  const direct = LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.text === text);
-  if (direct) return direct;
-  const target = resolveAlias(text);
-  return target ? LANDING_TITLE_SUBTITLE_OPTIONS.find((o) => o.id === target) ?? null : null;
+  const normalizedText = normalizeSubtitleSelection(text);
+
+  return SUBTITLE_OPTION_TEXT_REGISTRY[text]
+    ?? NORMALIZED_SUBTITLE_OPTION_TEXT_REGISTRY[normalizedText]
+    ?? SUBTITLE_OPTION_ID_REGISTRY[resolveAlias(normalizedText) ?? '']
+    ?? null;
 }
 
 export function resolveSubtitleOption(selection: string | null | undefined): LandingTitleSubtitleOption {
