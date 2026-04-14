@@ -27,9 +27,6 @@ type SystemsScene =
 interface SystemsVariantConfig {
   readonly scene: SystemsScene;
   readonly theme: SubtitleTheme;
-  readonly kicker: string;
-  readonly descriptor: string;
-  readonly notes: readonly string[];
 }
 
 const systemsSubtitle = (
@@ -174,51 +171,30 @@ const SYSTEMS_VARIANTS: readonly SystemsVariantConfig[] = [
   {
     scene: 'cybernetic',
     theme: CYBERNETIC_ARCHITECT_THEME,
-    kicker: 'Adaptive chassis',
-    descriptor: 'Docked actuator plates and a live command spine make the role feel like a wearable exoskeleton blueprint.',
-    notes: ['spine', 'relay', 'augment'],
   },
   {
     scene: 'zeroTrust',
     theme: ZERO_TRUST_ARCHITECT_THEME,
-    kicker: 'Sealed perimeter',
-    descriptor: 'Nested gates and a fingerprint core read as access control instead of another blue badge.',
-    notes: ['verify', 'seal', 'attest'],
   },
   {
     scene: 'synthetic',
     theme: SYNTHETIC_INTELLIGENCE_ARCHITECT_THEME,
-    kicker: 'Cortex scaffold',
-    descriptor: 'Offset cognition cells and a scaffolded core make the intelligence feel engineered instead of implied.',
-    notes: ['cortex', 'synth', 'adapt'],
   },
   {
     scene: 'quantum',
     theme: QUANTUM_DESIGNER_THEME,
-    kicker: 'Interference field',
-    descriptor: 'Orbit traces and split-state panels finally make the title feel quantum.',
-    notes: ['orbit', 'phase', 'superpose'],
   },
   {
     scene: 'cloud',
     theme: CLOUD_SHAPER_THEME,
-    kicker: 'Compute weather',
-    descriptor: 'Contour bands and floating cloud masses turn the phrase into shaped compute weather.',
-    notes: ['drift', 'shape', 'scale'],
   },
   {
     scene: 'cartographer',
     theme: AI_CARTOGRAPHER_THEME,
-    kicker: 'Route atlas',
-    descriptor: 'Tracked waypoints and a plotted sweep turn the title into a navigational scene.',
-    notes: ['plot', 'route', 'guide'],
   },
   {
     scene: 'orchestrator',
     theme: DATA_ORCHESTRATOR_THEME,
-    kicker: 'Traffic crescendo',
-    descriptor: 'Cue rails converge on a conductor node so the title reads like timed data traffic.',
-    notes: ['cue', 'merge', 'time'],
   },
 ];
 
@@ -246,46 +222,14 @@ function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSPropertie
   } as CSSProperties;
 }
 
-function SystemsDeck({
-  themeConfig,
-  notes,
-  positionLabel,
-  totalLabel,
-}: {
-  themeConfig: SubtitleTheme;
-  notes: readonly string[];
-  positionLabel: string;
-  totalLabel: string;
-}) {
-  return (
-    <div className={styles.deck} aria-hidden="true">
-      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
-      <div className={styles.deckNotes}>
-        {notes.map((note) => (
-          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
-            {note}
-          </span>
-        ))}
-      </div>
-      <span className={styles.deckCounter}>
-        {positionLabel}
-        <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
-      </span>
-    </div>
-  );
-}
-
 function SystemsScene({
   config,
   context,
-  hideSignalDeck,
   onBlur,
   onFocus,
   onMouseEnter,
   onMouseLeave,
-  positionLabel,
   rotationStatusLabel,
-  totalLabel,
 }: SubtitleRendererShellProps & { config: SystemsVariantConfig }) {
   const themeConfig = config.theme;
   const Icon = themeConfig.icon;
@@ -300,7 +244,7 @@ function SystemsScene({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${themeConfig.text}. ${rotationStatusLabel}`}
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -321,25 +265,14 @@ function SystemsScene({
           })}
           data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
         >
-          {!hideSignalDeck ? (
-            <SystemsDeck
-              themeConfig={themeConfig}
-              notes={config.notes}
-              positionLabel={positionLabel}
-              totalLabel={totalLabel}
-            />
-          ) : null}
-
           <div className={styles.sceneBody}>
             <div className={styles.titleBlock}>
-              <span className={styles.kicker}>{config.kicker}</span>
               <div className={styles.headlineWrap}>
                 <span className={styles.iconBadge} aria-hidden="true">
                   <Icon className={styles.icon} />
                 </span>
                 <div className={styles.titleLockup}>
                   <h2 className={styles.title}>{themeConfig.text}</h2>
-                  <p className={styles.descriptor}>{config.descriptor}</p>
                 </div>
               </div>
             </div>

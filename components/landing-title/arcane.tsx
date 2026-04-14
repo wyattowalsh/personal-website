@@ -26,9 +26,6 @@ type ArcaneScene =
 interface ArcaneVariantConfig {
   readonly scene: ArcaneScene;
   readonly theme: SubtitleTheme;
-  readonly kicker: string;
-  readonly descriptor: string;
-  readonly notes: readonly string[];
 }
 
 const arcaneSubtitle = (
@@ -156,44 +153,26 @@ const ARCANE_VARIANTS: readonly ArcaneVariantConfig[] = [
   {
     scene: 'sorcerer',
     theme: DATA_SORCERER_THEME,
-    kicker: 'Archive invocation',
-    descriptor: 'Archive monoliths rise from a ritual basin so the title feels invoked instead of arranged.',
-    notes: ['catalog', 'invoke', 'decode'],
   },
   {
     scene: 'mage',
     theme: WORKFLOW_MAGE_THEME,
-    kicker: 'Inscribed seal',
-    descriptor: 'A hexagonal seal and radiating inscriptions let the title feel like a ward being drawn, not a flowchart.',
-    notes: ['seal', 'glyph', 'ward'],
   },
   {
     scene: 'weaver',
     theme: ALGORITHM_WEAVER_THEME,
-    kicker: 'Logic loom',
-    descriptor: 'Crossed warp and weft threads with a shuttle read like a loom weaving code, not loading bars.',
-    notes: ['warp', 'thread', 'braid'],
   },
   {
     scene: 'conjurer',
     theme: SILICON_CONJURER_THEME,
-    kicker: 'Chip gate',
-    descriptor: 'Circuit corners and a summoned core turn the title into a silicon ritual rather than an icon swap.',
-    notes: ['summon', 'etch', 'ignite'],
   },
   {
     scene: 'mystic',
     theme: SYSTEMS_SEER_THEME,
-    kicker: 'Forecast bloom',
-    descriptor: 'A petaled halo and rising sigils frame the title like an unfolding omen.',
-    notes: ['bloom', 'signal', 'omen'],
   },
   {
     scene: 'oracle',
     theme: SIGNAL_ORACLE_THEME,
-    kicker: 'Far-signal lens',
-    descriptor: 'A radar sweep and divination tags let the title feel prophetic, not generic.',
-    notes: ['scan', 'listen', 'predict'],
   },
 ];
 
@@ -225,46 +204,14 @@ function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSPropertie
   } as CSSProperties;
 }
 
-function ArcaneDeck({
-  themeConfig,
-  notes,
-  positionLabel,
-  totalLabel,
-}: {
-  themeConfig: SubtitleTheme;
-  notes: readonly string[];
-  positionLabel: string;
-  totalLabel: string;
-}) {
-  return (
-    <div className={styles.deck} aria-hidden="true">
-      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
-      <div className={styles.deckNotes}>
-        {notes.map((note) => (
-          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
-            {note}
-          </span>
-        ))}
-      </div>
-      <span className={styles.deckCounter}>
-        {positionLabel}
-        <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
-      </span>
-    </div>
-  );
-}
-
 function ArcaneScene({
   config,
   context,
-  hideSignalDeck,
   onBlur,
   onFocus,
   onMouseEnter,
   onMouseLeave,
-  positionLabel,
   rotationStatusLabel,
-  totalLabel,
 }: SubtitleRendererShellProps & { config: ArcaneVariantConfig }) {
   const themeConfig = config.theme;
   const Icon = themeConfig.icon;
@@ -279,7 +226,7 @@ function ArcaneScene({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${themeConfig.text}. ${rotationStatusLabel}`}
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -299,25 +246,14 @@ function ArcaneScene({
           })}
           data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
         >
-          {!hideSignalDeck ? (
-            <ArcaneDeck
-              themeConfig={themeConfig}
-              notes={config.notes}
-              positionLabel={positionLabel}
-              totalLabel={totalLabel}
-            />
-          ) : null}
-
           <div className={styles.sceneBody}>
             <div className={styles.titleBlock}>
-              <span className={styles.kicker}>{config.kicker}</span>
               <div className={styles.headlineWrap}>
                 <span className={styles.iconBadge} aria-hidden="true">
                   <Icon className={styles.icon} />
                 </span>
                 <div className={styles.titleLockup}>
                   <h2 className={styles.title}>{themeConfig.text}</h2>
-                  <p className={styles.descriptor}>{config.descriptor}</p>
                 </div>
               </div>
             </div>
@@ -408,13 +344,6 @@ function ArcaneScene({
                     <span />
                     <span />
                     <span />
-                  </div>
-                  <div className={styles.oracleTags}>
-                    {config.notes.map((note) => (
-                      <span key={`${themeConfig.id}-${note}`} className={styles.oracleTag}>
-                        {note}
-                      </span>
-                    ))}
                   </div>
                 </>
               ) : null}

@@ -20,9 +20,6 @@ type PerformanceScene = 'automation' | 'robotics' | 'neural';
 interface PerformanceVariantConfig {
   readonly scene: PerformanceScene;
   readonly theme: SubtitleTheme;
-  readonly kicker: string;
-  readonly descriptor: string;
-  readonly notes: readonly string[];
 }
 
 const performanceSubtitle = (
@@ -105,23 +102,14 @@ const PERFORMANCE_VARIANTS: readonly PerformanceVariantConfig[] = [
   {
     scene: 'automation',
     theme: AUTOMATION_THEME,
-    kicker: 'Cue conductor',
-    descriptor: 'A radial timing gauge and cue indicators frame the title like a stage console.',
-    notes: ['tempo dial', 'cue lock', 'repeatable'],
   },
   {
     scene: 'robotics',
     theme: KINETIC_MACHINIST_THEME,
-    kicker: 'Actuated canvas',
-    descriptor: 'An articulated crane mast and jointed boom frame the title like stage rigging.',
-    notes: ['jointed', 'mechanical', 'precision'],
   },
   {
     scene: 'neural',
     theme: CORTEX_DIVINER_THEME,
-    kicker: 'Cognitive bloom',
-    descriptor: 'Concentric pulse rings radiate from a synaptic core around the title.',
-    notes: ['expressive', 'adaptive', 'networked'],
   },
 ];
 
@@ -147,46 +135,14 @@ function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSPropertie
   } as CSSProperties;
 }
 
-function PerformanceDeck({
-  themeConfig,
-  notes,
-  positionLabel,
-  totalLabel,
-}: {
-  themeConfig: SubtitleTheme;
-  notes: readonly string[];
-  positionLabel: string;
-  totalLabel: string;
-}) {
-  return (
-    <div className={styles.deck} aria-hidden="true">
-      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
-      <div className={styles.deckNotes}>
-        {notes.map((note) => (
-          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
-            {note}
-          </span>
-        ))}
-      </div>
-      <span className={styles.deckCounter}>
-        {positionLabel}
-        <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
-      </span>
-    </div>
-  );
-}
-
 function PerformanceScene({
   config,
   context,
-  hideSignalDeck,
   onBlur,
   onFocus,
   onMouseEnter,
   onMouseLeave,
-  positionLabel,
   rotationStatusLabel,
-  totalLabel,
 }: SubtitleRendererShellProps & { config: PerformanceVariantConfig }) {
   const themeConfig = config.theme;
   const Icon = themeConfig.icon;
@@ -202,7 +158,7 @@ function PerformanceScene({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${themeConfig.text}. ${rotationStatusLabel}`}
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -219,25 +175,14 @@ function PerformanceScene({
           })}
           data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
         >
-          {!hideSignalDeck ? (
-            <PerformanceDeck
-              themeConfig={themeConfig}
-              notes={config.notes}
-              positionLabel={positionLabel}
-              totalLabel={totalLabel}
-            />
-          ) : null}
-
           <div className={styles.sceneBody}>
             <div className={styles.titleBlock}>
-              <span className={styles.kicker}>{config.kicker}</span>
               <div className={styles.headlineWrap}>
                 <span className={styles.iconBadge} aria-hidden="true">
                   <Icon className={styles.icon} />
                 </span>
                 <div className={styles.titleLockup}>
                   <h2 className={styles.title}>{themeConfig.text}</h2>
-                  <p className={styles.descriptor}>{config.descriptor}</p>
                 </div>
               </div>
             </div>

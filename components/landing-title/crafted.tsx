@@ -26,9 +26,6 @@ type CraftedScene =
 interface CraftedVariantConfig {
   readonly scene: CraftedScene;
   readonly theme: SubtitleTheme;
-  readonly kicker: string;
-  readonly descriptor: string;
-  readonly notes: readonly string[];
 }
 
 const craftedSubtitle = (
@@ -156,50 +153,26 @@ const CRAFTED_VARIANTS: readonly CraftedVariantConfig[] = [
   {
     scene: 'alchemist',
     theme: CODE_ALCHEMIST_THEME,
-    kicker: 'Catalyst atelier',
-    descriptor:
-      'Alembics, crucibles, and catalyst trays — software transmutation rendered as a working bench.',
-    notes: ['brew', 'catalyze', 'distill'],
   },
   {
     scene: 'digitalSculptor',
     theme: DIGITAL_SCULPTOR_THEME,
-    kicker: 'Chisel workshop',
-    descriptor:
-      'A monolith block mid-carve, with toolpath grooves and chisel marks etched into the slab.',
-    notes: ['carve', 'gouge', 'shape'],
   },
   {
     scene: 'holographicSculptor',
     theme: HOLOGRAPHIC_SCULPTOR_THEME,
-    kicker: 'Projection atelier',
-    descriptor:
-      'Contour rings orbit a suspended volume above a projection beam — sculpted in open air.',
-    notes: ['project', 'contour', 'holo'],
   },
   {
     scene: 'cyberDefense',
     theme: CYBER_DEFENSE_ARTISAN_THEME,
-    kicker: 'Bastion forge',
-    descriptor:
-      'Rampart crenellations, a braced shield, and armored plates — a fortification workshop.',
-    notes: ['harden', 'brace', 'ward'],
   },
   {
     scene: 'blockchain',
     theme: BLOCKCHAIN_ARTISAN_THEME,
-    kicker: 'Lattice forge',
-    descriptor:
-      'Nodes lock into a crystalline lattice with forged struts radiating from a central core.',
-    notes: ['lattice', 'node', 'forge'],
   },
   {
     scene: 'frontier',
     theme: FRONTIER_FORGER_THEME,
-    kicker: 'Expedition workshop',
-    descriptor:
-      'Mountain terrain, switchback trails, and a camp marker — craft born from fieldwork.',
-    notes: ['trail', 'terrain', 'camp'],
   },
 ];
 
@@ -226,46 +199,14 @@ function getSceneVars(themeConfig: SubtitleTheme, isDark: boolean): CSSPropertie
   } as CSSProperties;
 }
 
-function CraftedDeck({
-  themeConfig,
-  notes,
-  positionLabel,
-  totalLabel,
-}: {
-  themeConfig: SubtitleTheme;
-  notes: readonly string[];
-  positionLabel: string;
-  totalLabel: string;
-}) {
-  return (
-    <div className={styles.deck} aria-hidden="true">
-      <span className={styles.deckFamily}>{themeConfig.signalDeck.family}</span>
-      <div className={styles.deckNotes}>
-        {notes.map((note) => (
-          <span key={`${themeConfig.id}-${note}`} className={styles.deckNote}>
-            {note}
-          </span>
-        ))}
-      </div>
-      <span className={styles.deckCounter}>
-        {positionLabel}
-        <span className={styles.deckCounterTotal}>/ {totalLabel}</span>
-      </span>
-    </div>
-  );
-}
-
 function CraftedScene({
   config,
   context,
-  hideSignalDeck,
   onBlur,
   onFocus,
   onMouseEnter,
   onMouseLeave,
-  positionLabel,
   rotationStatusLabel,
-  totalLabel,
 }: SubtitleRendererShellProps & { config: CraftedVariantConfig }) {
   const themeConfig = config.theme;
   const Icon = themeConfig.icon;
@@ -280,7 +221,7 @@ function CraftedScene({
       <div
         tabIndex={0}
         role="group"
-        aria-label={`${themeConfig.text}. ${themeConfig.signalDeck.family} family, ${themeConfig.signalDeck.descriptor}. ${rotationStatusLabel}`}
+        aria-label={`${themeConfig.text}. ${rotationStatusLabel}`}
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
@@ -300,25 +241,14 @@ function CraftedScene({
           })}
           data-motion={context.shouldAnimateTagline ? 'animated' : 'reduced'}
         >
-          {!hideSignalDeck ? (
-            <CraftedDeck
-              themeConfig={themeConfig}
-              notes={config.notes}
-              positionLabel={positionLabel}
-              totalLabel={totalLabel}
-            />
-          ) : null}
-
           <div className={styles.sceneBody}>
             <div className={styles.titleBlock}>
-              <span className={styles.kicker}>{config.kicker}</span>
               <div className={styles.headlineWrap}>
                 <span className={styles.iconBadge} aria-hidden="true">
                   <Icon className={styles.icon} />
                 </span>
                 <div className={styles.titleLockup}>
                   <h2 className={styles.title}>{themeConfig.text}</h2>
-                  <p className={styles.descriptor}>{config.descriptor}</p>
                 </div>
               </div>
             </div>

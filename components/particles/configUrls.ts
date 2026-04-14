@@ -1,11 +1,11 @@
 // This file is auto-generated. Do not edit manually.
-// Last generated: 2026-04-14T06:09:15.427Z
+// Last generated: 2026-04-14T09:51:12.747Z
 
 type ParticleConfig = {
   url: string;
   hash: string;
   lastModified: string;
-  theme: 'light' | 'dark';
+  theme: string;
 };
 
 export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
@@ -44,14 +44,14 @@ export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
   "dark": [
     {
       "url": "/particles/dark/fireflies.json",
-      "hash": "c6c173aad3fdf5c88828f71b2774ff06",
-      "lastModified": "2026-04-14T01:47:59.460Z",
+      "hash": "e76ce1ec8446e93072879b6afd5e48fa",
+      "lastModified": "2026-04-14T06:22:59.978Z",
       "theme": "dark"
     },
     {
       "url": "/particles/dark/galaxy.json",
-      "hash": "5f27c4d61408a39e377158945c35ce05",
-      "lastModified": "2026-04-14T01:47:59.464Z",
+      "hash": "ca9df1d7b967fec4ab0229679290849d",
+      "lastModified": "2026-04-14T06:22:59.977Z",
       "theme": "dark"
     },
     {
@@ -62,14 +62,14 @@ export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
     },
     {
       "url": "/particles/dark/nebula.json",
-      "hash": "489694f6c91d1d6b099ad44fec16956b",
-      "lastModified": "2026-04-14T01:47:59.466Z",
+      "hash": "ff325631e630a3108e8ef1e11c435617",
+      "lastModified": "2026-04-14T06:22:59.978Z",
       "theme": "dark"
     },
     {
       "url": "/particles/dark/stars.json",
-      "hash": "263de06f4e3b7c3da7668c476160513b",
-      "lastModified": "2026-04-14T01:47:59.470Z",
+      "hash": "3a3331610aad9dc25a9064139a109218",
+      "lastModified": "2026-04-14T06:22:59.974Z",
       "theme": "dark"
     }
   ]

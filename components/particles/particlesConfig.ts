@@ -176,7 +176,8 @@ const allParticleConfigs = (Object.values(configUrls).flat() as ParticleConfig[]
 
 const particlePresetById = new Map(allParticleConfigs.map((preset) => [preset.id, preset]));
 
-export const getAllConfigUrls = (theme: Theme): readonly ParticleConfig[] => configUrls[theme];
+export const getAllConfigUrls = (theme: Theme): readonly ParticleConfig[] =>
+  configUrls[theme] as readonly ParticleConfig[];
 
 export const getParticlePresets = (theme: Theme): readonly ParticlePreset[] =>
   allParticleConfigs.filter((preset) => preset.theme === theme);
