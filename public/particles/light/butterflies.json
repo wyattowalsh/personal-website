@@ -1,152 +1,99 @@
 {
-    "background": {
-        "color": {
-            "value": "#f9f9f9"
-        },
-        "opacity": 1
+  "autoPlay": true,
+  "background": {
+    "color": {
+      "value": "#f8f7f3"
     },
-    "particles": {
-        "number": {
-            "value": 60,
-            "density": {
-                "enable": true,
-                "area": 1000
-            }
-        },
-        "color": {
-            "value": ["#ff8c00", "#ffa500", "#ffd700", "#f0e68c"]
-        },
-        "shape": {
-            "type": "image",
-            "image": {
-                "src": "../../butterfly.webp",
-                "width": 32,
-                "height": 32
-            }
-        },
-        "opacity": {
-            "value": {
-                "min": 0.4,
-                "max": 0.8
-            },
-            "animation": {
-                "enable": true,
-                "speed": 0.8,
-                "minimumValue": 0.4,
-                "sync": false
-            }
-        },
-        "size": {
-            "value": {
-                "min": 10,
-                "max": 20
-            },
-            "animation": {
-                "enable": true,
-                "speed": 1.5,
-                "minimumValue": 10,
-                "sync": false
-            }
-        },
-        "move": {
-            "enable": true,
-            "speed": 1.8,
-            "direction": "none",
-            "outModes": {
-                "default": "out"
-            },
-            "straight": false,
-            "random": true,
-            "trail": {
-                "enable": true,
-                "length": 5,
-                "fill": {
-                    "color": "#f9f9f9"
-                }
-            }
-        },
-        "links": {
-            "enable": true,
-            "distance": 140,
-            "color": "#ffa500",
-            "opacity": 0.6,
-            "width": 1
-        }
+    "opacity": 1
+  },
+  "particles": {
+    "number": {
+      "value": 22,
+      "density": {
+        "enable": true,
+        "area": 1200
+      }
     },
-    "interactivity": {
-        "events": {
-            "onHover": {
-                "enable": true,
-                "mode": "bubble"
-            },
-            "onClick": {
-                "enable": true,
-                "mode": "repulse"
-            },
-            "resize": true
-        },
-        "modes": {
-            "grab": {
-                "distance": 250,
-                "links": {
-                    "opacity": 0.8
-                }
-            },
-            "bubble": {
-                "distance": 200,
-                "size": 28,
-                "duration": 2,
-                "opacity": 0.85
-            },
-            "repulse": {
-                "distance": 220,
-                "duration": 0.5
-            },
-            "push": {
-                "quantity": 6
-            },
-            "remove": {
-                "quantity": 4
-            }
-        }
+    "color": {
+      "value": ["#dcc9a3", "#f0d9a7", "#c7b28f"]
     },
-    "fullScreen": {
-        "enable": false
+    "shape": {
+      "type": "image",
+      "image": {
+        "src": "../../butterfly.webp",
+        "width": 32,
+        "height": 32
+      }
     },
-    "detectRetina": true,
-    "fpsLimit": 60,
-    "smooth": true,
-    "pauseOnBlur": true,
-    "pauseOnOutsideViewport": true,
-    "themes": [
-        {
-            "name": "light",
-            "options": {
-                "background": {
-                    "color": "#f9f9f9"
-                },
-                "particles": {
-                    "color": {
-                        "value": ["#ff8c00", "#ffa500", "#ffd700", "#f0e68c"]
-                    }
-                }
-            }
-        },
-        {
-            "name": "dark",
-            "options": {
-                "background": {
-                    "color": "#1e1e1e"
-                },
-                "particles": {
-                    "color": {
-                        "value": ["#ffffff", "#d3d3d3", "#c0c0c0", "#808080"]
-                    }
-                },
-                "links": {
-                    "color": "#d3d3d3"
-                }
-            }
-        }
-    ]
+    "opacity": {
+      "value": {
+        "min": 0.22,
+        "max": 0.58
+      },
+      "animation": {
+        "enable": true,
+        "speed": 0.45,
+        "minimumValue": 0.18,
+        "sync": false
+      }
+    },
+    "size": {
+      "value": {
+        "min": 9,
+        "max": 16
+      },
+      "animation": {
+        "enable": true,
+        "speed": 0.8,
+        "minimumValue": 8,
+        "sync": false
+      }
+    },
+    "move": {
+      "enable": true,
+      "speed": 0.85,
+      "direction": "none",
+      "outModes": {
+        "default": "out"
+      },
+      "random": true,
+      "straight": false
+    },
+    "links": {
+      "enable": false
+    }
+  },
+  "interactivity": {
+    "events": {
+      "onHover": {
+        "enable": true,
+        "mode": "bubble"
+      },
+      "onClick": {
+        "enable": false,
+        "mode": "repulse"
+      },
+      "resize": true
+    },
+    "modes": {
+      "bubble": {
+        "distance": 140,
+        "size": 20,
+        "duration": 1.2,
+        "opacity": 0.72
+      },
+      "repulse": {
+        "distance": 140,
+        "duration": 0.4
+      }
+    }
+  },
+  "fullScreen": {
+    "enable": false
+  },
+  "detectRetina": true,
+  "fpsLimit": 30,
+  "pauseOnBlur": true,
+  "pauseOnOutsideViewport": true,
+  "smooth": true
 }

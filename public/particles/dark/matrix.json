@@ -2,7 +2,7 @@
   "autoPlay": true,
   "background": {
     "color": {
-      "value": "#0d1117"
+      "value": "#0c1115"
     },
     "opacity": 1
   },
@@ -10,104 +10,95 @@
     "enable": false
   },
   "detectRetina": true,
-  "fpsLimit": 60,
+  "fpsLimit": 26,
   "particles": {
     "number": {
-      "value": 250,
+      "value": 18,
       "density": {
         "enable": true,
-        "area": 800
+        "area": 1300
       }
     },
     "color": {
-      "value": ["#00ff00", "#00cc00", "#009900", "#33ff33", "#66ff66"]
+      "value": ["#8cff9d", "#58d27a", "#d7ffe1"]
     },
     "shape": {
       "type": "char",
       "character": {
-        "value": ["✦", "✪", "⚙", "☯", "✧", "★", "♛"],
-        "font": "Verdana",
-        "style": "italic",
-        "weight": "bold",
+        "value": ["0", "1", "+", "*", "#", "::"],
+        "font": "Menlo, Monaco, monospace",
+        "style": "normal",
+        "weight": "600",
         "fill": true
       }
     },
     "opacity": {
       "value": {
-        "min": 0.3,
-        "max": 0.7
+        "min": 0.18,
+        "max": 0.48
       },
       "animation": {
         "enable": true,
-        "speed": 1.2,
-        "minimumValue": 0.2,
+        "speed": 0.7,
+        "minimumValue": 0.14,
         "sync": false
       }
     },
     "size": {
       "value": {
-        "min": 6,
-        "max": 12
+        "min": 8,
+        "max": 15
       },
       "animation": {
         "enable": true,
-        "speed": 1.8,
-        "minimumValue": 4,
+        "speed": 0.8,
+        "minimumValue": 6,
         "sync": false
       }
     },
     "move": {
       "enable": true,
-      "speed": 3,
-      "direction": "top",
+      "speed": 1.1,
+      "direction": "bottom",
       "outModes": {
         "default": "out"
       },
+      "random": true,
+      "straight": true,
       "gravity": {
-        "enable": true,
-        "acceleration": 3
+        "enable": false,
+        "acceleration": 0
       },
       "trail": {
-        "enable": true,
-        "length": 6,
+        "enable": false,
+        "length": 0,
         "fill": {
-          "color": "#0d1117"
+          "color": "#0c1115"
         }
       }
-    },
-    "zIndex": {
-      "value": {
-        "min": 0,
-        "max": 100
-      },
-      "opacityRate": 0.5
     }
   },
   "interactivity": {
     "events": {
       "onHover": {
         "enable": true,
-        "mode": ["grab", "trail"]
+        "mode": ["grab"]
       },
       "onClick": {
-        "enable": true,
+        "enable": false,
         "mode": ["push"]
       },
       "resize": true
     },
     "modes": {
-      "trail": {
-        "delay": 0.05,
-        "quantity": 5
-      },
       "grab": {
-        "distance": 200,
+        "distance": 140,
         "links": {
-          "opacity": 0.6
+          "opacity": 0.18
         }
       },
       "push": {
-        "quantity": 4
+        "quantity": 2
       }
     }
   },

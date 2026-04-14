@@ -1,171 +1,119 @@
 {
-    "autoPlay": true,
-    "background": {
-        "color": {
-            "value": "#f9f5ff"
-        },
-        "image": "",
-        "position": "50% 50%",
-        "repeat": "no-repeat",
-        "size": "cover"
+  "autoPlay": true,
+  "background": {
+    "color": {
+      "value": "#faf6fb"
     },
-    "particles": {
-        "number": {
-            "value": 120,
-            "density": {
-                "enable": true,
-                "area": 800
-            }
-        },
-        "color": {
-            "value": ["#ff69b4", "#ff1493", "#ff00ff", "#ffc0cb", "#f500a0", "#e0e0f8", "#d5d9ff", "#8a2be2", "#ffd700", "#ff4500"]
-        },
-        "shape": {
-            "type": ["circle", "image", "polygon"],
-            "image": {
-                "src": "../../flower.webp",
-                "width": 60,
-                "height": 60
-            },
-            "polygon": {
-                "nb_sides": 6
-            }
-        },
-        "opacity": {
-            "value": {
-                "min": 0.4,
-                "max": 0.9
-            },
-            "random": true,
-            "animation": {
-                "enable": true,
-                "speed": 0.8,
-                "minimumValue": 0.4,
-                "sync": false
-            }
-        },
-        "size": {
-            "value": {
-                "min": 8,
-                "max": 16
-            },
-            "random": true,
-            "animation": {
-                "enable": true,
-                "speed": 4,
-                "minimumValue": 8,
-                "sync": false
-            }
-        },
-        "move": {
-            "enable": true,
-            "speed": 2,
-            "direction": "bottom",
-            "random": false,
-            "straight": false,
-            "outModes": {
-                "default": "out"
-            },
-            "attract": {
-                "enable": false,
-                "rotateX": 800,
-                "rotateY": 1600
-            }
-        },
+    "opacity": 1
+  },
+  "particles": {
+    "number": {
+      "value": 30,
+      "density": {
+        "enable": true,
+        "area": 1200
+      }
+    },
+    "color": {
+      "value": ["#e3a3c2", "#f6c9db", "#cba4f2", "#f3d68d"]
+    },
+    "shape": {
+      "type": ["circle", "polygon"],
+      "polygon": {
+        "sides": 6
+      }
+    },
+    "opacity": {
+      "value": {
+        "min": 0.16,
+        "max": 0.48
+      },
+      "random": true,
+      "animation": {
+        "enable": true,
+        "speed": 0.6,
+        "minimumValue": 0.14,
+        "sync": false
+      }
+    },
+    "size": {
+      "value": {
+        "min": 5,
+        "max": 11
+      },
+      "random": true,
+      "animation": {
+        "enable": true,
+        "speed": 1.2,
+        "minimumValue": 4,
+        "sync": false
+      }
+    },
+    "move": {
+      "enable": true,
+      "speed": 0.75,
+      "direction": "none",
+      "random": true,
+      "straight": false,
+      "outModes": {
+        "default": "out"
+      }
+    },
+    "links": {
+      "enable": false
+    }
+  },
+  "interactivity": {
+    "events": {
+      "onHover": {
+        "enable": true,
+        "mode": ["bubble", "grab"],
+        "parallax": {
+          "enable": true,
+          "force": 24,
+          "smooth": 12
+        }
+      },
+      "onClick": {
+        "enable": false,
+        "mode": "push"
+      },
+      "resize": true
+    },
+    "modes": {
+      "grab": {
+        "distance": 120,
         "links": {
-            "enable": true,
-            "distance": 120,
-            "color": "#ff69b4",
-            "opacity": 0.5,
-            "width": 1
+          "opacity": 0.16
         }
-    },
-    "interactivity": {
-        "events": {
-            "onHover": {
-                "enable": true,
-                "mode": ["bubble", "grab"],
-                "parallax": {
-                    "enable": true,
-                    "force": 50,
-                    "smooth": 8
-                }
-            },
-            "onClick": {
-                "enable": true,
-                "mode": ["push", "repulse"]
-            },
-            "resize": true
-        },
-        "modes": {
-            "grab": {
-                "distance": 180,
-                "links": {
-                    "opacity": 0.8
-                }
-            },
-            "bubble": {
-                "distance": 180,
-                "size": 12,
-                "duration": 2,
-                "opacity": 0.7,
-                "mix": false
-            },
-            "repulse": {
-                "distance": 120,
-                "duration": 0.6
-            },
-            "push": {
-                "quantity": 3
-            },
-            "remove": {
-                "quantity": 2
-            }
+      },
+      "bubble": {
+        "distance": 130,
+        "size": 13,
+        "duration": 1.4,
+        "opacity": 0.56,
+        "mix": false
+      },
+      "push": {
+        "quantity": 2
+      }
+    }
+  },
+  "detectRetina": true,
+  "fpsLimit": 28,
+  "pauseOnBlur": true,
+  "pauseOnOutsideViewport": true,
+  "responsive": [
+    {
+      "maxWidth": 768,
+      "options": {
+        "particles": {
+          "number": {
+            "value": 18
+          }
         }
-    },
-    "detectRetina": true,
-    "fpsLimit": 60,
-    "pauseOnBlur": true,
-    "smooth": true,
-    "responsive": [
-        {
-            "maxWidth": 768,
-            "options": {
-                "particles": {
-                    "number": {
-                        "value": 60
-                    },
-                    "move": {
-                        "speed": 1.2
-                    },
-                    "size": {
-                        "value": {
-                            "min": 5,
-                            "max": 12
-                        }
-                    }
-                }
-            }
-        },
-        {
-            "maxWidth": 480,
-            "options": {
-                "particles": {
-                    "number": {
-                        "value": 40
-                    },
-                    "move": {
-                        "speed": 1
-                    },
-                    "size": {
-                        "value": {
-                            "min": 4,
-                            "max": 10
-                        }
-                    }
-                }
-            }
-        }
-    ],
-    "zLayers": 3
+      }
+    }
+  ],
+  "zLayers": 2
 }

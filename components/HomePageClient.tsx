@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
 import { Links } from "@/components/Links";
 import { LandingTitle } from "@/components/LandingTitle";
 import { PostCard } from "@/components/PostCard";
@@ -22,19 +21,6 @@ interface HomePageClientProps {
 export function HomePageClient({ recentPosts }: HomePageClientProps) {
   const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll();
-  const [showParticles, setShowParticles] = useState(false);
-
-  useEffect(() => {
-    const show = () => setShowParticles(true);
-
-    if (typeof window.requestIdleCallback === "function") {
-      const idleId = window.requestIdleCallback(show, { timeout: 1200 });
-      return () => window.cancelIdleCallback(idleId);
-    }
-
-    const timeoutId = window.setTimeout(show, 400);
-    return () => window.clearTimeout(timeoutId);
-  }, []);
 
   const imageScale = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.85]);
   const imageOpacity = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.8]);
@@ -70,22 +56,20 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
       variants={pageVariants}
       className={cn(
         "relative min-h-screen overflow-hidden -mt-14 sm:-mt-16",
-        "bg-gradient-to-b from-background/50 via-background/50 to-background/50",
-        "dark:from-background/50 dark:via-background/50 dark:to-background/50",
+        "bg-gradient-to-b from-background/30 via-background/35 to-background/45",
+        "dark:from-background/25 dark:via-background/30 dark:to-background/45",
         styles.mainContainer
       )}
     >
-      {showParticles && (
-        <div aria-hidden="true">
-          <ParticlesBackground />
-        </div>
-      )}
+      <div aria-hidden="true">
+        <ParticlesBackground />
+      </div>
 
         <motion.div
           className={cn(
             "relative z-10 flex flex-col justify-center min-h-screen",
             "px-4 sm:px-6 lg:px-8",
-            "pt-20 sm:pt-24 pb-12 sm:pb-16 lg:pb-20",
+            "pt-16 sm:pt-20 pb-10 sm:pb-14 lg:pb-18",
             "max-w-7xl mx-auto w-full",
             styles.heroViewportFrame
           )}
@@ -125,19 +109,23 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
               />
             </motion.div>
 
-            <LandingTitle hideSignalDeck framed={false} />
+            <div className={styles.titleStage}>
+              <LandingTitle hideSignalDeck framed={false} />
+            </div>
 
-            <Links />
+            <div className={styles.linksStage}>
+              <Links />
+            </div>
 
             {/* Latest Writing Section */}
             {recentPosts.length > 0 && (
               <section
-                className="w-full max-w-6xl mx-auto mt-12 px-4"
+                className={styles.latestWritingSection}
               >
-                <h2 className="text-2xl font-semibold mb-6 text-center bg-gradient-to-r from-primary via-primary/80 to-primary bg-clip-text text-transparent">
+                <h2 className={styles.latestWritingHeading}>
                   Latest Writing
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className={styles.latestWritingGrid}>
                   {recentPosts.map((post) => (
                     <div key={post.slug}>
                       <PostCard post={post} />
@@ -146,11 +134,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
                 </div>
                 <Link
                   href="/blog"
-                  className={cn(
-                    "block text-center mt-8 text-primary hover:text-primary/80",
-                    "transition-colors duration-200",
-                    "text-sm font-medium tracking-wide"
-                  )}
+                  className={styles.latestWritingLink}
                 >
                   View all posts →
                 </Link>

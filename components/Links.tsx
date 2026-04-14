@@ -67,25 +67,27 @@ export function Links() {
         "p-4 sm:p-6 md:p-8 lg:p-10",
         // Container dimensions
         "w-full max-w-[95vw] md:max-w-6xl mx-auto",
-        "rounded-2xl",
+        "rounded-[1.75rem]",
         // Enhanced glass effect with proper contrast
-        "bg-white/5 dark:bg-slate-900/10",
+        "bg-white/6 dark:bg-slate-950/16 backdrop-blur-xl",
         // Themed borders
-        "border border-primary/10 dark:border-primary-light/10",
+        "border border-primary/12 dark:border-primary-light/12",
         // Dynamic shadows
-        "shadow-xl shadow-black/5 dark:shadow-black/20",
-        "hover:shadow-2xl hover:shadow-primary/10 dark:hover:shadow-primary-light/20",
+        "shadow-[0_30px_80px_rgba(15,23,42,0.08)] dark:shadow-[0_32px_90px_rgba(2,6,23,0.36)]",
+        "hover:shadow-[0_36px_96px_rgba(59,130,246,0.12)] dark:hover:shadow-[0_36px_110px_rgba(125,211,252,0.18)]",
         // Enhanced gradients using theme colors
         "bg-gradient-to-br",
-        "from-primary/5 via-transparent to-accent/5",
-        "dark:from-primary-light/5 dark:via-transparent dark:to-accent/5",
+        "from-white/45 via-white/20 to-primary/6",
+        "dark:from-slate-900/45 dark:via-slate-950/16 dark:to-primary-light/8",
         // Smooth transitions
-        "motion-safe:transition-shadow motion-safe:duration-300 motion-safe:ease-out",
+        "motion-safe:transition-[box-shadow,border-color,background-color] motion-safe:duration-300 motion-safe:ease-out",
         "motion-reduce:transition-none",
         // Lightweight background effects
         "before:pointer-events-none before:absolute before:inset-0 before:-z-10 before:rounded-2xl",
-        "before:bg-gradient-to-br before:from-white/10 before:to-primary/5",
-        "before:opacity-70 dark:before:from-primary-light/5 dark:before:to-transparent",
+        "before:bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.55),transparent_58%)]",
+        "before:opacity-80 dark:before:bg-[radial-gradient(circle_at_top,rgba(125,211,252,0.12),transparent_62%)]",
+        "after:pointer-events-none after:absolute after:inset-px after:-z-10 after:rounded-[1.6rem]",
+        "after:border after:border-white/35 dark:after:border-white/6",
       )}
     >
       {links.map((link) => (

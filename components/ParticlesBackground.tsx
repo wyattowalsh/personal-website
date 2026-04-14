@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef, type FC } from "react";
-import { getAllConfigUrls, getRandomConfigUrl } from "@/components/particles/particlesConfig";
+import { useEffect, useMemo, useState, useCallback, useRef, type FC } from "react";
+import {
+  chooseWeightedParticlePreset,
+  getParticlePresetById,
+  getSupportedParticlePresets,
+  isParticlePresetSupported,
+} from "@/components/particles/particlesConfig";
 import { useTheme } from "next-themes";
 import { motion } from "motion/react";
 import { type Container } from "@tsparticles/engine";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 import { loadSlim } from "@tsparticles/slim";
+import { loadTextShape } from "@tsparticles/shape-text";
+import { loadTwinkleUpdater } from "@tsparticles/updater-twinkle";
+import type { ParticleFeature, Theme } from "@/components/particles/types";
 import { ParticleControls, type DensityLevel } from "./ParticleControls";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
@@ -15,6 +23,10 @@ interface ParticlesBackgroundProps {
 }
 
 const PARTICLES_ID = 'tsparticles-homepage';
+const PARTICLE_HISTORY_LIMIT = 3;
+const SUPPORTED_PARTICLE_FEATURES = new Set<ParticleFeature>(['slim', 'text', 'twinkle']);
+
+const getHistoryStorageKey = (theme: Theme) => `tsparticles-history:${theme}`;
 
 export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = '' }) => {
   const [init, setInit] = useState(false);
@@ -22,7 +34,7 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   const [isPaused, setIsPaused] = useState(false);
   const containerRef = useRef<Container | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [currentConfigUrl, setCurrentConfigUrl] = useState<string>("");
+  const [currentPresetId, setCurrentPresetId] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
@@ -31,6 +43,12 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
 
   // Initialize theme
   const currentTheme: "light" | "dark" = resolvedTheme === 'dark' ? 'dark' : 'light';
+  const availablePresets = useMemo(
+    () => getSupportedParticlePresets(currentTheme, SUPPORTED_PARTICLE_FEATURES),
+    [currentTheme],
+  );
+  const currentPreset = currentPresetId ? getParticlePresetById(currentPresetId) : undefined;
+  const currentConfigUrl = currentPreset?.url ?? '';
 
   const removeStaleParticleNodes = useCallback(() => {
     if (typeof document === 'undefined') return;
@@ -51,18 +69,47 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
     removeStaleParticleNodes();
   }, [removeStaleParticleNodes]);
 
-  const getPreferredConfigUrl = useCallback((theme: "light" | "dark", currentUrl: string) => {
-    const configs = getAllConfigUrls(theme);
-    if (!configs.length) return '';
-    if (configs.some((config) => config.url === currentUrl)) return currentUrl;
+  const getRecentPresetIds = useCallback((theme: Theme): string[] => {
+    if (typeof window === 'undefined') return [];
 
-    const currentName = currentUrl.split('/').pop()?.replace('.json', '');
-    const matchedConfig = currentName
-      ? configs.find((config) => config.url.endsWith(`/${currentName}.json`))
-      : undefined;
+    try {
+      const rawHistory = window.sessionStorage.getItem(getHistoryStorageKey(theme));
+      if (!rawHistory) return [];
 
-    return matchedConfig?.url ?? configs[0]?.url ?? '';
+      const parsed = JSON.parse(rawHistory);
+      return Array.isArray(parsed) ? parsed.filter((value): value is string => typeof value === 'string') : [];
+    } catch {
+      return [];
+    }
   }, []);
+
+  const pushRecentPresetId = useCallback((theme: Theme, presetId: string) => {
+    if (typeof window === 'undefined' || !presetId) return;
+
+    const history = getRecentPresetIds(theme).filter((value) => value !== presetId);
+    history.unshift(presetId);
+    window.sessionStorage.setItem(getHistoryStorageKey(theme), JSON.stringify(history.slice(0, PARTICLE_HISTORY_LIMIT)));
+  }, [getRecentPresetIds]);
+
+  const pickNextPresetId = useCallback((theme: Theme, preferredPresetId?: string) => {
+    const nextPreset = chooseWeightedParticlePreset({
+      theme,
+      features: SUPPORTED_PARTICLE_FEATURES,
+      currentPresetId: theme === currentTheme ? currentPresetId : undefined,
+      preferredPresetId,
+      recentPresetIds: getRecentPresetIds(theme),
+    });
+
+    return nextPreset?.id ?? '';
+  }, [currentPresetId, currentTheme, getRecentPresetIds]);
+
+  const selectPreset = useCallback((presetId: string) => {
+    if (!presetId || presetId === currentPresetId) return;
+
+    resetParticles();
+    setCurrentPresetId(presetId);
+    setIsPaused(false);
+  }, [currentPresetId, resetParticles]);
 
   // Density change handler
   const handleDensityChange = useCallback((newDensity: DensityLevel) => {
@@ -98,6 +145,8 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
       try {
         await initParticlesEngine(async (engine) => {
           await loadSlim(engine);
+          await loadTextShape(engine);
+          await loadTwinkleUpdater(engine);
         });
 
         setInit(true);
@@ -107,18 +156,9 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
       }
     };
 
-    // Defer particle initialization to avoid competing with LCP
-    let cleanup: (() => void) | undefined;
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      const id = requestIdleCallback(() => initEngine(), { timeout: 3000 });
-      cleanup = () => cancelIdleCallback(id);
-    } else {
-      const timer = setTimeout(initEngine, 3000);
-      cleanup = () => clearTimeout(timer);
-    }
+    void initEngine();
 
     return () => {
-      cleanup?.();
       setMounted(false);
       resetParticles();
     };
@@ -128,16 +168,27 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   useEffect(() => {
     if (!mounted || !init) return;
 
-    const preferredConfigUrl = getPreferredConfigUrl(currentTheme, currentConfigUrl);
-    if (preferredConfigUrl && preferredConfigUrl !== currentConfigUrl) {
+    if (currentPreset?.theme === currentTheme && isParticlePresetSupported(currentPreset, SUPPORTED_PARTICLE_FEATURES)) {
+      removeStaleParticleNodes();
+      return;
+    }
+
+    const preferredPresetId = currentPreset?.counterpartId;
+    const nextPresetId = pickNextPresetId(currentTheme, preferredPresetId);
+    if (nextPresetId && nextPresetId !== currentPresetId) {
       resetParticles();
-      setCurrentConfigUrl(preferredConfigUrl); // eslint-disable-line react-hooks/set-state-in-effect -- sync selected config when the theme changes
-      setIsPaused(false); // keep controls aligned with the live container
+      setCurrentPresetId(nextPresetId); // eslint-disable-line react-hooks/set-state-in-effect -- sync selected config when the theme changes
+      setIsPaused(false);
       return;
     }
 
     removeStaleParticleNodes();
-  }, [currentConfigUrl, currentTheme, getPreferredConfigUrl, init, mounted, removeStaleParticleNodes, resetParticles]);
+  }, [currentPreset, currentPresetId, currentTheme, init, mounted, pickNextPresetId, removeStaleParticleNodes, resetParticles]);
+
+  useEffect(() => {
+    if (!currentPreset || currentPreset.theme !== currentTheme) return;
+    pushRecentPresetId(currentTheme, currentPreset.id);
+  }, [currentPreset, currentTheme, pushRecentPresetId]);
 
   const particlesLoaded = useCallback(async (container?: Container) => {
     if (container) {
@@ -151,11 +202,9 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
     }
   }, [removeStaleParticleNodes]);
 
-  const handleConfigChange = useCallback((configUrl: string) => {
-    resetParticles();
-    setCurrentConfigUrl(configUrl);
-    setIsPaused(false);
-  }, [resetParticles]);
+  const handleConfigChange = useCallback((presetId: string) => {
+    selectPreset(presetId);
+  }, [selectPreset]);
 
   const handlePause = useCallback(() => {
     if (containerRef.current) {
@@ -172,17 +221,11 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   }, []);
 
   const handleRefresh = useCallback(() => {
-    resetParticles();
-
-    const availableConfigs = getAllConfigUrls(currentTheme);
-    const alternateConfigs = availableConfigs.filter((config) => config.url !== currentConfigUrl);
-    const newConfigUrl = alternateConfigs.length
-      ? alternateConfigs[Math.floor(Math.random() * alternateConfigs.length)]?.url ?? getRandomConfigUrl(currentTheme)
-      : getRandomConfigUrl(currentTheme);
-
-    setCurrentConfigUrl(newConfigUrl);
-    setIsPaused(false);
-  }, [currentConfigUrl, currentTheme, resetParticles]);
+    const nextPresetId = pickNextPresetId(currentTheme);
+    if (nextPresetId) {
+      selectPreset(nextPresetId);
+    }
+  }, [currentTheme, pickNextPresetId, selectPreset]);
 
   if (!mounted || !init) return null;
   if (error) {
@@ -201,10 +244,11 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
           onResume={handleResume}
           onRefresh={handleRefresh}
           isPaused={isPaused}
-          theme={currentTheme}
-          currentConfigUrl={currentConfigUrl}
+          presets={availablePresets}
+          currentPresetId={currentPresetId}
           density={density}
           onDensityChange={handleDensityChange}
+          canPause={!prefersReducedMotion && density !== 'off' && Boolean(currentPresetId)}
         />
       </>
     );
@@ -216,22 +260,29 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 z-0"
       >
         {currentConfigUrl ? (
           <Particles
             key={`${currentConfigUrl}-${density}`}
             id={PARTICLES_ID}
-            className="absolute inset-0"
+            className="absolute inset-0 opacity-90 mix-blend-multiply dark:mix-blend-screen"
             url={currentConfigUrl}
             particlesLoaded={particlesLoaded}
             options={{
-              fpsLimit: 30,
+              fpsLimit: currentPreset?.fpsLimit ?? 30,
               pauseOnBlur: true,
               pauseOnOutsideViewport: true,
+              interactivity: {
+                events: {
+                  onClick: {
+                    enable: false,
+                  },
+                },
+              },
               particles: {
                 number: {
-                  value: Math.round(80 * getDensityMultiplier(density)),
+                  value: Math.round((currentPreset?.desktopCount ?? 32) * getDensityMultiplier(density)),
                   density: {
                     enable: true,
                   }
@@ -243,7 +294,7 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
                   options: {
                     particles: {
                       number: {
-                        value: Math.round(30 * getDensityMultiplier(density))
+                        value: Math.round((currentPreset?.mobileCount ?? 18) * getDensityMultiplier(density))
                       }
                     }
                   }
@@ -260,10 +311,11 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
         onResume={handleResume}
         onRefresh={handleRefresh}
         isPaused={isPaused}
-        theme={currentTheme}
-        currentConfigUrl={currentConfigUrl}
+        presets={availablePresets}
+        currentPresetId={currentPresetId}
         density={density}
         onDensityChange={handleDensityChange}
+        canPause={Boolean(currentPresetId)}
       />
     </div>
   );
