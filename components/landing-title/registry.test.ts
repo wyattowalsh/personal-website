@@ -25,17 +25,17 @@ const EXPECTED_SUBTITLE_ORDER = [
   'workflow-mage',
   'algorithm-weaver',
   'silicon-conjurer',
-  'emergence-mystic',
+  'systems-seer',
   'signal-oracle',
   'code-alchemist',
   'digital-sculptor',
   'holographic-sculptor',
   'cyber-defense-artisan',
   'blockchain-artisan',
-  'frontier-crafter',
+  'frontier-forger',
   'automation-virtuoso',
-  'robotics-artist',
-  'neural-artist',
+  'kinetic-machinist',
+  'cortex-diviner',
 ] as const;
 
 describe('landing title registry contract', () => {
@@ -103,8 +103,12 @@ describe('deprecated subtitle alias compatibility', () => {
   it('resolves renamed old display texts to the correct current entry', () => {
     const cases: [string, string][] = [
       ['data sorcerer', 'data-sorcerer'],
+      ['emergence mystic', 'systems-seer'],
       ['cyber defense artisan', 'cyber-defense-artisan'],
       ['blockchain artisan', 'blockchain-artisan'],
+      ['frontier crafter', 'frontier-forger'],
+      ['robotics artist', 'kinetic-machinist'],
+      ['neural artist', 'cortex-diviner'],
       ['workflow mage', 'workflow-mage'],
     ];
     for (const [oldText, expectedId] of cases) {
@@ -118,6 +122,11 @@ describe('deprecated subtitle alias compatibility', () => {
     }
   });
 
+  it('normalizes whitespace and casing for current and legacy text lookups', () => {
+    expect(getSubtitleRenderer('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleRenderer('  Emergence   Mystic ')?.id).toBe('systems-seer');
+  });
+
   it('resolves dropped old display texts to a consolidated current entry', () => {
     const cases: [string, string][] = [
       ['code architect', 'cybernetic-architect'],
@@ -126,8 +135,8 @@ describe('deprecated subtitle alias compatibility', () => {
       ['augmented reality sculptor', 'holographic-sculptor'],
       ['resilience sculptor', 'digital-sculptor'],
       ['cybersecurity artisan', 'cyber-defense-artisan'],
-      ['knowledge craftsman', 'frontier-crafter'],
-      ['intelligent systems artist', 'neural-artist'],
+      ['knowledge craftsman', 'frontier-forger'],
+      ['intelligent systems artist', 'cortex-diviner'],
       ['platform visionary', 'cloud-shaper'],
       ['digital futurist', 'ai-cartographer'],
       ['technological mapper', 'ai-cartographer'],
@@ -142,13 +151,17 @@ describe('deprecated subtitle alias compatibility', () => {
   it('resolves old slugified pseudo-ids via getSubtitleRendererById', () => {
     const cases: [string, string][] = [
       ['code-architect', 'cybernetic-architect'],
-      ['innovation-mystic', 'emergence-mystic'],
+      ['innovation-mystic', 'systems-seer'],
+      ['emergence-mystic', 'systems-seer'],
       ['distributed-systems-alchemist', 'code-alchemist'],
       ['process-designer', 'quantum-designer'],
       ['experience-sculptor', 'digital-sculptor'],
       ['intelligence-artisan', 'blockchain-artisan'],
-      ['future-systems-crafter', 'frontier-crafter'],
-      ['scalability-artist', 'neural-artist'],
+      ['future-systems-crafter', 'frontier-forger'],
+      ['frontier-crafter', 'frontier-forger'],
+      ['scalability-artist', 'cortex-diviner'],
+      ['robotics-artist', 'kinetic-machinist'],
+      ['neural-artist', 'cortex-diviner'],
       ['enterprise-dreamer', 'cloud-shaper'],
     ];
     for (const [oldId, expectedId] of cases) {

@@ -65,7 +65,7 @@ describe('LandingTitle locked previews', () => {
     render(<LandingTitle forcedThemeText="emergence mystic" disableRotation />);
 
     expect(
-      screen.getByRole('group', { name: /emergence mystic/i }),
+      screen.getByRole('group', { name: /systems seer/i }),
     ).toBeTruthy();
   });
 });

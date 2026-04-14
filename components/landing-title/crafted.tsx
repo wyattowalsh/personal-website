@@ -123,8 +123,8 @@ const BLOCKCHAIN_ARTISAN_THEME = theme(
   { border: '1px solid rgba(251, 146, 60, 0.22)', shadow: '0 22px 60px rgba(251, 146, 60, 0.14)' },
 );
 
-const FRONTIER_CRAFTER_THEME = theme(
-  craftedSubtitle('frontier-crafter', 'frontier crafter', 'Crafter', 'living systems craft'),
+const FRONTIER_FORGER_THEME = theme(
+  craftedSubtitle('frontier-forger', 'frontier forger', 'Forger', 'expedition forge'),
   {
     gradient: 'linear-gradient(135deg, #84cc16 0%, #16a34a 42%, #0284c7 100%)',
     darkGradient: 'linear-gradient(135deg, #d9f99d 0%, #86efac 42%, #7dd3fc 100%)',
@@ -145,7 +145,7 @@ export const CRAFTED_SHOWCASE_THEMES: SubtitleTheme[] = [
   HOLOGRAPHIC_SCULPTOR_THEME,
   CYBER_DEFENSE_ARTISAN_THEME,
   BLOCKCHAIN_ARTISAN_THEME,
-  FRONTIER_CRAFTER_THEME,
+  FRONTIER_FORGER_THEME,
 ];
 
 export const CRAFTED_SUBTITLE_THEMES: SubtitleTheme[] = [
@@ -195,7 +195,7 @@ const CRAFTED_VARIANTS: readonly CraftedVariantConfig[] = [
   },
   {
     scene: 'frontier',
-    theme: FRONTIER_CRAFTER_THEME,
+    theme: FRONTIER_FORGER_THEME,
     kicker: 'Expedition workshop',
     descriptor:
       'Mountain terrain, switchback trails, and a camp marker — craft born from fieldwork.',
@@ -286,7 +286,7 @@ function CraftedScene({
         onBlur={onBlur}
       >
         <motion.section
-          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          initial={context.prefersReducedMotion || !context.allowAnimatedEntrance ? false : themeConfig.initial}
           animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
           exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
           transition={themeConfig.transition}

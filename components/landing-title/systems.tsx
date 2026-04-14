@@ -306,7 +306,7 @@ function SystemsScene({
         onBlur={onBlur}
       >
         <motion.section
-          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          initial={context.prefersReducedMotion || !context.allowAnimatedEntrance ? false : themeConfig.initial}
           animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
           exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
           transition={themeConfig.transition}

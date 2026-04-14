@@ -9,6 +9,7 @@ import type { SignalDeckMeta } from '@/lib/landing-title-sequence';
 import { cn } from '@/lib/utils';
 
 export interface LandingTitleRendererContext {
+  allowAnimatedEntrance: boolean;
   compact: boolean;
   isDark: boolean;
   prefersReducedMotion: boolean;
@@ -562,7 +563,7 @@ function ThemeSubtitleRenderer({
   theme,
   totalLabel,
 }: ThemeSubtitleRendererProps) {
-  const { compact, isDark, prefersReducedMotion, shouldAnimateTagline, showName, wordIndex } = context;
+  const { allowAnimatedEntrance, compact, isDark, prefersReducedMotion, shouldAnimateTagline, showName, wordIndex } = context;
   const Icon = theme.icon;
   const textSeed = createTextSeed(theme.text);
 
@@ -661,7 +662,7 @@ function ThemeSubtitleRenderer({
     return (
       <motion.span
         className={theme.iconWrapperClass}
-        initial={theme.iconMotion.initial}
+        initial={allowAnimatedEntrance ? theme.iconMotion.initial : false}
         animate={theme.iconMotion.animate}
         exit={theme.iconMotion.exit}
         transition={theme.iconMotion.transition}
@@ -728,7 +729,7 @@ function ThemeSubtitleRenderer({
             <motion.span
               key={`${unit}-${index}`}
               style={animatedUnitStyle}
-              initial={{ opacity: 0, y: 8 }}
+              initial={allowAnimatedEntrance ? { opacity: 0, y: 8 } : false}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{
@@ -749,12 +750,17 @@ function ThemeSubtitleRenderer({
       const waveLift = theme.renderMeta?.waveLift ?? (segmentMode === 'word' ? 10 : 7);
 
       return withReadableBase(
-        <motion.span style={choreographyWrapperStyle} className={typographyClasses} initial={{ opacity: 0.9 }} animate={{ opacity: 1 }}>
+        <motion.span
+          style={choreographyWrapperStyle}
+          className={typographyClasses}
+          initial={allowAnimatedEntrance ? { opacity: 0.9 } : false}
+          animate={{ opacity: 1 }}
+        >
           {motionUnits.map((unit, index) => (
             <motion.span
               key={`${unit}-${index}`}
               style={animatedUnitStyle}
-              initial={{ opacity: 0, y: waveLift, rotateZ: index % 2 === 0 ? -6 : 6 }}
+              initial={allowAnimatedEntrance ? { opacity: 0, y: waveLift, rotateZ: index % 2 === 0 ? -6 : 6 } : false}
               animate={{
                 opacity: [0.3, 1, 1],
                 y: [waveLift, -waveLift * 0.6, 0],
@@ -780,7 +786,7 @@ function ThemeSubtitleRenderer({
             <motion.span
               key={`${unit}-${index}`}
               style={animatedUnitStyle}
-              initial={{ opacity: 0, y: -cascadeDistance, rotateX: 70, scale: 0.88 }}
+              initial={allowAnimatedEntrance ? { opacity: 0, y: -cascadeDistance, rotateX: 70, scale: 0.88 } : false}
               animate={{ opacity: 1, y: [0, -2, 0], rotateX: [20, -6, 0], scale: [1.06, 0.98, 1] }}
               exit={{ opacity: 0, y: cascadeDistance * 0.55, rotateX: -55, scale: 0.9 }}
               transition={{
@@ -805,12 +811,12 @@ function ThemeSubtitleRenderer({
         <motion.span
           style={{ ...animatedCombinedStyle, display: 'inline-block' }}
           className={typographyClasses}
-          initial={{
+          initial={allowAnimatedEntrance ? {
             clipPath: revealFromRight ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)',
             opacity: 0.45,
             x: revealFromRight ? 20 : -20,
             skewX: revealSkew,
-          }}
+          } : false}
           animate={{ clipPath: 'inset(0 0% 0 0)', opacity: 1, x: 0, skewX: 0 }}
           exit={{
             clipPath: revealFromRight ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)',
@@ -835,7 +841,7 @@ function ThemeSubtitleRenderer({
         <span style={{ perspective: '1000px', display: 'inline-flex', alignItems: 'center' }} className={typographyClasses}>
           <motion.span
             style={animatedUnitStyle}
-            initial={{ opacity: 0, x: -splitDistance, rotateY: 28, scale: 0.9 }}
+            initial={allowAnimatedEntrance ? { opacity: 0, x: -splitDistance, rotateY: 28, scale: 0.9 } : false}
             animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
             exit={{ opacity: 0, x: -splitDistance * 1.2, rotateY: 32, scale: 0.92 }}
             transition={{ duration: 0.46, ease: [0.2, 0.8, 0.2, 1] }}
@@ -845,7 +851,7 @@ function ThemeSubtitleRenderer({
           {right ? (
             <motion.span
               style={{ ...animatedUnitStyle, marginLeft: '0.35ch' }}
-              initial={{ opacity: 0, x: splitDistance, rotateY: -28, scale: 0.9 }}
+              initial={allowAnimatedEntrance ? { opacity: 0, x: splitDistance, rotateY: -28, scale: 0.9 } : false}
               animate={{ opacity: 1, x: 0, rotateY: 0, scale: 1 }}
               exit={{ opacity: 0, x: splitDistance * 1.2, rotateY: -32, scale: 0.92 }}
               transition={{ duration: 0.46, ease: [0.2, 0.8, 0.2, 1], delay: 0.06 }}
@@ -865,7 +871,9 @@ function ThemeSubtitleRenderer({
             aria-hidden="true"
             className="absolute inset-0"
             style={animatedCombinedStyle}
-            initial={{ opacity: 0.18, y: 2, scale: 0.995, letterSpacing: typographyStyle.letterSpacing }}
+            initial={allowAnimatedEntrance
+              ? { opacity: 0.18, y: 2, scale: 0.995, letterSpacing: typographyStyle.letterSpacing }
+              : false}
             animate={{ opacity: 0, y: -14, scale: 1.015, letterSpacing: '0.08em' }}
             exit={{ opacity: 0, y: -14 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
@@ -875,7 +883,9 @@ function ThemeSubtitleRenderer({
           <motion.span
             key={`next-${wordIndex}`}
             style={animatedCombinedStyle}
-            initial={{ opacity: 0, y: 10, scale: 0.985, letterSpacing: '0.08em' }}
+            initial={allowAnimatedEntrance
+              ? { opacity: 0, y: 10, scale: 0.985, letterSpacing: '0.08em' }
+              : false}
             animate={{ opacity: 1, y: 0, scale: 1, letterSpacing: typographyStyle.letterSpacing }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
@@ -1000,10 +1010,10 @@ function ThemeSubtitleRenderer({
             {subtitleInner}
           </div>
         ) : (
-          <AnimatePresence mode="wait">
+          <AnimatePresence initial={false} mode="sync">
             <motion.div
               key={theme.text}
-              initial={theme.initial}
+              initial={allowAnimatedEntrance ? theme.initial : false}
               animate={theme.animate}
               exit={theme.exit}
               transition={theme.transition}

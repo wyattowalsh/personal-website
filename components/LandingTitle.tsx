@@ -1,5 +1,6 @@
 'use client';
 
+import { AnimatePresence, motion } from 'motion/react';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { useTheme } from 'next-themes';
 
@@ -63,6 +64,7 @@ export function LandingTitle({
   const [isShellHovered, setIsShellHovered] = useState(false);
   const [isShellFocused, setIsShellFocused] = useState(false);
   const [isDocumentVisible, setIsDocumentVisible] = useState(true);
+  const [allowAnimatedEntrance, setAllowAnimatedEntrance] = useState(false);
 
   const forcedRenderer = forcedSubtitleId
     ? getSubtitleRendererById(forcedSubtitleId)
@@ -73,6 +75,19 @@ export function LandingTitle({
   const forcedRendererIndex = forcedRenderer
     ? LANDING_TITLE_RENDERERS.findIndex(({ id }) => id === forcedRenderer.id)
     : -1;
+
+  useEffect(() => {
+    if (!hasHydrated || prefersReducedMotion || forcedRenderer || disableRotation) {
+      setAllowAnimatedEntrance(false);
+      return undefined;
+    }
+
+    const frame = requestAnimationFrame(() => {
+      setAllowAnimatedEntrance(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [disableRotation, forcedRenderer, hasHydrated, prefersReducedMotion]);
 
   useEffect(() => {
     if (!isRotationEnabled) {
@@ -212,6 +227,7 @@ export function LandingTitle({
       : 'Focus or hover pauses rotation.';
 
   const rendererContext: LandingTitleRendererContext = {
+    allowAnimatedEntrance,
     compact,
     isDark,
     prefersReducedMotion,
@@ -219,6 +235,17 @@ export function LandingTitle({
     showName,
     wordIndex,
   };
+  const subtitleNode = currentRenderer.render({
+    context: rendererContext,
+    hideSignalDeck,
+    onBlur: handleShellBlur,
+    onFocus: handleShellFocus,
+    onMouseEnter: isRotationEnabled ? handleDeckMouseEnter : undefined,
+    onMouseLeave: isRotationEnabled ? handleDeckMouseLeave : undefined,
+    positionLabel,
+    rotationStatusLabel,
+    totalLabel,
+  });
 
   return (
     <div
@@ -264,17 +291,22 @@ export function LandingTitle({
         </h1>
       ) : null}
 
-      {currentRenderer.render({
-        context: rendererContext,
-        hideSignalDeck,
-         onBlur: handleShellBlur,
-         onFocus: handleShellFocus,
-         onMouseEnter: isRotationEnabled ? handleDeckMouseEnter : undefined,
-         onMouseLeave: isRotationEnabled ? handleDeckMouseLeave : undefined,
-         positionLabel,
-         rotationStatusLabel,
-         totalLabel,
-      })}
+      {isRotationEnabled ? (
+        <div className="grid w-full">
+          <AnimatePresence initial={false} mode="sync">
+            <motion.div
+              key={currentRenderer.id}
+              className="col-start-1 row-start-1 w-full"
+              initial={{ opacity: 0, y: 14, scale: 0.985, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -10, scale: 1.01, filter: 'blur(10px)' }}
+              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+            >
+              {subtitleNode}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      ) : subtitleNode}
     </div>
   );
 }

@@ -47,12 +47,20 @@ export const SUBTITLE_RENDERER_TEXT_REGISTRY = Object.freeze(
   Object.fromEntries(LANDING_TITLE_RENDERERS.map((e) => [e.text, e])),
 ) as Readonly<Record<string, LandingTitleRendererEntry>>;
 
+const NORMALIZED_SUBTITLE_RENDERER_TEXT_REGISTRY = Object.freeze(
+  Object.fromEntries(LANDING_TITLE_RENDERERS.map((e) => [normalizeSubtitleSelection(e.text), e])),
+) as Readonly<Record<string, LandingTitleRendererEntry>>;
+
 export const LANDING_TITLE_SUBTITLE_OPTIONS: readonly LandingTitleSubtitleOption[] =
   LANDING_TITLE_RENDERERS.map(({ id, lane, signalDeck, text }) => ({ id, lane, signalDeck, text }));
 export const DEFAULT_LANDING_TITLE_SUBTITLE = LANDING_TITLE_SUBTITLE_OPTIONS[0] ?? null;
 export const DEFAULT_LANDING_TITLE_SUBTITLE_ID = DEFAULT_LANDING_TITLE_SUBTITLE?.id ?? 'cybernetic-architect';
 export const LANDING_TITLE_SUBTITLE_IDS = LANDING_TITLE_SUBTITLE_OPTIONS.map(({ id }) => id) as readonly string[];
 export const LANDING_TITLE_THEME_TEXTS = LANDING_TITLE_RENDERERS.map(({ text }) => text) as readonly string[];
+
+function normalizeSubtitleSelection(value: string): string {
+  return value.trim().replace(/\s+/g, ' ').toLowerCase();
+}
 
 /**
  * @deprecated Alias map from old subtitle ids/texts (pre-redesign 44-entry
@@ -71,7 +79,8 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
   // Arcane (text changed or consolidated)
   'data sorcerer': 'data-sorcerer',
   'technological conjurer': 'silicon-conjurer',
-  'innovation mystic': 'emergence-mystic',
+  'innovation mystic': 'systems-seer',
+  'emergence mystic': 'systems-seer',
   'workflow mage': 'workflow-mage',
 
   // Alchemists (consolidated → code-alchemist)
@@ -98,15 +107,18 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
   'blockchain artisan': 'blockchain-artisan',
   'cybersecurity artisan': 'cyber-defense-artisan',
 
-  // Crafters (consolidated → frontier-crafter)
-  'knowledge craftsman': 'frontier-crafter',
-  'experience crafter': 'frontier-crafter',
-  'edge systems crafter': 'frontier-crafter',
-  'future systems crafter': 'frontier-crafter',
+  // Crafters (consolidated → frontier-forger)
+  'knowledge craftsman': 'frontier-forger',
+  'experience crafter': 'frontier-forger',
+  'edge systems crafter': 'frontier-forger',
+  'future systems crafter': 'frontier-forger',
+  'frontier crafter': 'frontier-forger',
 
-  // Artists (consolidated → neural-artist)
-  'intelligent systems artist': 'neural-artist',
-  'scalability artist': 'neural-artist',
+  // Artists (consolidated → cortex-diviner)
+  'intelligent systems artist': 'cortex-diviner',
+  'scalability artist': 'cortex-diviner',
+  'robotics artist': 'kinetic-machinist',
+  'neural artist': 'cortex-diviner',
 
   // Visionaries / Dreamers (consolidated → navigation entries)
   'platform visionary': 'cloud-shaper',
@@ -121,7 +133,8 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
 
   'code-architect': 'cybernetic-architect',
   'technological-conjurer': 'silicon-conjurer',
-  'innovation-mystic': 'emergence-mystic',
+  'innovation-mystic': 'systems-seer',
+  'emergence-mystic': 'systems-seer',
   'systems-alchemist': 'code-alchemist',
   'distributed-systems-alchemist': 'code-alchemist',
   'ecosystem-designer': 'quantum-designer',
@@ -136,12 +149,15 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
   'experience-sculptor': 'digital-sculptor',
   'intelligence-artisan': 'blockchain-artisan',
   'cybersecurity-artisan': 'cyber-defense-artisan',
-  'knowledge-craftsman': 'frontier-crafter',
-  'experience-crafter': 'frontier-crafter',
-  'edge-systems-crafter': 'frontier-crafter',
-  'future-systems-crafter': 'frontier-crafter',
-  'intelligent-systems-artist': 'neural-artist',
-  'scalability-artist': 'neural-artist',
+  'knowledge-craftsman': 'frontier-forger',
+  'experience-crafter': 'frontier-forger',
+  'edge-systems-crafter': 'frontier-forger',
+  'future-systems-crafter': 'frontier-forger',
+  'frontier-crafter': 'frontier-forger',
+  'intelligent-systems-artist': 'cortex-diviner',
+  'scalability-artist': 'cortex-diviner',
+  'robotics-artist': 'kinetic-machinist',
+  'neural-artist': 'cortex-diviner',
   'platform-visionary': 'cloud-shaper',
   'systems-dreamer': 'cloud-shaper',
   'digital-futurist': 'ai-cartographer',
@@ -150,18 +166,25 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
 });
 
 function resolveAlias(key: string): string | undefined {
-  return DEPRECATED_SUBTITLE_ALIASES[key];
+  return DEPRECATED_SUBTITLE_ALIASES[normalizeSubtitleSelection(key)]
+    ?? DEPRECATED_SUBTITLE_ALIASES[key];
 }
 
 export function getSubtitleRendererById(id: string): LandingTitleRendererEntry | null {
+  const normalizedId = normalizeSubtitleSelection(id);
+
   return SUBTITLE_RENDERER_REGISTRY[id]
-    ?? SUBTITLE_RENDERER_REGISTRY[resolveAlias(id) ?? '']
+    ?? SUBTITLE_RENDERER_REGISTRY[normalizedId]
+    ?? SUBTITLE_RENDERER_REGISTRY[resolveAlias(normalizedId) ?? '']
     ?? null;
 }
 
 export function getSubtitleRendererByText(text: string): LandingTitleRendererEntry | null {
+  const normalizedText = normalizeSubtitleSelection(text);
+
   return SUBTITLE_RENDERER_TEXT_REGISTRY[text]
-    ?? SUBTITLE_RENDERER_REGISTRY[resolveAlias(text) ?? '']
+    ?? NORMALIZED_SUBTITLE_RENDERER_TEXT_REGISTRY[normalizedText]
+    ?? SUBTITLE_RENDERER_REGISTRY[resolveAlias(normalizedText) ?? '']
     ?? null;
 }
 

@@ -55,10 +55,10 @@ const AUTOMATION_THEME = theme(
   { border: '1px solid rgba(249, 115, 22, 0.24)', shadow: '0 22px 54px rgba(249, 115, 22, 0.18)' },
 );
 
-// ─── Robotics Artist ──────────────────────────────────────────────────────────
+// ─── Kinetic Machinist ────────────────────────────────────────────────────────
 // Cool industrial steel → brushed white — articulated crane / stage rigging
-const ROBOTICS_THEME = theme(
-  performanceSubtitle('robotics-artist', 'robotics artist', 'Virtuoso', 'articulated performance'),
+const KINETIC_MACHINIST_THEME = theme(
+  performanceSubtitle('kinetic-machinist', 'kinetic machinist', 'Machinist', 'articulated precision'),
   {
     gradient: 'linear-gradient(135deg, #475569 0%, #64748b 40%, #94a3b8 100%)',
     darkGradient: 'linear-gradient(135deg, #94a3b8 0%, #cbd5e1 42%, #f1f5f9 100%)',
@@ -73,10 +73,10 @@ const ROBOTICS_THEME = theme(
   { border: '1px solid rgba(148, 163, 184, 0.24)', shadow: '0 22px 54px rgba(148, 163, 184, 0.18)' },
 );
 
-// ─── Neural Artist ────────────────────────────────────────────────────────────
+// ─── Cortex Diviner ───────────────────────────────────────────────────────────
 // Hot fuchsia → magenta → rose — synaptic bloom / radiant pulses
-const NEURAL_THEME = theme(
-  performanceSubtitle('neural-artist', 'neural artist', 'Virtuoso', 'synaptic expression'),
+const CORTEX_DIVINER_THEME = theme(
+  performanceSubtitle('cortex-diviner', 'cortex diviner', 'Diviner', 'synaptic divination'),
   {
     gradient: 'linear-gradient(135deg, #d946ef 0%, #ec4899 44%, #fb7185 100%)',
     darkGradient: 'linear-gradient(135deg, #e879f9 0%, #f9a8d4 46%, #fda4af 100%)',
@@ -93,8 +93,8 @@ const NEURAL_THEME = theme(
 
 export const PERFORMANCE_SHOWCASE_THEMES: SubtitleTheme[] = [
   AUTOMATION_THEME,
-  ROBOTICS_THEME,
-  NEURAL_THEME,
+  KINETIC_MACHINIST_THEME,
+  CORTEX_DIVINER_THEME,
 ];
 
 export const PERFORMANCE_SUBTITLE_THEMES: SubtitleTheme[] = [
@@ -111,14 +111,14 @@ const PERFORMANCE_VARIANTS: readonly PerformanceVariantConfig[] = [
   },
   {
     scene: 'robotics',
-    theme: ROBOTICS_THEME,
+    theme: KINETIC_MACHINIST_THEME,
     kicker: 'Actuated canvas',
     descriptor: 'An articulated crane mast and jointed boom frame the title like stage rigging.',
     notes: ['jointed', 'mechanical', 'precision'],
   },
   {
     scene: 'neural',
-    theme: NEURAL_THEME,
+    theme: CORTEX_DIVINER_THEME,
     kicker: 'Cognitive bloom',
     descriptor: 'Concentric pulse rings radiate from a synaptic core around the title.',
     notes: ['expressive', 'adaptive', 'networked'],
@@ -208,7 +208,7 @@ function PerformanceScene({
         onBlur={onBlur}
       >
         <motion.section
-          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          initial={context.prefersReducedMotion || !context.allowAnimatedEntrance ? false : themeConfig.initial}
           animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
           exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
           transition={themeConfig.transition}

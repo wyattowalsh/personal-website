@@ -107,8 +107,8 @@ const SILICON_CONJURER_THEME = theme(
   { border: '1px solid rgba(251, 146, 60, 0.22)', shadow: '0 22px 60px rgba(251, 146, 60, 0.15)' },
 );
 
-const EMERGENCE_MYSTIC_THEME = theme(
-  arcaneSubtitle('emergence-mystic', 'emergence mystic', 'Mystic', 'blooming foresight'),
+const SYSTEMS_SEER_THEME = theme(
+  arcaneSubtitle('systems-seer', 'systems seer', 'Seer', 'systems foresight'),
   {
     gradient: 'linear-gradient(135deg, #f9a8d4 0%, #c084fc 42%, #818cf8 100%)',
     darkGradient: 'linear-gradient(135deg, #fbcfe8 0%, #ddd6fe 42%, #c7d2fe 100%)',
@@ -144,7 +144,7 @@ export const ARCANE_SHOWCASE_THEMES: SubtitleTheme[] = [
   WORKFLOW_MAGE_THEME,
   ALGORITHM_WEAVER_THEME,
   SILICON_CONJURER_THEME,
-  EMERGENCE_MYSTIC_THEME,
+  SYSTEMS_SEER_THEME,
   SIGNAL_ORACLE_THEME,
 ];
 
@@ -183,7 +183,7 @@ const ARCANE_VARIANTS: readonly ArcaneVariantConfig[] = [
   },
   {
     scene: 'mystic',
-    theme: EMERGENCE_MYSTIC_THEME,
+    theme: SYSTEMS_SEER_THEME,
     kicker: 'Forecast bloom',
     descriptor: 'A petaled halo and rising sigils frame the title like an unfolding omen.',
     notes: ['bloom', 'signal', 'omen'],
@@ -285,7 +285,7 @@ function ArcaneScene({
         onBlur={onBlur}
       >
         <motion.section
-          initial={context.prefersReducedMotion ? false : themeConfig.initial}
+          initial={context.prefersReducedMotion || !context.allowAnimatedEntrance ? false : themeConfig.initial}
           animate={context.prefersReducedMotion ? undefined : themeConfig.animate}
           exit={context.prefersReducedMotion ? undefined : themeConfig.exit}
           transition={themeConfig.transition}
