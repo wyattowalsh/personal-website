@@ -11,7 +11,7 @@ const SAMPLE_THEMES = [
   { text: 'digital sculptor' },
   { text: 'frontier forger' },
   { text: 'quantum designer' },
-  { text: 'signal orchestrator' },
+  { text: 'signal conductor' },
   { text: 'cloud shaper' },
   { text: 'cognitive architect' },
 ];
@@ -32,7 +32,7 @@ describe('deriveSignalDeckMeta', () => {
       descriptor: 'tactile systems',
     });
 
-    expect(deriveSignalDeckMeta('signal orchestrator')).toEqual({
+    expect(deriveSignalDeckMeta('signal conductor')).toEqual({
       family: 'Orchestrator',
       descriptor: 'coordinated crescendo',
     });
@@ -42,7 +42,7 @@ describe('deriveSignalDeckMeta', () => {
 describe('hasThemeAdjacencyConflict', () => {
   it('flags repeated lead words, role words, and families', () => {
     expect(hasThemeAdjacencyConflict(
-      { text: 'signal orchestrator' },
+      { text: 'signal conductor' },
       { text: 'signal oracle' },
     )).toBe(true);
 

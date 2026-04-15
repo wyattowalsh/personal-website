@@ -28,7 +28,7 @@ const SIGNAL_FAMILY_RULES: Array<{ pattern: RegExp; meta: SignalDeckMeta }> = [
   { pattern: /\b(mage|weaver)\b/i, meta: { family: 'Weaver', descriptor: 'procedural spellwork' } },
   { pattern: /\b(visionary|dreamer|futurist)\b/i, meta: { family: 'Visionary', descriptor: 'long-horizon signal' } },
   { pattern: /\b(shaper|cartographer|mapper)\b/i, meta: { family: 'Cartographer', descriptor: 'route synthesis' } },
-  { pattern: /\borchestrator\b/i, meta: { family: 'Orchestrator', descriptor: 'coordinated crescendo' } },
+  { pattern: /\b(orchestrator|conductor)\b/i, meta: { family: 'Orchestrator', descriptor: 'coordinated crescendo' } },
 ];
 
 const DEFAULT_SIGNAL_DECK: SignalDeckMeta = {

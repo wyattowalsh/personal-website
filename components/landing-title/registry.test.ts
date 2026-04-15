@@ -48,8 +48,8 @@ const EXPECTED_VISIBLE_TITLES = [
   'cognitive architect',
   'quantum designer',
   'cloud shaper',
-  'AI cartographer',
-  'signal orchestrator',
+  'AI mapper',
+  'signal conductor',
   'data sorcerer',
   'workflow mage',
   'logic weaver',
@@ -156,7 +156,9 @@ describe('deprecated subtitle alias compatibility', () => {
     const cases: [string, string][] = [
       ['cybernetic architect', 'cybernetic-architect'],
       ['synthetic intelligence architect', 'synthetic-intelligence-architect'],
+      ['AI cartographer', 'ai-cartographer'],
       ['data orchestrator', 'data-orchestrator'],
+      ['signal orchestrator', 'data-orchestrator'],
       ['archive sorcerer', 'data-sorcerer'],
       ['sigil mage', 'workflow-mage'],
       ['algorithm weaver', 'algorithm-weaver'],
@@ -178,13 +180,13 @@ describe('deprecated subtitle alias compatibility', () => {
   });
 
   it('normalizes whitespace and casing for current and legacy text lookups', () => {
-    expect(getSubtitleRenderer('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
-    expect(getSubtitleRenderer('  Signal   Orchestrator ')?.id).toBe('data-orchestrator');
+    expect(getSubtitleRenderer('  AI   Mapper  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleRenderer('  Signal   Conductor ')?.id).toBe('data-orchestrator');
     expect(getSubtitleRenderer('  Systems   Seer ')?.id).toBe('systems-seer');
     expect(getSubtitleRenderer('  Emergence   Mystic ')?.id).toBe('systems-seer');
 
-    expect(getSubtitleOptionByText('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
-    expect(getSubtitleOptionByText('  Signal   Orchestrator ')?.id).toBe('data-orchestrator');
+    expect(getSubtitleOptionByText('  AI   Mapper  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleOptionByText('  Signal   Conductor ')?.id).toBe('data-orchestrator');
     expect(getSubtitleOptionByText('  Systems   Seer ')?.id).toBe('systems-seer');
     expect(getSubtitleOptionByText('  Emergence   Mystic ')?.id).toBe('systems-seer');
   });
@@ -192,7 +194,7 @@ describe('deprecated subtitle alias compatibility', () => {
   it('normalizes casing and whitespace for current ids as well as text', () => {
     expect(getSubtitleOptionById('  DATA-ORCHESTRATOR  ')?.id).toBe('data-orchestrator');
     expect(getSubtitleOptionById('  AI-CARTOGRAPHER  ')?.id).toBe('ai-cartographer');
-    expect(resolveSubtitleOption('  AI   Cartographer  ')?.id).toBe('ai-cartographer');
+    expect(resolveSubtitleOption('  AI   Mapper  ')?.id).toBe('ai-cartographer');
   });
 
   it('resolves dropped old display texts to a consolidated current entry', () => {
@@ -231,6 +233,7 @@ describe('deprecated subtitle alias compatibility', () => {
       ['robotics-artist', 'kinetic-machinist'],
       ['neural-artist', 'cortex-diviner'],
       ['enterprise-dreamer', 'cloud-shaper'],
+      ['signal-orchestrator', 'data-orchestrator'],
     ];
     for (const [oldId, expectedId] of cases) {
       const renderer = getSubtitleRendererById(oldId);
@@ -252,6 +255,9 @@ describe('deprecated subtitle alias compatibility', () => {
 
     const retiredVisibleText = resolveSubtitleOption('systems seer');
     expect(retiredVisibleText.id).toBe('systems-seer');
+
+    const renamedSystemsSlug = resolveSubtitleOption('signal-orchestrator');
+    expect(renamedSystemsSlug.id).toBe('data-orchestrator');
 
     const droppedText = resolveSubtitleOption('machine learning designer');
     expect(droppedText.id).toBe('quantum-designer');

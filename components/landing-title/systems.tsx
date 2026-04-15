@@ -122,7 +122,7 @@ const CLOUD_SHAPER_THEME = theme(
 );
 
 const AI_CARTOGRAPHER_THEME = theme(
-  systemsSubtitle('ai-cartographer', 'AI cartographer', 'Cartographer', 'route intelligence'),
+  systemsSubtitle('ai-cartographer', 'AI mapper', 'Cartographer', 'route intelligence'),
   {
     gradient: 'linear-gradient(135deg, #fbbf24 0%, #38bdf8 44%, #34d399 100%)',
     darkGradient: 'linear-gradient(135deg, #fde68a 0%, #7dd3fc 44%, #86efac 100%)',
@@ -138,7 +138,7 @@ const AI_CARTOGRAPHER_THEME = theme(
 );
 
 const DATA_ORCHESTRATOR_THEME = theme(
-  systemsSubtitle('data-orchestrator', 'signal orchestrator', 'Orchestrator', 'coordinated signal traffic'),
+  systemsSubtitle('data-orchestrator', 'signal conductor', 'Orchestrator', 'coordinated signal traffic'),
   {
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #fb7185 42%, #8b5cf6 100%)',
     darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fda4af 42%, #c4b5fd 100%)',

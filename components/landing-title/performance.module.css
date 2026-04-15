@@ -65,14 +65,14 @@
 .sceneAutomation,
 .sceneRobotics,
 .sceneNeural {
-  padding: 1rem 1rem 1.1rem;
+  padding: 0.9rem 0.92rem 0.96rem;
 }
 
 .sceneBody {
   position: relative;
   display: grid;
-  gap: 0.9rem;
-  min-height: 15rem;
+  gap: 0.72rem;
+  min-height: 12.5rem;
 }
 
 .sceneAutomation .sceneBody {
@@ -124,7 +124,7 @@
 
 .headlineWrap {
   display: grid;
-  gap: 0.8rem;
+  gap: 0.6rem;
   justify-items: start;
 }
 
@@ -132,8 +132,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.65rem;
-  height: 2.65rem;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 0.95rem;
   border: 1px solid var(--perf-edge);
   background:
@@ -145,15 +145,15 @@
 }
 
 .icon {
-  width: 1.35rem;
-  height: 1.35rem;
+  width: 1.12rem;
+  height: 1.12rem;
 }
 
 .titleLockup {
   position: relative;
   display: grid;
   gap: 0.3rem;
-  padding: 0.95rem 1rem 1rem;
+  padding: 0.74rem 0.86rem 0.8rem;
   border-radius: 1.3rem;
   border: 1px solid var(--perf-edge);
   background:
@@ -175,7 +175,7 @@
 
 .title {
   margin: 0;
-  font-size: clamp(1.42rem, 3vw, 2.18rem);
+  font-size: clamp(1.14rem, 2.2vw, 1.84rem);
   line-height: 0.92;
   letter-spacing: -0.04em;
   text-wrap: balance;
@@ -187,7 +187,7 @@
 .sceneRig {
   position: relative;
   overflow: hidden;
-  min-height: 13.8rem;
+  min-height: 11rem;
   border-radius: 1.75rem;
   border: 1px solid var(--perf-edge);
   background:
@@ -612,6 +612,7 @@
 /* ─── Cortex Diviner ─────────────────────────────────────────────────────────── */
 
 .sceneNeural .sceneRig {
+  min-height: 12.55rem;
   background:
     radial-gradient(circle at 50% 28%, rgba(236, 72, 153, 0.14), transparent 30%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 18%),
