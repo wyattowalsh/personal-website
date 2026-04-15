@@ -246,6 +246,22 @@ describe('deprecated subtitle alias compatibility', () => {
     }
   });
 
+  it('keeps the signal orchestrator legacy text and slug pinned to the current conductor subtitle', () => {
+    const legacyTextOption = getSubtitleOptionByText('signal orchestrator');
+    expect(legacyTextOption).not.toBeNull();
+    expect(legacyTextOption?.id).toBe('data-orchestrator');
+    expect(legacyTextOption?.text).toBe('signal conductor');
+
+    const legacySlugOption = getSubtitleOptionById('signal-orchestrator');
+    expect(legacySlugOption).not.toBeNull();
+    expect(legacySlugOption?.id).toBe('data-orchestrator');
+    expect(legacySlugOption?.text).toBe('signal conductor');
+
+    const resolvedLegacySlug = resolveSubtitleOption('signal-orchestrator');
+    expect(resolvedLegacySlug.id).toBe('data-orchestrator');
+    expect(resolvedLegacySlug.text).toBe('signal conductor');
+  });
+
   it('resolves legacy values through resolveSubtitleOption without falling to default', () => {
     const defaultOption = LANDING_TITLE_SUBTITLE_OPTIONS[0];
 

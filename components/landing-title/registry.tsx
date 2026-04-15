@@ -95,6 +95,7 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
   'ai cartographer'                 : 'ai-cartographer',
   'data orchestrator'               : 'data-orchestrator',
   'signal orchestrator'             : 'data-orchestrator',
+  'signal-orchestrator'             : 'data-orchestrator',
   'archive sorcerer'                : 'data-sorcerer',
   'sigil mage'                      : 'workflow-mage',
   'algorithm weaver'                : 'algorithm-weaver',
@@ -189,7 +190,6 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
   'digital-futurist': 'ai-cartographer',
   'enterprise-dreamer': 'cloud-shaper',
   'technological-mapper': 'ai-cartographer',
-  'signal-orchestrator': 'data-orchestrator',
 });
 
 function resolveAlias(key: string): string | undefined {

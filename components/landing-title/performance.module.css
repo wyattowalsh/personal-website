@@ -612,7 +612,7 @@
 /* ─── Cortex Diviner ─────────────────────────────────────────────────────────── */
 
 .sceneNeural .sceneRig {
-  min-height: 12.55rem;
+  min-height: 13.15rem;
   background:
     radial-gradient(circle at 50% 28%, rgba(236, 72, 153, 0.14), transparent 30%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), transparent 18%),
