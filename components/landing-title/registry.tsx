@@ -91,9 +91,14 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
 
   // Current normalization pass (visible text changed, ids retained)
   'cybernetic architect'            : 'cybernetic-architect',
+  'cyber architect'                 : 'cybernetic-architect',
   'synthetic intelligence architect': 'synthetic-intelligence-architect',
-  'ai cartographer'                 : 'ai-cartographer',
-  'data orchestrator'               : 'data-orchestrator',
+  'zero trust architect'            : 'zero-trust-architect',
+  'cognitive architect'             : 'synthetic-intelligence-architect',
+  'ai mapper'                       : 'ai-cartographer',
+  'cloud shaper'                    : 'cloud-shaper',
+  'platform architect'              : 'cloud-shaper',
+  'signal conductor'                : 'data-orchestrator',
   'signal orchestrator'             : 'data-orchestrator',
   'signal-orchestrator'             : 'data-orchestrator',
   'archive sorcerer'                : 'data-sorcerer',
@@ -101,7 +106,9 @@ export const DEPRECATED_SUBTITLE_ALIASES: Readonly<Record<string, string>> = Obj
   'algorithm weaver'                : 'algorithm-weaver',
   'systems seer'                    : 'systems-seer',
   'holographic sculptor'            : 'holographic-sculptor',
+  'cyber defense artisan'           : 'cyber-defense-artisan',
   'bastion artisan'                 : 'cyber-defense-artisan',
+  'blockchain artisan'              : 'blockchain-artisan',
   'lattice artisan'                 : 'blockchain-artisan',
 
   // Architects (dropped)
@@ -245,6 +252,6 @@ export function resolveSubtitleOption(selection: string | null | undefined): Lan
       id: DEFAULT_LANDING_TITLE_SUBTITLE_ID,
       lane: 'systems',
       signalDeck: { family: 'Architect', descriptor: 'systems precision' },
-      text: 'cyber architect',
+      text: 'cyber tactician',
     };
 }

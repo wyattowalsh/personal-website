@@ -43,13 +43,13 @@ const EXPECTED_SUBTITLE_ORDER = [
 ] as const;
 
 const EXPECTED_VISIBLE_TITLES = [
-  'cyber architect',
-  'zero trust architect',
-  'cognitive architect',
+  'cyber tactician',
+  'zero trust sentinel',
+  'cognitive strategist',
   'quantum designer',
-  'cloud shaper',
-  'AI mapper',
-  'signal conductor',
+  'platform surveyor',
+  'AI cartographer',
+  'data orchestrator',
   'data sorcerer',
   'workflow mage',
   'logic weaver',
@@ -59,8 +59,8 @@ const EXPECTED_VISIBLE_TITLES = [
   'code alchemist',
   'digital sculptor',
   'holosculptor',
-  'cyber defense artisan',
-  'blockchain artisan',
+  'bastion warden',
+  'lattice smith',
   'frontier forger',
   'automation virtuoso',
   'kinetic machinist',
@@ -155,16 +155,23 @@ describe('deprecated subtitle alias compatibility', () => {
   it('resolves renamed old display texts to the correct current entry', () => {
     const cases: [string, string][] = [
       ['cybernetic architect', 'cybernetic-architect'],
+      ['cyber architect', 'cybernetic-architect'],
+      ['zero trust architect', 'zero-trust-architect'],
       ['synthetic intelligence architect', 'synthetic-intelligence-architect'],
-      ['AI cartographer', 'ai-cartographer'],
-      ['data orchestrator', 'data-orchestrator'],
+      ['cognitive architect', 'synthetic-intelligence-architect'],
+      ['AI mapper', 'ai-cartographer'],
+      ['cloud shaper', 'cloud-shaper'],
+      ['platform architect', 'cloud-shaper'],
+      ['signal conductor', 'data-orchestrator'],
       ['signal orchestrator', 'data-orchestrator'],
       ['archive sorcerer', 'data-sorcerer'],
       ['sigil mage', 'workflow-mage'],
       ['algorithm weaver', 'algorithm-weaver'],
       ['systems seer', 'systems-seer'],
       ['holographic sculptor', 'holographic-sculptor'],
+      ['cyber defense artisan', 'cyber-defense-artisan'],
       ['bastion artisan', 'cyber-defense-artisan'],
+      ['blockchain artisan', 'blockchain-artisan'],
       ['lattice artisan', 'blockchain-artisan'],
       ['emergence mystic', 'systems-seer'],
     ];
@@ -181,11 +188,13 @@ describe('deprecated subtitle alias compatibility', () => {
 
   it('normalizes whitespace and casing for current and legacy text lookups', () => {
     expect(getSubtitleRenderer('  AI   Mapper  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleRenderer('  Cloud   Shaper ')?.id).toBe('cloud-shaper');
     expect(getSubtitleRenderer('  Signal   Conductor ')?.id).toBe('data-orchestrator');
     expect(getSubtitleRenderer('  Systems   Seer ')?.id).toBe('systems-seer');
     expect(getSubtitleRenderer('  Emergence   Mystic ')?.id).toBe('systems-seer');
 
     expect(getSubtitleOptionByText('  AI   Mapper  ')?.id).toBe('ai-cartographer');
+    expect(getSubtitleOptionByText('  Cloud   Shaper ')?.id).toBe('cloud-shaper');
     expect(getSubtitleOptionByText('  Signal   Conductor ')?.id).toBe('data-orchestrator');
     expect(getSubtitleOptionByText('  Systems   Seer ')?.id).toBe('systems-seer');
     expect(getSubtitleOptionByText('  Emergence   Mystic ')?.id).toBe('systems-seer');
@@ -250,16 +259,16 @@ describe('deprecated subtitle alias compatibility', () => {
     const legacyTextOption = getSubtitleOptionByText('signal orchestrator');
     expect(legacyTextOption).not.toBeNull();
     expect(legacyTextOption?.id).toBe('data-orchestrator');
-    expect(legacyTextOption?.text).toBe('signal conductor');
+    expect(legacyTextOption?.text).toBe('data orchestrator');
 
     const legacySlugOption = getSubtitleOptionById('signal-orchestrator');
     expect(legacySlugOption).not.toBeNull();
     expect(legacySlugOption?.id).toBe('data-orchestrator');
-    expect(legacySlugOption?.text).toBe('signal conductor');
+    expect(legacySlugOption?.text).toBe('data orchestrator');
 
     const resolvedLegacySlug = resolveSubtitleOption('signal-orchestrator');
     expect(resolvedLegacySlug.id).toBe('data-orchestrator');
-    expect(resolvedLegacySlug.text).toBe('signal conductor');
+    expect(resolvedLegacySlug.text).toBe('data orchestrator');
   });
 
   it('resolves legacy values through resolveSubtitleOption without falling to default', () => {

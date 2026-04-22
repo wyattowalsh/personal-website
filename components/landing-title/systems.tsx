@@ -42,7 +42,7 @@ const systemsSubtitle = (
 });
 
 const CYBERNETIC_ARCHITECT_THEME = theme(
-  systemsSubtitle('cybernetic-architect', 'cyber architect', 'Architect', 'adaptive command mesh'),
+  systemsSubtitle('cybernetic-architect', 'cyber tactician', 'Architect', 'adaptive command mesh'),
   {
     gradient: 'linear-gradient(135deg, #67e8f9 0%, #38bdf8 40%, #818cf8 100%)',
     darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #7dd3fc 42%, #c7d2fe 100%)',
@@ -58,7 +58,7 @@ const CYBERNETIC_ARCHITECT_THEME = theme(
 );
 
 const ZERO_TRUST_ARCHITECT_THEME = theme(
-  systemsSubtitle('zero-trust-architect', 'zero trust architect', 'Architect', 'sealed trust fabric'),
+  systemsSubtitle('zero-trust-architect', 'zero trust sentinel', 'Architect', 'sealed trust fabric'),
   {
     gradient: 'linear-gradient(135deg, #93c5fd 0%, #6366f1 40%, #0f172a 100%)',
     darkGradient: 'linear-gradient(135deg, #dbeafe 0%, #a5b4fc 42%, #334155 100%)',
@@ -74,7 +74,7 @@ const ZERO_TRUST_ARCHITECT_THEME = theme(
 );
 
 const SYNTHETIC_INTELLIGENCE_ARCHITECT_THEME = theme(
-  systemsSubtitle('synthetic-intelligence-architect', 'cognitive architect', 'Architect', 'cognitive system framing'),
+  systemsSubtitle('synthetic-intelligence-architect', 'cognitive strategist', 'Architect', 'cognitive system framing'),
   {
     gradient: 'linear-gradient(135deg, #34d399 0%, #22d3ee 42%, #818cf8 100%)',
     darkGradient: 'linear-gradient(135deg, #86efac 0%, #67e8f9 42%, #c7d2fe 100%)',
@@ -106,29 +106,29 @@ const QUANTUM_DESIGNER_THEME = theme(
 );
 
 const CLOUD_SHAPER_THEME = theme(
-  systemsSubtitle('cloud-shaper', 'cloud shaper', 'Cartographer', 'weathered compute terrain'),
+  systemsSubtitle('cloud-shaper', 'platform surveyor', 'Architect', 'platform skyline'),
   {
-    gradient: 'linear-gradient(135deg, #f8fafc 0%, #bae6fd 35%, #38bdf8 100%)',
-    darkGradient: 'linear-gradient(135deg, #e0f2fe 0%, #bae6fd 35%, #60a5fa 100%)',
-    glow: 'rgba(125, 211, 252, 0.46)',
+    gradient: 'linear-gradient(135deg, #dbeafe 0%, #7dd3fc 38%, #2563eb 100%)',
+    darkGradient: 'linear-gradient(135deg, #e0f2fe 0%, #93c5fd 40%, #60a5fa 100%)',
+    glow: 'rgba(59, 130, 246, 0.48)',
   },
-  { ...typo.visionary, fontWeight: 520, textTransform: 'uppercase' },
+  { ...typo.architect, fontWeight: 590, letterSpacing: '0.075em', textTransform: 'none' },
   Cloud,
   'left',
   '',
-  'dreamFloat',
+  'blueprintFold',
   '',
-  { border: '1px solid rgba(125, 211, 252, 0.2)', shadow: '0 22px 60px rgba(125, 211, 252, 0.12)' },
+  { border: '1px solid rgba(59, 130, 246, 0.22)', shadow: '0 22px 60px rgba(59, 130, 246, 0.14)' },
 );
 
 const AI_CARTOGRAPHER_THEME = theme(
-  systemsSubtitle('ai-cartographer', 'AI mapper', 'Cartographer', 'route intelligence'),
+  systemsSubtitle('ai-cartographer', 'AI cartographer', 'Cartographer', 'route intelligence'),
   {
     gradient: 'linear-gradient(135deg, #fbbf24 0%, #38bdf8 44%, #34d399 100%)',
     darkGradient: 'linear-gradient(135deg, #fde68a 0%, #7dd3fc 44%, #86efac 100%)',
     glow: 'rgba(56, 189, 248, 0.44)',
   },
-  { ...typo.mapper, letterSpacing: '0.1em' },
+  { ...typo.mapper, fontWeight: 520, letterSpacing: '0.075em', textTransform: 'none' },
   MapIcon,
   'left',
   '',
@@ -138,13 +138,13 @@ const AI_CARTOGRAPHER_THEME = theme(
 );
 
 const DATA_ORCHESTRATOR_THEME = theme(
-  systemsSubtitle('data-orchestrator', 'signal conductor', 'Orchestrator', 'coordinated signal traffic'),
+  systemsSubtitle('data-orchestrator', 'data orchestrator', 'Orchestrator', 'coordinated signal traffic'),
   {
     gradient: 'linear-gradient(135deg, #f59e0b 0%, #fb7185 42%, #8b5cf6 100%)',
     darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fda4af 42%, #c4b5fd 100%)',
     glow: 'rgba(249, 115, 22, 0.48)',
   },
-  { ...typo.orchestrator, letterSpacing: '0.08em' },
+  { ...typo.orchestrator, fontWeight: 720, letterSpacing: '0.03em', textTransform: 'none' },
   Music,
   'left',
   '',

@@ -689,12 +689,13 @@
 
 .sceneCyberDefense {
   background:
-    radial-gradient(circle at 82% 18%, rgba(34, 197, 94, 0.15), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(34, 197, 94, 0.18), transparent 24%),
+    radial-gradient(circle at 70% 58%, rgba(14, 165, 233, 0.08), transparent 22%),
     linear-gradient(145deg, rgba(24, 33, 42, 0.98), rgba(13, 17, 24, 0.98));
 }
 
 .sceneCyberDefense .titleBlock {
-  max-width: 11.25rem;
+  max-width: 9.8rem;
   background:
     linear-gradient(180deg, rgba(189, 247, 205, 0.1), transparent 24%),
     repeating-linear-gradient(
@@ -707,7 +708,7 @@
 }
 
 .sceneCyberDefense .title {
-  font-size: clamp(1rem, 1.8vw, 1.52rem);
+  font-size: clamp(1rem, 1.68vw, 1.42rem);
   color: rgba(236, 246, 255, 0.96);
 }
 
@@ -769,7 +770,7 @@
   clip-path: polygon(50% 0, 88% 16%, 88% 58%, 50% 100%, 12% 58%, 12% 16%);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 24%),
-    radial-gradient(circle at 50% 40%, rgba(34, 197, 94, 0.2), transparent 42%),
+    radial-gradient(circle at 50% 40%, rgba(34, 197, 94, 0.24), transparent 42%),
     linear-gradient(160deg, rgba(74, 101, 123, 0.88), rgba(22, 31, 40, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
@@ -826,12 +827,13 @@
 
 .sceneBlockchain {
   background:
-    radial-gradient(circle at 86% 18%, rgba(251, 146, 60, 0.18), transparent 24%),
+    radial-gradient(circle at 86% 18%, rgba(251, 146, 60, 0.2), transparent 24%),
+    radial-gradient(circle at 22% 72%, rgba(251, 191, 36, 0.08), transparent 22%),
     linear-gradient(145deg, rgba(43, 31, 26, 0.98), rgba(18, 16, 19, 0.98));
 }
 
 .sceneBlockchain .titleBlock {
-  max-width: 11.2rem;
+  max-width: 9.7rem;
   background:
     linear-gradient(180deg, rgba(255, 223, 182, 0.11), transparent 24%),
     repeating-linear-gradient(
@@ -844,7 +846,7 @@
 }
 
 .sceneBlockchain .title {
-  font-size: clamp(1rem, 1.82vw, 1.5rem);
+  font-size: clamp(1rem, 1.66vw, 1.38rem);
 }
 
 .sceneBlockchain .sceneRig {
@@ -942,7 +944,7 @@
   border: 1px solid rgba(255, 226, 190, 0.18);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 30%),
-    radial-gradient(circle at 50% 45%, rgba(251, 146, 60, 0.22), transparent 46%),
+    radial-gradient(circle at 50% 45%, rgba(251, 146, 60, 0.28), transparent 46%),
     linear-gradient(160deg, rgba(121, 78, 51, 0.96), rgba(43, 28, 24, 0.98));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),

@@ -89,13 +89,13 @@ const HOLOGRAPHIC_SCULPTOR_THEME = theme(
 );
 
 const CYBER_DEFENSE_ARTISAN_THEME = theme(
-  craftedSubtitle('cyber-defense-artisan', 'cyber defense artisan', 'Artisan', 'forged reliability'),
+  craftedSubtitle('cyber-defense-artisan', 'bastion warden', 'Artisan', 'forged reliability'),
   {
     gradient: 'linear-gradient(135deg, #16a34a 0%, #0ea5e9 42%, #0f172a 100%)',
     darkGradient: 'linear-gradient(135deg, #86efac 0%, #7dd3fc 42%, #334155 100%)',
     glow: 'rgba(34, 197, 94, 0.44)',
   },
-  { ...typo.artisan, letterSpacing: '0.04em' },
+  { ...typo.artisan, fontWeight: 680, letterSpacing: '0.02em' },
   ShieldCheck,
   'left',
   '',
@@ -105,13 +105,13 @@ const CYBER_DEFENSE_ARTISAN_THEME = theme(
 );
 
 const BLOCKCHAIN_ARTISAN_THEME = theme(
-  craftedSubtitle('blockchain-artisan', 'blockchain artisan', 'Artisan', 'lattice forge'),
+  craftedSubtitle('blockchain-artisan', 'lattice smith', 'Artisan', 'lattice forge'),
   {
     gradient: 'linear-gradient(135deg, #d97706 0%, #ea580c 38%, #0ea5e9 100%)',
     darkGradient: 'linear-gradient(135deg, #fcd34d 0%, #fdba74 40%, #7dd3fc 100%)',
     glow: 'rgba(251, 146, 60, 0.48)',
   },
-  { ...typo.artisanBold, letterSpacing: '0.06em' },
+  { ...typo.artisanBold, fontWeight: 640, letterSpacing: '0.035em', textTransform: 'none' },
   Link,
   'left',
   '',

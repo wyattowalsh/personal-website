@@ -333,19 +333,53 @@
 }
 
 .sceneCloud .sceneBody {
-  grid-template-columns: minmax(0, 9.2rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 9.8rem) minmax(0, 1fr);
 }
 
 .sceneCloud .titleBlock {
-  max-width: 9rem;
+  max-width: 9.5rem;
+  background:
+    linear-gradient(180deg, rgba(219, 234, 254, 0.18), transparent 28%),
+    repeating-linear-gradient(
+      -12deg,
+      transparent 0 13px,
+      rgba(59, 130, 246, 0.05) 13px 14px,
+      transparent 14px 28px
+    ),
+    linear-gradient(160deg, rgba(227, 238, 252, 0.92), rgba(208, 224, 245, 0.98));
+  box-shadow: 0 16px 28px rgba(59, 130, 246, 0.08);
 }
 
 .sceneCloud .titleLockup {
-  max-width: 8.7rem;
+  max-width: 9rem;
+  padding-right: 0.5rem;
 }
 
 .sceneCloud .iconBadge {
-  display: none;
+  display: inline-flex;
+}
+
+.sceneCloud .title {
+  font-size: clamp(0.9rem, 1.3vw, 1.34rem);
+  line-height: 0.94;
+}
+
+.sceneCloud .sceneRig {
+  background:
+    linear-gradient(180deg, rgba(236, 244, 255, 0.96), rgba(214, 228, 247, 0.98)),
+    linear-gradient(90deg, transparent 0 14%, rgba(59, 130, 246, 0.08) 14% 15%, transparent 15% 85%, rgba(59, 130, 246, 0.08) 85% 86%, transparent 86% 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 0 0 1px rgba(59, 130, 246, 0.08),
+    0 16px 32px rgba(59, 130, 246, 0.08);
+}
+
+.sceneCloud .sceneRig::before {
+  background:
+    linear-gradient(90deg, rgba(59, 130, 246, 0.06), transparent 18%, transparent 82%, rgba(59, 130, 246, 0.06)),
+    repeating-linear-gradient(90deg, rgba(59, 130, 246, 0.06) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(0deg, transparent 0 18px, rgba(59, 130, 246, 0.05) 18px 19px, transparent 19px 36px);
+  opacity: 0.34;
 }
 
 .sceneCartographer .sceneBody {
@@ -356,6 +390,10 @@
   order: 2;
   justify-self: end;
   max-width: 13rem;
+  background:
+    linear-gradient(180deg, rgba(254, 240, 138, 0.08), transparent 24%),
+    linear-gradient(160deg, rgba(226, 236, 249, 0.92), rgba(207, 223, 242, 0.98));
+  box-shadow: 0 16px 28px rgba(56, 189, 248, 0.08);
 }
 
 .sceneCartographer .titleLockup {
@@ -369,11 +407,15 @@
 }
 
 .sceneCartographer .title {
-  font-size: clamp(0.88rem, 1.28vw, 1.34rem);
+  font-size: clamp(0.86rem, 1.2vw, 1.26rem);
 }
 
 .sceneCartographer .sceneRig {
   order: 1;
+  background:
+    radial-gradient(circle at 70% 36%, rgba(56, 189, 248, 0.12), transparent 18%),
+    linear-gradient(180deg, rgba(236, 245, 255, 0.96), rgba(214, 228, 247, 0.98)),
+    linear-gradient(90deg, transparent 0 11%, rgba(56, 189, 248, 0.08) 11% 12%, transparent 12% 88%, rgba(56, 189, 248, 0.08) 88% 89%, transparent 89% 100%);
 }
 
 .sceneOrchestrator .sceneBody {
@@ -384,6 +426,10 @@
   order: 2;
   justify-self: end;
   max-width: 13rem;
+  background:
+    linear-gradient(180deg, rgba(253, 186, 116, 0.08), transparent 22%),
+    linear-gradient(160deg, rgba(235, 237, 246, 0.92), rgba(216, 223, 238, 0.98));
+  box-shadow: 0 16px 28px rgba(249, 115, 22, 0.08);
 }
 
 .sceneOrchestrator .titleLockup {
@@ -397,11 +443,15 @@
 }
 
 .sceneOrchestrator .title {
-  font-size: clamp(0.9rem, 1.28vw, 1.36rem);
+  font-size: clamp(0.88rem, 1.2vw, 1.28rem);
 }
 
 .sceneOrchestrator .sceneRig {
   order: 1;
+  background:
+    radial-gradient(circle at 72% 22%, rgba(249, 115, 22, 0.12), transparent 18%),
+    linear-gradient(180deg, rgba(237, 240, 249, 0.96), rgba(217, 223, 238, 0.98)),
+    repeating-linear-gradient(0deg, transparent 0 18px, rgba(249, 115, 22, 0.05) 18px 19px);
 }
 
 .cyberneticRig {
@@ -717,6 +767,7 @@
 
 .cloudRig {
   background:
+    radial-gradient(circle at 66% 28%, var(--sys-glow-soft), transparent 22%),
     linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3)),
     linear-gradient(0deg, transparent 0 74%, var(--sys-struct-faint) 74% 75%, transparent 75%),
     repeating-linear-gradient(90deg, transparent 0 24px, var(--sys-struct-faint) 24px 25px);
@@ -724,70 +775,105 @@
 
 .cloudMasses {
   position: absolute;
-  inset: 2.1rem 1rem 3.7rem 1rem;
+  inset: 1.55rem 1rem 2.9rem 1rem;
 }
 
 .cloudMasses span {
   position: absolute;
   bottom: 0;
   border: 1px solid var(--sys-edge);
-  background: linear-gradient(180deg, var(--sys-fill), var(--sys-panel-2));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), transparent 22%),
+    linear-gradient(180deg, var(--sys-fill), var(--sys-panel-2));
   box-shadow:
     inset 0 1px 0 var(--sys-struct-strong),
     0 0.2rem 0 var(--sys-struct-faint);
-  clip-path: polygon(0 18px, 18px 18px, 18px 0, 62% 0, 62% 16px, 100% 16px, 100% 100%, 0 100%);
+  clip-path: polygon(0 14px, 14px 14px, 14px 0, 58% 0, 58% 12px, 100% 12px, 100% 100%, 0 100%);
 }
 
 .cloudMasses span:nth-child(1) {
-  left: 0.8rem;
-  width: 4.5rem;
-  height: 4.15rem;
+  left: 0.65rem;
+  width: 4.15rem;
+  height: 5rem;
 }
 
 .cloudMasses span:nth-child(2) {
-  right: 0.6rem;
-  width: 5.2rem;
-  height: 5.25rem;
+  right: 0.25rem;
+  width: 5.5rem;
+  height: 6.35rem;
+}
+
+.cloudMasses span::before {
+  content: '';
+  position: absolute;
+  left: 0.55rem;
+  right: 0.55rem;
+  top: 0.7rem;
+  height: 0.28rem;
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+}
+
+.cloudMasses span::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  width: 0.42rem;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--sys-glow-strong), transparent);
+}
+
+.cloudMasses span:nth-child(1)::after {
+  height: 1.9rem;
+}
+
+.cloudMasses span:nth-child(2)::after {
+  height: 2.8rem;
 }
 
 .cloudRain {
   position: absolute;
-  left: 1.3rem;
-  right: 1.3rem;
-  bottom: 1.2rem;
-  height: 4.7rem;
+  left: 1rem;
+  right: 1rem;
+  bottom: 0.8rem;
+  height: 3.55rem;
 }
 
 .cloudRain span {
   position: absolute;
   bottom: 0;
-  width: 0.34rem;
+  width: 0.42rem;
+  border-radius: 999px;
   background: linear-gradient(180deg, var(--sys-glow-strong), transparent);
-  box-shadow: 0 0 0 1px var(--sys-struct-faint);
+  box-shadow:
+    0 0 0 1px var(--sys-struct-faint),
+    0 0 12px var(--sys-glow-soft);
 }
 
 .cloudRain span:nth-child(1) {
-  left: 16%;
-  height: 3.6rem;
+  left: 19%;
+  height: 2.8rem;
 }
 
 .cloudRain span:nth-child(2) {
-  left: 33%;
-  height: 4.85rem;
+  left: 39%;
+  height: 3.4rem;
 }
 
 .cloudRain span:nth-child(3) {
-  left: 52%;
-  height: 3.2rem;
+  left: 59%;
+  height: 2.2rem;
 }
 
 .cloudRain span:nth-child(4) {
-  left: 71%;
-  height: 4.2rem;
+  left: 77%;
+  height: 3rem;
 }
 
 .cartographerRig {
   background:
+    radial-gradient(circle at 70% 36%, var(--sys-glow-soft), transparent 18%),
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel)),
     linear-gradient(90deg, transparent 0 11%, var(--sys-struct-faint) 11% 12%, transparent 12% 88%, var(--sys-struct-faint) 88% 89%, transparent 89% 100%);
 }
@@ -800,7 +886,7 @@
     linear-gradient(90deg, var(--sys-struct) 1px, transparent 1px),
     linear-gradient(0deg, var(--sys-struct) 1px, transparent 1px);
   background-size: 1.08rem 1.08rem;
-  opacity: 0.56;
+  opacity: 0.64;
 }
 
 .mapRoute,
@@ -815,7 +901,7 @@
   left: 1.1rem;
   right: 2.2rem;
   transform: rotate(18deg);
-  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), rgba(250, 204, 21, 0.9), transparent);
 }
 
 .mapRouteAlt {
@@ -823,7 +909,7 @@
   right: 1.1rem;
   bottom: 3.8rem;
   transform: rotate(-14deg);
-  background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
+  background: linear-gradient(90deg, transparent, var(--sys-edge), rgba(52, 211, 153, 0.76), transparent);
 }
 
 .mapPins {
@@ -836,7 +922,9 @@
   border: 1px solid var(--sys-edge);
   clip-path: polygon(50% 0, 100% 46%, 50% 100%, 0 46%);
   background: var(--sys-panel);
-  box-shadow: 0 0 0 0.18rem var(--sys-struct-faint);
+  box-shadow:
+    0 0 0 0.18rem var(--sys-struct-faint),
+    0 0 14px var(--sys-glow-soft);
 }
 
 .mapPins span:nth-child(1) {
@@ -873,14 +961,17 @@
 
 .mapContours span:nth-child(1) {
   inset: 2rem 1.4rem 4.1rem 2.7rem;
+  opacity: 0.72;
 }
 
 .mapContours span:nth-child(2) {
   inset: 4rem 2.8rem 2rem 1.4rem;
+  opacity: 0.52;
 }
 
 .orchestratorRig {
   background:
+    radial-gradient(circle at 72% 22%, rgba(249, 115, 22, 0.12), transparent 18%),
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel-3)),
     repeating-linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
 }
@@ -894,7 +985,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 0.2rem;
+  height: 0.22rem;
   background: linear-gradient(90deg, transparent, var(--sys-edge), transparent);
 }
 
@@ -926,10 +1017,12 @@
 .orchestratorBeats span {
   position: absolute;
   bottom: 0.95rem;
-  width: 1rem;
+  width: 1.05rem;
   border: 1px solid var(--sys-edge);
   clip-path: polygon(0 8px, 8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
-  background: linear-gradient(180deg, var(--sys-fill), var(--sys-panel));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 20%),
+    linear-gradient(180deg, var(--sys-fill), var(--sys-panel));
   box-shadow: 0 0 0 0.2rem var(--sys-struct-faint);
 }
 

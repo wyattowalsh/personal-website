@@ -11,9 +11,9 @@ const SAMPLE_THEMES = [
   { text: 'digital sculptor' },
   { text: 'frontier forger' },
   { text: 'quantum designer' },
-  { text: 'signal conductor' },
-  { text: 'cloud shaper' },
-  { text: 'cognitive architect' },
+  { text: 'data orchestrator' },
+  { text: 'platform surveyor' },
+  { text: 'cognitive strategist' },
 ];
 
 function deterministicRandom() {
@@ -32,7 +32,7 @@ describe('deriveSignalDeckMeta', () => {
       descriptor: 'tactile systems',
     });
 
-    expect(deriveSignalDeckMeta('signal conductor')).toEqual({
+    expect(deriveSignalDeckMeta('data orchestrator')).toEqual({
       family: 'Orchestrator',
       descriptor: 'coordinated crescendo',
     });
@@ -42,8 +42,8 @@ describe('deriveSignalDeckMeta', () => {
 describe('hasThemeAdjacencyConflict', () => {
   it('flags repeated lead words, role words, and families', () => {
     expect(hasThemeAdjacencyConflict(
-      { text: 'signal conductor' },
-      { text: 'signal oracle' },
+      { text: 'data orchestrator' },
+      { text: 'automation orchestrator' },
     )).toBe(true);
 
     expect(hasThemeAdjacencyConflict(
@@ -56,12 +56,12 @@ describe('hasThemeAdjacencyConflict', () => {
 
     expect(hasThemeAdjacencyConflict(
       { text: 'cognitive architect' },
-      { text: 'cyber architect' },
+      { text: 'systems architect' },
     )).toBe(true);
 
     expect(hasThemeAdjacencyConflict(
-      { text: 'cloud shaper' },
-      { text: 'frontier forger' },
+      { text: 'platform surveyor' },
+      { text: 'data sorcerer' },
     )).toBe(false);
   });
 
@@ -102,7 +102,7 @@ describe('buildRotationSequence', () => {
   it('builds a sequence without adjacent collisions and respects the anchor theme', () => {
     vi.spyOn(Math, 'random').mockImplementation(deterministicRandom());
 
-    const anchorTheme = { text: 'cyber architect' };
+    const anchorTheme = { text: 'cyber tactician' };
     const sequence = buildRotationSequence(SAMPLE_THEMES, anchorTheme);
 
     expect(sequence.map((theme) => theme.text).sort()).toEqual(
