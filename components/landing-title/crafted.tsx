@@ -282,6 +282,13 @@ function CraftedScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.alchemistSparks}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.alchemistLedger} />
                 </>
               ) : null}
 
@@ -294,6 +301,12 @@ function CraftedScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.digitalDust}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.digitalFacet} />
                 </>
               ) : null}
 
@@ -308,6 +321,12 @@ function CraftedScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.holoGhost}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.holoPrism} />
                 </>
               ) : null}
 
@@ -321,6 +340,12 @@ function CraftedScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.defenseWatch}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.defenseBeacon} />
                 </>
               ) : null}
 
@@ -340,6 +365,13 @@ function CraftedScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.latticeHeat}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.latticeAnchor} />
                 </>
               ) : null}
 
@@ -352,6 +384,13 @@ function CraftedScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.frontierStars}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.frontierBeacon} />
                 </>
               ) : null}
             </div>

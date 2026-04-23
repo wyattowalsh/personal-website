@@ -1171,3 +1171,181 @@
   border-radius: 1.2rem 1.9rem 1.9rem 1.2rem;
   text-align: center;
 }
+
+/* Poster-depth overlays */
+
+.sorcererRunes,
+.mageChain,
+.mysticConstellation,
+.oracleBands {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.sorcererArc,
+.mageOrbit,
+.weaverKnot,
+.conjurerChamber,
+.mysticMeridian,
+.oracleAntenna {
+  position: absolute;
+  pointer-events: none;
+}
+
+.sorcererRunes span {
+  position: absolute;
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 1px solid color-mix(in srgb, var(--arc-edge) 78%, transparent);
+  border-radius: 0.3rem;
+  transform: rotate(45deg);
+  opacity: 0.55;
+}
+
+.sorcererRunes span:nth-child(1) { left: 1.15rem; top: 1rem; }
+.sorcererRunes span:nth-child(2) { right: 1.35rem; top: 1.55rem; }
+.sorcererRunes span:nth-child(3) { left: 1.75rem; bottom: 1.25rem; }
+.sorcererRunes span:nth-child(4) { right: 2.15rem; bottom: 1.15rem; }
+
+.sorcererArc {
+  left: 50%;
+  top: 50%;
+  width: 8.2rem;
+  height: 8.2rem;
+  transform: translate(-50%, -50%);
+  border: 1px dashed color-mix(in srgb, var(--arc-overlay-bold) 92%, transparent);
+  border-radius: 999px;
+  clip-path: polygon(0 0, 100% 0, 100% 58%, 0 58%);
+  opacity: 0.42;
+}
+
+.mageOrbit {
+  right: 1.05rem;
+  top: 1rem;
+  width: 3.8rem;
+  height: 3.8rem;
+  border: 1px solid color-mix(in srgb, var(--arc-overlay-bold) 88%, transparent);
+  border-radius: 999px;
+  opacity: 0.46;
+}
+
+.mageChain span {
+  position: absolute;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 1px solid color-mix(in srgb, var(--arc-overlay-bold) 78%, transparent);
+  border-radius: 999px;
+  opacity: 0.52;
+}
+
+.mageChain span:nth-child(1) { right: 1.2rem; bottom: 1.2rem; }
+.mageChain span:nth-child(2) { right: 2.3rem; bottom: 2.2rem; }
+.mageChain span:nth-child(3) { right: 3.6rem; bottom: 3rem; }
+
+.weaverThreads {
+  position: absolute;
+  inset: 1rem 1rem 1rem 1rem;
+  pointer-events: none;
+}
+
+.weaverThreads span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--arc-overlay-bold), transparent);
+  opacity: 0.45;
+}
+
+.weaverThreads span:nth-child(1) { left: 18%; }
+.weaverThreads span:nth-child(2) { left: 39%; }
+.weaverThreads span:nth-child(3) { left: 63%; }
+.weaverThreads span:nth-child(4) { left: 82%; }
+
+.weaverKnot {
+  left: 50%;
+  top: 50%;
+  width: 2rem;
+  height: 2rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid color-mix(in srgb, var(--arc-overlay-bold) 88%, transparent);
+  border-radius: 0.55rem;
+  rotate: 18deg;
+  opacity: 0.54;
+}
+
+.conjurerChamber {
+  inset: 1rem;
+  border: 1px solid color-mix(in srgb, var(--arc-overlay-bold) 72%, transparent);
+  border-radius: 1.1rem;
+  opacity: 0.42;
+}
+
+.conjurerMist {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.conjurerMist span {
+  position: absolute;
+  width: 4rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--arc-glow-soft) 78%, transparent), transparent 70%);
+  opacity: 0.4;
+}
+
+.conjurerMist span:nth-child(1) { left: 1rem; top: 1.2rem; }
+.conjurerMist span:nth-child(2) { right: 1.1rem; top: 2.3rem; }
+.conjurerMist span:nth-child(3) { left: 2rem; bottom: 1.2rem; }
+
+.mysticConstellation span {
+  position: absolute;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: var(--arc-overlay-bold);
+  box-shadow: 0 0 0.45rem var(--arc-glow-soft);
+}
+
+.mysticConstellation span:nth-child(1) { left: 1.2rem; top: 1.2rem; }
+.mysticConstellation span:nth-child(2) { right: 1.45rem; top: 1.8rem; }
+.mysticConstellation span:nth-child(3) { left: 50%; top: 1rem; transform: translateX(-50%); }
+.mysticConstellation span:nth-child(4) { left: 1.8rem; bottom: 1.45rem; }
+.mysticConstellation span:nth-child(5) { right: 1.95rem; bottom: 1.1rem; }
+
+.mysticMeridian {
+  left: 50%;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  width: 1px;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, transparent, var(--arc-overlay-bold), transparent);
+  opacity: 0.4;
+}
+
+.oracleAntenna {
+  left: 50%;
+  top: 0.8rem;
+  width: 1px;
+  height: 3rem;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, var(--arc-overlay-bold), transparent);
+  opacity: 0.58;
+}
+
+.oracleBands span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 1px solid color-mix(in srgb, var(--arc-overlay-bold) 75%, transparent);
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  opacity: 0.4;
+}
+
+.oracleBands span:nth-child(1) { width: 3.2rem; height: 3.2rem; }
+.oracleBands span:nth-child(2) { width: 5.1rem; height: 5.1rem; }
+.oracleBands span:nth-child(3) { width: 7rem; height: 7rem; }

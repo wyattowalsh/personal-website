@@ -19,14 +19,11 @@ export interface LandingTitleRendererContext {
 
 export interface SubtitleRendererShellProps {
   context: LandingTitleRendererContext;
-  hideSignalDeck: boolean;
   onBlur: (event: FocusEvent<HTMLDivElement>) => void;
   onFocus: () => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
-  positionLabel: string;
   rotationStatusLabel: string;
-  totalLabel: string;
 }
 
 export type SubtitleLane = 'systems' | 'arcane' | 'crafted' | 'performance';
@@ -53,8 +50,6 @@ export interface SubtitleTheme {
   animate: TargetAndTransition;
   exit: TargetAndTransition;
   transition: Transition;
-  containerBorder: string;
-  containerShadow: string;
 }
 
 export interface LandingTitleRendererEntry {
@@ -72,11 +67,6 @@ interface TypographyTheme {
   letterSpacing: string;
   textTransform: SubtitleTheme['textTransform'];
   fontStyle: SubtitleTheme['fontStyle'];
-}
-
-interface SurfaceTheme {
-  border: string;
-  shadow: string;
 }
 
 const anim = {
@@ -132,8 +122,8 @@ export function theme(
   iconPosition: SubtitleTheme['iconPosition'],
   iconClass: string,
   animation: keyof typeof anim,
-  _effectClass: string,
-  surfaceTheme: SurfaceTheme,
+  _deprecatedEffectClass?: string,
+  _deprecatedSurfaceTheme?: { border: string; shadow: string },
 ): SubtitleTheme {
   const motion = anim[animation];
 
@@ -148,8 +138,6 @@ export function theme(
     iconPosition,
     initial: motion.initial,
     transition: motion.transition,
-    containerBorder: surfaceTheme.border,
-    containerShadow: surfaceTheme.shadow,
   };
 }
 
@@ -298,4 +286,3 @@ export function getTitleTextStyle(themeConfig: SubtitleTheme, isDark: boolean): 
     WebkitBackgroundClip: 'text',
   };
 }
-

@@ -233,7 +233,7 @@ export function SubtitleAuditLab() {
               Signal deck
             </p>
             <p className="text-xs text-muted-foreground">
-              Keep or hide the metadata strip.
+              Keep or hide audit metadata.
             </p>
           </div>
           <Switch
@@ -274,18 +274,20 @@ export function SubtitleAuditLab() {
       >
         {viewMode === 'single' ? (
           <div className="space-y-4">
-            <div className="flex flex-wrap items-end justify-between gap-3 rounded-[1.4rem] border border-border/60 bg-background/75 px-4 py-3">
-              <div className="min-w-0 space-y-1">
+            {showSignalDeck ? (
+              <div className="flex flex-wrap items-end justify-between gap-3 rounded-[1.4rem] border border-border/60 bg-background/75 px-4 py-3">
+                <div className="min-w-0 space-y-1">
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                    {selectedSubtitle.signalDeck.family}
+                  </p>
+                  <p className="text-sm font-medium text-foreground sm:text-base">{selectedSubtitle.text}</p>
+                  <p className="text-xs text-muted-foreground sm:text-sm">{selectedSubtitle.signalDeck.descriptor}</p>
+                </div>
                 <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                  {selectedSubtitle.signalDeck.family}
+                  {selectedSubtitle.lane}
                 </p>
-                <p className="text-sm font-medium text-foreground sm:text-base">{selectedSubtitle.text}</p>
-                <p className="text-xs text-muted-foreground sm:text-sm">{selectedSubtitle.signalDeck.descriptor}</p>
               </div>
-              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                {selectedSubtitle.lane}
-              </p>
-            </div>
+            ) : null}
             <LandingTitle forcedSubtitleId={selectedSubtitle.id} {...sharedPreviewProps} />
           </div>
         ) : (
@@ -305,12 +307,16 @@ export function SubtitleAuditLab() {
                       <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
                         {String(index + 1).padStart(2, '0')}
                       </p>
-                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground/80">
-                        {option.signalDeck.family}
-                      </p>
+                      {showSignalDeck ? (
+                        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground/80">
+                          {option.signalDeck.family}
+                        </p>
+                      ) : null}
                     </div>
                     <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
-                    <p className="line-clamp-2 text-xs text-muted-foreground">{option.signalDeck.descriptor}</p>
+                    {showSignalDeck ? (
+                      <p className="line-clamp-2 text-xs text-muted-foreground">{option.signalDeck.descriptor}</p>
+                    ) : null}
                   </div>
                   <Button
                     variant="ghost"

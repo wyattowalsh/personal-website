@@ -286,6 +286,13 @@ function ArcaneScene({
                   <span className={styles.sorcererSeal} />
                   <span className={styles.sorcererSeal} />
                   <span className={styles.sorcererNeedle} />
+                  <div className={styles.sorcererRunes}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.sorcererArc} />
                 </>
               ) : null}
 
@@ -297,6 +304,12 @@ function ArcaneScene({
                   <span className={styles.mageSeal} />
                   <span className={styles.mageCharm} />
                   <span className={styles.mageCharm} />
+                  <span className={styles.mageOrbit} />
+                  <div className={styles.mageChain}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                 </>
               ) : null}
 
@@ -316,6 +329,13 @@ function ArcaneScene({
                   </div>
                   <span className={styles.weaverShuttle} />
                   <span className={styles.weaverSeal} />
+                  <div className={styles.weaverThreads}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.weaverKnot} />
                 </div>
               ) : null}
 
@@ -327,6 +347,12 @@ function ArcaneScene({
                   <span className={styles.conjurerTrace} />
                   <span className={styles.conjurerTrace} />
                   <span className={styles.conjurerTrace} />
+                  <span className={styles.conjurerChamber} />
+                  <div className={styles.conjurerMist}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                 </>
               ) : null}
 
@@ -350,6 +376,14 @@ function ArcaneScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.mysticConstellation}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.mysticMeridian} />
                 </>
               ) : null}
 
@@ -363,6 +397,12 @@ function ArcaneScene({
                   <div className={styles.oraclePips}>
                     <span />
                     <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.oracleAntenna} />
+                  <div className={styles.oracleBands}>
                     <span />
                     <span />
                     <span />

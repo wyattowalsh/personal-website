@@ -242,14 +242,11 @@ export function LandingTitle({
   };
   const subtitleNode = currentRenderer.render({
     context: rendererContext,
-    hideSignalDeck,
     onBlur: handleShellBlur,
     onFocus: handleShellFocus,
     onMouseEnter: isRotationEnabled ? handleDeckMouseEnter : undefined,
     onMouseLeave: isRotationEnabled ? handleDeckMouseLeave : undefined,
-    positionLabel,
     rotationStatusLabel,
-    totalLabel,
   });
 
   return (

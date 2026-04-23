@@ -222,6 +222,14 @@ function PerformanceScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.automationSequencer}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.automationSweep} />
                 </div>
               ) : null}
 
@@ -233,6 +241,13 @@ function PerformanceScene({
                   <span className={styles.roboticsCrank} />
                   <span className={styles.roboticsPiston} />
                   <span className={styles.roboticsAnvil} />
+                  <span className={styles.roboticsArm} />
+                  <span className={styles.roboticsCounterweight} />
+                  <div className={styles.roboticsPins}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                 </div>
               ) : null}
 
@@ -252,6 +267,14 @@ function PerformanceScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.neuralConstellation}>
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.neuralMeridian} />
+                  <span className={styles.neuralEcho} />
                 </div>
               ) : null}
             </div>

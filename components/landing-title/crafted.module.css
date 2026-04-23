@@ -1390,3 +1390,174 @@
 .sceneFrontier .title {
   font-size: clamp(1.04rem, 1.86vw, 1.58rem);
 }
+
+/* Poster-depth overlays */
+
+.alchemistSparks,
+.digitalDust,
+.holoGhost,
+.defenseWatch,
+.latticeHeat,
+.frontierStars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.alchemistLedger,
+.digitalFacet,
+.holoPrism,
+.defenseBeacon,
+.latticeAnchor,
+.frontierBeacon {
+  position: absolute;
+  pointer-events: none;
+}
+
+.alchemistSparks span {
+  position: absolute;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--craft-gradient) 58%, rgba(255, 245, 200, 0.88));
+  box-shadow: 0 0 0.45rem rgba(251, 191, 36, 0.28);
+}
+
+.alchemistSparks span:nth-child(1) { left: 1.2rem; top: 1.2rem; }
+.alchemistSparks span:nth-child(2) { left: 2rem; top: 2rem; }
+.alchemistSparks span:nth-child(3) { right: 1.5rem; top: 1.4rem; }
+.alchemistSparks span:nth-child(4) { right: 2.4rem; bottom: 1.25rem; }
+
+.alchemistLedger {
+  right: 1rem;
+  bottom: 1rem;
+  width: 3.2rem;
+  height: 2.3rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.7rem;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 214, 0.14), transparent 28%),
+    repeating-linear-gradient(180deg, transparent 0 0.45rem, rgba(255, 255, 255, 0.08) 0.45rem 0.52rem);
+  opacity: 0.52;
+}
+
+.digitalDust span {
+  position: absolute;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--craft-gradient) 46%, rgba(255, 255, 255, 0.7));
+  opacity: 0.55;
+}
+
+.digitalDust span:nth-child(1) { left: 1.3rem; bottom: 1.15rem; }
+.digitalDust span:nth-child(2) { left: 2rem; bottom: 1.8rem; }
+.digitalDust span:nth-child(3) { right: 1.55rem; top: 1.25rem; }
+
+.digitalFacet {
+  left: 1rem;
+  top: 1rem;
+  width: 3rem;
+  height: 3rem;
+  clip-path: polygon(0 18%, 58% 0, 100% 36%, 82% 100%, 16% 84%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), transparent 68%);
+  opacity: 0.38;
+}
+
+.holoGhost span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  transform: translate(-50%, -50%);
+  opacity: 0.3;
+}
+
+.holoGhost span:nth-child(1) { width: 3.8rem; height: 5rem; }
+.holoGhost span:nth-child(2) { width: 5rem; height: 6.2rem; }
+.holoGhost span:nth-child(3) { width: 6.4rem; height: 7.4rem; }
+
+.holoPrism {
+  right: 1.1rem;
+  top: 1rem;
+  width: 2.8rem;
+  height: 2.8rem;
+  clip-path: polygon(50% 0, 100% 32%, 82% 100%, 18% 100%, 0 32%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  opacity: 0.52;
+}
+
+.defenseWatch span {
+  position: absolute;
+  width: 0.95rem;
+  height: 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: rgba(248, 113, 113, 0.08);
+  opacity: 0.55;
+}
+
+.defenseWatch span:nth-child(1) { left: 1rem; top: 1rem; }
+.defenseWatch span:nth-child(2) { right: 1.3rem; top: 1.6rem; }
+.defenseWatch span:nth-child(3) { left: 1.7rem; bottom: 1.1rem; }
+
+.defenseBeacon {
+  right: 1rem;
+  bottom: 1rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(248, 113, 113, 0.78), transparent 72%);
+  opacity: 0.8;
+}
+
+.latticeHeat span {
+  position: absolute;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(251, 146, 60, 0.28), transparent 72%);
+  opacity: 0.55;
+}
+
+.latticeHeat span:nth-child(1) { left: 1.1rem; top: 1.1rem; }
+.latticeHeat span:nth-child(2) { right: 1.3rem; top: 1.8rem; }
+.latticeHeat span:nth-child(3) { left: 2.3rem; bottom: 1.15rem; }
+.latticeHeat span:nth-child(4) { right: 2.1rem; bottom: 1rem; }
+
+.latticeAnchor {
+  left: 50%;
+  top: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.4rem;
+  rotate: 45deg;
+  opacity: 0.52;
+}
+
+.frontierStars span {
+  position: absolute;
+  width: 0.24rem;
+  height: 0.24rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 0.35rem rgba(255, 255, 255, 0.24);
+}
+
+.frontierStars span:nth-child(1) { left: 1.1rem; top: 1rem; }
+.frontierStars span:nth-child(2) { left: 2.3rem; top: 1.5rem; }
+.frontierStars span:nth-child(3) { right: 1.5rem; top: 1.2rem; }
+.frontierStars span:nth-child(4) { right: 2.6rem; top: 2rem; }
+
+.frontierBeacon {
+  right: 1.2rem;
+  bottom: 1.1rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px 999px 0 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: radial-gradient(circle at 30% 30%, rgba(217, 249, 157, 0.25), transparent 64%);
+  opacity: 0.45;
+}

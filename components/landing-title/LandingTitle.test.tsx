@@ -4,6 +4,7 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { LandingTitle } from '@/components/LandingTitle';
+import { LANDING_TITLE_SUBTITLE_OPTIONS } from '@/components/landing-title/registry';
 
 const mockUseReducedMotion = vi.fn(() => false);
 
@@ -92,5 +93,36 @@ describe('LandingTitle locked previews', () => {
     expect(
       screen.getByRole('group', { name: /cyber tactician/i }).getAttribute('data-surface'),
     ).toBe('audit');
+  });
+
+  it('hides audit metadata when the audit surface signal deck is disabled', () => {
+    render(
+      <LandingTitle
+        forcedSubtitleId="cybernetic-architect"
+        disableRotation
+        surface="audit"
+        hideSignalDeck
+      />,
+    );
+
+    expect(screen.queryByText('Architect')).toBeNull();
+    expect(screen.queryByText('adaptive command mesh')).toBeNull();
+  });
+
+  it('renders every subtitle variant in compact audit mode without throwing', () => {
+    for (const option of LANDING_TITLE_SUBTITLE_OPTIONS) {
+      const { unmount } = render(
+        <LandingTitle
+          forcedSubtitleId={option.id}
+          disableRotation
+          surface="audit"
+          compact
+          showName={false}
+        />,
+      );
+
+      expect(screen.getByRole('group', { name: new RegExp(option.text, 'i') })).toBeTruthy();
+      unmount();
+    }
   });
 });

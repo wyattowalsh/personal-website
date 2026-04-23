@@ -1187,3 +1187,272 @@
     transition: none;
   }
 }
+
+/* Poster-depth overlays */
+
+.cyberRails,
+.zeroMesh,
+.syntheticLanes,
+.syntheticNodes,
+.cloudLevels,
+.orchestratorCluster {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.cyberRails span {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+  opacity: 0.58;
+}
+
+.cyberRails span:nth-child(1) { top: 1.45rem; }
+.cyberRails span:nth-child(2) { bottom: 1.2rem; }
+
+.cyberVector,
+.cyberTarget,
+.zeroVault,
+.zeroPulse,
+.quantumPrism,
+.quantumSplit,
+.quantumRibbon,
+.cloudAxis,
+.cloudBeacon,
+.mapFold,
+.mapCompassRose,
+.mapLegend,
+.orchestratorBaton,
+.orchestratorWave {
+  position: absolute;
+  pointer-events: none;
+}
+
+.cyberVector {
+  top: 1.5rem;
+  right: 1.35rem;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-top: 1px solid var(--sys-glow-strong);
+  border-right: 1px solid var(--sys-glow-strong);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  opacity: 0.5;
+}
+
+.cyberTarget {
+  bottom: 1rem;
+  right: 1.1rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border: 1px solid var(--sys-edge);
+  border-radius: 999px;
+  box-shadow: 0 0 0 0.3rem color-mix(in srgb, var(--sys-glow-soft) 50%, transparent);
+  opacity: 0.7;
+}
+
+.zeroVault {
+  inset: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--sys-edge) 85%, rgba(255, 255, 255, 0.08));
+  border-radius: 1.3rem;
+  opacity: 0.5;
+}
+
+.zeroPulse {
+  left: 50%;
+  top: 50%;
+  width: 5.2rem;
+  height: 5.2rem;
+  transform: translate(-50%, -50%);
+  border: 1px dashed var(--sys-glow-strong);
+  border-radius: 999px;
+  opacity: 0.45;
+}
+
+.zeroMesh span {
+  position: absolute;
+  background: color-mix(in srgb, var(--sys-edge) 82%, transparent);
+  opacity: 0.45;
+}
+
+.zeroMesh span:nth-child(1) {
+  left: 1.15rem;
+  right: 1.15rem;
+  top: 50%;
+  height: 1px;
+}
+
+.zeroMesh span:nth-child(2) {
+  top: 1.15rem;
+  bottom: 1.15rem;
+  left: 50%;
+  width: 1px;
+}
+
+.zeroMesh span:nth-child(3) {
+  inset: 1.9rem;
+  border: 1px solid color-mix(in srgb, var(--sys-edge) 55%, transparent);
+  border-radius: 999px;
+  background: none;
+}
+
+.syntheticLanes span {
+  position: absolute;
+  left: 1.1rem;
+  right: 1.1rem;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+  opacity: 0.48;
+}
+
+.syntheticLanes span:nth-child(1) { top: 1.35rem; }
+.syntheticLanes span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+.syntheticLanes span:nth-child(3) { bottom: 1.35rem; }
+
+.syntheticNodes span {
+  position: absolute;
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 999px;
+  background: var(--sys-glow-strong);
+  box-shadow: 0 0 0.5rem var(--sys-glow-soft);
+}
+
+.syntheticNodes span:nth-child(1) { left: 1.35rem; top: 1.7rem; }
+.syntheticNodes span:nth-child(2) { right: 1.8rem; top: 50%; transform: translateY(-50%); }
+.syntheticNodes span:nth-child(3) { left: 2rem; bottom: 1.4rem; }
+
+.quantumPrism {
+  left: 50%;
+  top: 50%;
+  width: 4.4rem;
+  height: 4.4rem;
+  transform: translate(-50%, -50%) rotate(16deg);
+  border: 1px solid color-mix(in srgb, var(--sys-glow-strong) 80%, rgba(255, 255, 255, 0.14));
+  background: linear-gradient(135deg, color-mix(in srgb, var(--sys-glow-soft) 58%, transparent), transparent 72%);
+  clip-path: polygon(50% 0, 100% 32%, 82% 100%, 18% 100%, 0 32%);
+  opacity: 0.54;
+}
+
+.quantumSplit {
+  left: 1.1rem;
+  right: 1.1rem;
+  top: 50%;
+  height: 0.18rem;
+  transform: translateY(-50%) rotate(-10deg);
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
+  opacity: 0.56;
+}
+
+.quantumRibbon {
+  left: 50%;
+  top: 50%;
+  width: 7rem;
+  height: 2.8rem;
+  transform: translate(-50%, -50%) rotate(18deg);
+  border-top: 1px solid color-mix(in srgb, var(--sys-glow-strong) 72%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--sys-glow-soft) 68%, transparent);
+  opacity: 0.45;
+}
+
+.cloudAxis {
+  top: 1rem;
+  bottom: 1rem;
+  left: 1.4rem;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--sys-edge), transparent);
+  opacity: 0.5;
+}
+
+.cloudLevels span {
+  position: absolute;
+  left: 1.4rem;
+  right: 1.1rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--sys-edge), transparent 70%);
+  opacity: 0.42;
+}
+
+.cloudLevels span:nth-child(1) { top: 1.55rem; }
+.cloudLevels span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+.cloudLevels span:nth-child(3) { bottom: 1.5rem; }
+
+.cloudBeacon {
+  right: 1.15rem;
+  top: 1.15rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--sys-glow-strong), transparent 72%);
+  opacity: 0.8;
+}
+
+.mapFold {
+  inset: 1.05rem;
+  border-left: 1px dashed color-mix(in srgb, var(--sys-edge) 75%, transparent);
+  border-right: 1px dashed color-mix(in srgb, var(--sys-edge) 55%, transparent);
+  opacity: 0.45;
+}
+
+.mapCompassRose {
+  right: 1rem;
+  top: 1rem;
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 1px solid color-mix(in srgb, var(--sys-glow-strong) 80%, transparent);
+  border-radius: 999px;
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  opacity: 0.5;
+}
+
+.mapLegend {
+  left: 1rem;
+  bottom: 1rem;
+  width: 3.2rem;
+  height: 2.4rem;
+  border: 1px solid color-mix(in srgb, var(--sys-edge) 70%, transparent);
+  border-radius: 0.7rem;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sys-glow-soft) 36%, transparent), transparent 60%),
+    repeating-linear-gradient(180deg, transparent 0 0.5rem, color-mix(in srgb, var(--sys-edge) 55%, transparent) 0.5rem 0.58rem);
+  opacity: 0.48;
+}
+
+.orchestratorBaton {
+  right: 1.2rem;
+  top: 1.2rem;
+  width: 4.2rem;
+  height: 0.22rem;
+  transform: rotate(-24deg);
+  transform-origin: right center;
+  background: linear-gradient(90deg, transparent, var(--sys-glow-strong), var(--sys-glow-strong));
+  border-radius: 999px;
+  opacity: 0.72;
+}
+
+.orchestratorWave {
+  left: 1rem;
+  right: 1rem;
+  bottom: 1.25rem;
+  height: 2.8rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--sys-glow-strong) 72%, transparent);
+  border-radius: 0 0 2rem 2rem;
+  opacity: 0.42;
+}
+
+.orchestratorCluster span {
+  position: absolute;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--sys-glow-strong);
+  box-shadow: 0 0 0.45rem var(--sys-glow-soft);
+}
+
+.orchestratorCluster span:nth-child(1) { left: 1.4rem; top: 1.5rem; }
+.orchestratorCluster span:nth-child(2) { right: 1.6rem; top: 2rem; }
+.orchestratorCluster span:nth-child(3) { left: 48%; bottom: 1.6rem; }
+.orchestratorCluster span:nth-child(4) { right: 2.8rem; bottom: 1.4rem; }

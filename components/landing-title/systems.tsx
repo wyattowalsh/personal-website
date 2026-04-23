@@ -304,6 +304,12 @@ function SystemsScene({
                     <span />
                     <span />
                   </div>
+                  <div className={styles.cyberRails}>
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.cyberVector} />
+                  <span className={styles.cyberTarget} />
                 </>
               ) : null}
 
@@ -312,6 +318,13 @@ function SystemsScene({
                   <span className={styles.zeroRing} />
                   <span className={styles.zeroRingInner} />
                   <span className={styles.zeroCore} />
+                  <span className={styles.zeroVault} />
+                  <span className={styles.zeroPulse} />
+                  <div className={styles.zeroMesh}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
                 </>
               ) : null}
 
@@ -319,6 +332,16 @@ function SystemsScene({
                 <>
                   <span className={styles.syntheticCore} />
                   <div className={styles.syntheticDendrites}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.syntheticLanes}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <div className={styles.syntheticNodes}>
                     <span />
                     <span />
                     <span />
@@ -335,6 +358,9 @@ function SystemsScene({
                     <span />
                     <span />
                   </div>
+                  <span className={styles.quantumPrism} />
+                  <span className={styles.quantumSplit} />
+                  <span className={styles.quantumRibbon} />
                 </>
               ) : null}
 
@@ -350,6 +376,13 @@ function SystemsScene({
                     <span />
                     <span />
                   </div>
+                  <span className={styles.cloudAxis} />
+                  <div className={styles.cloudLevels}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.cloudBeacon} />
                 </>
               ) : null}
 
@@ -367,6 +400,9 @@ function SystemsScene({
                     <span />
                     <span />
                   </div>
+                  <span className={styles.mapFold} />
+                  <span className={styles.mapCompassRose} />
+                  <span className={styles.mapLegend} />
                 </>
               ) : null}
 
@@ -380,6 +416,14 @@ function SystemsScene({
                     <span />
                   </div>
                   <div className={styles.orchestratorBeats}>
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <span className={styles.orchestratorBaton} />
+                  <span className={styles.orchestratorWave} />
+                  <div className={styles.orchestratorCluster}>
+                    <span />
                     <span />
                     <span />
                     <span />
