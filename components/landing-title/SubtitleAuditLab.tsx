@@ -168,6 +168,7 @@ export function SubtitleAuditLab() {
     forceReducedMotion: reducedMotionOverride,
     framed: false as const,
     hideSignalDeck: !showSignalDeck,
+    surface: 'audit' as const,
   };
 
   return (
@@ -272,7 +273,21 @@ export function SubtitleAuditLab() {
         data-subtitle-preview
       >
         {viewMode === 'single' ? (
-          <LandingTitle forcedSubtitleId={selectedSubtitle.id} {...sharedPreviewProps} />
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-end justify-between gap-3 rounded-[1.4rem] border border-border/60 bg-background/75 px-4 py-3">
+              <div className="min-w-0 space-y-1">
+                <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                  {selectedSubtitle.signalDeck.family}
+                </p>
+                <p className="text-sm font-medium text-foreground sm:text-base">{selectedSubtitle.text}</p>
+                <p className="text-xs text-muted-foreground sm:text-sm">{selectedSubtitle.signalDeck.descriptor}</p>
+              </div>
+              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                {selectedSubtitle.lane}
+              </p>
+            </div>
+            <LandingTitle forcedSubtitleId={selectedSubtitle.id} {...sharedPreviewProps} />
+          </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-subtitle-matrix>
             {matrixThemes.map((option, index) => (
@@ -286,10 +301,16 @@ export function SubtitleAuditLab() {
               >
                 <div className="mb-3 flex items-center justify-between gap-3">
                   <div className="min-w-0 space-y-1">
-                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                      {String(index + 1).padStart(2, '0')}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                        {String(index + 1).padStart(2, '0')}
+                      </p>
+                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground/80">
+                        {option.signalDeck.family}
+                      </p>
+                    </div>
                     <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
+                    <p className="line-clamp-2 text-xs text-muted-foreground">{option.signalDeck.descriptor}</p>
                   </div>
                   <Button
                     variant="ghost"

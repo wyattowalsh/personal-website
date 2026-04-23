@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 
 import styles from './systems.module.css';
 import {
+  getTitleTextStyle,
   theme,
   typo,
   type LandingTitleRendererEntry,
@@ -248,6 +249,7 @@ function SystemsScene({
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
+        data-surface={context.surface}
       >
         <motion.section
           initial={context.prefersReducedMotion || !context.allowAnimatedEntrance ? false : themeConfig.initial}
@@ -272,7 +274,12 @@ function SystemsScene({
                   <Icon className={styles.icon} />
                 </span>
                 <div className={styles.titleLockup}>
-                  <h2 className={styles.title}>{themeConfig.text}</h2>
+                  <h2
+                    className={styles.title}
+                    style={getTitleTextStyle(themeConfig, context.isDark)}
+                  >
+                    {themeConfig.text}
+                  </h2>
                 </div>
               </div>
             </div>

@@ -1055,3 +1055,41 @@
     height: 6rem;
   }
 }
+
+/* Bespoke title plates */
+
+.sceneAutomation .titleLockup {
+  border-radius: 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02)),
+    linear-gradient(90deg, rgba(249, 115, 22, 0.18), transparent 32%, rgba(239, 68, 68, 0.18));
+}
+
+.sceneAutomation .title {
+  font-size: clamp(1.06rem, 1.9vw, 1.68rem);
+}
+
+.sceneRobotics .iconBadge {
+  border-radius: 0.78rem;
+}
+
+.sceneRobotics .titleLockup {
+  border-radius: 0.95rem 1.5rem 1.15rem 1.45rem;
+}
+
+.sceneRobotics .title {
+  letter-spacing: 0.01em;
+}
+
+.sceneNeural .titleBlock {
+  justify-self: center;
+}
+
+.sceneNeural .headlineWrap {
+  justify-items: center;
+}
+
+.sceneNeural .titleLockup {
+  border-radius: 1.5rem 1.5rem 2rem 2rem;
+  text-align: center;
+}

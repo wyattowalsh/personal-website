@@ -1098,9 +1098,76 @@
   }
 
   .mysticHalo,
-  .oracleRing,
-  .oracleDial,
-  .oracleSweep {
-    left: 50%;
-  }
+.oracleRing,
+.oracleDial,
+.oracleSweep {
+  left: 50%;
+}
+}
+
+/* Bespoke title plates */
+
+.sceneSorcerer .titleLockup {
+  padding: 0.9rem 0.88rem 0.84rem 1rem;
+  border-radius: 1.9rem 1.2rem 1.5rem 1rem;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--arc-glow-soft) 56%, transparent), transparent 60%),
+    linear-gradient(160deg, var(--arc-panel), rgba(255, 255, 255, 0.02));
+}
+
+.sceneSorcerer .title {
+  font-size: clamp(1.08rem, 2.02vw, 1.72rem);
+}
+
+.sceneMage .iconBadge {
+  transform: rotate(12deg);
+}
+
+.sceneMage .titleLockup {
+  border-radius: 999px 1.5rem 1.35rem 999px;
+}
+
+.sceneWeaver .headlineWrap {
+  gap: 0.72rem;
+}
+
+.sceneWeaver .titleLockup {
+  border-radius: 1rem 1.65rem 1.95rem 1.05rem;
+  transform: rotate(-2deg);
+}
+
+.sceneWeaver .title {
+  font-size: clamp(1.04rem, 1.92vw, 1.62rem);
+}
+
+.sceneConjurer .iconBadge {
+  width: 2.65rem;
+  height: 2.65rem;
+  border-radius: 0.7rem;
+}
+
+.sceneConjurer .titleLockup {
+  border-radius: 0.8rem 1.7rem 1.15rem 1.45rem;
+}
+
+.sceneMystic .titleLockup {
+  border-radius: 999px;
+  padding-inline: 1rem;
+}
+
+.sceneMystic .title {
+  font-size: clamp(1rem, 1.82vw, 1.52rem);
+}
+
+.sceneOracle .titleBlock {
+  justify-self: center;
+}
+
+.sceneOracle .headlineWrap {
+  justify-items: center;
+}
+
+.sceneOracle .titleLockup {
+  border-radius: 1.2rem 1.9rem 1.9rem 1.2rem;
+  text-align: center;
 }

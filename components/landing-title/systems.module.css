@@ -1065,6 +1065,98 @@
   height: 3.55rem;
 }
 
+/* Bespoke title plates */
+
+.sceneCybernetic .titleLockup {
+  border-radius: 0;
+  clip-path: polygon(0 12px, 12px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 24px) 100%, 0 100%);
+}
+
+.sceneCybernetic .title {
+  font-size: clamp(1.14rem, 1.85vw, 1.86rem);
+}
+
+.sceneZeroTrust .headlineWrap {
+  gap: 0.72rem;
+}
+
+.sceneZeroTrust .iconBadge {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 999px;
+}
+
+.sceneZeroTrust .titleLockup {
+  border-radius: 1.3rem;
+  clip-path: none;
+}
+
+.sceneSynthetic .titleLockup {
+  border-radius: 1.5rem;
+  clip-path: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sys-panel-2) 80%, rgba(255, 255, 255, 0.08)), rgba(0, 0, 0, 0) 160%),
+    linear-gradient(135deg, color-mix(in srgb, var(--sys-glow-soft) 64%, transparent), transparent 58%);
+}
+
+.sceneSynthetic .title {
+  letter-spacing: 0.02em;
+}
+
+.sceneQuantum .titleBlock {
+  transform: translateY(0.25rem);
+}
+
+.sceneQuantum .iconBadge {
+  transform: rotate(8deg);
+}
+
+.sceneQuantum .titleLockup {
+  border-radius: 1.65rem 0.95rem 1.45rem 1.1rem;
+  clip-path: none;
+}
+
+.sceneQuantum .title {
+  font-size: clamp(1.06rem, 1.75vw, 1.72rem);
+}
+
+.sceneCloud .titleLockup {
+  border-radius: 1.5rem;
+  clip-path: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sys-panel-2) 68%, rgba(255, 255, 255, 0.22)), rgba(0, 0, 0, 0) 170%),
+    linear-gradient(135deg, color-mix(in srgb, var(--sys-glow-soft) 58%, transparent), transparent 62%);
+}
+
+.sceneCartographer .headlineWrap {
+  align-items: center;
+}
+
+.sceneCartographer .iconBadge {
+  transform: rotate(-8deg);
+}
+
+.sceneCartographer .titleLockup {
+  border-radius: 0.95rem 1.5rem 1.2rem 1.35rem;
+  clip-path: none;
+}
+
+.sceneOrchestrator .titleBlock {
+  max-width: 14.5rem;
+}
+
+.sceneOrchestrator .titleLockup {
+  border-radius: 1.2rem;
+  clip-path: none;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--sys-panel-2) 84%, rgba(255, 255, 255, 0.1)), rgba(0, 0, 0, 0) 150%),
+    linear-gradient(90deg, color-mix(in srgb, var(--sys-glow-soft) 48%, transparent), transparent 32%, color-mix(in srgb, var(--sys-glow-soft) 28%, transparent));
+}
+
+.sceneOrchestrator .title {
+  font-size: clamp(1.02rem, 1.66vw, 1.56rem);
+}
+
 @media (max-width: 720px) {
   .title {
     font-size: clamp(1.28rem, 6vw, 1.92rem);

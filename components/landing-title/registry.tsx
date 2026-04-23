@@ -22,6 +22,7 @@ export type {
   SubtitleRenderMode,
   SubtitleRendererShellProps,
   SubtitleLane,
+  SubtitleSurface,
   SubtitleTheme,
 } from '@/components/landing-title/shared';
 

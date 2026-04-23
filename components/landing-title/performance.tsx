@@ -6,6 +6,7 @@ import type { CSSProperties } from 'react';
 
 import styles from './performance.module.css';
 import {
+  getTitleTextStyle,
   theme,
   typo,
   type LandingTitleRendererEntry,
@@ -162,6 +163,7 @@ function PerformanceScene({
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
+        data-surface={context.surface}
       >
         <motion.section
           initial={context.prefersReducedMotion || !context.allowAnimatedEntrance ? false : themeConfig.initial}
@@ -182,7 +184,12 @@ function PerformanceScene({
                   <Icon className={styles.icon} />
                 </span>
                 <div className={styles.titleLockup}>
-                  <h2 className={styles.title}>{themeConfig.text}</h2>
+                  <h2
+                    className={styles.title}
+                    style={getTitleTextStyle(themeConfig, context.isDark)}
+                  >
+                    {themeConfig.text}
+                  </h2>
                 </div>
               </div>
             </div>

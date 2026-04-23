@@ -11,6 +11,7 @@ import {
   LANDING_TITLE_THEME_TEXTS,
   type LandingTitleRendererContext,
   type LandingTitleRendererEntry,
+  type SubtitleSurface,
 } from '@/components/landing-title/registry';
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import styles from '@/components/landing-title/subtitle.module.css';
@@ -27,6 +28,7 @@ export interface LandingTitleProps {
   disableRotation?: boolean;
   forceReducedMotion?: boolean;
   hideSignalDeck?: boolean;
+  surface?: SubtitleSurface;
   framed?: boolean;
   showName?: boolean;
   compact?: boolean;
@@ -43,6 +45,7 @@ export function LandingTitle({
   disableRotation = false,
   forceReducedMotion,
   hideSignalDeck = false,
+  surface = 'homepage',
   framed = true,
   showName = true,
   compact = false,
@@ -225,6 +228,7 @@ export function LandingTitle({
     : forcedRenderer || disableRotation
       ? 'Rotation is locked for inspection.'
       : 'Focus or hover pauses rotation.';
+  const showAuditMeta = surface === 'audit' && !hideSignalDeck;
 
   const rendererContext: LandingTitleRendererContext = {
     allowAnimatedEntrance,
@@ -233,6 +237,7 @@ export function LandingTitle({
     prefersReducedMotion,
     shouldAnimateTagline,
     showName,
+    surface,
     wordIndex,
   };
   const subtitleNode = currentRenderer.render({
@@ -250,6 +255,7 @@ export function LandingTitle({
   return (
     <div
       data-motion-mode={prefersReducedMotion ? 'reduced' : 'animated'}
+      data-title-surface={surface}
       className={cn(
         'relative z-10',
         'mx-auto w-full',
@@ -297,16 +303,26 @@ export function LandingTitle({
             <motion.div
               key={currentRenderer.id}
               className="col-start-1 row-start-1 w-full"
-              initial={{ opacity: 0, y: 14, scale: 0.985, filter: 'blur(10px)' }}
+              initial={{ opacity: 0, y: 10, scale: 0.992, filter: 'blur(7px)' }}
               animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-              exit={{ opacity: 0, y: -10, scale: 1.01, filter: 'blur(10px)' }}
-              transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+              exit={{ opacity: 0, y: -8, scale: 1.008, filter: 'blur(7px)' }}
+              transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
             >
               {subtitleNode}
             </motion.div>
           </AnimatePresence>
         </div>
       ) : subtitleNode}
+
+      {showAuditMeta ? (
+        <div className={styles.auditMeta} aria-hidden="true">
+          <span className={styles.auditMetaBadge}>{currentRenderer.signalDeck.family}</span>
+          <span className={styles.auditMetaText}>{currentRenderer.signalDeck.descriptor}</span>
+          <span className={styles.auditMetaCounter}>
+            {positionLabel} / {totalLabel}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 }

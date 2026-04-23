@@ -1326,3 +1326,67 @@
     right: 1.55rem;
   }
 }
+
+/* Bespoke title plates */
+
+.sceneAlchemist .titleLockup {
+  border-radius: 1.2rem 1.75rem 1.3rem 1rem;
+  background:
+    linear-gradient(180deg, rgba(255, 244, 214, 0.14), transparent 24%),
+    linear-gradient(155deg, rgba(248, 180, 71, 0.14), rgba(0, 0, 0, 0.2));
+}
+
+.sceneAlchemist .title {
+  font-size: clamp(1.12rem, 2.02vw, 1.76rem);
+}
+
+.sceneDigitalSculptor .titleBlock {
+  transform: translateY(-0.2rem);
+}
+
+.sceneDigitalSculptor .titleLockup {
+  border-radius: 0.9rem;
+}
+
+.sceneDigitalSculptor .title {
+  letter-spacing: -0.05em;
+}
+
+.sceneHolographicSculptor .iconBadge {
+  transform: rotate(-10deg);
+}
+
+.sceneHolographicSculptor .titleLockup {
+  border-radius: 1.6rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 26%),
+    linear-gradient(155deg, rgba(96, 165, 250, 0.14), rgba(0, 0, 0, 0.16));
+}
+
+.sceneCyberDefense .iconBadge {
+  border-radius: 0.85rem 0.85rem 1.15rem 1.15rem;
+}
+
+.sceneCyberDefense .titleLockup {
+  border-radius: 1rem 1rem 1.55rem 1.55rem;
+}
+
+.sceneBlockchain .headlineWrap {
+  gap: 0.72rem;
+}
+
+.sceneBlockchain .iconBadge {
+  transform: rotate(8deg);
+}
+
+.sceneBlockchain .titleLockup {
+  border-radius: 1.55rem 1rem 1.6rem 1rem;
+}
+
+.sceneFrontier .titleLockup {
+  border-radius: 999px 1.35rem 1.35rem 999px;
+}
+
+.sceneFrontier .title {
+  font-size: clamp(1.04rem, 1.86vw, 1.58rem);
+}

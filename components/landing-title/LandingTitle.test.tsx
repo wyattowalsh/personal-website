@@ -68,4 +68,29 @@ describe('LandingTitle locked previews', () => {
       screen.getByRole('group', { name: /circuit seer/i }),
     ).toBeTruthy();
   });
+
+  it('keeps homepage surface free of audit metadata', () => {
+    render(<LandingTitle forcedSubtitleId="cybernetic-architect" disableRotation />);
+
+    expect(screen.queryByText('adaptive command mesh')).toBeNull();
+    expect(
+      screen.getByRole('group', { name: /cyber tactician/i }).getAttribute('data-surface'),
+    ).toBe('homepage');
+  });
+
+  it('shows metadata on the audit surface outside the card composition', () => {
+    render(
+      <LandingTitle
+        forcedSubtitleId="cybernetic-architect"
+        disableRotation
+        surface="audit"
+      />,
+    );
+
+    expect(screen.getByText('Architect')).toBeTruthy();
+    expect(screen.getByText('adaptive command mesh')).toBeTruthy();
+    expect(
+      screen.getByRole('group', { name: /cyber tactician/i }).getAttribute('data-surface'),
+    ).toBe('audit');
+  });
 });
