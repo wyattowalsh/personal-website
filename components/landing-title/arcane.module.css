@@ -217,6 +217,7 @@
   order: 2;
   justify-self: end;
   max-width: 9rem;
+  transform: translateY(-0.18rem);
 }
 
 .sceneSorcerer .sceneRig {
@@ -255,6 +256,7 @@
 
 .sceneMystic .titleBlock {
   max-width: 8.4rem;
+  transform: translateY(0.16rem);
 }
 
 .sceneOracle .sceneBody {
@@ -265,6 +267,7 @@
   order: 2;
   justify-self: end;
   max-width: 8.5rem;
+  transform: translateY(-0.12rem);
 }
 
 .sceneOracle .sceneRig {
@@ -1115,8 +1118,21 @@
     linear-gradient(160deg, var(--arc-panel), rgba(255, 255, 255, 0.02));
 }
 
+.sceneSorcerer .titleLockup::before {
+  content: '';
+  position: absolute;
+  left: 0.88rem;
+  right: 1.2rem;
+  bottom: 0.54rem;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--arc-edge) 58%, transparent), transparent);
+  pointer-events: none;
+}
+
 .sceneSorcerer .title {
   font-size: clamp(1.08rem, 2.02vw, 1.72rem);
+  line-height: 0.9;
 }
 
 .sceneMage .iconBadge {
@@ -1125,19 +1141,34 @@
 
 .sceneMage .titleLockup {
   border-radius: 999px 1.5rem 1.35rem 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 26%),
+    linear-gradient(155deg, color-mix(in srgb, var(--arc-glow-soft) 40%, transparent), rgba(255, 255, 255, 0.02));
 }
 
 .sceneWeaver .headlineWrap {
   gap: 0.72rem;
 }
 
+.sceneWeaver .titleBlock {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 22%),
+    linear-gradient(155deg, color-mix(in srgb, var(--arc-glow-soft) 22%, transparent), transparent 72%);
+  border-radius: 1.2rem 1rem 1.8rem 1rem;
+  padding: 0.45rem 0.35rem 0.4rem 0.25rem;
+}
+
 .sceneWeaver .titleLockup {
   border-radius: 1rem 1.65rem 1.95rem 1.05rem;
   transform: rotate(-2deg);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 28%),
+    linear-gradient(155deg, color-mix(in srgb, var(--arc-glow-soft) 40%, transparent), rgba(255, 255, 255, 0.02));
 }
 
 .sceneWeaver .title {
   font-size: clamp(1.04rem, 1.92vw, 1.62rem);
+  letter-spacing: 0.045em;
 }
 
 .sceneConjurer .iconBadge {
@@ -1151,25 +1182,51 @@
 }
 
 .sceneMystic .titleLockup {
-  border-radius: 999px;
-  padding-inline: 1rem;
+  border-radius: 1.8rem 1.8rem 2.4rem 1.2rem;
+  padding: 0.92rem 1rem 0.86rem 1.02rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 26%),
+    linear-gradient(155deg, color-mix(in srgb, var(--arc-glow-soft) 38%, transparent), rgba(255, 255, 255, 0.02));
 }
 
 .sceneMystic .title {
   font-size: clamp(1rem, 1.82vw, 1.52rem);
+  letter-spacing: 0.1em;
 }
 
 .sceneOracle .titleBlock {
   justify-self: center;
+  width: 100%;
 }
 
 .sceneOracle .headlineWrap {
   justify-items: center;
+  gap: 0.68rem;
 }
 
 .sceneOracle .titleLockup {
+  width: 100%;
   border-radius: 1.2rem 1.9rem 1.9rem 1.2rem;
+  padding: 0.9rem 0.9rem 0.84rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 24%),
+    linear-gradient(155deg, color-mix(in srgb, var(--arc-glow-soft) 34%, transparent), rgba(255, 255, 255, 0.02));
   text-align: center;
+}
+
+.sceneOracle .titleLockup::before {
+  content: '';
+  position: absolute;
+  inset: 0.48rem;
+  border-radius: 0.9rem 1.5rem 1.5rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--arc-edge) 56%, transparent);
+  background:
+    linear-gradient(90deg, transparent 0 68%, color-mix(in srgb, var(--arc-edge) 28%, transparent) 68% 69%, transparent 69% 100%);
+  pointer-events: none;
+}
+
+.sceneOracle .title {
+  letter-spacing: 0.1em;
 }
 
 /* Poster-depth overlays */

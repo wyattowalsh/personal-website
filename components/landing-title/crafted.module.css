@@ -415,15 +415,18 @@
 .sceneDigitalSculptor .titleBlock {
   order: 2;
   max-width: 11rem;
+  padding: 0.92rem 0.84rem 0.92rem 0.88rem;
+  border-radius: 1rem 1.5rem 0.95rem 1.3rem;
   background:
-    linear-gradient(180deg, rgba(194, 240, 246, 0.12), transparent 22%),
+    radial-gradient(circle at 84% 16%, rgba(165, 243, 252, 0.18), transparent 20%),
+    linear-gradient(180deg, rgba(194, 240, 246, 0.14), transparent 22%),
     repeating-linear-gradient(
-      -16deg,
-      transparent 0 12px,
-      rgba(194, 240, 246, 0.04) 12px 13px,
-      transparent 13px 24px
+      0deg,
+      transparent 0 13px,
+      rgba(194, 240, 246, 0.05) 13px 14px,
+      transparent 14px 28px
     ),
-    linear-gradient(160deg, rgba(73, 88, 104, 0.78), rgba(30, 35, 44, 0.95));
+    linear-gradient(160deg, rgba(82, 98, 116, 0.82), rgba(26, 30, 38, 0.96));
 }
 
 .sceneDigitalSculptor .sceneRig {
@@ -695,21 +698,26 @@
 }
 
 .sceneCyberDefense .titleBlock {
-  max-width: 9.8rem;
+  max-width: 10.9rem;
+  padding: 0.94rem 0.86rem 0.94rem;
+  border-radius: 1.1rem 1.1rem 1.55rem 1.55rem;
   background:
-    linear-gradient(180deg, rgba(189, 247, 205, 0.1), transparent 24%),
+    radial-gradient(circle at 82% 18%, rgba(134, 239, 172, 0.18), transparent 20%),
+    linear-gradient(180deg, rgba(189, 247, 205, 0.12), transparent 24%),
     repeating-linear-gradient(
-      -12deg,
+      0deg,
       transparent 0 14px,
-      rgba(125, 211, 252, 0.03) 14px 15px,
+      rgba(125, 211, 252, 0.04) 14px 15px,
       transparent 15px 28px
     ),
     linear-gradient(160deg, rgba(39, 62, 79, 0.82), rgba(18, 25, 34, 0.96));
 }
 
 .sceneCyberDefense .title {
-  font-size: clamp(1rem, 1.68vw, 1.42rem);
+  font-size: clamp(1.02rem, 1.78vw, 1.5rem);
   color: rgba(236, 246, 255, 0.96);
+  line-height: 0.9;
+  letter-spacing: 0.035em;
 }
 
 .sceneCyberDefense .sceneRig {
@@ -998,12 +1006,15 @@
 .sceneFrontier .titleBlock {
   order: 2;
   max-width: 10.8rem;
+  padding: 0.94rem 0.88rem 0.94rem;
+  border-radius: 1.5rem 1rem 1.2rem 1.55rem;
   background:
-    linear-gradient(180deg, rgba(214, 245, 180, 0.1), transparent 24%),
+    radial-gradient(circle at 18% 16%, rgba(217, 249, 157, 0.18), transparent 20%),
+    linear-gradient(180deg, rgba(214, 245, 180, 0.12), transparent 24%),
     repeating-linear-gradient(
-      -16deg,
+      0deg,
       transparent 0 14px,
-      rgba(214, 245, 180, 0.03) 14px 15px,
+      rgba(214, 245, 180, 0.04) 14px 15px,
       transparent 15px 28px
     ),
     linear-gradient(160deg, rgba(84, 72, 45, 0.82), rgba(30, 25, 22, 0.96));
@@ -1345,11 +1356,16 @@
 }
 
 .sceneDigitalSculptor .titleLockup {
-  border-radius: 0.9rem;
+  border-radius: 0.8rem 1.3rem 0.9rem 1.15rem;
+  padding: 0.9rem 0.82rem 0.84rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 22%),
+    linear-gradient(155deg, rgba(34, 211, 238, 0.12), rgba(255, 255, 255, 0.02));
 }
 
 .sceneDigitalSculptor .title {
   letter-spacing: -0.05em;
+  line-height: 0.9;
 }
 
 .sceneHolographicSculptor .iconBadge {
@@ -1365,10 +1381,15 @@
 
 .sceneCyberDefense .iconBadge {
   border-radius: 0.85rem 0.85rem 1.15rem 1.15rem;
+  transform: translateY(-0.06rem);
 }
 
 .sceneCyberDefense .titleLockup {
-  border-radius: 1rem 1rem 1.55rem 1.55rem;
+  border-radius: 0.95rem 0.95rem 1.55rem 1.55rem;
+  padding: 0.9rem 0.86rem 0.88rem 0.94rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 24%),
+    linear-gradient(155deg, rgba(34, 197, 94, 0.12), rgba(255, 255, 255, 0.02));
 }
 
 .sceneBlockchain .headlineWrap {
@@ -1381,14 +1402,24 @@
 
 .sceneBlockchain .titleLockup {
   border-radius: 1.55rem 1rem 1.6rem 1rem;
+  padding: 0.9rem 0.84rem 0.84rem 0.96rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 24%),
+    linear-gradient(155deg, rgba(251, 146, 60, 0.14), rgba(255, 255, 255, 0.02));
 }
 
 .sceneFrontier .titleLockup {
   border-radius: 999px 1.35rem 1.35rem 999px;
+  padding: 0.92rem 0.86rem 0.86rem 0.98rem;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 24%),
+    linear-gradient(155deg, rgba(132, 204, 22, 0.16), rgba(255, 255, 255, 0.02));
 }
 
 .sceneFrontier .title {
   font-size: clamp(1.04rem, 1.86vw, 1.58rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
 }
 
 /* Poster-depth overlays */
