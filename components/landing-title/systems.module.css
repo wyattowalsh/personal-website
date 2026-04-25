@@ -1689,3 +1689,75 @@
 .orchestratorCluster span:nth-child(2) { right: 1.6rem; top: 2rem; }
 .orchestratorCluster span:nth-child(3) { left: 48%; bottom: 1.6rem; }
 .orchestratorCluster span:nth-child(4) { right: 2.8rem; bottom: 1.4rem; }
+
+/* Audit refinement: tactical control-bay depth without changing geometry. */
+
+.scene {
+  background:
+    radial-gradient(circle at 12% 12%, color-mix(in srgb, var(--sys-glow-strong) 24%, transparent), transparent 28%),
+    radial-gradient(circle at 86% 16%, color-mix(in srgb, var(--sys-edge) 18%, transparent), transparent 24%),
+    linear-gradient(118deg, transparent 0 21%, color-mix(in srgb, var(--sys-struct-faint) 80%, transparent) 21% 22%, transparent 22% 66%, color-mix(in srgb, var(--sys-edge) 20%, transparent) 66% 67%, transparent 67%),
+    linear-gradient(180deg, var(--sys-panel), var(--sys-panel-2) 56%, var(--sys-panel-3)),
+    linear-gradient(90deg, var(--sys-struct-faint) 1px, transparent 1px),
+    linear-gradient(0deg, var(--sys-struct-faint) 1px, transparent 1px);
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    inset 0 -1px 0 var(--sys-struct),
+    inset 0 0 0 1px color-mix(in srgb, var(--sys-edge) 22%, transparent),
+    0 24px 62px var(--sys-glow-soft);
+}
+
+.titleLockup {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--sys-glow-soft) 36%, transparent), transparent 34%, color-mix(in srgb, var(--sys-edge) 12%, transparent)),
+    linear-gradient(180deg, var(--sys-panel-2), rgba(0, 0, 0, 0) 160%),
+    linear-gradient(135deg, var(--sys-struct), transparent 58%);
+}
+
+.sceneCybernetic .sceneRig,
+.sceneZeroTrust .sceneRig,
+.sceneSynthetic .sceneRig,
+.sceneQuantum .sceneRig,
+.sceneCloud .sceneRig,
+.sceneCartographer .sceneRig,
+.sceneOrchestrator .sceneRig {
+  background:
+    radial-gradient(circle at 72% 24%, color-mix(in srgb, var(--sys-glow-strong) 20%, transparent), transparent 28%),
+    repeating-linear-gradient(135deg, transparent 0 13px, color-mix(in srgb, var(--sys-struct-faint) 70%, transparent) 13px 14px),
+    linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel) 46%, var(--sys-panel-3));
+}
+
+.sceneZeroTrust .titleLockup,
+.sceneCloud .titleLockup {
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    inset 0 0 0 1px color-mix(in srgb, var(--sys-glow-strong) 18%, transparent),
+    0 14px 30px var(--sys-glow-soft);
+}
+
+.sceneQuantum .titleLockup,
+.sceneOrchestrator .titleLockup {
+  border-color: color-mix(in srgb, var(--sys-glow-strong) 74%, var(--sys-edge));
+}
+
+/* Compact audit polish: reduce forced mid-word breaks on narrow cards. */
+
+@container (max-width: 23rem) {
+  .sceneCybernetic .title,
+  .sceneCartographer .title {
+    font-size: clamp(0.82rem, 6.35cqi, 1.08rem);
+    letter-spacing: 0.02em;
+  }
+
+  .sceneZeroTrust .title,
+  .sceneQuantum .title {
+    font-size: clamp(0.84rem, 6.55cqi, 1.14rem);
+    letter-spacing: 0.04em;
+  }
+
+  .sceneCloud .title,
+  .sceneOrchestrator .title {
+    font-size: clamp(0.82rem, 6.45cqi, 1.1rem);
+    letter-spacing: 0.01em;
+  }
+}

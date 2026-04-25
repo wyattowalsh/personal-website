@@ -1287,3 +1287,52 @@
   border-radius: 999px;
   opacity: 0.28;
 }
+
+/* Audit refinement: kinetic timing rigs and stronger stage instrumentation. */
+
+.scene {
+  background:
+    linear-gradient(102deg, transparent 0 18%, color-mix(in srgb, var(--perf-edge) 16%, transparent) 18% 19%, transparent 19% 71%, color-mix(in srgb, var(--perf-glow-strong) 14%, transparent) 71% 72%, transparent 72%),
+    radial-gradient(circle at 12% 12%, var(--perf-glow-soft), transparent 34%),
+    radial-gradient(circle at 88% 8%, var(--perf-glow-soft), transparent 28%),
+    linear-gradient(155deg, var(--perf-panel) 0%, var(--perf-panel-2) 42%, var(--perf-panel-3) 100%);
+}
+
+.sceneRig {
+  background:
+    repeating-linear-gradient(90deg, transparent 0 18px, color-mix(in srgb, var(--perf-edge) 18%, transparent) 18px 19px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), transparent 16%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.18), transparent 30%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01)),
+    var(--perf-panel-2);
+}
+
+.titleLockup {
+  background:
+    radial-gradient(circle at 90% 18%, color-mix(in srgb, var(--perf-glow-strong) 22%, transparent), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.02)),
+    linear-gradient(160deg, var(--perf-panel), rgba(255, 255, 255, 0.02));
+}
+
+.sceneAutomation .titleLockup,
+.sceneNeural .titleLockup {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 0 0 1px color-mix(in srgb, var(--perf-glow-strong) 16%, transparent),
+    0 18px 34px var(--perf-glow-soft);
+}
+
+.sceneRobotics .sceneRig {
+  filter: saturate(0.92) contrast(1.08);
+}
+
+/* Compact audit polish: keep machine titles legible in single-column cards. */
+
+@container (max-width: 23rem) {
+  .sceneAutomation .title,
+  .sceneRobotics .title,
+  .sceneNeural .title {
+    font-size: clamp(0.86rem, 6.85cqi, 1.18rem);
+    letter-spacing: 0.01em;
+  }
+}

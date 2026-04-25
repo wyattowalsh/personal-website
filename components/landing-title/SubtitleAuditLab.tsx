@@ -8,6 +8,7 @@ import {
   LANDING_TITLE_SUBTITLE_OPTIONS,
   resolveSubtitleOption,
 } from '@/components/landing-title/registry';
+import type { SubtitleLane } from '@/components/landing-title/shared';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -25,6 +26,20 @@ const VIEW_OPTIONS = ['single', 'matrix'] as const;
 const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
 const MOTION_OPTIONS = ['system', 'animated', 'reduced'] as const;
 const FRAME_OPTIONS = ['desktop', 'tablet', 'mobile'] as const;
+const LANE_ORDER = ['systems', 'arcane', 'crafted', 'performance'] as const satisfies readonly SubtitleLane[];
+const LANE_LABELS: Record<SubtitleLane, string> = {
+  systems: 'Systems Theatre',
+  arcane: 'Arcane Instruments',
+  crafted: 'Crafted Objects',
+  performance: 'Performance Machines',
+};
+
+const LANE_DESCRIPTIONS: Record<SubtitleLane, string> = {
+  systems: 'Blueprint panels, command meshes, routing instruments.',
+  arcane: 'Ritual seals, signal divination, computational spellcraft.',
+  crafted: 'Material workshops, forge surfaces, sculptural tools.',
+  performance: 'Timing rigs, kinetic machinery, synaptic stage lights.',
+};
 
 type FrameMode = (typeof FRAME_OPTIONS)[number];
 
@@ -149,12 +164,12 @@ export function SubtitleAuditLab() {
     motionMode === 'system' ? undefined : motionMode === 'reduced';
   const forcedPreviewIsDark = themeMode === 'system' ? undefined : themeMode === 'dark';
 
-  const matrixThemes = useMemo(
-    () => [
-      selectedSubtitle,
-      ...LANDING_TITLE_SUBTITLE_OPTIONS.filter(({ id }) => id !== selectedSubtitle.id),
-    ],
-    [selectedSubtitle],
+  const matrixGroups = useMemo(
+    () => LANE_ORDER.map((lane) => ({
+      lane,
+      options: LANDING_TITLE_SUBTITLE_OPTIONS.filter((option) => option.lane === lane),
+    })),
+    [],
   );
 
   const goToRelativeSubtitle = (delta: number) => {
@@ -293,48 +308,68 @@ export function SubtitleAuditLab() {
             <LandingTitle forcedSubtitleId={selectedSubtitle.id} {...sharedPreviewProps} />
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3" data-subtitle-matrix>
-            {matrixThemes.map((option, index) => (
-              <div
-                key={option.id}
-                className={cn(
-                  'rounded-[1.5rem] border border-border/60 bg-background/80 p-4 shadow-sm',
-                  option.id === selectedSubtitle.id && 'ring-1 ring-primary/40',
-                )}
-                data-subtitle-card={option.id}
-              >
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0 space-y-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-                        {String(index + 1).padStart(2, '0')}
-                      </p>
-                      {showSignalDeck ? (
-                        <p className="text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground/80">
-                          {option.signalDeck.family}
-                        </p>
-                      ) : null}
-                    </div>
-                    <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
-                    {showSignalDeck ? (
-                      <p className="line-clamp-2 text-xs text-muted-foreground">{option.signalDeck.descriptor}</p>
-                    ) : null}
+          <div className="space-y-8" data-subtitle-matrix>
+            {matrixGroups.map(({ lane, options }) => (
+              <section key={lane} className="space-y-3" data-subtitle-lane-group={lane}>
+                <div className="flex flex-wrap items-end justify-between gap-3 rounded-[1.35rem] border border-border/60 bg-background/75 px-4 py-3">
+                  <div className="space-y-1">
+                    <p className="text-[0.65rem] font-semibold uppercase tracking-[0.34em] text-primary/80">
+                      {LANE_LABELS[lane]}
+                    </p>
+                    <p className="text-xs text-muted-foreground sm:text-sm">
+                      {LANE_DESCRIPTIONS[lane]}
+                    </p>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => updateParams({ subtitle: option.id, view: 'single' })}
-                  >
-                    Focus
-                  </Button>
+                  <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
+                    {options.length} variants
+                  </p>
                 </div>
-                <LandingTitle
-                  forcedSubtitleId={option.id}
-                  {...sharedPreviewProps}
-                  showName={false}
-                  compact
-                />
-              </div>
+
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {options.map((option, index) => (
+                    <div
+                      key={option.id}
+                      className={cn(
+                        'rounded-[1.5rem] border border-border/60 bg-background/80 p-4 shadow-sm',
+                        option.id === selectedSubtitle.id && 'ring-1 ring-primary/40',
+                      )}
+                      data-subtitle-card={option.id}
+                    >
+                      <div className="mb-3 flex items-center justify-between gap-3">
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">
+                              {String(index + 1).padStart(2, '0')}
+                            </p>
+                            {showSignalDeck ? (
+                              <p className="text-[0.65rem] font-semibold uppercase tracking-[0.26em] text-muted-foreground/80">
+                                {option.signalDeck.family}
+                              </p>
+                            ) : null}
+                          </div>
+                          <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
+                          {showSignalDeck ? (
+                            <p className="line-clamp-2 text-xs text-muted-foreground">{option.signalDeck.descriptor}</p>
+                          ) : null}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => updateParams({ subtitle: option.id, view: 'single' })}
+                        >
+                          Focus
+                        </Button>
+                      </div>
+                      <LandingTitle
+                        forcedSubtitleId={option.id}
+                        {...sharedPreviewProps}
+                        showName={false}
+                        compact
+                      />
+                    </div>
+                  ))}
+                </div>
+              </section>
             ))}
           </div>
         )}

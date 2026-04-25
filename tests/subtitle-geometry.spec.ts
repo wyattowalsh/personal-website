@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type ConsoleMessage, type Page } from '@playwright/test';
 
 type SubtitleGeometry = {
   failures: string[];
@@ -22,10 +22,29 @@ const VIEWPORTS: readonly ViewportCase[] = [
 ];
 
 const THEMES = ['light', 'dark'] as const;
+type SubtitleTheme = (typeof THEMES)[number];
+
+type VisualMatrixCase = ViewportCase & {
+  theme: SubtitleTheme;
+};
+
 const EXPECTED_SUBTITLE_COUNT = 22;
 const MIN_LOCKUP_CLEARANCE_PX = 8;
+const BROWSER_ISSUE_PATTERNS: readonly RegExp[] = [
+  /hydration/i,
+  /hydrated but some attributes/i,
+  /did not match/i,
+  /text content does not match/i,
+];
 
-function subtitlesUrl(theme: (typeof THEMES)[number]) {
+const VISUAL_MATRIX_CASES: readonly VisualMatrixCase[] = [
+  { name: 'desktop', width: 1440, height: 1000, theme: 'light' },
+  { name: 'desktop', width: 1440, height: 1000, theme: 'dark' },
+  { name: 'mobile-320', width: 320, height: 1000, theme: 'light' },
+  { name: 'mobile-320', width: 320, height: 1000, theme: 'dark' },
+];
+
+function subtitlesUrl(theme: SubtitleTheme) {
   return `/lab/subtitles?${new URLSearchParams({
     deck: '0',
     motion: 'reduced',
@@ -34,15 +53,33 @@ function subtitlesUrl(theme: (typeof THEMES)[number]) {
   }).toString()}`;
 }
 
-async function openSubtitleMatrix(page: Page, viewport: ViewportCase, theme: (typeof THEMES)[number]) {
+async function openSubtitleMatrix(page: Page, viewport: ViewportCase, theme: SubtitleTheme) {
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
   await page.goto(subtitlesUrl(theme), { waitUntil: 'domcontentloaded' });
   await page.locator('[data-subtitle-id]').first().waitFor();
   await page.evaluate(() => document.fonts.ready);
 }
 
+function watchBrowserIssues(page: Page) {
+  const issues: string[] = [];
+
+  page.on('console', (message: ConsoleMessage) => {
+    const text = message.text();
+    if (message.type() === 'error' || BROWSER_ISSUE_PATTERNS.some((pattern) => pattern.test(text))) {
+      issues.push(`[console:${message.type()}] ${text}`);
+    }
+  });
+
+  page.on('pageerror', (error) => {
+    issues.push(`[pageerror] ${error.message}`);
+  });
+
+  return issues;
+}
+
 test('every homepage subtitle matrix preview keeps title text inside its plate', async ({ page }) => {
   const failures: string[] = [];
+  const browserIssues = watchBrowserIssues(page);
 
   for (const theme of THEMES) {
     for (const viewport of VIEWPORTS) {
@@ -190,4 +227,24 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
   }
 
   expect(failures).toEqual([]);
+  expect(browserIssues).toEqual([]);
+});
+
+test('homepage subtitle matrix visual states stay intentional', async ({ page }) => {
+  const browserIssues = watchBrowserIssues(page);
+
+  for (const visualCase of VISUAL_MATRIX_CASES) {
+    await openSubtitleMatrix(page, visualCase, visualCase.theme);
+
+    await expect(page.locator('[data-subtitle-preview]')).toHaveScreenshot(
+      `subtitle-matrix-${visualCase.name}-${visualCase.theme}.png`,
+      {
+        animations: 'disabled',
+        caret: 'hide',
+        maxDiffPixelRatio: 0.015,
+      },
+    );
+  }
+
+  expect(browserIssues).toEqual([]);
 });

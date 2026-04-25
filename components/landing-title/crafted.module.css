@@ -1645,3 +1645,86 @@
   background: radial-gradient(circle at 30% 30%, rgba(217, 249, 157, 0.25), transparent 64%);
   opacity: 0.45;
 }
+
+/* Audit refinement: heavier material surfaces and visible workshop craft. */
+
+.scene {
+  background:
+    radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--craft-fill-strong) 28%, transparent), transparent 28%),
+    radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--craft-edge) 22%, transparent), transparent 30%),
+    repeating-linear-gradient(102deg, transparent 0 18px, rgba(255, 255, 255, 0.035) 18px 19px, transparent 19px 37px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 14%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.3), transparent 38%),
+    linear-gradient(155deg, var(--craft-panel), var(--craft-panel-2) 54%, var(--craft-panel-3));
+}
+
+.titleBlock {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42),
+    inset 0 0 0 1px color-mix(in srgb, var(--craft-edge) 16%, transparent),
+    0 16px 30px rgba(0, 0, 0, 0.24);
+}
+
+.titleLockup {
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--craft-fill-strong) 18%, transparent), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 62%);
+}
+
+.sceneAlchemist .sceneRig,
+.sceneBlockchain .sceneRig,
+.sceneFrontier .sceneRig {
+  background:
+    radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--craft-fill-strong) 24%, transparent), transparent 30%),
+    repeating-linear-gradient(-22deg, transparent 0 16px, rgba(255, 255, 255, 0.04) 16px 17px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 18%),
+    linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.18)),
+    rgba(8, 10, 18, 0.45);
+}
+
+.sceneCyberDefense .titleLockup,
+.sceneHolographicSculptor .titleLockup {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 14px 32px color-mix(in srgb, var(--craft-glow-soft) 70%, rgba(0, 0, 0, 0.2));
+}
+
+/* Compact audit polish: preserve material labels without letter-by-letter wraps. */
+
+@container (max-width: 23rem) {
+  .sceneAlchemist .title,
+  .sceneDigitalSculptor .title,
+  .sceneHolographicSculptor .title,
+  .sceneCyberDefense .title,
+  .sceneBlockchain .title,
+  .sceneFrontier .title {
+    font-size: clamp(0.82rem, 6.45cqi, 1.12rem);
+    letter-spacing: 0;
+    line-height: 1.06;
+  }
+}
+
+@container (max-width: 23rem) {
+  .sceneAlchemist .headlineWrap,
+  .sceneDigitalSculptor .headlineWrap,
+  .sceneHolographicSculptor .headlineWrap,
+  .sceneCyberDefense .headlineWrap,
+  .sceneBlockchain .headlineWrap,
+  .sceneFrontier .headlineWrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .sceneAlchemist .iconBadge,
+  .sceneDigitalSculptor .iconBadge,
+  .sceneHolographicSculptor .iconBadge,
+  .sceneCyberDefense .iconBadge,
+  .sceneBlockchain .iconBadge,
+  .sceneFrontier .iconBadge {
+    width: 2.05rem;
+    height: 2.05rem;
+  }
+}

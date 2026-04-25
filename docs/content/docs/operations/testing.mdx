@@ -67,7 +67,20 @@ The config starts `pnpm dev` and checks the subtitle audit lab at `http://localh
 
 The current gate renders `/lab/subtitles?view=matrix&motion=reduced&deck=0` for both light and dark themes. It verifies all 22 homepage subtitle variants across desktop, tablet, 390px mobile, 320px mobile, and short landscape viewports.
 
-It is focused on the specific failure class that can be missed by Vitest: title text escaping its visual plate, clipped lockups, insufficient title/control clearance, and unsafe compressed line-height.
+It is focused on the specific failure class that can be missed by Vitest: title text escaping its visual plate, clipped lockups, insufficient title/control clearance, unsafe compressed line-height, browser console errors, and hydration mismatch warnings.
+
+The same spec also keeps visual snapshots for the matrix lab in four representative states:
+
+- desktop light
+- desktop dark
+- 320px mobile light
+- 320px mobile dark
+
+When intentional visual changes alter those snapshots, update them with:
+
+```bash
+pnpm test:subtitle-geometry --update-snapshots
+```
 
 If Chromium is missing on a clean machine, install it once with:
 
