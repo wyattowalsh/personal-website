@@ -1,4 +1,5 @@
 .cluster {
+  container-type: inline-size;
   width: 100%;
 }
 
@@ -178,14 +179,23 @@
 }
 
 .titleLockup {
+  box-sizing: border-box;
+  display: grid;
   min-width: 0;
+  max-width: 100%;
+  padding: 0.86rem 0.94rem 0.9rem;
 }
 
 .title {
+  box-sizing: border-box;
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   font-size: clamp(1.1rem, 2.1vw, 1.78rem);
-  line-height: 0.94;
+  line-height: 1.06;
   letter-spacing: -0.035em;
+  overflow-wrap: normal;
   text-wrap: balance;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.08);
 }
@@ -716,7 +726,7 @@
 .sceneCyberDefense .title {
   font-size: clamp(1.02rem, 1.78vw, 1.5rem);
   color: rgba(236, 246, 255, 0.96);
-  line-height: 0.9;
+  line-height: 1.06;
   letter-spacing: 0.035em;
 }
 
@@ -1365,7 +1375,7 @@
 
 .sceneDigitalSculptor .title {
   letter-spacing: -0.05em;
-  line-height: 0.9;
+  line-height: 1.06;
 }
 
 .sceneHolographicSculptor .iconBadge {
@@ -1418,8 +1428,51 @@
 
 .sceneFrontier .title {
   font-size: clamp(1.04rem, 1.86vw, 1.58rem);
-  line-height: 0.9;
+  line-height: 1.06;
   letter-spacing: 0.02em;
+}
+
+@container (max-width: 23rem) {
+  .sceneBody,
+  .sceneAlchemist .sceneBody,
+  .sceneDigitalSculptor .sceneBody,
+  .sceneFrontier .sceneBody {
+    grid-template-columns: 1fr;
+  }
+
+  .titleBlock,
+  .sceneAlchemist .titleBlock,
+  .sceneHolographicSculptor .titleBlock,
+  .sceneDigitalSculptor .titleBlock,
+  .sceneCyberDefense .titleBlock,
+  .sceneBlockchain .titleBlock,
+  .sceneFrontier .titleBlock {
+    order: 1;
+    justify-self: stretch;
+    max-width: none;
+    min-height: auto;
+  }
+
+  .headlineWrap {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .title {
+    font-size: clamp(1rem, 8.4cqi, 1.46rem);
+    letter-spacing: -0.015em;
+    overflow-wrap: anywhere;
+  }
+
+  .sceneBlockchain .title,
+  .sceneAlchemist .title,
+  .sceneFrontier .title,
+  .sceneCyberDefense .title {
+    font-size: clamp(0.98rem, 8cqi, 1.38rem);
+  }
+
+  .titleLockup {
+    padding: 0.96rem 1rem 1rem;
+  }
 }
 
 /* Poster-depth overlays */

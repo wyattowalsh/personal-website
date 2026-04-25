@@ -1,6 +1,7 @@
 /* ─── Shell ──────────────────────────────────────────────────────────────────── */
 
 .cluster {
+  container-type: inline-size;
   width: 100%;
 }
 
@@ -150,10 +151,13 @@
 }
 
 .titleLockup {
+  box-sizing: border-box;
   position: relative;
   display: grid;
   gap: 0.3rem;
-  padding: 0.74rem 0.86rem 0.8rem;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.9rem 0.98rem 0.94rem;
   border-radius: 1.3rem;
   border: 1px solid var(--perf-edge);
   background:
@@ -174,10 +178,15 @@
 }
 
 .title {
+  box-sizing: border-box;
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   font-size: clamp(1.14rem, 2.2vw, 1.84rem);
-  line-height: 0.92;
+  line-height: 1.06;
   letter-spacing: -0.04em;
+  overflow-wrap: normal;
   text-wrap: balance;
   text-shadow: 0 4px 18px var(--perf-glow-soft);
 }
@@ -1077,7 +1086,7 @@
 
 .sceneAutomation .title {
   font-size: clamp(1.06rem, 1.9vw, 1.68rem);
-  line-height: 0.9;
+  line-height: 1.06;
 }
 
 .sceneRobotics .iconBadge {
@@ -1095,7 +1104,43 @@
 
 .sceneRobotics .title {
   letter-spacing: 0.01em;
-  line-height: 0.88;
+  line-height: 1.06;
+}
+
+@container (max-width: 23rem) {
+  .sceneAutomation .sceneBody,
+  .sceneRobotics .sceneBody,
+  .sceneNeural .sceneBody {
+    grid-template-columns: 1fr;
+  }
+
+  .titleBlock,
+  .sceneRobotics .titleBlock,
+  .sceneNeural .titleBlock {
+    order: 1;
+    justify-self: stretch;
+    width: 100%;
+    margin-left: 0;
+    text-align: center;
+  }
+
+  .headlineWrap {
+    justify-items: center;
+  }
+
+  .title {
+    font-size: clamp(1rem, 8.4cqi, 1.48rem);
+    letter-spacing: -0.015em;
+    overflow-wrap: anywhere;
+  }
+
+  .sceneRobotics .title {
+    font-size: clamp(0.96rem, 7.8cqi, 1.36rem);
+  }
+
+  .titleLockup {
+    padding: 0.96rem 1rem 1rem;
+  }
 }
 
 .sceneNeural .titleBlock {

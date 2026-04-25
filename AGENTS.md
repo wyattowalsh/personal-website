@@ -10,14 +10,14 @@ globs: "**/*"
 ## Commands
 
 ```bash
-pnpm dev                  # Dev server (port 3000)
+pnpm dev                  # Dev server (port 3458)
 pnpm build                # Production build
 pnpm lint                 # ESLint
 pnpm typecheck            # TypeScript strict mode
 pnpm test                 # Run vitest tests
+pnpm test:subtitle-geometry  # Playwright homepage subtitle geometry gate
 pnpm new-post             # Create blog post (interactive)
 pnpm new-post --title "X" --tags "A,B"  # CLI mode
-pnpm storybook            # Component explorer (port 6006)
 pnpm preprocess           # Rebuild search index/cache
 pnpm lclean               # Clean .next, .cache
 ```

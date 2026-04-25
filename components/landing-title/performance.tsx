@@ -163,6 +163,8 @@ function PerformanceScene({
         className={styles.control}
         onFocus={onFocus}
         onBlur={onBlur}
+        data-subtitle-id={themeConfig.id}
+        data-subtitle-lane={themeConfig.lane}
         data-surface={context.surface}
       >
         <motion.section

@@ -1,6 +1,7 @@
 /* Systems lane: control-bay chassis with sharper, plated silhouettes. */
 
 .cluster {
+  container-type: inline-size;
   width: 100%;
 }
 
@@ -157,9 +158,11 @@
 }
 
 .titleLockup {
+  box-sizing: border-box;
   position: relative;
   min-width: 0;
-  padding: 0.74rem 0.82rem 0.7rem;
+  max-width: 100%;
+  padding: 0.9rem 0.98rem 0.92rem;
   border: 1px solid var(--sys-edge);
   clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%);
   background:
@@ -194,12 +197,17 @@
 }
 
 .title {
+  box-sizing: border-box;
   margin: 0;
   color: var(--sys-text);
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   font-size: clamp(1.08rem, 1.75vw, 1.76rem);
-  line-height: 0.9;
+  line-height: 1.06;
   font-weight: 650;
   letter-spacing: 0.045em;
+  overflow-wrap: normal;
   text-transform: none;
   text-wrap: balance;
 }
@@ -415,7 +423,7 @@
 
 .sceneCloud .title {
   font-size: clamp(0.9rem, 1.3vw, 1.34rem);
-  line-height: 0.9;
+  line-height: 1.06;
   letter-spacing: 0.035em;
 }
 
@@ -594,7 +602,7 @@
 
 .sceneOrchestrator .title {
   font-size: clamp(0.88rem, 1.2vw, 1.28rem);
-  line-height: 0.9;
+  line-height: 1.06;
   letter-spacing: 0.045em;
 }
 
@@ -1313,9 +1321,58 @@
   font-size: clamp(1.02rem, 1.66vw, 1.56rem);
 }
 
+@container (max-width: 23rem) {
+  .sceneBody,
+  .sceneCybernetic .sceneBody,
+  .sceneZeroTrust .sceneBody,
+  .sceneSynthetic .sceneBody,
+  .sceneQuantum .sceneBody,
+  .sceneCloud .sceneBody,
+  .sceneCartographer .sceneBody,
+  .sceneOrchestrator .sceneBody {
+    grid-template-columns: 1fr;
+  }
+
+  .titleBlock,
+  .sceneCybernetic .titleBlock,
+  .sceneZeroTrust .titleBlock,
+  .sceneSynthetic .titleBlock,
+  .sceneQuantum .titleBlock,
+  .sceneCloud .titleBlock,
+  .sceneCartographer .titleBlock,
+  .sceneOrchestrator .titleBlock {
+    order: 1;
+    justify-self: stretch;
+    max-width: none;
+    transform: none;
+  }
+
+  .headlineWrap {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .title {
+    font-size: clamp(0.96rem, 7.8cqi, 1.38rem);
+    letter-spacing: 0.035em;
+    overflow-wrap: anywhere;
+  }
+
+  .sceneZeroTrust .title,
+  .sceneCartographer .title,
+  .sceneOrchestrator .title {
+    font-size: clamp(0.92rem, 7.2cqi, 1.28rem);
+  }
+
+  .titleLockup {
+    width: 100%;
+    max-width: none;
+    padding: 0.96rem 1rem 1rem;
+  }
+}
+
 @media (max-width: 720px) {
   .title {
-    font-size: clamp(1.28rem, 6vw, 1.92rem);
+    font-size: clamp(1rem, 5.2vw, 1.6rem);
   }
 
   .scene {
@@ -1334,6 +1391,26 @@
   .sceneZeroTrust .sceneBody,
   .sceneCloud .sceneBody {
     grid-template-columns: minmax(0, 8.4rem) minmax(0, 1fr);
+  }
+}
+
+@container (max-width: 23rem) {
+  .sceneCybernetic .sceneBody,
+  .sceneZeroTrust .sceneBody,
+  .sceneSynthetic .sceneBody,
+  .sceneQuantum .sceneBody,
+  .sceneCloud .sceneBody,
+  .sceneCartographer .sceneBody,
+  .sceneOrchestrator .sceneBody {
+    grid-template-columns: 1fr;
+  }
+
+  .sceneCloud .titleBlock {
+    max-width: none;
+  }
+
+  .sceneCloud .title {
+    font-size: clamp(0.92rem, 7.2cqi, 1.28rem);
   }
 }
 

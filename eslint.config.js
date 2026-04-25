@@ -16,6 +16,8 @@ const config = [
       "docs/**",
       ".storybook/**",
       ".claude/helpers/**",
+      "test-results/**",
+      "playwright-report/**",
       "**/*.d.ts",
     ],
   },

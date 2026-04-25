@@ -26,6 +26,7 @@ export interface LandingTitleProps {
   forcedSubtitleId?: string;
   forcedThemeText?: string;
   disableRotation?: boolean;
+  forcedIsDark?: boolean;
   forceReducedMotion?: boolean;
   hideSignalDeck?: boolean;
   surface?: SubtitleSurface;
@@ -43,6 +44,7 @@ export function LandingTitle({
   forcedSubtitleId,
   forcedThemeText,
   disableRotation = false,
+  forcedIsDark,
   forceReducedMotion,
   hideSignalDeck = false,
   surface = 'homepage',
@@ -219,7 +221,7 @@ export function LandingTitle({
   const currentRenderer =
     forcedRenderer ?? rotationSequence[wordIndex] ?? rotationSequence[0] ?? LANDING_TITLE_RENDERERS[0];
   const currentTheme = currentRenderer.theme;
-  const isDark = resolvedTheme === 'dark';
+  const isDark = forcedIsDark ?? resolvedTheme === 'dark';
   const shouldAnimateTagline = hasHydrated && !prefersReducedMotion;
   const positionLabel = String((forcedRendererIndex >= 0 ? forcedRendererIndex : wordIndex) + 1).padStart(2, '0');
   const totalLabel = String(LANDING_TITLE_RENDERERS.length).padStart(2, '0');

@@ -1,4 +1,5 @@
 .cluster {
+  container-type: inline-size;
   width: 100%;
 }
 
@@ -177,14 +178,23 @@
 }
 
 .titleLockup {
+  box-sizing: border-box;
   display: grid;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0.82rem 0.9rem 0.84rem;
 }
 
 .title {
+  box-sizing: border-box;
   margin: 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
   font-size: clamp(1.14rem, 2.15vw, 1.84rem);
-  line-height: 0.94;
+  line-height: 1.06;
   letter-spacing: -0.03em;
+  overflow-wrap: normal;
   text-wrap: balance;
 }
 
@@ -1132,7 +1142,7 @@
 
 .sceneSorcerer .title {
   font-size: clamp(1.08rem, 2.02vw, 1.72rem);
-  line-height: 0.9;
+  line-height: 1.06;
 }
 
 .sceneMage .iconBadge {
@@ -1227,6 +1237,44 @@
 
 .sceneOracle .title {
   letter-spacing: 0.1em;
+}
+
+@container (max-width: 23rem) {
+  .sceneBody,
+  .sceneSorcerer .sceneBody,
+  .sceneWeaver .sceneBody,
+  .sceneConjurer .sceneBody,
+  .sceneMystic .sceneBody,
+  .sceneOracle .sceneBody {
+    grid-template-columns: 1fr;
+  }
+
+  .titleBlock,
+  .sceneSorcerer .titleBlock,
+  .sceneMage .titleBlock,
+  .sceneWeaver .titleBlock,
+  .sceneConjurer .titleBlock,
+  .sceneMystic .titleBlock,
+  .sceneOracle .titleBlock {
+    order: 1;
+    justify-self: stretch;
+    max-width: none;
+    text-align: center;
+  }
+
+  .headlineWrap {
+    justify-items: center;
+  }
+
+  .title {
+    font-size: clamp(1rem, 8.8cqi, 1.46rem);
+    letter-spacing: 0.035em;
+    overflow-wrap: anywhere;
+  }
+
+  .titleLockup {
+    padding: 0.96rem 1rem 1rem;
+  }
 }
 
 /* Poster-depth overlays */

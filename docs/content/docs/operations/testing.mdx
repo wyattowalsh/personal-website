@@ -1,6 +1,6 @@
 ---
 title: Testing
-description: Vitest, lint/typecheck gates, Lighthouse CI, and the current CI quality workflow.
+description: Vitest, Playwright subtitle geometry, lint/typecheck gates, Lighthouse CI, and the current CI quality workflow.
 icon: fa/FaFlask
 ---
 
@@ -9,6 +9,7 @@ icon: fa/FaFlask
 The repo's active quality gates are centered on:
 
 - **Vitest** for automated tests
+- **Playwright** for homepage subtitle geometry checks
 - **ESLint** for static analysis
 - **TypeScript** type checking
 - **Next.js production builds**
@@ -40,9 +41,9 @@ That runs `vitest run`.
 
 A recent local run in this repo snapshot completed:
 
-- **17 test files**
-- **245 tests**
-- **9.75s duration**
+- **28 test files**
+- **325 tests**
+- **7.04s duration**
 
 Treat those numbers as a point-in-time check, not a guaranteed constant.
 
@@ -51,6 +52,28 @@ Treat those numbers as a point-in-time check, not a guaranteed constant.
 There is **no configured coverage provider** in `vitest.config.ts`, no dedicated coverage script in `package.json`, and no coverage dependency wired in the root app.
 
 So if you need coverage reporting, that work still needs to be added first.
+
+## Playwright Subtitle Geometry
+
+The root subtitle geometry gate is:
+
+```bash
+pnpm test:subtitle-geometry
+```
+
+That runs `playwright test tests/subtitle-geometry.spec.ts` through the root `playwright.config.ts`.
+
+The config starts `pnpm dev` and checks the subtitle audit lab at `http://localhost:3458/lab/subtitles`.
+
+The current gate renders `/lab/subtitles?view=matrix&motion=reduced&deck=0` for both light and dark themes. It verifies all 22 homepage subtitle variants across desktop, tablet, 390px mobile, 320px mobile, and short landscape viewports.
+
+It is focused on the specific failure class that can be missed by Vitest: title text escaping its visual plate, clipped lockups, insufficient title/control clearance, and unsafe compressed line-height.
+
+If Chromium is missing on a clean machine, install it once with:
+
+```bash
+pnpm exec playwright install chromium
+```
 
 ## ESLint
 
@@ -164,27 +187,25 @@ There is no root `pnpm lighthouse` script right now.
 `.github/workflows/deploy.yml` defines the main quality gate job. It currently runs:
 
 1. dependency install
-2. DB migration preflight guard
-3. `pnpm lint`
-4. `pnpm typecheck`
+2. `pnpm lint`
+3. `pnpm typecheck`
+4. `pnpm test`
 5. `pnpm build`
-6. Playwright browser install
-7. a Playwright smoke gate step
-8. artifact upload for Playwright results
 
 ## Playwright Status
 
-The CI workflow includes a Playwright smoke step, but this repository snapshot does **not** currently expose:
+This repository snapshot now exposes:
 
 - a checked-in root Playwright config file
-- a root `e2e` script in `package.json`
+- a focused root `test:subtitle-geometry` script in `package.json`
+- a checked-in Playwright spec for homepage subtitle geometry
 
-So the honest state is:
+It does **not** currently expose:
 
-- **CI expects a Playwright smoke gate**
-- **local Playwright execution is not fully codified from the root package right now**
+- a general-purpose root `e2e` script
+- a CI workflow step that runs `pnpm test:subtitle-geometry`
 
-If you need to rely on Playwright locally, inspect the current CI workflow first and expect additional setup work.
+So the honest state is: local Playwright execution is codified for the homepage subtitle geometry gate, but CI does not yet enforce that gate.
 
 ## What Is Not Currently Documented as Active Tooling
 
@@ -196,6 +217,7 @@ This repo snapshot does not include root Storybook scripts or dependencies in `p
 
 ```bash
 pnpm test
+pnpm test:subtitle-geometry
 pnpm lint
 pnpm typecheck
 pnpm build

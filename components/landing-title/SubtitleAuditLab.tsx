@@ -147,6 +147,7 @@ export function SubtitleAuditLab() {
   );
   const reducedMotionOverride =
     motionMode === 'system' ? undefined : motionMode === 'reduced';
+  const forcedPreviewIsDark = themeMode === 'system' ? undefined : themeMode === 'dark';
 
   const matrixThemes = useMemo(
     () => [
@@ -165,6 +166,7 @@ export function SubtitleAuditLab() {
   // Props shared by every LandingTitle preview instance
   const sharedPreviewProps = {
     disableRotation: true as const,
+    forcedIsDark: forcedPreviewIsDark,
     forceReducedMotion: reducedMotionOverride,
     framed: false as const,
     hideSignalDeck: !showSignalDeck,

@@ -14,27 +14,28 @@ The `package.json` defines the following npm scripts for common tasks:
 
 | Script | Command | Description |
 | :--- | :--- | :--- |
-| `dev` | `next dev` | Start development server with debug logging (port 3000) |
+| `preprocess` | `tsx --conditions react-server scripts/index.ts` | Run preprocessing pipeline manually |
+| `predev` | `NODE_ENV=development pnpm preprocess` | Auto-run before dev (development mode) |
+| `dev` | `DEBUG=true LOG_LEVEL=debug next dev --turbopack --port 3458` | Start development server with debug logging |
+| `prebuild` | `NODE_ENV=production pnpm preprocess` | Auto-run before build (production mode) |
 | `build` | `next build` | Production build |
-| `start` | `next start` | Start production server |
+| `start` | `next start --port 3458` | Start production server |
 | `lint` | `eslint .` | Run ESLint on all files |
 | `typecheck` | `tsc --noEmit` | Run TypeScript type checking |
-| `preprocess` | `tsx scripts/index.ts` | Run preprocessing pipeline manually |
-| `predev` | `NODE_ENV=development npm run preprocess` | Auto-run before dev (development mode) |
-| `prebuild` | `NODE_ENV=production npm run preprocess` | Auto-run before build (production mode) |
+| `test` | `vitest run` | Run Vitest suite |
+| `test:subtitle-geometry` | `playwright test tests/subtitle-geometry.spec.ts` | Run the homepage subtitle geometry gate |
 | `lclean` | `rimraf .next .cache node_modules/.cache` | Clean build artifacts and caches |
 | `clean` | `rimraf .next .cache node_modules/` | Full clean including node_modules |
-| `storybook` | `storybook dev -p 6006` | Start Storybook component explorer |
-| `build-storybook` | `storybook build` | Build Storybook for deployment |
-| `lighthouse` | `lhci autorun` | Run Lighthouse CI performance audit |
 | `new-post` | `tsx scripts/new-post.ts` | Create a new blog post (interactive or CLI) |
+| `validate:blog-manager` | `tsx scripts/validate-blog-manager.ts` | Validate the blog manager skill metadata and files |
+| `generate-icons` | `tsx scripts/generate-icons.ts` | Generate icon assets |
 
 ### Environment-Specific Behavior
 
 The development server sets additional environment variables for enhanced debugging:
 
 ```bash
-DEBUG=true LOG_LEVEL=debug next dev
+DEBUG=true LOG_LEVEL=debug next dev --turbopack --port 3458
 ```
 
 This enables verbose logging in the `BackendService` and other core services.
