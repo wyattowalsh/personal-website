@@ -6,9 +6,15 @@
     "gradient": {
       "type": "radial",
       "colors": [
-        { "value": "#0b0d15" },
-        { "value": "#121726" },
-        { "value": "#1a2032" }
+        {
+          "value": "#0b0d15"
+        },
+        {
+          "value": "#121726"
+        },
+        {
+          "value": "#1a2032"
+        }
       ]
     },
     "opacity": 1
@@ -22,7 +28,12 @@
       }
     },
     "color": {
-      "value": ["#ffffff", "#b6c8ff", "#8fb2ff", "#d7e6ff"],
+      "value": [
+        "#ffffff",
+        "#b6c8ff",
+        "#8fb2ff",
+        "#d7e6ff"
+      ],
       "animation": {
         "enable": true,
         "speed": 2,
@@ -30,13 +41,14 @@
       }
     },
     "shape": {
-      "type": ["circle", "star"],
-      "polygon": {
-        "sides": 5
-      },
-      "stroke": {
-        "width": 0.2,
-        "color": "#10131d"
+      "type": [
+        "circle",
+        "star"
+      ],
+      "options": {
+        "polygon": {
+          "sides": 5
+        }
       }
     },
     "opacity": {
@@ -89,17 +101,26 @@
         "rotateX": 500,
         "rotateY": 700
       }
+    },
+    "stroke": {
+      "width": 0.2,
+      "color": "#10131d"
     }
   },
   "interactivity": {
     "events": {
       "onHover": {
         "enable": true,
-        "mode": ["grab", "bubble"]
+        "mode": [
+          "grab",
+          "bubble"
+        ]
       },
       "onClick": {
         "enable": false,
-        "mode": ["repulse"]
+        "mode": [
+          "repulse"
+        ]
       },
       "resize": true
     },

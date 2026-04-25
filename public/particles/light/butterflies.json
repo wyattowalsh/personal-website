@@ -15,14 +15,20 @@
       }
     },
     "color": {
-      "value": ["#dcc9a3", "#f0d9a7", "#c7b28f"]
+      "value": [
+        "#dcc9a3",
+        "#f0d9a7",
+        "#c7b28f"
+      ]
     },
     "shape": {
       "type": "image",
-      "image": {
-        "src": "../../butterfly.webp",
-        "width": 32,
-        "height": 32
+      "options": {
+        "image": {
+          "src": "/butterfly.webp",
+          "width": 32,
+          "height": 32
+        }
       }
     },
     "opacity": {

@@ -14,16 +14,18 @@
       }
     },
     "color": {
-      "value": ["#6e9eb8", "#83b9c7", "#8fd5cf"]
+      "value": [
+        "#6e9eb8",
+        "#83b9c7",
+        "#8fd5cf"
+      ]
     },
     "shape": {
       "type": "polygon",
-      "polygon": {
-        "sides": 6
-      },
-      "stroke": {
-        "width": 0.8,
-        "color": "#d7eef1"
+      "options": {
+        "polygon": {
+          "sides": 6
+        }
       }
     },
     "opacity": {
@@ -64,6 +66,10 @@
       "color": "#8fd5cf",
       "opacity": 0.14,
       "width": 1
+    },
+    "stroke": {
+      "width": 0.8,
+      "color": "#d7eef1"
     }
   },
   "interactivity": {

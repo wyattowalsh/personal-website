@@ -20,16 +20,29 @@
       }
     },
     "color": {
-      "value": ["#8cff9d", "#58d27a", "#d7ffe1"]
+      "value": [
+        "#8cff9d",
+        "#58d27a",
+        "#d7ffe1"
+      ]
     },
     "shape": {
       "type": "char",
-      "character": {
-        "value": ["0", "1", "+", "*", "#", "::"],
-        "font": "Menlo, Monaco, monospace",
-        "style": "normal",
-        "weight": "600",
-        "fill": true
+      "options": {
+        "character": {
+          "value": [
+            "0",
+            "1",
+            "+",
+            "*",
+            "#",
+            "::"
+          ],
+          "font": "Menlo, Monaco, monospace",
+          "style": "normal",
+          "weight": "600",
+          "fill": true
+        }
       }
     },
     "opacity": {
@@ -82,11 +95,15 @@
     "events": {
       "onHover": {
         "enable": true,
-        "mode": ["grab"]
+        "mode": [
+          "grab"
+        ]
       },
       "onClick": {
         "enable": false,
-        "mode": ["push"]
+        "mode": [
+          "push"
+        ]
       },
       "resize": true
     },

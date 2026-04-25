@@ -15,12 +15,22 @@
       }
     },
     "color": {
-      "value": ["#e3a3c2", "#f6c9db", "#cba4f2", "#f3d68d"]
+      "value": [
+        "#e3a3c2",
+        "#f6c9db",
+        "#cba4f2",
+        "#f3d68d"
+      ]
     },
     "shape": {
-      "type": ["circle", "polygon"],
-      "polygon": {
-        "sides": 6
+      "type": [
+        "circle",
+        "polygon"
+      ],
+      "options": {
+        "polygon": {
+          "sides": 6
+        }
       }
     },
     "opacity": {
@@ -67,7 +77,10 @@
     "events": {
       "onHover": {
         "enable": true,
-        "mode": ["bubble", "grab"],
+        "mode": [
+          "bubble",
+          "grab"
+        ],
         "parallax": {
           "enable": true,
           "force": 24,

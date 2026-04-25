@@ -13,6 +13,18 @@ export type ParticleFamily = 'technical' | 'atmospheric' | 'organic' | 'cosmic' 
 
 export type ParticleIntensity = 'calm' | 'balanced' | 'dramatic';
 
+export type ParticleBlendMode = 'normal' | 'multiply' | 'screen';
+
+export interface ParticlePresetPalette {
+  base: string;
+  accents: readonly string[];
+}
+
+export interface ParticlePresetBackdrop {
+  blendMode: ParticleBlendMode;
+  opacity: number;
+}
+
 export interface ParticlePreset {
   id: string;
   url: string;
@@ -23,6 +35,8 @@ export interface ParticlePreset {
   family: ParticleFamily;
   mood: string;
   description: string;
+  palette: ParticlePresetPalette;
+  backdrop: ParticlePresetBackdrop;
   weight: number;
   heroSafe: boolean;
   intensity: ParticleIntensity;

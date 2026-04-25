@@ -1,5 +1,4 @@
 // This file is auto-generated. Do not edit manually.
-// Last generated: 2026-04-14T09:51:12.747Z
 
 type ParticleConfig = {
   url: string;
@@ -12,32 +11,32 @@ export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
   "light": [
     {
       "url": "/particles/light/butterflies.json",
-      "hash": "abf30a0b0b636ca48dde81c7cacadcc2",
-      "lastModified": "2026-04-14T01:46:25.946Z",
+      "hash": "9bcd8c833fc45b3eda988c52fa348288",
+      "lastModified": "2026-04-25T23:14:33.710Z",
       "theme": "light"
     },
     {
       "url": "/particles/light/flowers.json",
-      "hash": "ae2cdefdd1af2bc9582c177a71f831bd",
-      "lastModified": "2026-04-14T01:46:25.950Z",
+      "hash": "f750de55009e75234f8d380264da7113",
+      "lastModified": "2026-04-25T23:14:33.712Z",
       "theme": "light"
     },
     {
       "url": "/particles/light/hex.json",
-      "hash": "bb7912e0fb3737c09cdb93f23fe02005",
-      "lastModified": "2026-04-14T01:46:25.960Z",
+      "hash": "d6d42fd3c7e0b8f97abbb77d8d016620",
+      "lastModified": "2026-04-25T23:14:33.713Z",
       "theme": "light"
     },
     {
       "url": "/particles/light/net.json",
       "hash": "4c2ba689c7b89cb18f28ad79af115b61",
-      "lastModified": "2026-04-14T01:46:25.962Z",
+      "lastModified": "2026-04-25T23:11:36.096Z",
       "theme": "light"
     },
     {
       "url": "/particles/light/snow.json",
       "hash": "bc3eb970b710525e2cac456042442515",
-      "lastModified": "2026-04-14T01:46:25.963Z",
+      "lastModified": "2026-04-25T23:11:36.110Z",
       "theme": "light"
     }
   ],
@@ -45,31 +44,31 @@ export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = {
     {
       "url": "/particles/dark/fireflies.json",
       "hash": "e76ce1ec8446e93072879b6afd5e48fa",
-      "lastModified": "2026-04-14T06:22:59.978Z",
+      "lastModified": "2026-04-25T23:11:35.957Z",
       "theme": "dark"
     },
     {
       "url": "/particles/dark/galaxy.json",
-      "hash": "ca9df1d7b967fec4ab0229679290849d",
-      "lastModified": "2026-04-14T06:22:59.977Z",
+      "hash": "5af941721d5f48a987ea412ca4969e9f",
+      "lastModified": "2026-04-25T23:14:33.709Z",
       "theme": "dark"
     },
     {
       "url": "/particles/dark/matrix.json",
-      "hash": "df1676ae8ee9786b5ba6ec0f055c66fb",
-      "lastModified": "2026-04-14T01:47:59.465Z",
+      "hash": "d6c86e1a5ca5b63a89975f76ce7fc3df",
+      "lastModified": "2026-04-25T23:14:33.710Z",
       "theme": "dark"
     },
     {
       "url": "/particles/dark/nebula.json",
       "hash": "ff325631e630a3108e8ef1e11c435617",
-      "lastModified": "2026-04-14T06:22:59.978Z",
+      "lastModified": "2026-04-25T23:11:36.004Z",
       "theme": "dark"
     },
     {
       "url": "/particles/dark/stars.json",
       "hash": "3a3331610aad9dc25a9064139a109218",
-      "lastModified": "2026-04-14T06:22:59.974Z",
+      "lastModified": "2026-04-25T23:11:36.014Z",
       "theme": "dark"
     }
   ]

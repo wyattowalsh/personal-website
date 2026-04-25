@@ -77,6 +77,17 @@ const ShapeSchema = z.object({
   options: z.record(z.string(), z.any()).optional(),
 }).passthrough();
 
+const LEGACY_SHAPE_KEYS = ['character', 'image', 'polygon', 'stroke'] as const;
+
+export function findLegacyShapeKeys(shape: unknown): string[] {
+  if (!shape || typeof shape !== 'object' || Array.isArray(shape)) {
+    return [];
+  }
+
+  const shapeRecord = shape as Record<string, unknown>;
+  return LEGACY_SHAPE_KEYS.filter((key) => key in shapeRecord);
+}
+
 // Define the animation schemas
 const AnimationSchema = z.object({
   enable: z.boolean().optional(),
@@ -178,6 +189,11 @@ const ParticlesSchema = z.object({
       y: z.number().optional(),
     }).optional(),
   }).optional(),
+  stroke: z.object({
+    width: z.number().optional(),
+    color: ColorSchema.optional(),
+    opacity: z.number().min(0).max(1).optional(),
+  }).passthrough().optional(),
   life: z.object({
     count: z.number().optional(),
     delay: z.object({
@@ -355,7 +371,7 @@ async function calculateFileHash(filePath: string): Promise<string> {
 }
 
 // Validate particle config files against the full Zod schema
-async function validateParticleConfig(filePath: string): Promise<void> {
+export async function validateParticleConfig(filePath: string): Promise<void> {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
     const json = JSON.parse(content);
@@ -368,6 +384,13 @@ async function validateParticleConfig(filePath: string): Promise<void> {
         .join('\n');
       throw new Error(
         `Schema validation failed for ${path.basename(filePath)}:\n${issues}`
+      );
+    }
+
+    const legacyShapeKeys = findLegacyShapeKeys(json.particles?.shape);
+    if (legacyShapeKeys.length > 0) {
+      throw new Error(
+        `Legacy particle shape keys are not supported in ${path.basename(filePath)}: ${legacyShapeKeys.map((key) => `shape.${key}`).join(', ')}. Use particles.shape.options.{type} and particles.stroke instead.`
       );
     }
 
@@ -457,7 +480,6 @@ export async function generateParticleConfigs(): Promise<string> {
 
     // Generate TypeScript code
     const code = `// This file is auto-generated. Do not edit manually.
-// Last generated: ${new Date().toISOString()}
 
 type ParticleConfig = {
   url: string;
