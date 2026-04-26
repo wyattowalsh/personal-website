@@ -1500,3 +1500,64 @@
 .sceneConjurer .sceneRig {
   filter: saturate(1.12) contrast(1.04);
 }
+
+/* Alignment pass: consistent ritual plates with richer but controlled glow. */
+
+.scene {
+  box-shadow:
+    0 26px 66px var(--arc-glow-soft),
+    inset 0 1px 0 var(--arc-overlay),
+    inset 0 -16px 28px rgba(0, 0, 0, 0.1),
+    inset 0 0 0 1px color-mix(in srgb, var(--arc-overlay-bold) 14%, transparent);
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.titleLockup {
+  align-items: center;
+  justify-items: center;
+  min-height: 3.15rem;
+  border-radius: 1.35rem;
+}
+
+.sceneSorcerer .titleLockup,
+.sceneMage .titleLockup,
+.sceneWeaver .titleLockup,
+.sceneConjurer .titleLockup,
+.sceneMystic .titleLockup,
+.sceneOracle .titleLockup {
+  min-width: min(100%, 10.5rem);
+}
+
+.iconBadge {
+  box-shadow:
+    0 14px 28px var(--arc-glow-soft),
+    0 0 0 1px color-mix(in srgb, var(--arc-overlay-bold) 18%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.sceneRig::after {
+  content: '';
+  position: absolute;
+  inset: auto 0.9rem 0.7rem;
+  height: 0.24rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--arc-overlay-bold) 58%, transparent), transparent);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@container (max-width: 23rem) {
+  .titleLockup,
+  .sceneSorcerer .titleLockup,
+  .sceneMage .titleLockup,
+  .sceneWeaver .titleLockup,
+  .sceneConjurer .titleLockup,
+  .sceneMystic .titleLockup,
+  .sceneOracle .titleLockup {
+    min-width: 0;
+    min-height: 3rem;
+  }
+}

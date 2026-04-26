@@ -1728,3 +1728,60 @@
     height: 2.05rem;
   }
 }
+
+/* Alignment pass: standardized material nameplates across the workshop lane. */
+
+.scene {
+  filter: saturate(1.06) contrast(1.04);
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.titleLockup {
+  align-items: center;
+  justify-items: center;
+  min-height: 3.1rem;
+}
+
+.sceneAlchemist .titleLockup,
+.sceneDigitalSculptor .titleLockup,
+.sceneHolographicSculptor .titleLockup,
+.sceneCyberDefense .titleLockup,
+.sceneBlockchain .titleLockup,
+.sceneFrontier .titleLockup {
+  min-width: min(100%, 10rem);
+}
+
+.iconBadge {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32),
+    0 0 0 1px color-mix(in srgb, var(--craft-edge) 16%, transparent),
+    0 12px 22px rgba(0, 0, 0, 0.24);
+}
+
+.sceneRig::after {
+  content: '';
+  position: absolute;
+  inset: auto 1rem 0.66rem;
+  height: 0.28rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--craft-fill-strong) 42%, rgba(255, 255, 255, 0.1)), transparent);
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+@container (max-width: 23rem) {
+  .titleLockup,
+  .sceneAlchemist .titleLockup,
+  .sceneDigitalSculptor .titleLockup,
+  .sceneHolographicSculptor .titleLockup,
+  .sceneCyberDefense .titleLockup,
+  .sceneBlockchain .titleLockup,
+  .sceneFrontier .titleLockup {
+    min-width: 0;
+    min-height: 3rem;
+  }
+}

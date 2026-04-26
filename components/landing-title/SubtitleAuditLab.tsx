@@ -17,7 +17,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Switch } from '@/components/ui/switch';
 import { cn } from '@/lib/utils';
 
 /* ── option tuples ────────────────────────────────────────────────────────── */
@@ -253,11 +252,24 @@ export function SubtitleAuditLab() {
               Keep or hide audit metadata.
             </p>
           </div>
-          <Switch
-            checked={showSignalDeck}
-            onCheckedChange={(checked) => updateParams({ deck: checked ? '1' : '0' })}
+          <button
+            type="button"
+            role="switch"
+            aria-checked={showSignalDeck}
+            className={cn(
+              'relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border-2 border-transparent shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+              showSignalDeck ? 'bg-primary' : 'bg-input',
+            )}
+            onClick={() => updateParams({ deck: showSignalDeck ? '0' : '1' })}
             aria-label="Toggle subtitle signal deck"
-          />
+          >
+            <span
+              className={cn(
+                'pointer-events-none block h-4 w-4 rounded-full bg-background shadow-lg ring-0 transition-transform',
+                showSignalDeck ? 'translate-x-4' : 'translate-x-0',
+              )}
+            />
+          </button>
         </div>
 
         <div className="flex justify-end">
@@ -284,7 +296,7 @@ export function SubtitleAuditLab() {
 
       <section
         className={cn(
-          'rounded-[2rem] border border-border/60 bg-background/60 p-4 shadow-sm backdrop-blur sm:p-6',
+          'overflow-hidden rounded-[2rem] border border-border/60 bg-[radial-gradient(circle_at_12%_0%,color-mix(in_srgb,var(--primary)_10%,transparent),transparent_34%),linear-gradient(180deg,color-mix(in_srgb,var(--background)_92%,transparent),color-mix(in_srgb,var(--muted)_18%,transparent))] p-4 shadow-sm backdrop-blur sm:p-6',
           viewMode === 'single' ? FRAME_CLASS_MAP[frameMode] : 'w-full',
         )}
         data-subtitle-preview
@@ -308,10 +320,12 @@ export function SubtitleAuditLab() {
             <LandingTitle forcedSubtitleId={selectedSubtitle.id} {...sharedPreviewProps} />
           </div>
         ) : (
-          <div className="space-y-8" data-subtitle-matrix>
+          <div className="space-y-10" data-subtitle-matrix>
             {matrixGroups.map(({ lane, options }) => (
-              <section key={lane} className="space-y-3" data-subtitle-lane-group={lane}>
-                <div className="flex flex-wrap items-end justify-between gap-3 rounded-[1.35rem] border border-border/60 bg-background/75 px-4 py-3">
+              <section key={lane} className="space-y-4" data-subtitle-lane-group={lane}>
+                <div className="relative overflow-hidden rounded-[1.5rem] border border-border/60 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--background)_88%,transparent),color-mix(in_srgb,var(--muted)_22%,transparent))] px-4 py-3 shadow-sm">
+                  <div className="pointer-events-none absolute inset-x-4 top-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent" />
+                  <div className="relative flex flex-wrap items-end justify-between gap-3">
                   <div className="space-y-1">
                     <p className="text-[0.65rem] font-semibold uppercase tracking-[0.34em] text-primary/80">
                       {LANE_LABELS[lane]}
@@ -323,6 +337,7 @@ export function SubtitleAuditLab() {
                   <p className="text-[0.65rem] font-semibold uppercase tracking-[0.28em] text-muted-foreground">
                     {options.length} variants
                   </p>
+                  </div>
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -330,12 +345,13 @@ export function SubtitleAuditLab() {
                     <div
                       key={option.id}
                       className={cn(
-                        'rounded-[1.5rem] border border-border/60 bg-background/80 p-4 shadow-sm',
+                        'relative overflow-hidden rounded-[1.6rem] border border-border/60 bg-[radial-gradient(circle_at_18%_0%,color-mix(in_srgb,var(--primary)_8%,transparent),transparent_32%),linear-gradient(180deg,color-mix(in_srgb,var(--background)_88%,transparent),color-mix(in_srgb,var(--background)_72%,var(--muted)_16%))] p-4 shadow-sm transition-shadow duration-200',
+                        'before:pointer-events-none before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-primary/25 before:to-transparent',
                         option.id === selectedSubtitle.id && 'ring-1 ring-primary/40',
                       )}
                       data-subtitle-card={option.id}
                     >
-                      <div className="mb-3 flex items-center justify-between gap-3">
+                      <div className="relative mb-3 flex items-start justify-between gap-3">
                         <div className="min-w-0 space-y-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <p className="text-[0.65rem] font-semibold uppercase tracking-[0.3em] text-muted-foreground">

@@ -1761,3 +1761,124 @@
     letter-spacing: 0.01em;
   }
 }
+
+/* Alignment pass: make the systems lane read like one calibrated instrument set. */
+
+.scene {
+  filter: saturate(1.08) contrast(1.03);
+}
+
+.titleBlock {
+  min-width: 0;
+}
+
+.titleLockup {
+  display: grid;
+  align-items: center;
+  min-height: 3.2rem;
+}
+
+.sceneCybernetic .titleLockup,
+.sceneZeroTrust .titleLockup,
+.sceneQuantum .titleLockup,
+.sceneCloud .titleLockup,
+.sceneCartographer .titleLockup,
+.sceneOrchestrator .titleLockup {
+  min-width: min(100%, 10.4rem);
+}
+
+.sceneSynthetic .titleLockup {
+  min-width: min(100%, 11.2rem);
+}
+
+.iconBadge {
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    0 0 0 1px color-mix(in srgb, var(--sys-glow-strong) 24%, transparent),
+    0 10px 22px var(--sys-glow-soft);
+}
+
+.sceneRig::after {
+  content: '';
+  position: absolute;
+  inset: auto 0.8rem 0.62rem;
+  height: 0.22rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--sys-glow-strong) 62%, transparent), transparent);
+  opacity: 0.52;
+  pointer-events: none;
+}
+
+@container (max-width: 23rem) {
+  .titleLockup,
+  .sceneCybernetic .titleLockup,
+  .sceneZeroTrust .titleLockup,
+  .sceneSynthetic .titleLockup,
+  .sceneQuantum .titleLockup,
+  .sceneCloud .titleLockup,
+  .sceneCartographer .titleLockup,
+  .sceneOrchestrator .titleLockup {
+    min-width: 0;
+    min-height: 3rem;
+  }
+}
+
+/* Focused guard fix: the cybernetic nameplate needs full-word clearance in single view. */
+
+.sceneCybernetic .titleBlock {
+  max-width: 16.2rem;
+}
+
+.sceneCybernetic .titleLockup {
+  width: min(100%, 15.2rem);
+  max-width: 15.2rem;
+  padding-right: 1.18rem;
+}
+
+.sceneCybernetic .title {
+  font-size: clamp(1.04rem, 1.58vw, 1.58rem);
+  letter-spacing: 0.065em;
+}
+
+@container (max-width: 23rem) {
+  .sceneCybernetic .titleLockup {
+    width: 100%;
+    max-width: none;
+    padding-right: 1rem;
+  }
+
+  .sceneCybernetic .title {
+    font-size: clamp(0.82rem, 6.35cqi, 1.08rem);
+    letter-spacing: 0.02em;
+  }
+}
+
+.sceneCybernetic .titleLockup {
+  width: min(100%, 17.4rem);
+  max-width: 17.4rem;
+  padding-right: 1.55rem;
+}
+
+.sceneCybernetic .title {
+  font-size: clamp(1rem, 1.42vw, 1.42rem);
+  letter-spacing: 0.055em;
+}
+
+.sceneCybernetic .titleLockup {
+  clip-path: none;
+  border-radius: 0.9rem 0.28rem 1.05rem 0.28rem;
+}
+
+.sceneCybernetic .titleBlock {
+  max-width: 22rem;
+}
+
+.sceneCybernetic .titleLockup {
+  width: min(100%, 19rem);
+  max-width: 19rem;
+}
+
+.sceneCybernetic .title {
+  font-size: clamp(0.98rem, 1.26vw, 1.32rem);
+  letter-spacing: 0.04em;
+}

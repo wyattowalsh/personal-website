@@ -2,8 +2,10 @@ import { expect, test, type ConsoleMessage, type Page } from '@playwright/test';
 
 type SubtitleGeometry = {
   failures: string[];
+  fontSize: number;
   id: string;
   lane: string;
+  lockupWidth: number;
   text: string;
 };
 
@@ -28,8 +30,16 @@ type VisualMatrixCase = ViewportCase & {
   theme: SubtitleTheme;
 };
 
+type VisualSingleCase = ViewportCase & {
+  subtitleId: string;
+  theme: SubtitleTheme;
+};
+
 const EXPECTED_SUBTITLE_COUNT = 22;
 const MIN_LOCKUP_CLEARANCE_PX = 8;
+const MIN_READABLE_FONT_SIZE_PX = 11;
+const MIN_LOCKUP_WIDTH_PX = 62;
+const MAX_LANE_FONT_SIZE_RATIO = 2.15;
 const BROWSER_ISSUE_PATTERNS: readonly RegExp[] = [
   /hydration/i,
   /hydrated but some attributes/i,
@@ -44,12 +54,18 @@ const VISUAL_MATRIX_CASES: readonly VisualMatrixCase[] = [
   { name: 'mobile-320', width: 320, height: 1000, theme: 'dark' },
 ];
 
-function subtitlesUrl(theme: SubtitleTheme) {
+const VISUAL_SINGLE_CASES: readonly VisualSingleCase[] = [
+  { name: 'desktop-cybernetic', width: 1440, height: 900, theme: 'dark', subtitleId: 'cybernetic-architect' },
+  { name: 'mobile-320-automation', width: 320, height: 780, theme: 'dark', subtitleId: 'automation-virtuoso' },
+];
+
+function subtitlesUrl(theme: SubtitleTheme, view: 'matrix' | 'single' = 'matrix', subtitleId?: string) {
   return `/lab/subtitles?${new URLSearchParams({
     deck: '0',
     motion: 'reduced',
+    ...(subtitleId ? { subtitle: subtitleId } : {}),
     theme,
-    view: 'matrix',
+    view,
   }).toString()}`;
 }
 
@@ -57,6 +73,13 @@ async function openSubtitleMatrix(page: Page, viewport: ViewportCase, theme: Sub
   await page.setViewportSize({ width: viewport.width, height: viewport.height });
   await page.goto(subtitlesUrl(theme), { waitUntil: 'domcontentloaded' });
   await page.locator('[data-subtitle-id]').first().waitFor();
+  await page.evaluate(() => document.fonts.ready);
+}
+
+async function openSubtitleSingle(page: Page, visualCase: VisualSingleCase) {
+  await page.setViewportSize({ width: visualCase.width, height: visualCase.height });
+  await page.goto(subtitlesUrl(visualCase.theme, 'single', visualCase.subtitleId), { waitUntil: 'domcontentloaded' });
+  await page.locator(`[data-subtitle-id="${visualCase.subtitleId}"]`).first().waitFor();
   await page.evaluate(() => document.fonts.ready);
 }
 
@@ -85,7 +108,7 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
     for (const viewport of VIEWPORTS) {
       await openSubtitleMatrix(page, viewport, theme);
 
-      const geometries = await page.locator('[data-subtitle-id]').evaluateAll((controls, minClearancePx) => {
+      const geometries = await page.locator('[data-subtitle-id]').evaluateAll((controls, thresholds) => {
         function rectOf(element: Element) {
           const rect = element.getBoundingClientRect();
 
@@ -151,10 +174,11 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
           const failures: string[] = [];
 
           if (!title) {
-            return { failures: ['missing h2'], id, lane, text: '' };
+            return { failures: ['missing h2'], fontSize: 0, id, lane, lockupWidth: 0, text: '' };
           }
 
           const text = title.textContent?.trim() ?? '';
+          const card = element.closest('[data-subtitle-card]') as HTMLElement | null;
           const lockup = title.parentElement;
           const scene = title.closest('section');
           const range = document.createRange();
@@ -178,14 +202,35 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
             failures.push(`line-height/font-size ${lineHeightRatio.toFixed(2)} < 1.00`);
           }
 
+          if (!Number.isFinite(fontSize) || fontSize < thresholds.minReadableFontSizePx) {
+            failures.push(`font-size ${fontSize.toFixed(1)}px < ${thresholds.minReadableFontSizePx}px`);
+          }
+
+          if (card) {
+            if (card.scrollWidth > card.clientWidth + 1) {
+              failures.push(`card horizontal overflow ${card.scrollWidth}px > ${card.clientWidth}px`);
+            }
+
+            if (card.scrollHeight > card.clientHeight + 2) {
+              failures.push(`card vertical overflow ${card.scrollHeight}px > ${card.clientHeight}px`);
+            }
+          }
+
+          let lockupWidth = 0;
+
           if (!lockup) {
             failures.push('missing title lockup');
           } else {
             const lockupRect = rectOf(lockup);
+            lockupWidth = lockupRect.width;
             const lockupClearance = minInset(textRect, lockupRect);
 
-            if (lockupClearance < minClearancePx) {
-              failures.push(`title clearance ${lockupClearance.toFixed(1)}px < ${minClearancePx}px`);
+            if (lockupWidth < thresholds.minLockupWidthPx) {
+              failures.push(`lockup width ${lockupWidth.toFixed(1)}px < ${thresholds.minLockupWidthPx}px`);
+            }
+
+            if (lockupClearance < thresholds.minClearancePx) {
+              failures.push(`title clearance ${lockupClearance.toFixed(1)}px < ${thresholds.minClearancePx}px`);
             }
 
             if (lockup.scrollWidth > lockup.clientWidth + 1) {
@@ -212,11 +257,28 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
             ancestor = ancestor.parentElement;
           }
 
-          return { failures, id, lane, text };
+          return { failures, fontSize, id, lane, lockupWidth, text };
         });
-      }, MIN_LOCKUP_CLEARANCE_PX);
+      }, {
+        minClearancePx: MIN_LOCKUP_CLEARANCE_PX,
+        minLockupWidthPx: MIN_LOCKUP_WIDTH_PX,
+        minReadableFontSizePx: MIN_READABLE_FONT_SIZE_PX,
+      });
 
       expect(new Set(geometries.map(({ id }) => id)).size).toBe(EXPECTED_SUBTITLE_COUNT);
+
+      for (const lane of new Set(geometries.map(({ lane }) => lane))) {
+        const laneFontSizes = geometries
+          .filter((geometry) => geometry.lane === lane && geometry.fontSize > 0)
+          .map(({ fontSize }) => fontSize);
+        const minFontSize = Math.min(...laneFontSizes);
+        const maxFontSize = Math.max(...laneFontSizes);
+        const laneFontRatio = maxFontSize / minFontSize;
+
+        if (Number.isFinite(laneFontRatio) && laneFontRatio > MAX_LANE_FONT_SIZE_RATIO) {
+          failures.push(`${theme}/${viewport.name}/${lane}: lane font-size ratio ${laneFontRatio.toFixed(2)} > ${MAX_LANE_FONT_SIZE_RATIO}`);
+        }
+      }
 
       for (const geometry of geometries) {
         for (const failure of geometry.failures) {
@@ -227,6 +289,25 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
   }
 
   expect(failures).toEqual([]);
+  expect(browserIssues).toEqual([]);
+});
+
+test('focused homepage subtitle visual states stay intentional', async ({ page }) => {
+  const browserIssues = watchBrowserIssues(page);
+
+  for (const visualCase of VISUAL_SINGLE_CASES) {
+    await openSubtitleSingle(page, visualCase);
+
+    await expect(page.locator('[data-subtitle-preview]')).toHaveScreenshot(
+      `subtitle-single-${visualCase.name}-${visualCase.theme}.png`,
+      {
+        animations: 'disabled',
+        caret: 'hide',
+        maxDiffPixelRatio: 0.015,
+      },
+    );
+  }
+
   expect(browserIssues).toEqual([]);
 });
 
