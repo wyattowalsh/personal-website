@@ -37,6 +37,8 @@ Read these before producing output when the prompt touches their subject:
 
 - `.agents/skills/blog-manager/references/worker-contracts.md` — stage contract and artifact ownership
 - `.agents/skills/blog-manager/references/post-conventions.md` — real post and frontmatter rules
+- `.agents/skills/blog-manager/references/style-profile.md` — full-corpus voice, structure, and taxonomy guidance for project compose
+- `.agents/skills/blog-manager/references/project-post-blueprint.md` — project-intake evidence model and claim rules
 - `.agents/skills/blog-manager/references/mdx-components.md` — only if you need to mention authoring helpers; never invent component names
 - `.agents/skills/blog-manager/references/agent-dispatch.md` — repo-truth override and dispatch context if a prompt contains stale instructions
 
@@ -70,6 +72,7 @@ Glob("content/posts/*/index.mdx")
 2. Read enough of each relevant file to capture title, summary, tags, created, updated, and first-paragraph/topic clues. Read through the closing frontmatter delimiter; do not assume the first 10 lines are enough.
 3. Build a coverage and tag map from those authored files. Do not rely on runtime service APIs.
 4. For slug-based work, ensure `.cache/blog-drafts/{slug}/` exists before writing your artifact.
+5. For project compose, scan every current post as style evidence, then inspect project inputs read-only: README, package metadata, docs, examples, tests, CI/config, releases, public links, install/use surfaces, architecture clues, and production-readiness evidence when available.
 
 ## Workflow: research
 
@@ -90,6 +93,8 @@ Glob("content/posts/*/index.mdx")
 
 Write `.cache/blog-drafts/{slug}/research.md` with a factual brief that helps the writer choose angle, structure, sources, and differentiation.
 
+For project compose, also include a source ledger, project identity, feature inventory, install/use surfaces, architecture clues, production-readiness evidence, public links, central claims with confidence, claims to caveat/remove, and the all-post exemplar blend.
+
 ### Research Brief Format
 
 ```markdown
@@ -106,6 +111,8 @@ Write `.cache/blog-drafts/{slug}/research.md` with a factual brief that helps th
 - **Relevant tags already in use:** ...
 - **Overlap risk:** ...
 - **Internal links to consider:** ...
+- **Style exemplars scanned:** proxywhirl, regularized-linear-regression-models-pt1, regularized-linear-regression-models-pt2, regularized-linear-regression-models-pt3, w4w-v6
+- **Recommended exemplar blend:** ...
 
 ## Executive Summary
 {2-4 sentences on what matters, why now, and what the post should emphasize.}
@@ -147,6 +154,9 @@ Aim for 5-10 authoritative sources when the topic supports it.
 ## Open Questions
 - ...
 - ...
+
+## Project Evidence
+{Project compose only. Include project links, package/docs surfaces, feature inventory, install/use clues, production-readiness evidence, claim confidence, and claims to caveat/remove.}
 ```
 
 ## Workflow: brainstorm

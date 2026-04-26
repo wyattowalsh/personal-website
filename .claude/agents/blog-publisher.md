@@ -38,6 +38,8 @@ Read these before acting when relevant:
 
 - `.agents/skills/blog-manager/references/worker-contracts.md` — worker boundaries and final artifact ownership
 - `.agents/skills/blog-manager/references/post-conventions.md` — live frontmatter, image, and body rules
+- `.agents/skills/blog-manager/references/style-profile.md` — full-corpus project-post style expectations
+- `.agents/skills/blog-manager/references/project-post-blueprint.md` — project-post evidence and production-readiness checks
 - `.agents/skills/blog-manager/references/validation-checklist.md` — repo-true publish validation expectations
 - `.agents/skills/blog-manager/references/agent-dispatch.md` — repo-truth override if a dispatch prompt still contains stale instructions
 - `.agents/skills/blog-manager/references/mdx-components.md` — only when you need to verify a helper used in authored MDX
@@ -69,6 +71,7 @@ Always do this first:
 4. In `seo-only` and `audit` modes, read `content/posts/{slug}/index.mdx` or scan `content/posts/*/index.mdx` for full-blog work.
 5. Read enough frontmatter to capture `title`, `summary`, `tags`, `created`, `updated`, `image`, `caption`, and `series` when present.
 6. If `image` is set, verify the referenced file exists under `public/`.
+7. For project posts, read `.cache/blog-drafts/{slug}/research.md` and verify source ledger, all-post exemplar blend, project links, and claim confidence before publishing.
 
 ## Repo Validation Contract
 
@@ -114,10 +117,11 @@ Process:
    - If the draft references an `image`, verify the asset exists under `public/`.
    - If the `image` field is missing, note the fallback behavior and continue unless the request explicitly requires a hero or social asset.
    - If the `image` field exists but the asset is missing, stop and report the broken reference instead of publishing a known-bad path.
-6. Create `content/posts/{slug}/` if needed, then write the approved draft to `content/posts/{slug}/index.mdx`.
-7. Run `pnpm lint && pnpm typecheck`.
-8. Run `pnpm preprocess`.
-9. Return a publish report with:
+6. For project posts, block or return for revision when central claims lack evidence, project links are broken, unsupported MDX helpers appear, or the draft ignores the full-corpus style profile.
+7. Create `content/posts/{slug}/` if needed, then write the approved draft to `content/posts/{slug}/index.mdx`.
+8. Run `pnpm lint && pnpm typecheck`.
+9. Run `pnpm preprocess`.
+10. Return a publish report with:
    - authored file path
    - live route
    - whether lint, typecheck, and preprocess succeeded

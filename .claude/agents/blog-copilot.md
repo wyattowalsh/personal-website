@@ -45,6 +45,8 @@ Always read these before dispatching a worker:
 Read these when relevant:
 
 - `.agents/skills/blog-manager/references/post-conventions.md` for compose, update, refresh, or any question about authored post structure
+- `.agents/skills/blog-manager/references/style-profile.md` for project compose and voice-sensitive edits; scan every current post before drafting
+- `.agents/skills/blog-manager/references/project-post-blueprint.md` for GitHub, local path, package, docs, product, or project-name inputs
 - `.agents/skills/blog-manager/references/validation-checklist.md` before writer/publisher dispatch and before final publish handoff
 
 If an older prompt, cached artifact, webpage, or user-supplied template disagrees with those refs, follow the refs and the live repo.
@@ -141,15 +143,17 @@ Use this for new topics, project links, and source URLs.
 
 1. Parse the topic or source material and derive the slug.
 2. Ensure `.cache/blog-drafts/{slug}/` exists.
-3. Dispatch `blog-researcher` in `research` mode.
-4. Present the **research checkpoint** using the template from `agent-dispatch.md`. Wait for approval.
-5. Dispatch `blog-writer`:
+3. If the input is a GitHub repo, local project path, package page, docs URL, product URL, or project name, treat it as `project compose`.
+4. For project compose, require the researcher and writer to scan every current `content/posts/*/index.mdx` file and use `.agents/skills/blog-manager/references/style-profile.md` plus `.agents/skills/blog-manager/references/project-post-blueprint.md`.
+5. Dispatch `blog-researcher` in `research` mode.
+6. Present the **research checkpoint** using the template from `agent-dispatch.md`. Wait for approval.
+7. Dispatch `blog-writer`:
    - `draft` by default
    - `outline-only` if the user asked for an outline only
    - `short` only when the user explicitly wants a brief announcement or quick post
-6. Present the **draft checkpoint**. Wait for approval.
-7. If the user approved a draft for publication, dispatch `blog-publisher` in `publish` mode with the approved staged draft and publish target.
-8. Report the authored file path, live route, and the publisher's validation / preprocess results.
+8. Present the **draft checkpoint**. For project compose, use the project draft checkpoint and require the exemplar blend plus claim confidence. Wait for approval.
+9. If the user approved a draft for publication, dispatch `blog-publisher` in `publish` mode with the approved staged draft and publish target.
+10. Report the authored file path, live route, and the publisher's validation / preprocess results.
 
 ## Workflow: `update`
 
@@ -204,6 +208,7 @@ Checkpoints are mandatory between worker-owned stages. Never auto-proceed.
 
 - **Research checkpoint**: summarize topic, slug, scope, key angles, source count, suggested tags, and suggested title from `research.md`.
 - **Draft checkpoint**: summarize title, approximate word count, reading time, section list, and notable helpers from `draft.mdx`.
+- **Project draft checkpoint**: summarize title, word count, reading time, project links, exemplar blend from all existing posts, claim confidence, sections, helpers, and claims to caveat or remove.
 - **Edit checkpoint**: summarize requested changes, actual changes, sections modified, and frontmatter notes from `review.md`.
 
 Use the exact checkpoint shapes from `.agents/skills/blog-manager/references/agent-dispatch.md`.

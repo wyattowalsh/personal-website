@@ -46,6 +46,16 @@ Fill every field. Use `none` for unknown or not applicable values.
   - Depth: {e.g. "tutorial with code examples", "high-level overview"}
   - Format: {e.g. "standard article", "announcement", "update"}
 - **mode**: {research | brainstorm | outline-only | draft | short | edit | publish | seo-only | audit}
+- **compose_subtype**: {project compose | topic compose | source compose | none}
+- **project_input**: {GitHub URL, local path, package page, docs URL, product URL, project name, or none}
+- **project_type**: {github-repo | local-path | package | docs | product | name-only | none}
+- **source_urls**: {comma-separated source URLs or none}
+- **local_project_path**: {absolute or repo-relative path, or none}
+- **repo_url**: {repository URL or none}
+- **package_url**: {package registry URL or none}
+- **homepage_url**: {homepage/product/demo URL or none}
+- **style_exemplars**: {all scanned posts and chosen exemplar blend, or none}
+- **claim_confidence**: {high | medium | low | unknown}
 - **existing_post_path**: {absolute path to `content/posts/{slug}/index.mdx` or `none`}
 - **handoff_dir**: {absolute path to `.cache/blog-drafts/{slug}/` or `none`}
 - **approved_draft_path**: {absolute path to `.cache/blog-drafts/{slug}/draft.mdx` or `none`}
@@ -59,6 +69,8 @@ Fill every field. Use `none` for unknown or not applicable values.
 - Shared metadata + JSON-LD: `app/blog/posts/[slug]/layout.tsx`
 - Schema reality: `components/PostSchema.tsx` exports `WebSiteJsonLd`, `PersonJsonLd`, and `JsonLd` only
 - Draft cache: `.cache/blog-drafts/{slug}/`
+- Style profile: `references/style-profile.md`
+- Project blueprint: `references/project-post-blueprint.md`
 - Scaffold command: `pnpm new-post --title "X" --tags "A,B"`
 - Validation: `pnpm lint && pnpm typecheck`
 - Search rebuild: `pnpm preprocess`
@@ -137,6 +149,34 @@ Publish this draft to `content/posts/{slug}/index.mdx`?
 ```
 
 Populate from `.cache/blog-drafts/{slug}/draft.mdx`.
+
+### Project Draft Checkpoint
+
+Present after `blog-writer` completes a project draft:
+
+```md
+## Project Draft Complete
+
+**Project**: {project name}
+**Title**: "{title}"
+**Word count**: {N}
+**Reading time**: ~{N} min
+**Exemplar blend**: {all-post scan summary and primary style influences}
+**Claim confidence**: {high/medium/low with short reason}
+
+**Sections**:
+1. {section 1}
+2. {section 2}
+3. {section 3}
+
+**Project links**: {GitHub/package/homepage/docs or "none"}
+**MDX components used**: {list or "none"}
+**Claims to caveat/remove before publish**: {list or "none"}
+
+Publish this draft to `content/posts/{slug}/index.mdx`?
+```
+
+Populate from `.cache/blog-drafts/{slug}/draft.mdx` and `.cache/blog-drafts/{slug}/research.md`.
 
 ### Edit Checkpoint
 

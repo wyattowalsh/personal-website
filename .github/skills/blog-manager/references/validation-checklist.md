@@ -30,6 +30,21 @@ Portable checks to run before dispatching a worker and before final publish. Use
 
 ---
 
+## Project-Post Checks
+
+| Check | How to verify | Pass condition |
+|------|---------------|----------------|
+| Existing posts scanned | Confirm `research.md` or writer checkpoint mentions every current `content/posts/*/index.mdx` exemplar | The draft is style-matched against the full corpus, not a single post |
+| Exemplar blend named | Read the draft checkpoint or `research.md` style section | The blend names `proxywhirl`, the regression series, and `w4w-v6` with appropriate weights |
+| Source ledger exists | Read `.cache/blog-drafts/{slug}/research.md` | Central project claims have source paths/URLs and confidence levels |
+| Project links verified | Check GitHub/package/homepage/docs links from the draft | Links resolve or are intentionally omitted |
+| Install/use snippets grounded | Compare code or shell snippets with README/docs/package metadata | Snippets are copied from evidence or clearly marked illustrative |
+| Claims are stable | Review metrics and version/support claims | Fast-aging exact counts are rounded/caveated unless source evidence is current |
+| Style fit holds | Compare hook, section shape, and tone with `references/style-profile.md` | Project posts resemble the site voice without copying existing text |
+| MDX helpers are valid | Compare helper names with `references/mdx-components.md` | No unsupported helper names appear |
+
+---
+
 ## Mode Notes
 
 - **`audit`** is read-only. Stop after reporting findings unless the user explicitly asks for a fix pass.

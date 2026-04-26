@@ -42,6 +42,8 @@ Read these before writing when they are relevant:
 
 - `.agents/skills/blog-manager/references/worker-contracts.md` — worker boundaries and artifact ownership
 - `.agents/skills/blog-manager/references/post-conventions.md` — real post structure and frontmatter rules
+- `.agents/skills/blog-manager/references/style-profile.md` — full-corpus voice, structure, and taxonomy guidance for project compose and voice-sensitive edits
+- `.agents/skills/blog-manager/references/project-post-blueprint.md` — project-post structure, project evidence, and claim rules
 - `.agents/skills/blog-manager/references/mdx-components.md` — the only reliable list of no-import authoring helpers
 - `.agents/skills/blog-manager/references/agent-dispatch.md` — repo-truth override if a dispatch prompt contains stale instructions
 
@@ -76,6 +78,7 @@ Always do this first:
 4. In `edit` mode, read `content/posts/{slug}/index.mdx` from `existing_post_path`.
 5. Ensure `.cache/blog-drafts/{slug}/` exists before writing.
 6. Scan related authored posts in `content/posts/*/index.mdx` when you need examples for tone, tag usage, internal links, or frontmatter conventions.
+7. For project compose, scan every current `content/posts/*/index.mdx` file and use the full-corpus style profile before writing. Name the exemplar blend in the draft checkpoint.
 
 ## Authoring Rules
 
@@ -178,13 +181,16 @@ Write a publish-ready staged draft to `.cache/blog-drafts/{slug}/draft.mdx`.
 Process:
 
 1. Read `research.md` and any existing `outline.md`.
-2. Create or refresh `outline.md` first when it would materially help the draft.
-3. Choose tags and framing based on the current blog taxonomy and nearby posts.
-4. Write a complete staged article with frontmatter and body only.
-5. Use MDX helpers only when they improve clarity.
-6. Keep the draft ready for manager review and later publisher handoff.
+2. For project compose, read `style-profile.md` and `project-post-blueprint.md`, then verify the research brief includes a source ledger, style map, exemplar blend, and claim-confidence notes.
+3. Create or refresh `outline.md` first when it would materially help the draft.
+4. Choose tags and framing based on the current blog taxonomy and nearby posts.
+5. Write a complete staged article with frontmatter and body only.
+6. Use MDX helpers only when they improve clarity.
+7. Keep the draft ready for manager review and later publisher handoff.
 
 Aim for a standard post unless constraints say otherwise: clear hook, scannable `##` / `###` headings, concrete examples, and a strong conclusion.
+
+For project compose, default to the project-post blueprint: direct hook, optional badge/link block, problem, what the project does, architecture/workflow, key features, usage, production notes, trade-offs, and next steps. Use `proxywhirl` as the primary modern project-post shape, the regression series for deeper technical pacing when useful, and `w4w-v6` only as frontmatter/tag signal.
 
 ## Workflow: `short`
 
