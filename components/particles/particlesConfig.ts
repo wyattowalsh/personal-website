@@ -12,7 +12,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'Elegant paper moths with warm champagne accents.',
     palette: {
       base: '#f8f7f3',
-      accents: ['#dcc9a3', '#f0d9a7', '#c7b28f'],
+      accents: ['#dcc9a3', '#f0d9a7', '#c7b28f', '#f7ead0'],
     },
     backdrop: {
       blendMode: 'multiply',
@@ -23,8 +23,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'balanced',
     requires: ['slim'],
     counterpartId: 'fireflies',
-    desktopCount: 18,
-    mobileCount: 10,
+    desktopCount: 22,
+    mobileCount: 12,
     fpsLimit: 30,
   },
   flowers: {
@@ -35,7 +35,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A soft upward bloom with pastel petal geometry.',
     palette: {
       base: '#faf6fb',
-      accents: ['#e3a3c2', '#f6c9db', '#cba4f2', '#f3d68d'],
+      accents: ['#e3a3c2', '#f6c9db', '#cba4f2', '#f3d68d', '#9fd8c8'],
     },
     backdrop: {
       blendMode: 'multiply',
@@ -46,8 +46,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'balanced',
     requires: ['slim'],
     counterpartId: 'nebula',
-    desktopCount: 28,
-    mobileCount: 14,
+    desktopCount: 32,
+    mobileCount: 16,
     fpsLimit: 28,
   },
   hex: {
@@ -58,7 +58,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A restrained geometric field with icy lattice motion.',
     palette: {
       base: '#f7fafc',
-      accents: ['#6e9eb8', '#83b9c7', '#8fd5cf'],
+      accents: ['#6e9eb8', '#83b9c7', '#8fd5cf', '#b7e4f0'],
     },
     backdrop: {
       blendMode: 'multiply',
@@ -69,8 +69,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'balanced',
     requires: ['slim'],
     counterpartId: 'matrix',
-    desktopCount: 34,
-    mobileCount: 18,
+    desktopCount: 38,
+    mobileCount: 20,
     fpsLimit: 30,
   },
   net: {
@@ -81,7 +81,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A premium technical mesh with soft links and subtle parallax.',
     palette: {
       base: '#ffffff',
-      accents: ['#24404f', '#365867', '#6b8995', '#a8c3cb'],
+      accents: ['#1f3a48', '#2f5362', '#5f8290', '#a8c3cb', '#d4e7ec'],
     },
     backdrop: {
       blendMode: 'multiply',
@@ -92,8 +92,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'calm',
     requires: ['slim'],
     counterpartId: 'galaxy',
-    desktopCount: 36,
-    mobileCount: 20,
+    desktopCount: 42,
+    mobileCount: 22,
     fpsLimit: 30,
   },
   snow: {
@@ -104,7 +104,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A sparse atmospheric drift with a cool, polished glow.',
     palette: {
       base: '#f5f8fb',
-      accents: ['#d5e4f7', '#c1d7f0', '#ffffff'],
+      accents: ['#d5e4f7', '#c1d7f0', '#ffffff', '#e7f4ff'],
     },
     backdrop: {
       blendMode: 'multiply',
@@ -115,8 +115,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'calm',
     requires: ['slim'],
     counterpartId: 'stars',
-    desktopCount: 26,
-    mobileCount: 14,
+    desktopCount: 30,
+    mobileCount: 16,
     fpsLimit: 26,
   },
   fireflies: {
@@ -127,7 +127,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'Sparse amber embers that pulse like distant fireflies.',
     palette: {
       base: '#0d1018',
-      accents: ['#f4c86d', '#dca14f', '#ffdc9a'],
+      accents: ['#f4c86d', '#dca14f', '#ffdc9a', '#fff1b8'],
     },
     backdrop: {
       blendMode: 'screen',
@@ -138,8 +138,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'balanced',
     requires: ['slim', 'twinkle'],
     counterpartId: 'butterflies',
-    desktopCount: 28,
-    mobileCount: 14,
+    desktopCount: 34,
+    mobileCount: 16,
     fpsLimit: 30,
   },
   galaxy: {
@@ -150,7 +150,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A layered starfield with quiet depth and cool orbit energy.',
     palette: {
       base: '#0b0d15',
-      accents: ['#ffffff', '#b6c8ff', '#8fb2ff', '#d7e6ff'],
+      accents: ['#ffffff', '#b6c8ff', '#8fb2ff', '#d7e6ff', '#f8d6ff'],
     },
     backdrop: {
       blendMode: 'screen',
@@ -161,8 +161,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'calm',
     requires: ['slim'],
     counterpartId: 'net',
-    desktopCount: 32,
-    mobileCount: 18,
+    desktopCount: 38,
+    mobileCount: 20,
     fpsLimit: 30,
   },
   matrix: {
@@ -173,7 +173,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A rare dramatic preset with descending glyphs and spectral green.',
     palette: {
       base: '#0c1115',
-      accents: ['#8cff9d', '#58d27a', '#d7ffe1'],
+      accents: ['#8cff9d', '#58d27a', '#d7ffe1', '#42ffc4'],
     },
     backdrop: {
       blendMode: 'screen',
@@ -184,8 +184,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'dramatic',
     requires: ['slim', 'text'],
     counterpartId: 'hex',
-    desktopCount: 22,
-    mobileCount: 12,
+    desktopCount: 26,
+    mobileCount: 14,
     fpsLimit: 26,
   },
   nebula: {
@@ -196,7 +196,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A dramatic neon haze with restrained depth and bloom.',
     palette: {
       base: '#090b14',
-      accents: ['#a86fff', '#ff5fb2', '#3ed7ff', '#ffe082'],
+      accents: ['#a86fff', '#ff5fb2', '#3ed7ff', '#ffe082', '#f7b2ff'],
     },
     backdrop: {
       blendMode: 'screen',
@@ -207,8 +207,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'dramatic',
     requires: ['slim'],
     counterpartId: 'flowers',
-    desktopCount: 30,
-    mobileCount: 16,
+    desktopCount: 34,
+    mobileCount: 18,
     fpsLimit: 28,
   },
   stars: {
@@ -219,7 +219,7 @@ const PARTICLE_PRESET_METADATA = {
     description: 'A sparse night field with refined twinkle and minimal drift.',
     palette: {
       base: '#090c14',
-      accents: ['#ffffff', '#f7ddb5', '#bfd6ff', '#fff7db'],
+      accents: ['#ffffff', '#f7ddb5', '#bfd6ff', '#fff7db', '#d8c8ff'],
     },
     backdrop: {
       blendMode: 'screen',
@@ -230,8 +230,8 @@ const PARTICLE_PRESET_METADATA = {
     intensity: 'calm',
     requires: ['slim', 'twinkle'],
     counterpartId: 'snow',
-    desktopCount: 24,
-    mobileCount: 12,
+    desktopCount: 30,
+    mobileCount: 14,
     fpsLimit: 26,
   },
 } satisfies Record<string, ParticlePresetMetadata>;

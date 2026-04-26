@@ -44,19 +44,19 @@
       }
     },
     "color": {
-      "value": ["#d5e4f7", "#c1d7f0", "#ffffff"]
+      "value": ["#d5e4f7", "#c1d7f0", "#ffffff", "#e7f4ff"]
     },
     "shape": {
       "type": "circle"
     },
     "opacity": {
       "value": {
-        "min": 0.18,
-        "max": 0.46
+        "min": 0.2,
+        "max": 0.58
       },
       "animation": {
         "enable": true,
-        "speed": 0.45,
+        "speed": 0.5,
         "minimumValue": 0.16,
         "sync": false
       }
@@ -68,7 +68,7 @@
       },
       "animation": {
         "enable": true,
-        "speed": 0.6,
+        "speed": 0.7,
         "minimumValue": 1.2,
         "sync": false
       }
@@ -84,6 +84,18 @@
       "trail": {
         "enable": false
       }
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#c8def6",
+      "blur": 6
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 80
+      },
+      "opacityRate": 0.5
     }
   },
   "pauseOnBlur": true,

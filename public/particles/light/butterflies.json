@@ -18,7 +18,8 @@
       "value": [
         "#dcc9a3",
         "#f0d9a7",
-        "#c7b28f"
+        "#c7b28f",
+        "#f7ead0"
       ]
     },
     "shape": {
@@ -33,13 +34,13 @@
     },
     "opacity": {
       "value": {
-        "min": 0.22,
-        "max": 0.58
+        "min": 0.24,
+        "max": 0.66
       },
       "animation": {
         "enable": true,
-        "speed": 0.45,
-        "minimumValue": 0.18,
+        "speed": 0.55,
+        "minimumValue": 0.2,
         "sync": false
       }
     },
@@ -50,20 +51,50 @@
       },
       "animation": {
         "enable": true,
-        "speed": 0.8,
+        "speed": 0.9,
         "minimumValue": 8,
+        "sync": false
+      }
+    },
+    "rotate": {
+      "value": {
+        "min": -14,
+        "max": 14
+      },
+      "random": true,
+      "direction": "random",
+      "animation": {
+        "enable": true,
+        "speed": 0.9,
         "sync": false
       }
     },
     "move": {
       "enable": true,
-      "speed": 0.85,
+      "speed": 0.95,
       "direction": "none",
       "outModes": {
         "default": "out"
       },
       "random": true,
-      "straight": false
+      "straight": false,
+      "attract": {
+        "enable": true,
+        "rotateX": 900,
+        "rotateY": 1100
+      }
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#d6b56c",
+      "blur": 8
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 55
+      },
+      "opacityRate": 0.65
     },
     "links": {
       "enable": false

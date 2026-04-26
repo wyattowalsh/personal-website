@@ -20,22 +20,22 @@
   },
   "particles": {
     "number": {
-      "value": 42,
+      "value": 46,
       "density": {
         "enable": true,
         "area": 1300
       }
     },
     "color": {
-      "value": ["#24404f", "#365867", "#6b8995", "#a8c3cb"]
+      "value": ["#1f3a48", "#2f5362", "#5f8290", "#a8c3cb", "#d4e7ec"]
     },
     "shape": {
       "type": ["circle", "square"]
     },
     "opacity": {
       "value": {
-        "min": 0.16,
-        "max": 0.42
+        "min": 0.18,
+        "max": 0.48
       },
       "random": true,
       "animation": {
@@ -60,11 +60,11 @@
     },
     "links": {
       "enable": true,
-      "distance": 140,
+      "distance": 152,
       "color": {
         "value": "#a9c6ce"
       },
-      "opacity": 0.14,
+      "opacity": 0.18,
       "width": 1
     },
     "move": {
@@ -78,9 +78,21 @@
       "straight": false,
       "attract": {
         "enable": true,
-        "rotateX": 800,
-        "rotateY": 800
+        "rotateX": 950,
+        "rotateY": 900
       }
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#7fa9b8",
+      "blur": 4
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 65
+      },
+      "opacityRate": 0.58
     }
   },
   "interactivity": {

@@ -19,7 +19,8 @@
         "#e3a3c2",
         "#f6c9db",
         "#cba4f2",
-        "#f3d68d"
+        "#f3d68d",
+        "#9fd8c8"
       ]
     },
     "shape": {
@@ -35,13 +36,13 @@
     },
     "opacity": {
       "value": {
-        "min": 0.16,
-        "max": 0.48
+        "min": 0.18,
+        "max": 0.56
       },
       "random": true,
       "animation": {
         "enable": true,
-        "speed": 0.6,
+        "speed": 0.72,
         "minimumValue": 0.14,
         "sync": false
       }
@@ -54,14 +55,27 @@
       "random": true,
       "animation": {
         "enable": true,
-        "speed": 1.2,
+        "speed": 1.35,
         "minimumValue": 4,
+        "sync": false
+      }
+    },
+    "rotate": {
+      "value": {
+        "min": 0,
+        "max": 360
+      },
+      "random": true,
+      "direction": "random",
+      "animation": {
+        "enable": true,
+        "speed": 1.2,
         "sync": false
       }
     },
     "move": {
       "enable": true,
-      "speed": 0.75,
+      "speed": 0.86,
       "direction": "none",
       "random": true,
       "straight": false,
@@ -70,7 +84,25 @@
       }
     },
     "links": {
-      "enable": false
+      "enable": true,
+      "distance": 115,
+      "color": {
+        "value": "#f0bfd7"
+      },
+      "opacity": 0.1,
+      "width": 0.8
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#eab3d2",
+      "blur": 7
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 70
+      },
+      "opacityRate": 0.58
     }
   },
   "interactivity": {

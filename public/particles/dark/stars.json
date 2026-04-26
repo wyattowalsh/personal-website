@@ -17,22 +17,22 @@
   "fpsLimit": 26,
   "particles": {
     "number": {
-      "value": 34,
+      "value": 40,
       "density": {
         "enable": true,
         "area": 1300
       }
     },
     "color": {
-      "value": ["#ffffff", "#f7ddb5", "#bfd6ff", "#fff7db"]
+      "value": ["#ffffff", "#f7ddb5", "#bfd6ff", "#fff7db", "#d8c8ff"]
     },
     "shape": {
       "type": "star"
     },
     "opacity": {
       "value": {
-        "min": 0.14,
-        "max": 0.62
+        "min": 0.16,
+        "max": 0.74
       },
       "animation": {
         "enable": true,
@@ -43,8 +43,8 @@
     },
     "size": {
       "value": {
-        "min": 1.6,
-        "max": 4.8
+        "min": 1.5,
+        "max": 5.8
       },
       "animation": {
         "enable": true,
@@ -84,9 +84,14 @@
     "twinkle": {
       "particles": {
         "enable": true,
-        "frequency": 0.02,
-        "opacity": 0.84
+        "frequency": 0.028,
+        "opacity": 0.9
       }
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#bfd6ff",
+      "blur": 8
     },
     "zIndex": {
       "value": {

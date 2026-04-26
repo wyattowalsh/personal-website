@@ -17,7 +17,8 @@
       "value": [
         "#6e9eb8",
         "#83b9c7",
-        "#8fd5cf"
+        "#8fd5cf",
+        "#b7e4f0"
       ]
     },
     "shape": {
@@ -30,8 +31,8 @@
     },
     "opacity": {
       "value": {
-        "min": 0.14,
-        "max": 0.38
+        "min": 0.16,
+        "max": 0.48
       },
       "animation": {
         "enable": true,
@@ -42,8 +43,8 @@
     },
     "size": {
       "value": {
-        "min": 7,
-        "max": 13
+        "min": 6,
+        "max": 14
       },
       "animation": {
         "enable": true,
@@ -62,14 +63,26 @@
     },
     "links": {
       "enable": true,
-      "distance": 125,
-      "color": "#8fd5cf",
-      "opacity": 0.14,
+      "distance": 138,
+      "color": "#7fc7d4",
+      "opacity": 0.2,
       "width": 1
     },
     "stroke": {
-      "width": 0.8,
-      "color": "#d7eef1"
+      "width": 1,
+      "color": "#c7edf4"
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#8fd5cf",
+      "blur": 5
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 60
+      },
+      "opacityRate": 0.55
     }
   },
   "interactivity": {

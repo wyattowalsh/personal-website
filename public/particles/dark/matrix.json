@@ -13,7 +13,7 @@
   "fpsLimit": 26,
   "particles": {
     "number": {
-      "value": 18,
+      "value": 24,
       "density": {
         "enable": true,
         "area": 1300
@@ -23,7 +23,8 @@
       "value": [
         "#8cff9d",
         "#58d27a",
-        "#d7ffe1"
+        "#d7ffe1",
+        "#42ffc4"
       ]
     },
     "shape": {
@@ -36,7 +37,9 @@
             "+",
             "*",
             "#",
-            "::"
+            "::",
+            "</>",
+            "{}"
           ],
           "font": "Menlo, Monaco, monospace",
           "style": "normal",
@@ -47,8 +50,8 @@
     },
     "opacity": {
       "value": {
-        "min": 0.18,
-        "max": 0.48
+        "min": 0.2,
+        "max": 0.62
       },
       "animation": {
         "enable": true,
@@ -59,8 +62,8 @@
     },
     "size": {
       "value": {
-        "min": 8,
-        "max": 15
+        "min": 7,
+        "max": 16
       },
       "animation": {
         "enable": true,
@@ -72,6 +75,10 @@
     "move": {
       "enable": true,
       "speed": 1.1,
+      "angle": {
+        "offset": 5,
+        "value": 92
+      },
       "direction": "bottom",
       "outModes": {
         "default": "out"
@@ -89,6 +96,18 @@
           "color": "#0c1115"
         }
       }
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#58d27a",
+      "blur": 9
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 80
+      },
+      "opacityRate": 0.5
     }
   },
   "interactivity": {

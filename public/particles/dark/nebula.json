@@ -14,14 +14,14 @@
   "fpsLimit": 28,
   "particles": {
     "number": {
-      "value": 22,
+      "value": 30,
       "density": {
         "enable": true,
         "area": 1300
       }
     },
     "color": {
-      "value": ["#a86fff", "#ff5fb2", "#3ed7ff", "#ffe082"]
+      "value": ["#a86fff", "#ff5fb2", "#3ed7ff", "#ffe082", "#f7b2ff"]
     },
     "shape": {
       "type": ["circle", "star", "polygon"],
@@ -33,8 +33,8 @@
     },
     "opacity": {
       "value": {
-        "min": 0.1,
-        "max": 0.34
+        "min": 0.12,
+        "max": 0.48
       },
       "animation": {
         "enable": true,
@@ -46,7 +46,7 @@
     "size": {
       "value": {
         "min": 2,
-        "max": 6
+        "max": 7.5
       },
       "animation": {
         "enable": true,
@@ -61,7 +61,7 @@
       "color": {
         "value": "#ffffff"
       },
-      "opacity": 0.08,
+      "opacity": 0.12,
       "width": 0.8
     },
     "move": {
@@ -79,6 +79,11 @@
           "color": "#090b14"
         }
       }
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#a86fff",
+      "blur": 10
     },
     "zIndex": {
       "value": {

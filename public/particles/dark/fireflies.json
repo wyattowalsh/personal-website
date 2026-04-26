@@ -7,22 +7,22 @@
   },
   "particles": {
     "number": {
-      "value": 30,
+      "value": 34,
       "density": {
         "enable": true,
         "area": 1200
       }
     },
     "color": {
-      "value": ["#f4c86d", "#dca14f", "#ffdc9a"]
+      "value": ["#f4c86d", "#dca14f", "#ffdc9a", "#fff1b8"]
     },
     "shape": {
       "type": "circle"
     },
     "opacity": {
       "value": {
-        "min": 0.12,
-        "max": 0.6
+        "min": 0.14,
+        "max": 0.74
       },
       "animation": {
         "enable": true,
@@ -38,7 +38,7 @@
       },
       "animation": {
         "enable": true,
-        "speed": 0.7,
+        "speed": 0.85,
         "minimumValue": 1.2,
         "sync": false
       },
@@ -55,8 +55,8 @@
       "straight": false,
       "attract": {
         "enable": true,
-        "rotateX": 1200,
-        "rotateY": 1200
+        "rotateX": 1400,
+        "rotateY": 1300
       }
     },
     "twinkle": {
@@ -67,7 +67,23 @@
       }
     },
     "links": {
-      "enable": false
+      "enable": true,
+      "distance": 118,
+      "color": "#f8c46b",
+      "opacity": 0.08,
+      "width": 0.7
+    },
+    "shadow": {
+      "enable": true,
+      "color": "#f4b85f",
+      "blur": 12
+    },
+    "zIndex": {
+      "value": {
+        "min": 0,
+        "max": 85
+      },
+      "opacityRate": 0.48
     }
   },
   "interactivity": {
