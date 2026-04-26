@@ -180,6 +180,42 @@ describe('free admin dashboard providers', () => {
     });
   });
 
+  it('treats absent CrUX field data as configured when the API key exists', async () => {
+    process.env.CRUX_API_KEY = 'test-crux-key';
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(mockJsonResponse({
+        lighthouseResult: {
+          categories: {
+            performance: { score: 0.88 },
+            accessibility: { score: 0.99 },
+            seo: { score: 1 },
+          },
+          audits: {},
+        },
+      }))
+      .mockResolvedValueOnce(mockJsonResponse({
+        lighthouseResult: {
+          categories: {
+            performance: { score: 0.94 },
+          },
+          audits: {},
+        },
+      }))
+      .mockResolvedValueOnce(mockJsonResponse({
+        error: { code: 404, status: 'NOT_FOUND', message: 'chrome ux report data not found' },
+      }, false, 404));
+
+    const snapshot = await getPerformanceSnapshot();
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.missingEnv).toEqual([]);
+    expect(snapshot.rows[0]).toEqual({
+      label: 'CrUX field data',
+      value: 'No data',
+      detail: 'Google has no public 28-day field dataset for this origin yet',
+    });
+  });
+
   it('uses public GitHub workflow data without requiring a token', async () => {
     delete process.env.GITHUB_TOKEN;
     vi.mocked(fetch).mockResolvedValue(mockJsonResponse({

@@ -90,7 +90,9 @@ interface CruxResponse {
     }>;
   };
   error?: {
+    code?: number;
     message?: string;
+    status?: string;
   };
 }
 
@@ -442,6 +444,9 @@ async function fetchCrux(): Promise<CruxResponse | null> {
     next: { revalidate: 12 * 60 * 60 },
   });
   const payload = (await response.json().catch(() => ({}))) as CruxResponse;
+  if (response.status === 404 && payload.error?.status === 'NOT_FOUND') {
+    return { record: { metrics: {} } };
+  }
   if (!response.ok) {
     throw new Error(payload.error?.message || `CrUX request failed with ${response.status}`);
   }
@@ -458,6 +463,8 @@ export async function getPerformanceSnapshot(): Promise<AdminProviderSnapshot> {
     const mobileCategories = mobile.lighthouseResult?.categories ?? {};
     const desktopCategories = desktop.lighthouseResult?.categories ?? {};
     const cruxMetrics = crux?.record?.metrics ?? {};
+    const hasCruxConfig = !isMissing(process.env.CRUX_API_KEY);
+    const hasCruxRows = Object.keys(cruxMetrics).length > 0;
     const mobileAudits = Object.values(mobile.lighthouseResult?.audits ?? {})
       .filter((audit) => typeof audit.score === 'number' && audit.score < 0.9)
       .slice(0, 6);
@@ -465,11 +472,11 @@ export async function getPerformanceSnapshot(): Promise<AdminProviderSnapshot> {
     return {
       id: 'pagespeed-crux',
       title: 'PageSpeed + CrUX',
-      status: crux ? 'configured' : 'partial',
+      status: hasCruxConfig ? 'configured' : 'partial',
       lastCheckedAt: nowIso(),
       freeTier: 'PageSpeed is free with optional API key; CrUX uses a free Google API key',
-      missingEnv: crux ? [] : ['CRUX_API_KEY'],
-      setupSteps: crux ? [] : [setupCommand('CRUX_API_KEY')],
+      missingEnv: hasCruxConfig ? [] : ['CRUX_API_KEY'],
+      setupSteps: hasCruxConfig ? [] : [setupCommand('CRUX_API_KEY')],
       sourceUrl: 'https://developers.google.com/speed/docs/insights/v5/get-started',
       cards: [
         { label: 'Mobile Perf', value: formatScore(mobileCategories.performance?.score), description: 'Lighthouse mobile performance' },
@@ -478,6 +485,11 @@ export async function getPerformanceSnapshot(): Promise<AdminProviderSnapshot> {
         { label: 'SEO', value: formatScore(mobileCategories.seo?.score), description: 'Mobile SEO score' },
       ],
       rows: [
+        ...(hasCruxConfig && !hasCruxRows ? [{
+          label: 'CrUX field data',
+          value: 'No data',
+          detail: 'Google has no public 28-day field dataset for this origin yet',
+        }] : []),
         ...Object.entries(cruxMetrics).map(([name, metric]) => ({
           label: name.replace(/_/g, ' '),
           value: String(metric.percentiles?.p75 ?? 'n/a'),
