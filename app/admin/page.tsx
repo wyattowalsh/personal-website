@@ -29,6 +29,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+export const maxDuration = 60;
+
 const visitorMetricIcons = [UsersRound, BarChart3, Eye, MousePointerClick] as const;
 
 function formatGeneratedAt(timestamp: string): string {

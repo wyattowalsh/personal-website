@@ -2,6 +2,7 @@ import 'server-only';
 
 const DEFAULT_POSTHOG_API_HOST = 'https://us.posthog.com';
 const ANALYTICS_WINDOW_DAYS = 30;
+const POSTHOG_QUERY_TIMEOUT_MS = 10_000;
 const INTERACTION_EVENTS = [
   'reading_progress',
   'time_on_page',
@@ -128,21 +129,35 @@ function eventList(): string {
 }
 
 async function queryPostHog(config: PostHogConfig, name: string, query: string): Promise<unknown[][]> {
-  const response = await fetch(`${config.apiHost}/api/projects/${config.projectId}/query/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.personalApiKey}`,
-    },
-    body: JSON.stringify({
-      name,
-      query: {
-        kind: 'HogQLQuery',
-        query,
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), POSTHOG_QUERY_TIMEOUT_MS);
+  let response: Response;
+
+  try {
+    response = await fetch(`${config.apiHost}/api/projects/${config.projectId}/query/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.personalApiKey}`,
       },
-    }),
-    cache: 'no-store',
-  });
+      body: JSON.stringify({
+        name,
+        query: {
+          kind: 'HogQLQuery',
+          query,
+        },
+      }),
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`PostHog query timed out after ${Math.round(POSTHOG_QUERY_TIMEOUT_MS / 1000)}s`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
 
   const payload = (await response.json().catch(() => ({}))) as PostHogQueryResponse;
 

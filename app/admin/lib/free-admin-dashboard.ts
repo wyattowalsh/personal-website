@@ -9,6 +9,8 @@ const DEFAULT_SITE_URL = 'https://www.w4w.dev';
 const DEFAULT_GITHUB_REPOSITORY = 'wyattowalsh/personal-website';
 const SEARCH_CONSOLE_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
+const DEFAULT_PROVIDER_TIMEOUT_MS = 10_000;
+const PAGESPEED_TIMEOUT_MS = 45_000;
 
 export type AdminProviderStatus = 'configured' | 'missing_config' | 'error' | 'partial';
 
@@ -178,6 +180,29 @@ function isMissing(value: string | undefined): boolean {
   return !value || value.trim() === '';
 }
 
+async function fetchWithTimeout(
+  input: RequestInfo | URL,
+  init: (RequestInit & { next?: { revalidate?: number } }) = {},
+  timeoutMs = DEFAULT_PROVIDER_TIMEOUT_MS
+): Promise<Response> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: init.signal ?? controller.signal,
+    });
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`Provider request timed out after ${Math.round(timeoutMs / 1000)}s`);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function configuredProvider(input: Omit<AdminProviderSnapshot, 'status' | 'lastCheckedAt' | 'missingEnv' | 'setupSteps' | 'error'>): AdminProviderSnapshot {
   return {
     ...input,
@@ -261,7 +286,7 @@ async function getGoogleAccessToken(): Promise<string> {
   const oauthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
   const oauthRefreshToken = process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
   if (oauthClientId && oauthClientSecret && oauthRefreshToken) {
-    const response = await fetch(GOOGLE_TOKEN_URL, {
+    const response = await fetchWithTimeout(GOOGLE_TOKEN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
@@ -300,7 +325,7 @@ async function getGoogleAccessToken(): Promise<string> {
   const signature = base64Url(signer.sign(privateKey));
   const assertion = `${unsigned}.${signature}`;
 
-  const response = await fetch(GOOGLE_TOKEN_URL, {
+  const response = await fetchWithTimeout(GOOGLE_TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -318,7 +343,7 @@ async function getGoogleAccessToken(): Promise<string> {
 
 async function querySearchConsole(accessToken: string, dimension: 'query' | 'page'): Promise<SearchConsoleRow[]> {
   const siteUrl = process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL || getSiteUrl();
-  const response = await fetch(
+  const response = await fetchWithTimeout(
     `https://www.googleapis.com/webmasters/v3/sites/${encodeURIComponent(siteUrl)}/searchAnalytics/query`,
     {
       method: 'POST',
@@ -424,7 +449,7 @@ async function fetchPageSpeed(strategy: 'mobile' | 'desktop'): Promise<PageSpeed
   }
   if (process.env.PAGESPEED_API_KEY) url.searchParams.set('key', process.env.PAGESPEED_API_KEY);
 
-  const response = await fetch(url, { next: { revalidate: 12 * 60 * 60 } });
+  const response = await fetchWithTimeout(url, { next: { revalidate: 12 * 60 * 60 } }, PAGESPEED_TIMEOUT_MS);
   const payload = (await response.json().catch(() => ({}))) as PageSpeedResponse;
   if (!response.ok) {
     throw new Error(payload.error?.message || `PageSpeed request failed with ${response.status}`);
@@ -437,7 +462,7 @@ async function fetchCrux(): Promise<CruxResponse | null> {
 
   const url = new URL('https://chromeuxreport.googleapis.com/v1/records:queryRecord');
   url.searchParams.set('key', process.env.CRUX_API_KEY ?? '');
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ origin: getSiteUrl(), formFactor: 'ALL_FORM_FACTORS' }),
@@ -531,7 +556,7 @@ export async function getVercelSnapshot(): Promise<AdminProviderSnapshot> {
     url.searchParams.set('target', 'production');
     if (process.env.VERCEL_TEAM_ID) url.searchParams.set('teamId', process.env.VERCEL_TEAM_ID);
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       headers: { Authorization: `Bearer ${process.env.VERCEL_TOKEN}` },
       next: { revalidate: 5 * 60 },
     });
@@ -584,7 +609,7 @@ export async function getGitHubSnapshot(): Promise<AdminProviderSnapshot> {
   }
 
   try {
-    const runsResponse = await fetch(`https://api.github.com/repos/${repository}/actions/runs?per_page=8`, {
+    const runsResponse = await fetchWithTimeout(`https://api.github.com/repos/${repository}/actions/runs?per_page=8`, {
       headers,
       next: { revalidate: 5 * 60 },
     });
@@ -596,7 +621,7 @@ export async function getGitHubSnapshot(): Promise<AdminProviderSnapshot> {
     let dependabotAlerts: GitHubDependabotResponseItem[] = [];
     let dependabotError: string | undefined;
     if (process.env.GITHUB_TOKEN) {
-      const dependabotResponse = await fetch(`https://api.github.com/repos/${repository}/dependabot/alerts?state=open&per_page=10`, {
+      const dependabotResponse = await fetchWithTimeout(`https://api.github.com/repos/${repository}/dependabot/alerts?state=open&per_page=10`, {
         headers,
         next: { revalidate: 5 * 60 },
       });
@@ -690,7 +715,7 @@ export async function getUptimeRobotSnapshot(): Promise<AdminProviderSnapshot> {
       body.set('monitors', process.env.UPTIMEROBOT_MONITOR_ID);
     }
 
-    const response = await fetch('https://api.uptimerobot.com/v2/getMonitors', {
+    const response = await fetchWithTimeout('https://api.uptimerobot.com/v2/getMonitors', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body,
