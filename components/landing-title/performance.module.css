@@ -1386,3 +1386,63 @@
     min-height: 3rem;
   }
 }
+
+/* Swarm refinement: stage instruments collapse without losing the performance cue. */
+
+@container (max-width: 28rem) {
+  .sceneAutomation,
+  .sceneRobotics,
+  .sceneNeural {
+    padding: 0.72rem;
+  }
+
+  .sceneAutomation .sceneBody,
+  .sceneRobotics .sceneBody,
+  .sceneNeural .sceneBody {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .sceneRobotics .titleBlock {
+    order: 0;
+    justify-self: stretch;
+    margin-left: 0;
+  }
+
+  .headlineWrap {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .iconBadge {
+    width: 2.12rem;
+    height: 2.12rem;
+  }
+
+  .sceneRig {
+    min-height: 7.2rem;
+  }
+}
+
+@container (max-width: 20rem) {
+  .title {
+    font-size: clamp(0.84rem, 6.25cqi, 1.04rem);
+    letter-spacing: 0;
+  }
+
+  .sceneRig {
+    min-height: 6.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .iconBadge,
+  .sceneRig {
+    transition: none;
+  }
+
+  .sceneRig::after {
+    opacity: 0.36;
+  }
+}

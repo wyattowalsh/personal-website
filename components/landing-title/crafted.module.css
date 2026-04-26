@@ -1785,3 +1785,56 @@
     min-height: 3rem;
   }
 }
+
+/* Swarm refinement: material cards stack gracefully in narrow audit frames. */
+
+@container (max-width: 28rem) {
+  .sceneAlchemist,
+  .sceneDigitalSculptor,
+  .sceneHolographicSculptor,
+  .sceneCyberDefense,
+  .sceneBlockchain,
+  .sceneFrontier {
+    padding: 0.72rem;
+  }
+
+  .sceneBody {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .titleBlock {
+    min-height: 0;
+  }
+
+  .sceneRig {
+    min-height: 7.25rem;
+  }
+}
+
+@container (max-width: 20rem) {
+  .title {
+    font-size: clamp(0.82rem, 6.25cqi, 1.02rem);
+  }
+
+  .titleBlock {
+    padding: 0.72rem;
+  }
+
+  .sceneRig {
+    min-height: 6.15rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .titleBlock,
+  .iconBadge,
+  .sceneRig {
+    transition: none;
+  }
+
+  .sceneRig::after {
+    opacity: 0.32;
+  }
+}

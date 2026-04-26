@@ -1,5 +1,202 @@
 /* Systems lane: control-bay chassis with sharper, plated silhouettes. */
 
+/* Swarm hardening: additive specificity overrides for systems title plates. */
+.scene.scene {
+  padding: clamp(0.72rem, 2.8cqi, 0.95rem);
+  color: color-mix(in oklab, var(--sys-text) 92%, white 8%);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sys-panel) 82%, white 7%), var(--sys-panel-2) 54%, var(--sys-panel-3)),
+    linear-gradient(90deg, var(--sys-struct-faint) 1px, transparent 1px),
+    linear-gradient(0deg, var(--sys-struct-faint) 1px, transparent 1px);
+}
+
+.sceneBody.sceneBody {
+  gap: clamp(0.62rem, 2.4cqi, 0.82rem);
+  min-height: clamp(11.35rem, 38cqi, 12.7rem);
+}
+
+.headlineWrap.headlineWrap {
+  gap: clamp(0.44rem, 1.8cqi, 0.66rem);
+  align-items: stretch;
+}
+
+.iconBadge.iconBadge {
+  width: clamp(2rem, 7.2cqi, 2.42rem);
+  height: clamp(2rem, 7.2cqi, 2.42rem);
+  align-self: start;
+  margin-top: 0.06rem;
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 84%, white 10%), var(--sys-panel-3)),
+    radial-gradient(circle at 50% 20%, var(--sys-glow-soft), transparent 62%);
+  box-shadow:
+    inset 0 1px 0 var(--sys-struct-strong),
+    inset 0 -1px 0 var(--sys-struct),
+    0 0 0 1px color-mix(in oklab, var(--sys-edge) 70%, transparent);
+}
+
+.titleLockup.titleLockup {
+  min-height: clamp(4.95rem, 16.5cqi, 5.65rem);
+  display: grid;
+  align-content: center;
+  padding: clamp(0.82rem, 2.7cqi, 1rem) clamp(0.86rem, 3.1cqi, 1.12rem);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 82%, white 9%), color-mix(in oklab, var(--sys-panel-3) 90%, black 6%)),
+    linear-gradient(135deg, color-mix(in oklab, var(--sys-struct) 82%, var(--sys-glow-strong) 18%), transparent 62%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--sys-struct-strong) 78%, white 12%),
+    inset 0 -1px 0 var(--sys-struct),
+    0 13px 30px var(--sys-glow-soft);
+}
+
+.title.title {
+  color: color-mix(in oklab, var(--sys-text) 90%, white 10%);
+  font-size: clamp(1rem, 4.8cqi, 1.58rem);
+  line-height: 1.03;
+  letter-spacing: clamp(0.018em, 0.38cqi, 0.045em);
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  text-shadow: 0 1px 10px color-mix(in oklab, var(--sys-glow-soft) 68%, transparent);
+}
+
+.sceneRig.sceneRig {
+  min-height: clamp(9.75rem, 32cqi, 11.15rem);
+}
+
+.sceneCybernetic.sceneCybernetic .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(5.8rem, 6.6rem);
+}
+
+.sceneCybernetic.sceneCybernetic .titleBlock {
+  max-width: 14.25rem;
+}
+
+.sceneCybernetic.sceneCybernetic .titleLockup {
+  border-color: color-mix(in oklab, var(--sys-edge) 76%, var(--sys-glow-strong) 24%);
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 82%, var(--sys-glow-strong) 8%), var(--sys-panel-3)),
+    linear-gradient(120deg, var(--sys-struct), transparent 60%);
+}
+
+.sceneZeroTrust.sceneZeroTrust .sceneBody {
+  grid-template-columns: minmax(6.2rem, 7.45rem) minmax(0, 1fr);
+}
+
+.sceneZeroTrust.sceneZeroTrust .titleBlock {
+  max-width: 14.4rem;
+}
+
+.sceneZeroTrust.sceneZeroTrust .titleLockup {
+  border-color: color-mix(in oklab, var(--sys-edge) 72%, var(--sys-glow-strong) 28%);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--sys-struct-strong) 62%, transparent),
+    inset 0 1px 0 color-mix(in oklab, var(--sys-struct-strong) 82%, white 10%),
+    0 14px 34px var(--sys-glow-soft);
+}
+
+.sceneCognitive.sceneCognitive .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(6.05rem, 7.15rem);
+}
+
+.sceneCognitive.sceneCognitive .titleBlock {
+  max-width: 14.6rem;
+}
+
+.sceneCognitive.sceneCognitive .titleLockup {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 78%, white 10%), color-mix(in oklab, var(--sys-panel-3) 92%, black 7%)),
+    radial-gradient(circle at 12% 20%, var(--sys-glow-soft), transparent 58%);
+}
+
+.sceneQuantum.sceneQuantum .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(5.9rem, 7rem);
+}
+
+.sceneQuantum.sceneQuantum .titleBlock {
+  max-width: 14.1rem;
+}
+
+.sceneQuantum.sceneQuantum .title {
+  font-size: clamp(1.04rem, 4.7cqi, 1.52rem);
+  letter-spacing: clamp(0.02em, 0.34cqi, 0.038em);
+}
+
+.scenePlatform.scenePlatform .sceneBody {
+  grid-template-columns: minmax(6.3rem, 7.55rem) minmax(0, 1fr);
+}
+
+.scenePlatform.scenePlatform .titleBlock {
+  max-width: 14.75rem;
+}
+
+.scenePlatform.scenePlatform .titleLockup {
+  background:
+    linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 80%, white 9%), var(--sys-panel-3)),
+    linear-gradient(90deg, color-mix(in oklab, var(--sys-struct) 70%, transparent), transparent 64%);
+}
+
+.sceneCartographer.sceneCartographer .sceneBody {
+  grid-template-columns: minmax(0, 1fr) minmax(6.05rem, 7.2rem);
+}
+
+.sceneCartographer.sceneCartographer .titleBlock {
+  max-width: 14.95rem;
+}
+
+.sceneCartographer.sceneCartographer .title {
+  font-size: clamp(0.98rem, 4.3cqi, 1.42rem);
+  letter-spacing: clamp(0.014em, 0.32cqi, 0.036em);
+}
+
+.sceneOrchestrator.sceneOrchestrator .sceneBody {
+  grid-template-columns: minmax(6.35rem, 7.7rem) minmax(0, 1fr);
+}
+
+.sceneOrchestrator.sceneOrchestrator .titleBlock {
+  max-width: 15.05rem;
+}
+
+.sceneOrchestrator.sceneOrchestrator .title {
+  font-size: clamp(0.96rem, 4.15cqi, 1.38rem);
+  letter-spacing: clamp(0.01em, 0.28cqi, 0.03em);
+}
+
+@container (max-width: 26rem) {
+  .sceneBody.sceneBody,
+  .sceneCybernetic.sceneCybernetic .sceneBody,
+  .sceneZeroTrust.sceneZeroTrust .sceneBody,
+  .sceneCognitive.sceneCognitive .sceneBody,
+  .sceneQuantum.sceneQuantum .sceneBody,
+  .scenePlatform.scenePlatform .sceneBody,
+  .sceneCartographer.sceneCartographer .sceneBody,
+  .sceneOrchestrator.sceneOrchestrator .sceneBody {
+    grid-template-columns: 1fr;
+  }
+
+  .headlineWrap.headlineWrap {
+    grid-template-columns: minmax(1.82rem, auto) minmax(0, 1fr);
+    gap: 0.42rem;
+  }
+
+  .iconBadge.iconBadge {
+    width: 1.92rem;
+    height: 1.92rem;
+  }
+
+  .titleLockup.titleLockup {
+    min-height: 4.34rem;
+    padding: 0.74rem 0.78rem 0.76rem;
+  }
+
+  .title.title,
+  .sceneQuantum.sceneQuantum .title,
+  .sceneCartographer.sceneCartographer .title,
+  .sceneOrchestrator.sceneOrchestrator .title {
+    font-size: clamp(0.92rem, 7.2cqi, 1.16rem);
+    line-height: 1.05;
+    letter-spacing: 0.014em;
+  }
+}
+
 .cluster {
   container-type: inline-size;
   width: 100%;
@@ -1881,4 +2078,59 @@
 .sceneCybernetic .title {
   font-size: clamp(0.98rem, 1.26vw, 1.32rem);
   letter-spacing: 0.04em;
+}
+
+/* Swarm refinement: mobile-first composition and reduced-motion stability. */
+
+@container (max-width: 28rem) {
+  .scene {
+    padding: 0.72rem;
+  }
+
+  .sceneBody {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .headlineWrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .iconBadge {
+    width: 2.08rem;
+    height: 2.08rem;
+  }
+
+  .sceneRig {
+    min-height: 7.4rem;
+  }
+}
+
+@container (max-width: 20rem) {
+  .scene {
+    clip-path: polygon(0 14px, 14px 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  }
+
+  .title {
+    font-size: clamp(0.8rem, 6.1cqi, 1rem);
+    letter-spacing: 0.01em;
+  }
+
+  .sceneRig {
+    min-height: 6.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .iconBadge,
+  .sceneRig {
+    transition: none;
+  }
+
+  .sceneRig::after {
+    opacity: 0.36;
+  }
 }

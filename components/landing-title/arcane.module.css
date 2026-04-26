@@ -1561,3 +1561,65 @@
     min-height: 3rem;
   }
 }
+
+/* Swarm refinement: ritual scenes keep their title-first hierarchy on phones. */
+
+@container (max-width: 28rem) {
+  .scene {
+    min-height: 0;
+    padding: 0.72rem;
+  }
+
+  .sceneBody {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+
+  .headlineWrap {
+    justify-items: center;
+    text-align: center;
+  }
+
+  .iconBadge {
+    width: 2.12rem;
+    height: 2.12rem;
+  }
+
+  .sceneRig {
+    min-height: 7.25rem;
+  }
+
+  .shellSeal {
+    width: 2.2rem;
+    height: 2.2rem;
+    opacity: 0.7;
+  }
+
+  .shellHalo {
+    opacity: 0.24;
+  }
+}
+
+@container (max-width: 20rem) {
+  .title {
+    font-size: clamp(0.82rem, 6.2cqi, 1.02rem);
+    letter-spacing: 0;
+  }
+
+  .sceneRig {
+    min-height: 6.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene,
+  .iconBadge,
+  .sceneRig {
+    transition: none;
+  }
+
+  .shellHalo,
+  .shellSeal {
+    opacity: 0.28;
+  }
+}
