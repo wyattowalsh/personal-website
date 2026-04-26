@@ -8,69 +8,94 @@ created: "2026-04-26"
 updated: "2026-04-26"
 ---
 
-Most agent workflows start as scattered prompt fragments. A review prompt lives in one tool, a docs prompt lives in another, shell habits sit in a dotfile, and the install story changes with whichever agent you opened that day.
-
-I built Agents to make that mess versioned, portable, and inspectable.
+Prompts drift. Skills fork. Agent configs rot. I built Agents so the operational layer around my coding agents would live in git instead of in clipboard history.
 
 <div className="flex flex-wrap gap-2 my-4">
   <Badge variant="default">47 Skills</Badge>
-  <Badge variant="secondary">30 MCP Tools Configured</Badge>
+  <Badge variant="secondary">30 MCP Tools</Badge>
   <Badge variant="outline">MIT Licensed</Badge>
   <Badge variant="secondary">Python 3.13+</Badge>
-  <Badge variant="outline">Claude Code + Codex Plugins</Badge>
+  <Badge variant="outline">Claude + Codex Plugins</Badge>
   <Badge variant="default">Validation Gated</Badge>
 </div>
 
 - **GitHub**: [github.com/wyattowalsh/agents](https://github.com/wyattowalsh/agents)
 - **Docs**: [agents.w4w.dev](https://agents.w4w.dev)
-- **Quick start**: install the full catalog or a focused skill from the [Installation](#installation) section.
+- **Start Here**: [agents.w4w.dev/start-here](https://agents.w4w.dev/start-here/)
+- **Skills**: [agents.w4w.dev/skills](https://agents.w4w.dev/skills/)
+- **CLI**: [agents.w4w.dev/cli](https://agents.w4w.dev/cli/)
+- **MCP**: [agents.w4w.dev/mcp](https://agents.w4w.dev/mcp/)
+
+```bash
+npx skills add github:wyattowalsh/agents --all -y -g --agent claude-code --agent codex --agent gemini-cli --agent antigravity --agent github-copilot --agent opencode
+```
 
 ---
 
 ## The Problem
 
 <Callout type="warning">
-Agent behavior is only as consistent as the instructions, skills, and tools that reach the runtime. If those assets are copied by hand, they drift.
+Agent workflows get brittle when the instructions, tools, and review habits that make them useful are copied by hand from one runtime to another.
 </Callout>
 
-Coding agents are getting better at using tools, reading repositories, and carrying out longer workflows. The hard part is no longer writing one good prompt. The hard part is keeping a useful workflow alive across Claude Code, Codex, Gemini CLI, GitHub Copilot, OpenCode, Cursor, Crush, and whatever comes next.
+The failure mode is familiar: I improve a review workflow in Claude Code, then forget to update the Codex version. I tune a docs prompt in one repo, but the global instruction file still says something older. I add a safer install command, but the next agent run finds the stale one first.
 
-Without a source of truth, every improvement becomes local folklore. A good code-review rubric stays in one chat. A safer install command is fixed in one README but not another. A docs workflow changes, but the prompt that tells the agent how to run it keeps pointing at the old path.
+<Mermaid chart={`
+flowchart LR
+    Idea[Useful workflow] --> Copy[Copy into one tool]
+    Copy --> Fork[Another tool needs it]
+    Fork --> Patch[Patch by hand]
+    Patch --> Drift[Versions drift]
+    Drift --> Rediscover[Rediscover the same fix]
+    Rediscover --> Patch
 
-That is the failure mode Agents is designed around. It treats skills, shared instructions, MCP configuration, packaging metadata, and docs as repo-owned artifacts instead of personal clipboard state.
+    style Drift fill:#fee2e2,stroke:#ef4444
+    style Rediscover fill:#fff7ed,stroke:#f97316
+`} title="Prompt and config drift" />
+
+That is manageable for one prompt. It breaks down when the setup becomes a working system: review skills, prompt-engineering workflows, MCP server builders, docs stewards, language conventions, install targets, hooks, evals, and public docs.
+
+Agents is my answer to that problem: make the agent asset layer boring enough to review, validate, install, and update like software.
+
+---
 
 ## What Agents Does
 
-Agents is a control plane for AI-agent assets. Today it primarily ships portable skills, shared instruction files, MCP configuration, docs, plugin metadata, and the `wagents` CLI that validates and packages the system.
+<Callout type="success">
+Agents packages reusable agent workflows as source-controlled skills, instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
+</Callout>
 
-The smallest useful unit is a skill: a focused, named workflow with frontmatter, invocation guidance, references, hooks, evals, or helper scripts when needed. The catalog currently contains 47 skills, ranging from code review and prompt engineering to MCP creation, docs stewardship, shell conventions, security scanning, and release planning.
+The smallest useful unit is a skill: a focused workflow with frontmatter, invocation guidance, references, hooks, evals, or helper scripts when the workflow needs them. The repo currently carries 47 skills, covering everything from code review to MCP creation, release planning, docs stewardship, shell conventions, and prompt engineering.
 
-The important part is not the count. The important part is that the workflows are inspectable files. They can be reviewed in git, validated in CI, installed into multiple agents, and improved without depending on memory or hidden product state.
+The important part is not the exact count. The important part is that the workflow is a file. It can be reviewed, tested, linked, installed, and improved without relying on hidden tool state.
 
-<Details summary="Current snapshot">
-
-| Signal | Source-backed state |
+| Snapshot | Source-backed state |
 | --- | --- |
-| Skills | 47 `SKILL.md` definitions in the catalog |
-| MCP | 30 configured MCP tools documented from `mcp.json` |
-| Docs | Public docs at `agents.w4w.dev` |
-| License | MIT |
-| Validation | `wagents validate` returns zero catalog errors in the local checkout |
+| Skills | 47 `SKILL.md` definitions in [`skills/`](https://github.com/wyattowalsh/agents/tree/main/skills) |
+| MCP tools | 30 configured tools documented from [`mcp.json`](https://github.com/wyattowalsh/agents/blob/main/mcp.json) |
+| CLI | [`wagents`](https://github.com/wyattowalsh/agents/blob/main/pyproject.toml) package with a `wagents` entry point |
+| Docs | Public reference site at [agents.w4w.dev](https://agents.w4w.dev) |
+| License | [MIT](https://github.com/wyattowalsh/agents/blob/main/LICENSE) |
+
+<Details summary="Representative skills">
+
+| Skill | What it is for |
+| --- | --- |
+| [`honest-review`](https://agents.w4w.dev/skills/honest-review/) | Evidence-scored code review with structured findings. |
+| [`mcp-creator`](https://agents.w4w.dev/skills/mcp-creator/) | Building MCP servers with design, implementation, and validation guidance. |
+| [`skill-creator`](https://agents.w4w.dev/skills/skill-creator/) | Creating, improving, auditing, and packaging skills. |
+| [`prompt-engineer`](https://agents.w4w.dev/skills/prompt-engineer/) | Prompt design, hardening, conversion, and PromptOps planning. |
+| [`docs-steward`](https://agents.w4w.dev/skills/docs-steward/) | Keeping documentation systems current and coherent. |
+| [`python-conventions`](https://agents.w4w.dev/skills/python-conventions/) | Python tooling and repo-convention guidance. |
+| [`javascript-conventions`](https://agents.w4w.dev/skills/javascript-conventions/) | JavaScript and TypeScript tooling conventions. |
 
 </Details>
 
-| Surface | Role |
-| --- | --- |
-| `skills/` | Source of truth for portable skill definitions and references. |
-| `instructions/` | Shared operating rules and platform-specific instruction sources. |
-| `mcp.json` and MCP config | Tool configuration that can travel with the agent stack. |
-| `.claude-plugin/` and `.codex-plugin/` | Native plugin adapters for supported runtimes. |
-| `docs/` | Generated and curated public documentation at `agents.w4w.dev`. |
-| `wagents/` | Python CLI for validation, packaging, docs generation, install support, and catalog inspection. |
+---
 
 ## Architecture
 
-At a high level, Agents keeps the source files plain and makes the automation strict. Skills and instructions live in the repo. The CLI reads them, validates contracts, generates docs, and packages or installs them through the appropriate distribution path.
+At a high level, Agents is a repo-first distribution pipeline. Source files feed `wagents`; `wagents` validates and renders the catalog; docs and install paths expose the same source to different agent runtimes.
 
 <Mermaid chart={`
 flowchart LR
@@ -78,68 +103,140 @@ flowchart LR
         Skills["skills/*/SKILL.md"]
         Instructions["instructions/*"]
         MCP["mcp.json"]
-        Plugins["plugin metadata"]
+        Plugins[".claude-plugin / .codex-plugin"]
+        Workflows[".github/workflows"]
     end
 
     CLI["wagents CLI"]
     Docs["agents.w4w.dev"]
-    CI["CI validation"]
-    Install["skills CLI / plugins"]
+    Package["skill packages"]
+    Install["skills CLI"]
+    Native["runtime plugins"]
     Runtimes["Claude Code, Codex, Gemini, Copilot, OpenCode, Cursor"]
 
     Skills --> CLI
     Instructions --> CLI
     MCP --> CLI
     Plugins --> CLI
+    Workflows --> CLI
     CLI --> Docs
-    CLI --> CI
-    CLI --> Install
+    CLI --> Package
+    Package --> Install
+    Plugins --> Native
     Install --> Runtimes
+    Native --> Runtimes
 
     style Source fill:#ecfeff,stroke:#0891b2
     style CLI fill:#eef2ff,stroke:#4f46e5
     style Runtimes fill:#f0fdf4,stroke:#16a34a
-`} />
+`} title="Agents distribution pipeline" />
 
-That shape keeps the repo extensible. Adding a workflow should be a file addition plus validation, not a private ritual. Changing an install command should update the docs and pass the same checks as the rest of the catalog.
+Every layer is visible:
 
-The `wagents` CLI is the connective tissue. It can scaffold new assets, validate naming and metadata, inspect hooks and evals, regenerate docs, package skills, and install selected skills into supported agents.
+| Surface | Role | Reference |
+| --- | --- | --- |
+| `README.md` | Public repo overview and quick start | [source](https://github.com/wyattowalsh/agents/blob/main/README.md) |
+| `pyproject.toml` | `wagents` package metadata and Python version | [source](https://github.com/wyattowalsh/agents/blob/main/pyproject.toml) |
+| `mcp.json` | Configured MCP tool surface | [source](https://github.com/wyattowalsh/agents/blob/main/mcp.json) |
+| `.claude-plugin/plugin.json` | Claude Code plugin metadata | [source](https://github.com/wyattowalsh/agents/blob/main/.claude-plugin/plugin.json) |
+| `.codex-plugin/plugin.json` | Codex plugin metadata | [source](https://github.com/wyattowalsh/agents/blob/main/.codex-plugin/plugin.json) |
+| `.github/workflows/ci.yml` | CI validation, tests, typecheck, docs build | [source](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
+| `.github/workflows/release-skills.yml` | Strict audit and release packaging | [source](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/release-skills.yml) |
 
-```bash
-uv run wagents validate
-uv run wagents eval validate
-uv run wagents hooks validate
-uv run wagents docs generate
-uv run wagents package skill-creator --dry-run
-```
+The repo is not trying to hide runtime differences. Claude Code, Codex, Gemini CLI, GitHub Copilot, OpenCode, Cursor, Crush, and Antigravity all have different expectations. Agents keeps the canonical files in one place and exposes the adapters around them.
 
-Those commands are the enforcement layer that makes the catalog feel like software instead of a pile of prompts.
+---
 
-## Installation
+## Skill Catalog
 
-The public install path uses the `skills` CLI. You can install the full catalog globally:
+The catalog is intentionally broad, but the pattern is consistent: each skill names the work it owns, says when to use it, says when not to use it, and can carry references, helper scripts, hooks, or evals when plain instructions are not enough.
+
+<Callout type="info">
+I want skills to behave more like small operational packages than pasted prompts: inspectable, documented, versioned, and validated.
+</Callout>
+
+<Details summary="Source files behind the catalog">
+
+- [`skills/`](https://github.com/wyattowalsh/agents/tree/main/skills) contains repo-owned skill definitions.
+- [`docs/src/content/docs/skills/`](https://github.com/wyattowalsh/agents/tree/main/docs/src/content/docs/skills) contains generated and curated public skill pages.
+- [`wagents/catalog.py`](https://github.com/wyattowalsh/agents/blob/main/wagents/catalog.py) scans skills, agents, MCP servers, and relationships.
+- [`wagents/cli.py`](https://github.com/wyattowalsh/agents/blob/main/wagents/cli.py) exposes validation, docs, hooks, evals, package, install, and skill-index commands.
+- [`skills/skill-creator/scripts/audit.py`](https://github.com/wyattowalsh/agents/blob/main/skills/skill-creator/scripts/audit.py) audits skills for structure and quality gates.
+
+</Details>
+
+That source layout matters because the catalog can grow without turning into a private notebook. A new skill can be added, documented, linked to related skills, validated, and packaged from the same repo.
+
+---
+
+## Distribution Paths
+
+Agents ships through multiple paths because agent runtimes do not all consume the same shape of asset.
+
+<Tabs defaultValue="full">
+  <TabsList>
+    <TabsTrigger value="full">Full Catalog</TabsTrigger>
+    <TabsTrigger value="focused">Focused Skill</TabsTrigger>
+    <TabsTrigger value="plugins">Plugins</TabsTrigger>
+    <TabsTrigger value="local">Local Checks</TabsTrigger>
+  </TabsList>
+
+  <TabsContent value="full">
+
+<CodeFilename>install-full.sh</CodeFilename>
 
 ```bash
 npx skills add github:wyattowalsh/agents --all -y -g --agent claude-code --agent codex --agent gemini-cli --agent antigravity --agent github-copilot --agent opencode
 ```
 
-Or install a focused skill:
+  </TabsContent>
+
+  <TabsContent value="focused">
+
+<CodeFilename>install-skill.sh</CodeFilename>
 
 ```bash
 npx skills add github:wyattowalsh/agents --skill honest-review -y -g --agent claude-code --agent codex
 ```
 
-The docs also describe native plugin distribution for Claude Code and Codex. That matters because not every agent runtime wants to consume skills the same way. Agents keeps the canonical source in one repo, then exposes runtime-specific adapters around it.
+  </TabsContent>
 
-<Callout type="info">
-The project is intentionally designed around multiple distribution paths: native plugin metadata where the runtime supports it, and the skills CLI as the portable fallback.
-</Callout>
+  <TabsContent value="plugins">
+
+| Runtime | Metadata |
+| --- | --- |
+| Claude Code | [`.claude-plugin/plugin.json`](https://github.com/wyattowalsh/agents/blob/main/.claude-plugin/plugin.json) and [marketplace metadata](https://github.com/wyattowalsh/agents/blob/main/.claude-plugin/marketplace.json) |
+| Codex | [`.codex-plugin/plugin.json`](https://github.com/wyattowalsh/agents/blob/main/.codex-plugin/plugin.json) and [repo marketplace metadata](https://github.com/wyattowalsh/agents/blob/main/.agents/plugins/marketplace.json) |
+| Other agents | [`npx skills add`](https://agents.w4w.dev/cli/) fallback install path |
+
+  </TabsContent>
+
+  <TabsContent value="local">
+
+<CodeFilename>validate.sh</CodeFilename>
+
+```bash
+uv run wagents validate
+uv run wagents eval validate
+uv run wagents hooks validate
+uv run wagents readme --check
+uv run wagents package skill-creator --dry-run
+```
+
+  </TabsContent>
+</Tabs>
+
+The adapter layer is not decorative. It keeps the same source files available through native plugin metadata where that exists and through the portable skills CLI everywhere else.
+
+---
 
 ## Validation and Release Discipline
 
-Agents has to validate itself because broken agent assets fail in subtle ways. A malformed frontmatter block, stale related-skill reference, invalid hook event, or out-of-date docs index might not show up until an agent tries to use the workflow.
+Agent assets fail differently than application code. A bad skill can still be valid Markdown. A stale install command can still look plausible. A hook can drift from the runtime event names it expects.
 
-At this post's first snapshot, the local checkout passed the core repository validator:
+That is why `wagents` is part of the project, not just a convenience script.
+
+<CodeFilename>snapshot-validator.json</CodeFilename>
 
 ```json
 {
@@ -150,41 +247,89 @@ At this post's first snapshot, the local checkout passed the core repository val
 }
 ```
 
-CI runs the same kind of checks at the repo boundary: Ruff lint and format checks, Ty typechecking, pytest, catalog validation, README freshness checks, docs generation, Astro checks, and a docs build. The release workflow adds strict skill audit and packaging verification before publishing tagged artifacts.
+The repo also runs those checks at the boundary.
 
-That validation stack is the difference between "I have some useful prompts" and "I can maintain an agent asset catalog as a project."
+| Gate | What it proves | Reference |
+| --- | --- | --- |
+| Ruff lint and format | Python code stays mechanically clean | [CI](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
+| Ty | Python types stay checked | [CI](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
+| pytest | CLI and helper behavior stay covered | [CI](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
+| `wagents validate` | Skill, agent, hook, and relationship contracts hold | [CLI docs](https://agents.w4w.dev/cli/) |
+| `wagents readme --check` | Public README is not stale | [CI](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
+| Docs build | Generated and curated docs still compile | [CI](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
+| Strict skill audit | Release candidates pass the skill quality audit | [release workflow](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/release-skills.yml) |
 
-## Why Source-Control Agent Workflows
+<Details summary="Validation command map">
 
-The practical win is reviewability. When a workflow is a repo artifact, the same habits that work for application code start applying to agent behavior:
+```bash
+# Check repository assets
+uv run wagents validate
 
-| Habit | What it buys |
-| --- | --- |
-| Version control | A skill can be diffed, reverted, and discussed like code. |
-| Validation | Broken metadata, stale relationships, and docs drift can fail early. |
-| Distribution adapters | One canonical source can reach several runtimes without hand-copying. |
-| Docs generation | Public reference pages stay close to the files they describe. |
+# Check eval definitions
+uv run wagents eval validate
 
-That does not make agents deterministic. It makes the operating layer around them less accidental.
+# Check hook metadata
+uv run wagents hooks validate
+
+# Check generated README freshness
+uv run wagents readme --check
+
+# Package a skill without publishing it
+uv run wagents package skill-creator --dry-run
+
+# Build public docs
+pnpm --dir docs build
+```
+
+</Details>
+
+That validation stack is what moves the project from "useful prompts" toward maintainable agent infrastructure.
+
+---
 
 ## Trade-offs
 
-The project is still young. The public GitHub metadata does not currently show a latest release, and some surfaces are intentionally placeholders for future expansion. The repo-level `agents/` directory is reserved for bundled agent definitions, while the current emphasis is skills, shared instructions, MCP configuration, plugins, docs, and CLI tooling.
+Agents is still early. The public GitHub metadata did not show a latest release when I first wrote this post, and some surfaces are intentionally reserved for future expansion. The repo-level `agents/` directory, for example, is reserved for bundled agent definitions while the current emphasis is skills, shared instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
 
-There is also a cost to making agent workflows portable. Every runtime has its own expectations. Some support native plugin metadata. Some lean on global skill installs. Some can read repo-local instruction files directly. Agents does not hide that complexity; it tries to put it behind explicit files, commands, and validation gates.
+Exact counts also age. The catalog had 47 skills at this snapshot, and the docs described 30 configured MCP tools from `mcp.json`. Those numbers are useful orientation, not the durable claim.
 
-The other trade-off is that exact counts age. The catalog had 47 skills when I first published this, but the durable claim is broader: Agents is a versioned place to grow reusable agent workflows without scattering them across local tool state.
+The durable claim is simpler: reusable agent workflows should have a source of truth.
+
+---
 
 ## Next Steps
 
-The post can grow with the project in a few natural directions:
+The obvious next posts are more specific:
 
-- deeper walkthroughs for individual skills like `honest-review`, `mcp-creator`, `skill-creator`, and `prompt-engineer`
-- a practical guide to adding a new skill and getting it through validation
-- a closer look at plugin distribution for Claude Code and Codex
-- examples of MCP configuration moving from local setup into documented workflow surfaces
-- release notes once the package and tagged-release story becomes more formal
+- a walkthrough of building a new skill with [`skill-creator`](https://agents.w4w.dev/skills/skill-creator/)
+- a deep dive on [`honest-review`](https://agents.w4w.dev/skills/honest-review/) and confidence-scored review workflows
+- a practical guide to [`mcp-creator`](https://agents.w4w.dev/skills/mcp-creator/) and MCP server packaging
+- a look at Claude Code and Codex plugin distribution from the same repo source
+- a docs-generation pass from `SKILL.md` to public reference pages
 
-For now, Agents is the repo where I keep the operational layer of my coding-agent setup honest: the prompts, tools, docs, installs, and checks all have to live somewhere concrete.
+<div className="grid gap-4 md:grid-cols-2 my-8">
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <h3 className="text-lg font-semibold mt-0">GitHub</h3>
+    <p>Source code, workflows, plugin metadata, and skill definitions.</p>
+    <a href="https://github.com/wyattowalsh/agents">github.com/wyattowalsh/agents</a>
+  </Card>
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <h3 className="text-lg font-semibold mt-0">Docs</h3>
+    <p>Public catalog, setup guide, CLI reference, and MCP overview.</p>
+    <a href="https://agents.w4w.dev">agents.w4w.dev</a>
+  </Card>
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <h3 className="text-lg font-semibold mt-0">Skills Index</h3>
+    <p>Browse the current skill catalog and generated skill pages.</p>
+    <a href="https://agents.w4w.dev/skills/">agents.w4w.dev/skills</a>
+  </Card>
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <h3 className="text-lg font-semibold mt-0">CLI Reference</h3>
+    <p>Commands for validation, docs, packaging, hooks, evals, and install workflows.</p>
+    <a href="https://agents.w4w.dev/cli/">agents.w4w.dev/cli</a>
+  </Card>
+</div>
 
-That concrete place is [github.com/wyattowalsh/agents](https://github.com/wyattowalsh/agents).
+<Callout type="info">
+The project is open source and intentionally inspectable. If a workflow is worth reusing, I want it in a file that can be read, reviewed, linked, tested, and installed.
+</Callout>
