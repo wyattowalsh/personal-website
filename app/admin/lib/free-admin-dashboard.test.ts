@@ -303,6 +303,73 @@ describe('free admin dashboard providers', () => {
     });
   });
 
+  it('keeps GitHub workflows when a traffic endpoint fails', async () => {
+    process.env.GITHUB_TOKEN = 'github-token';
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(mockJsonResponse({
+        workflow_runs: [{
+          name: 'Deploy',
+          status: 'completed',
+          conclusion: 'success',
+          head_branch: 'master',
+          head_sha: 'abcdef1234567890',
+          run_started_at: '2026-04-25T12:00:00Z',
+        }],
+      }))
+      .mockResolvedValueOnce(mockJsonResponse([]))
+      .mockRejectedValueOnce(new Error('GitHub traffic timeout'))
+      .mockResolvedValueOnce(mockJsonResponse({ count: 7, uniques: 4 }))
+      .mockResolvedValueOnce(mockJsonResponse([{ path: '/wyattowalsh/personal-website', count: 12, uniques: 8 }]))
+      .mockResolvedValueOnce(mockJsonResponse([{ referrer: 'github.com', count: 5, uniques: 3 }]));
+
+    const snapshot = await getGitHubSnapshot();
+
+    expect(snapshot.status).toBe('partial');
+    expect(snapshot.error).toContain('GitHub traffic timeout');
+    expect(snapshot.cards[0]).toEqual({
+      label: 'Workflow Runs',
+      value: '1',
+      description: 'Recent GitHub Actions runs',
+    });
+    expect(snapshot.rows.some((row) => row.label === 'Deploy')).toBe(true);
+    expect(snapshot.rows.some((row) => row.label === '/wyattowalsh/personal-website')).toBe(true);
+  });
+
+  it('keeps successful GitHub traffic when Dependabot is unavailable', async () => {
+    process.env.GITHUB_TOKEN = 'github-token';
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(mockJsonResponse({
+        workflow_runs: [{
+          name: 'Deploy',
+          status: 'completed',
+          conclusion: 'success',
+          head_branch: 'master',
+          head_sha: 'abcdef1234567890',
+          run_started_at: '2026-04-25T12:00:00Z',
+        }],
+      }))
+      .mockResolvedValueOnce(mockJsonResponse({ message: 'Resource not accessible by integration' }, false, 403))
+      .mockResolvedValueOnce(mockJsonResponse({ count: 42, uniques: 20 }))
+      .mockResolvedValueOnce(mockJsonResponse({ count: 7, uniques: 4 }))
+      .mockResolvedValueOnce(mockJsonResponse([{ path: '/wyattowalsh/personal-website', count: 12, uniques: 8 }]))
+      .mockResolvedValueOnce(mockJsonResponse([{ referrer: 'github.com', count: 5, uniques: 3 }]));
+
+    const snapshot = await getGitHubSnapshot();
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.error).toBe('Resource not accessible by integration');
+    expect(snapshot.cards[2]).toEqual({
+      label: 'Repo Views',
+      value: '42',
+      description: 'GitHub traffic views, token required',
+    });
+    expect(snapshot.rows[0]).toEqual({
+      label: '/wyattowalsh/personal-website',
+      value: '12',
+      detail: '8 unique GitHub visitors',
+    });
+  });
+
   it('builds a dashboard snapshot with content health and setup panels', async () => {
     delete process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL;
     delete process.env.GOOGLE_OAUTH_CLIENT_ID;

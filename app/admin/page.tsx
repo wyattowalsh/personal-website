@@ -342,6 +342,15 @@ function costStatusClass(status: AdminCostStatus): string {
   }[status];
 }
 
+function signalSeverityClass(severity: AdminSignal['severity']): string {
+  return {
+    critical: 'border-destructive/35 bg-destructive/10 text-destructive',
+    action: 'border-[hsl(var(--chart-4)/0.35)] bg-[hsl(var(--chart-4)/0.1)] text-[hsl(var(--chart-4))]',
+    watch: 'border-[hsl(var(--chart-2)/0.35)] bg-[hsl(var(--chart-2)/0.1)] text-[hsl(var(--chart-2))]',
+    info: 'border-[hsl(var(--chart-1)/0.35)] bg-[hsl(var(--chart-1)/0.1)] text-[hsl(var(--chart-1))]',
+  }[severity];
+}
+
 function SignalsSection({
   signals,
   costLedger,
@@ -374,7 +383,7 @@ function SignalsSection({
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 space-y-2">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Badge variant="outline" className={cn('font-mono uppercase tracking-[0.14em]', costStatusClass(signal.severity === 'critical' ? 'disabled_paid_risk' : signal.severity === 'action' ? 'free_with_limit' : 'free'))}>
+                        <Badge variant="outline" className={cn('font-mono uppercase tracking-[0.14em]', signalSeverityClass(signal.severity))}>
                           {signal.severity}
                         </Badge>
                         <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">
@@ -469,13 +478,6 @@ function CostLedgerSection({ costLedger }: { costLedger: AdminCostLedgerItem[] }
 }
 
 function SignalConstellation({ signals }: { signals: AdminSignal[] }) {
-  const toneClass = {
-    critical: 'border-destructive/35 bg-destructive/10 text-destructive',
-    action: 'border-[hsl(var(--chart-4)/0.35)] bg-[hsl(var(--chart-4)/0.1)] text-[hsl(var(--chart-4))]',
-    watch: 'border-[hsl(var(--chart-2)/0.35)] bg-[hsl(var(--chart-2)/0.1)] text-[hsl(var(--chart-2))]',
-    info: 'border-[hsl(var(--chart-1)/0.35)] bg-[hsl(var(--chart-1)/0.1)] text-[hsl(var(--chart-1))]',
-  } satisfies Record<AdminSignal['severity'], string>;
-
   if (signals.length === 0) {
     return <EmptyState label="No signal clusters yet." />;
   }
@@ -483,7 +485,7 @@ function SignalConstellation({ signals }: { signals: AdminSignal[] }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       {signals.slice(0, 8).map((signal) => (
-        <div key={`constellation-${signal.id}`} className={cn('rounded-lg border p-3', toneClass[signal.severity])}>
+        <div key={`constellation-${signal.id}`} className={cn('rounded-lg border p-3', signalSeverityClass(signal.severity))}>
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-foreground">{signal.entity}</p>
@@ -598,10 +600,10 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
         </div>
 
-        <Tabs defaultValue="signals" className="space-y-6">
+        <Tabs defaultValue="visitors" className="space-y-6">
         <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-lg border border-border/80 bg-card/75 p-1">
-          <TabsTrigger value="signals" className="gap-2"><Sparkles className="size-4" />Signals</TabsTrigger>
           <TabsTrigger value="visitors" className="gap-2"><UsersRound className="size-4" />Visitors</TabsTrigger>
+          <TabsTrigger value="signals" className="gap-2"><Sparkles className="size-4" />Signals</TabsTrigger>
           <TabsTrigger value="growth" className="gap-2"><Search className="size-4" />Growth</TabsTrigger>
           <TabsTrigger value="performance" className="gap-2"><Gauge className="size-4" />Performance</TabsTrigger>
           <TabsTrigger value="operations" className="gap-2"><Siren className="size-4" />Operations</TabsTrigger>
@@ -609,12 +611,12 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           <TabsTrigger value="setup" className="gap-2"><Settings2 className="size-4" />Setup</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="signals">
-          <SignalsSection signals={dashboard.signals} costLedger={dashboard.costLedger} providers={providers} />
-        </TabsContent>
-
         <TabsContent value="visitors">
           <VisitorsSection analytics={dashboard.visitors} />
+        </TabsContent>
+
+        <TabsContent value="signals">
+          <SignalsSection signals={dashboard.signals} costLedger={dashboard.costLedger} providers={providers} />
         </TabsContent>
 
         <TabsContent value="growth">

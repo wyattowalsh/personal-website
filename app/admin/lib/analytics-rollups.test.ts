@@ -256,7 +256,7 @@ describe('analytics rollups', () => {
       expect(newerStart).toBe(newerEnd);
     });
 
-    it('does not group dimension queries by day', async () => {
+    it('groups dimension queries by actual UTC event day', async () => {
       configureEnv();
       const bodies: string[] = [];
       const fetchMock = vi.fn(async (_: unknown, init: RequestInit) => {
@@ -271,8 +271,47 @@ describe('analytics rollups', () => {
       const dimensionBodies = bodies.filter((body) => !body.includes('pageviews'));
       expect(dimensionBodies.length).toBe(8);
       for (const body of dimensionBodies) {
-        expect(body).not.toMatch(/GROUP BY[^"]*\bday\b/);
+        expect(body).toContain('SELECT toString(toDate(timestamp)) AS day');
+        expect(body).toMatch(/GROUP BY day,/);
       }
+    });
+
+    it('persists dimension rows using their returned event days', async () => {
+      configureEnv();
+      const jsonResponse = (results: unknown[][]) => ({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ results }),
+      }) as Response;
+      const fetchMock = vi.fn()
+        .mockResolvedValueOnce(jsonResponse([
+          ['2026-03-27', 2, 1, 1, 0, 0, 0],
+          ['2026-03-28', 3, 2, 2, 1, 0, 0],
+        ]))
+        .mockResolvedValueOnce(jsonResponse([
+          ['2026-03-27', '/older', '', 2, '1 visitors'],
+          ['2026-03-28', '/newer', '', 3, '2 visitors'],
+        ]));
+      for (let index = 0; index < 7; index += 1) {
+        fetchMock.mockResolvedValueOnce(emptyPostHogResponse());
+      }
+      vi.stubGlobal('fetch', fetchMock);
+      mockClient.execute.mockResolvedValue({ rows: [] });
+
+      const result = await refreshAnalyticsRollups(1);
+
+      expect(result.status).toBe('configured');
+      const dimensionInsert = mockClient.batch.mock.calls.find((call) => {
+        const statements = call[0];
+        return Array.isArray(statements)
+          && statements.some((statement) => String(statement.sql).includes('INSERT INTO analytics_rollup_dimensions'));
+      });
+      expect(dimensionInsert).toBeTruthy();
+      const statements = dimensionInsert?.[0] as Array<{ args: unknown[] }>;
+      expect(statements.map((statement) => statement.args.slice(0, 5))).toEqual([
+        ['2026-03-27', 'page', '/older', '', 2],
+        ['2026-03-28', 'page', '/newer', '', 3],
+      ]);
     });
   });
 });

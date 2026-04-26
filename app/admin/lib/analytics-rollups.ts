@@ -152,7 +152,6 @@ interface ChunkRange {
   startDay: string;
   endDay: string;
   spanDays: number;
-  representativeDay: string;
   startDateTime: string;
   endExclusiveDateTime: string;
 }
@@ -190,7 +189,6 @@ function buildChunkRanges(totalDays: number, chunkDays = ROLLUP_CHUNK_DAYS, now 
       startDay,
       endDay,
       spanDays: chunkSpan,
-      representativeDay: startDay,
       startDateTime: hogQlDateTime(startDay),
       endExclusiveDateTime: hogQlDateTime(endExclusiveDay),
     });
@@ -212,15 +210,15 @@ function dailyRowsFromPostHog(rows: unknown[][]): RollupDay[] {
   })).filter((row) => row.day !== 'unknown');
 }
 
-function dimensionRowsFromPostHog(rows: unknown[][], kind: RollupDimensionKind, day: string): RollupDimension[] {
+function dimensionRowsFromPostHog(rows: unknown[][], kind: RollupDimensionKind): RollupDimension[] {
   return rows.map((row) => ({
-    day,
+    day: toText(row[0], 'unknown'),
     kind,
-    label: toText(row[0], 'Unknown'),
-    detailKey: toText(row[1], ''),
-    value: toNumber(row[2]),
-    detail: typeof row[3] === 'string' && row[3] ? row[3] : undefined,
-  })).filter((row) => row.label !== 'Unknown');
+    label: toText(row[1], 'Unknown'),
+    detailKey: toText(row[2], ''),
+    value: toNumber(row[3]),
+    detail: typeof row[4] === 'string' && row[4] ? row[4] : undefined,
+  })).filter((row) => row.day !== 'unknown' && row.label !== 'Unknown');
 }
 
 async function upsertDailyRows(client: Client, rows: RollupDay[], updatedAt: string): Promise<void> {
@@ -275,13 +273,13 @@ async function insertDimensionRows(client: Client, rows: RollupDimension[], upda
 }
 
 function dimensionQuery(select: string, where: string, groupBy: string, orderBy = 'value DESC'): string {
-  return `SELECT ${select}
+  return `SELECT toString(toDate(timestamp)) AS day, ${select}
     FROM events
     WHERE timestamp >= toDateTime('{startDateTime}', 'UTC')
       AND timestamp < toDateTime('{endExclusiveDateTime}', 'UTC')
       AND ${where}
-    GROUP BY ${groupBy}
-    ORDER BY ${orderBy}
+    GROUP BY day, ${groupBy}
+    ORDER BY day ASC, ${orderBy}
     LIMIT 1000`;
 }
 
@@ -397,18 +395,17 @@ async function fetchPostHogChunk(chunk: ChunkRange): Promise<{ days: RollupDay[]
     ),
   ]);
 
-  const day = chunk.representativeDay;
   return {
     days: dailyRowsFromPostHog(daily),
     dimensions: [
-      ...dimensionRowsFromPostHog(pages, 'page', day),
-      ...dimensionRowsFromPostHog(referrers, 'referrer', day),
-      ...dimensionRowsFromPostHog(devices, 'device', day),
-      ...dimensionRowsFromPostHog(events, 'event', day),
-      ...dimensionRowsFromPostHog(searches, 'search', day),
-      ...dimensionRowsFromPostHog(outbound, 'outbound', day),
-      ...dimensionRowsFromPostHog(reading, 'reading_progress', day),
-      ...dimensionRowsFromPostHog(pageEvents, 'page_event', day),
+      ...dimensionRowsFromPostHog(pages, 'page'),
+      ...dimensionRowsFromPostHog(referrers, 'referrer'),
+      ...dimensionRowsFromPostHog(devices, 'device'),
+      ...dimensionRowsFromPostHog(events, 'event'),
+      ...dimensionRowsFromPostHog(searches, 'search'),
+      ...dimensionRowsFromPostHog(outbound, 'outbound'),
+      ...dimensionRowsFromPostHog(reading, 'reading_progress'),
+      ...dimensionRowsFromPostHog(pageEvents, 'page_event'),
     ],
   };
 }

@@ -253,6 +253,11 @@ interface GitHubTrafficReferrerItem {
   uniques?: number;
 }
 
+interface GitHubEndpointResult<T> {
+  data?: T;
+  error?: string;
+}
+
 function configuredProvider(input: Omit<AdminProviderSnapshot, 'status' | 'lastCheckedAt' | 'missingEnv' | 'setupSteps' | 'error'>): AdminProviderSnapshot {
   return {
     ...input,
@@ -321,6 +326,27 @@ function formatDate(value: string | number | undefined): string {
     hour: 'numeric',
     minute: '2-digit',
   }).format(date);
+}
+
+async function fetchOptionalGitHubEndpoint<T>(
+  url: string,
+  headers: HeadersInit,
+  label: string,
+  revalidate: number,
+): Promise<GitHubEndpointResult<T>> {
+  try {
+    const response = await fetchWithTimeout(url, {
+      headers,
+      next: { revalidate },
+    });
+    const payload = (await response.json().catch(() => ({}))) as T & { message?: string };
+    if (!response.ok) {
+      return { error: payload.message || `${label} request failed with ${response.status}` };
+    }
+    return { data: payload };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : `${label} request failed` };
+  }
 }
 
 function dayString(offsetDays: number): string {
@@ -684,72 +710,58 @@ export async function getGitHubSnapshot(): Promise<AdminProviderSnapshot> {
 
     if (process.env.GITHUB_TOKEN) {
       const [
-        dependabotResponse,
-        viewsResponse,
-        clonesResponse,
-        pathsResponse,
-        referrersResponse,
+        dependabotResult,
+        viewsResult,
+        clonesResult,
+        pathsResult,
+        referrersResult,
       ] = await Promise.all([
-        fetchWithTimeout(`https://api.github.com/repos/${repository}/dependabot/alerts?state=open&per_page=10`, {
+        fetchOptionalGitHubEndpoint<GitHubDependabotResponseItem[]>(
+          `https://api.github.com/repos/${repository}/dependabot/alerts?state=open&per_page=10`,
           headers,
-          next: { revalidate: 5 * 60 },
-        }),
-        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/views`, {
+          'Dependabot',
+          5 * 60,
+        ),
+        fetchOptionalGitHubEndpoint<GitHubTrafficCountResponse>(
+          `https://api.github.com/repos/${repository}/traffic/views`,
           headers,
-          next: { revalidate: 60 * 60 },
-        }),
-        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/clones`, {
+          'GitHub views',
+          60 * 60,
+        ),
+        fetchOptionalGitHubEndpoint<GitHubTrafficCountResponse>(
+          `https://api.github.com/repos/${repository}/traffic/clones`,
           headers,
-          next: { revalidate: 60 * 60 },
-        }),
-        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/popular/paths`, {
+          'GitHub clones',
+          60 * 60,
+        ),
+        fetchOptionalGitHubEndpoint<GitHubTrafficPathItem[]>(
+          `https://api.github.com/repos/${repository}/traffic/popular/paths`,
           headers,
-          next: { revalidate: 60 * 60 },
-        }),
-        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/popular/referrers`, {
+          'GitHub popular paths',
+          60 * 60,
+        ),
+        fetchOptionalGitHubEndpoint<GitHubTrafficReferrerItem[]>(
+          `https://api.github.com/repos/${repository}/traffic/popular/referrers`,
           headers,
-          next: { revalidate: 60 * 60 },
-        }),
+          'GitHub referrers',
+          60 * 60,
+        ),
       ]);
 
-      if (dependabotResponse.ok) {
-        dependabotAlerts = (await dependabotResponse.json().catch(() => [])) as GitHubDependabotResponseItem[];
-      } else {
-        const payload = (await dependabotResponse.json().catch(() => ({}))) as { message?: string };
-        dependabotError = payload.message || `Dependabot request failed with ${dependabotResponse.status}`;
-      }
-
-      if (viewsResponse.ok) {
-        trafficViews = (await viewsResponse.json().catch(() => ({}))) as GitHubTrafficCountResponse;
-      } else {
-        const payload = (await viewsResponse.json().catch(() => ({}))) as { message?: string };
-        trafficError = payload.message || `GitHub views request failed with ${viewsResponse.status}`;
-      }
-
-      if (clonesResponse.ok) {
-        trafficClones = (await clonesResponse.json().catch(() => ({}))) as GitHubTrafficCountResponse;
-      } else if (!trafficError) {
-        const payload = (await clonesResponse.json().catch(() => ({}))) as { message?: string };
-        trafficError = payload.message || `GitHub clones request failed with ${clonesResponse.status}`;
-      }
-
-      if (pathsResponse.ok) {
-        trafficPaths = (await pathsResponse.json().catch(() => [])) as GitHubTrafficPathItem[];
-      } else if (!trafficError) {
-        const payload = (await pathsResponse.json().catch(() => ({}))) as { message?: string };
-        trafficError = payload.message || `GitHub popular paths request failed with ${pathsResponse.status}`;
-      }
-
-      if (referrersResponse.ok) {
-        trafficReferrers = (await referrersResponse.json().catch(() => [])) as GitHubTrafficReferrerItem[];
-      } else if (!trafficError) {
-        const payload = (await referrersResponse.json().catch(() => ({}))) as { message?: string };
-        trafficError = payload.message || `GitHub referrers request failed with ${referrersResponse.status}`;
-      }
+      dependabotAlerts = dependabotResult.data ?? [];
+      dependabotError = dependabotResult.error;
+      trafficViews = viewsResult.data;
+      trafficClones = clonesResult.data;
+      trafficPaths = pathsResult.data ?? [];
+      trafficReferrers = referrersResult.data ?? [];
+      trafficError = [viewsResult.error, clonesResult.error, pathsResult.error, referrersResult.error]
+        .filter(Boolean)
+        .join('; ') || undefined;
     }
 
     const runs = runsPayload.workflow_runs ?? [];
     const failed = runs.filter((run) => run.conclusion && run.conclusion !== 'success').length;
+    const providerError = [dependabotError, trafficError].filter(Boolean).join('; ') || undefined;
 
     return {
       id: 'github',
@@ -760,7 +772,7 @@ export async function getGitHubSnapshot(): Promise<AdminProviderSnapshot> {
       missingEnv: process.env.GITHUB_TOKEN ? [] : ['GITHUB_TOKEN'],
       setupSteps: process.env.GITHUB_TOKEN ? [] : [setupCommand('GITHUB_TOKEN')],
       sourceUrl: 'https://docs.github.com/v3/actions/workflow-runs/',
-      error: dependabotError ?? trafficError,
+      error: providerError,
       cards: [
         { label: 'Workflow Runs', value: formatNumber(runs.length), description: 'Recent GitHub Actions runs' },
         { label: 'Failed Runs', value: formatNumber(failed), description: 'Recent non-success conclusions' },
@@ -1024,6 +1036,8 @@ function buildCostLedger(input: {
 }): AdminCostLedgerItem[] {
   const providerById = new Map(input.providers.map((provider) => [provider.id, provider]));
   const lookup = (id: string) => providerById.get(id);
+  const cardValue = (providerId: string, label: string, fallback: string) =>
+    lookup(providerId)?.cards.find((card) => card.label === label)?.value ?? fallback;
 
   return [
     {
@@ -1043,7 +1057,7 @@ function buildCostLedger(input: {
       title: 'Turso Rollups',
       status: lookup('analytics-rollups')?.status === 'configured' ? 'free' : 'free_with_limit',
       freeTier: 'Free libSQL storage for aggregate snapshots',
-      usage: lookup('analytics-rollups')?.cards.find((card) => card.label === 'Covered Days')?.value ?? '0',
+      usage: cardValue('analytics-rollups', 'Covered Days', '0'),
       cadence: 'Daily Vercel Cron refresh',
       guardrail: 'Store aggregates only; do not copy raw PostHog events',
       sourceUrl: 'https://turso.tech/pricing',
@@ -1054,7 +1068,7 @@ function buildCostLedger(input: {
       title: 'Vercel Cron + Deploys',
       status: lookup('vercel')?.status === 'configured' ? 'free' : 'free_with_limit',
       freeTier: 'Hobby cron supports daily schedules',
-      usage: lookup('vercel')?.cards.find((card) => card.label === 'Latest')?.value ?? 'n/a',
+      usage: cardValue('vercel', 'Latest', 'n/a'),
       cadence: 'One daily cron, API reads on dashboard load',
       guardrail: 'Keep scheduled refreshes at one daily job',
       sourceUrl: 'https://vercel.com/docs/cron-jobs/usage-and-pricing',
@@ -1065,7 +1079,7 @@ function buildCostLedger(input: {
       title: 'Search Console',
       status: lookup('search-console')?.status === 'configured' ? 'free' : 'free_with_limit',
       freeTier: 'Free API, subject to Google quotas',
-      usage: lookup('search-console')?.cards.find((card) => card.label === 'Queries')?.value ?? '0',
+      usage: cardValue('search-console', 'Queries', '0'),
       cadence: 'Daily query/page/device/country snapshots',
       guardrail: 'Use row limits and daily snapshots; no paid SEO APIs',
       sourceUrl: 'https://developers.google.com/webmaster-tools/pricing',
@@ -1076,7 +1090,7 @@ function buildCostLedger(input: {
       title: 'PageSpeed + CrUX',
       status: lookup('pagespeed-crux')?.status === 'configured' ? 'free' : 'free_with_limit',
       freeTier: 'Free PageSpeed API with optional free CrUX API key',
-      usage: lookup('pagespeed-crux')?.cards.find((card) => card.label === 'Mobile Perf')?.value ?? 'n/a',
+      usage: cardValue('pagespeed-crux', 'Mobile Perf', 'n/a'),
       cadence: 'Homepage daily; top pages rotate weekly',
       guardrail: 'Cap URL audits to homepage plus top pages',
       sourceUrl: 'https://developers.google.com/speed/docs/insights/v5/get-started',
@@ -1087,7 +1101,7 @@ function buildCostLedger(input: {
       title: 'GitHub Traffic',
       status: lookup('github')?.status === 'configured' ? 'free' : 'free_with_limit',
       freeTier: 'REST traffic and workflow APIs for the repository',
-      usage: lookup('github')?.cards.find((card) => card.label === 'Workflow Runs')?.value ?? '0',
+      usage: cardValue('github', 'Workflow Runs', '0'),
       cadence: 'Daily traffic/workflow/security snapshots',
       guardrail: 'Use existing token if present; public fallback stays partial',
       sourceUrl: 'https://docs.github.com/rest/metrics/traffic',
@@ -1098,7 +1112,7 @@ function buildCostLedger(input: {
       title: 'UptimeRobot',
       status: lookup('uptimerobot')?.status === 'configured' ? 'free' : 'free_with_limit',
       freeTier: 'Free monitor API for hobby/non-commercial use',
-      usage: lookup('uptimerobot')?.cards.find((card) => card.label === 'Status')?.value ?? 'n/a',
+      usage: cardValue('uptimerobot', 'Status', 'n/a'),
       cadence: 'Daily incident and response-time snapshot',
       guardrail: 'Keep monitor count within the free account',
       sourceUrl: 'https://uptimerobot.com/api/',
@@ -1124,6 +1138,9 @@ function buildSignals(input: {
 }): AdminSignal[] {
   const signals: AdminSignal[] = [];
   const add = (signal: AdminSignal) => signals.push(signal);
+  const providerById = new Map(input.providers.map((provider) => [provider.id, provider]));
+  const card = (providerId: string, label: string) =>
+    providerById.get(providerId)?.cards.find((item) => item.label === label);
 
   for (const provider of input.providers) {
     if (provider.status === 'error') {
@@ -1155,15 +1172,9 @@ function buildSignals(input: {
     }
   }
 
-  const metadataGaps = input.providers
-    .find((provider) => provider.id === 'content-health')
-    ?.cards.find((card) => card.label === 'Metadata Gaps');
-  const stalePosts = input.providers
-    .find((provider) => provider.id === 'content-health')
-    ?.cards.find((card) => card.label === 'Stale Posts');
-  const mobilePerf = input.providers
-    .find((provider) => provider.id === 'pagespeed-crux')
-    ?.cards.find((card) => card.label === 'Mobile Perf');
+  const metadataGaps = card('content-health', 'Metadata Gaps');
+  const stalePosts = card('content-health', 'Stale Posts');
+  const mobilePerf = card('pagespeed-crux', 'Mobile Perf');
   const setupRisk = input.costLedger.filter((item) => item.status === 'disabled_paid_risk');
 
   if (parseMetricNumber(metadataGaps?.value) > 0) {
