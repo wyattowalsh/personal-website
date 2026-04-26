@@ -29,22 +29,8 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
   const imageOpacity = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.8]);
   const imageRotate = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [0, 0] : [0, -5]);
 
-  // Enhanced animations
-  // Content starts visible — no hidden state that delays FCP/LCP
-  const pageVariants: Variants = {
-    visible: {
-      opacity: 1,
-      y: 0,
-    }
-  };
-
   // Image starts visible (no hidden state) to avoid delaying LCP
   const imageContainerVariants: Variants = {
-    visible: {
-      scale: 1,
-      opacity: 1,
-      rotate: 0,
-    },
     hover: prefersReducedMotion ? {} : {
       scale: 1.05,
       rotate: 5,
@@ -75,10 +61,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
   }, [prefersReducedMotion]);
 
   return (
-    <motion.div
-      initial={false}
-      animate="visible"
-      variants={pageVariants}
+    <div
       className={cn(
         "relative min-h-screen overflow-hidden -mt-14 sm:-mt-16",
         "bg-gradient-to-b from-background/30 via-background/35 to-background/45",
@@ -173,6 +156,6 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
             )}
         </motion.div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
