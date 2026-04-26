@@ -114,102 +114,103 @@ export function ParticleControls({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2"
+      className="fixed bottom-3 right-3 z-50 flex flex-col items-end gap-2 sm:bottom-4 sm:right-4"
     >
-      <motion.div
-        className={cn(
-          menuBaseStyles,
-          isOpen ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-        )}
-      >
-        <div className="flex flex-col gap-4">
-          {/* Density Controls */}
-          <div className="flex flex-col gap-1">
-            <span className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Density
-            </span>
-            <div className="flex gap-1">
-              {(['full', 'reduced', 'off'] as const).map((level) => (
-                <button
-                  key={level}
-                  onClick={() => onDensityChange(level)}
-                  aria-label={`Set particle density to ${level}`}
-                  className={cn(
-                    "flex-1 px-3 py-1.5 rounded-md text-xs font-medium capitalize",
-                    "transition-all duration-200",
-                    // Light mode
-                    "text-slate-600 hover:text-slate-900",
-                    "hover:bg-slate-200/50",
-                    // Dark mode
-                    "dark:text-slate-300 dark:hover:text-slate-100",
-                    "dark:hover:bg-slate-700/50",
-                    // Active state
-                    density === level && [
-                      "bg-slate-200/70 dark:bg-slate-700/70",
-                      "ring-2 ring-slate-400 dark:ring-slate-500"
-                    ],
-                    // Focus styles
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  )}
-                >
-                  {level}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Divider */}
-          <div className="h-px bg-slate-200 dark:bg-slate-700" />
-
-          {/* Config Selection */}
-          <div className="flex flex-col gap-2">
-            <span className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-              Styles
-            </span>
-
-            {groupedPresets.map(([family, familyPresets]) => (
-              <div key={family} className="flex flex-col gap-1.5">
-                <span className="px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
-                  {FAMILY_LABELS[family]}
-                </span>
-
-                {familyPresets.map((preset) => (
+      {isOpen ? (
+        <motion.div
+          initial={prefersReducedMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={menuBaseStyles}
+        >
+          <div className="flex flex-col gap-4">
+            {/* Density Controls */}
+            <div className="flex flex-col gap-1">
+              <span className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Density
+              </span>
+              <div className="flex gap-1">
+                {(['full', 'reduced', 'off'] as const).map((level) => (
                   <button
-                    key={preset.id}
-                    onClick={() => onConfigChange(preset.id)}
-                    aria-label={`Switch to ${preset.label}`}
+                    key={level}
+                    onClick={() => onDensityChange(level)}
+                    aria-label={`Set particle density to ${level}`}
                     className={cn(
-                      "rounded-xl px-3 py-2 text-left transition-all duration-200",
-                      "border border-transparent",
-                      "hover:bg-slate-200/50 hover:text-slate-900",
-                      "dark:hover:bg-slate-700/50 dark:hover:text-slate-100",
-                      currentPresetId === preset.id && [
+                      "flex-1 px-3 py-1.5 rounded-md text-xs font-medium capitalize",
+                      "transition-all duration-200",
+                      // Light mode
+                      "text-slate-600 hover:text-slate-900",
+                      "hover:bg-slate-200/50",
+                      // Dark mode
+                      "dark:text-slate-300 dark:hover:text-slate-100",
+                      "dark:hover:bg-slate-700/50",
+                      // Active state
+                      density === level && [
                         "bg-slate-200/70 dark:bg-slate-700/70",
-                        "border-slate-300/70 dark:border-slate-600/70",
+                        "ring-2 ring-slate-400 dark:ring-slate-500"
                       ],
+                      // Focus styles
                       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     )}
                   >
-                    <span className="block text-sm font-semibold text-slate-700 dark:text-slate-100">
-                      {preset.label}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
-                      {preset.mood} · {preset.description}
-                    </span>
+                    {level}
                   </button>
                 ))}
               </div>
-            ))}
+            </div>
+
+            {/* Divider */}
+            <div className="h-px bg-slate-200 dark:bg-slate-700" />
+
+            {/* Config Selection */}
+            <div className="flex flex-col gap-2">
+              <span className="px-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Styles
+              </span>
+
+              {groupedPresets.map(([family, familyPresets]) => (
+                <div key={family} className="flex flex-col gap-1.5">
+                  <span className="px-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500">
+                    {FAMILY_LABELS[family]}
+                  </span>
+
+                  {familyPresets.map((preset) => (
+                    <button
+                      key={preset.id}
+                      onClick={() => onConfigChange(preset.id)}
+                      aria-label={`Switch to ${preset.label}`}
+                      className={cn(
+                        "rounded-xl px-3 py-2 text-left transition-all duration-200",
+                        "border border-transparent",
+                        "hover:bg-slate-200/50 hover:text-slate-900",
+                        "dark:hover:bg-slate-700/50 dark:hover:text-slate-100",
+                        currentPresetId === preset.id && [
+                          "bg-slate-200/70 dark:bg-slate-700/70",
+                          "border-slate-300/70 dark:border-slate-600/70",
+                        ],
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                      )}
+                    >
+                      <span className="block text-sm font-semibold text-slate-700 dark:text-slate-100">
+                        {preset.label}
+                      </span>
+                      <span className="mt-0.5 block text-xs text-slate-500 dark:text-slate-400">
+                        {preset.mood} · {preset.description}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      ) : null}
 
       {currentPreset ? (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
-            "max-w-52 rounded-full border px-3 py-1.5 text-right shadow-lg backdrop-blur-md",
+            "hidden max-w-52 rounded-full border px-3 py-1.5 text-right shadow-lg backdrop-blur-md sm:block",
             "bg-white/80 border-slate-200 text-slate-700",
             "dark:bg-slate-800/80 dark:border-slate-700 dark:text-slate-200",
           )}

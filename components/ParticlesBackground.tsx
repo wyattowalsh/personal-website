@@ -24,9 +24,13 @@ interface ParticlesBackgroundProps {
 
 const PARTICLES_ID = 'tsparticles-homepage';
 const PARTICLE_HISTORY_LIMIT = 3;
+const DENSITY_STORAGE_KEY = 'tsparticles-density';
 const SUPPORTED_PARTICLE_FEATURES = new Set<ParticleFeature>(['slim', 'text', 'twinkle']);
 
 const getHistoryStorageKey = (theme: Theme) => `tsparticles-history:${theme}`;
+
+const isDensityLevel = (value: string | null): value is DensityLevel =>
+  value === 'full' || value === 'reduced' || value === 'off';
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
@@ -119,7 +123,6 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   const [configOptions, setConfigOptions] = useState<ISourceOptions | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  // Density state (localStorage persistence disabled temporarily)
   const [density, setDensity] = useState<DensityLevel>('full');
 
   // Initialize theme
@@ -226,6 +229,29 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
       resetParticles();
     };
   }, [resetParticles]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    try {
+      const storedDensity = window.localStorage.getItem(DENSITY_STORAGE_KEY);
+      if (isDensityLevel(storedDensity)) {
+        setDensity(storedDensity);
+      }
+    } catch {
+      // Ignore storage failures; controls remain usable for the current page view.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === 'undefined') return;
+
+    try {
+      window.localStorage.setItem(DENSITY_STORAGE_KEY, density);
+    } catch {
+      // Ignore storage failures; the in-memory density state is still authoritative.
+    }
+  }, [density, mounted]);
 
   // Handle engine initialization only when animated particles can be shown.
   useEffect(() => {
