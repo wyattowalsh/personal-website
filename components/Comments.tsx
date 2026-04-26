@@ -1,12 +1,18 @@
 "use client";
 
-import Giscus from "@giscus/react";
+import dynamic from "next/dynamic";
 import { useTheme } from "next-themes";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+
+const Giscus = dynamic(() => import("@giscus/react"), {
+	ssr: false,
+	loading: () => <div className="min-h-24 rounded-lg border border-border/40 bg-muted/20" />,
+});
 
 export function Comments() {
 	const { resolvedTheme } = useTheme();
 	const sectionRef = useRef<HTMLElement>(null);
+	const [isVisible, setIsVisible] = useState(false);
 
 	// Capture the initial theme so the Giscus component mounts once and never
 	// re-renders due to a theme prop change. All subsequent theme switches are
@@ -26,6 +32,26 @@ export function Comments() {
 	}, []);
 
 	useEffect(() => {
+		if (isVisible) return;
+		const node = sectionRef.current;
+		if (!node) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					setIsVisible(true);
+					observer.disconnect();
+				}
+			},
+			{ rootMargin: "600px 0px" },
+		);
+
+		observer.observe(node);
+		return () => observer.disconnect();
+	}, [isVisible]);
+
+	useEffect(() => {
+		if (!isVisible) return;
 		// Update theme in the existing Giscus iframe without remounting
 		const theme = resolvedTheme === "dark" ? "dark" : "light";
 		const sent = sendThemeMessage(theme);
@@ -44,25 +70,27 @@ export function Comments() {
 				return () => { clearTimeout(timeout); observer.disconnect(); };
 			}
 		}
-	}, [resolvedTheme, sendThemeMessage]);
+	}, [isVisible, resolvedTheme, sendThemeMessage]);
 
 	return (
-		<section ref={sectionRef}>
-			<Giscus
-				id="comments"
-				repo="wyattowalsh/personal-website"
-				repoId="MDEwOlJlcG9zaXRvcnkxNTgxOTI2MDk="
-				category="General"
-				categoryId="DIC_kwDOCW3T4c4CkPJr"
-				mapping="pathname"
-				strict="0"
-				reactionsEnabled="1"
-				emitMetadata="1"
-				inputPosition="bottom"
-				theme={initialTheme.current}
-				lang="en"
-				loading="lazy"
-			/>
+		<section ref={sectionRef} className="min-h-24">
+			{isVisible ? (
+				<Giscus
+					id="comments"
+					repo="wyattowalsh/personal-website"
+					repoId="MDEwOlJlcG9zaXRvcnkxNTgxOTI2MDk="
+					category="General"
+					categoryId="DIC_kwDOCW3T4c4CkPJr"
+					mapping="pathname"
+					strict="0"
+					reactionsEnabled="1"
+					emitMetadata="1"
+					inputPosition="bottom"
+					theme={initialTheme.current}
+					lang="en"
+					loading="lazy"
+				/>
+			) : null}
 		</section>
 	);
 }

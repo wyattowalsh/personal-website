@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
@@ -27,11 +27,33 @@ interface WebmentionResponse {
 
 export function Webmentions() {
   const pathname = usePathname();
+  const sectionRef = useRef<HTMLElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [mentions, setMentions] = useState<Webmention[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
   useEffect(() => {
+    const node = sectionRef.current;
+    if (!node || isVisible) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '600px 0px' },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
     const controller = new AbortController();
 
     // Build target URL from pathname
@@ -62,9 +84,10 @@ export function Webmentions() {
       .finally(() => setIsLoading(false));
 
     return () => controller.abort();
-  }, [pathname]);
+  }, [isVisible, pathname]);
 
   // Don't render if no mentions and not loading
+  if (!isVisible) return <section ref={sectionRef} className="my-8 min-h-1 max-w-5xl mx-auto" />;
   if (!isLoading && mentions.length === 0) return null;
   if (error) return null; // Fail silently
 
@@ -74,7 +97,7 @@ export function Webmentions() {
   const replies = mentions.filter(m => m['wm-property'] === 'in-reply-to');
 
   return (
-    <section className="my-8 max-w-5xl mx-auto">
+    <section ref={sectionRef} className="my-8 max-w-5xl mx-auto">
       <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
         <Globe className="h-5 w-5 text-primary" />
         Webmentions

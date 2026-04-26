@@ -1,7 +1,7 @@
 // components/SearchBar.tsx
 "use client";
 
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useDeferredValue, useState, useEffect, useMemo, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PostCard } from "./PostCard";
 import { Input } from "@/components/ui/input";
@@ -77,22 +77,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags,
 	// Ensure stable initial states
 	const [query, setQuery] = useState(initialQuery);
 	const [debouncedQuery, setDebouncedQuery] = useState(initialQuery);
-	const [results, setResults] = useState<PostMetadata[]>(() =>
-		getInitialResults(posts, initialQuery)
-	);
+	const deferredQuery = useDeferredValue(debouncedQuery, initialQuery);
 	const [selectedTags, setSelectedTags] = useState<string[]>([]);
 	const [sortMethod, setSortMethod] = useState<string>("date");
 	const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-
-	// Update mount effect to handle empty posts
-	useEffect(() => {
-		if (!posts?.length) {
-			setResults([]);
-			return;
-		}
-
-		setResults(getInitialResults(posts, currentUrlQuery));
-	}, [currentUrlQuery, posts]);
 
 	useEffect(() => {
 		setQuery(currentUrlQuery);
@@ -110,11 +98,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags,
 	const [fuse, setFuse] = useState<import('fuse.js').default<PostMetadata> | null>(null);
 
 	useEffect(() => {
-		if (!debouncedQuery.trim()) {
-			setFuse(null);
-			return;
-		}
-
 		let cancelled = false;
 
 		(async () => {
@@ -125,14 +108,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags,
 
 			if (cancelled) return;
 
-				const instance = new FuseRef.current(posts, {
-					keys: [
-						{ name: "title", weight: 1.0 },
-						{ name: "summary", weight: 0.8 },
-						{ name: "tags", weight: 0.9 },
-					],
-					includeScore: true,
-					threshold: 0.3,
+			const instance = new FuseRef.current(posts, {
+				keys: [
+					{ name: "title", weight: 1.0 },
+					{ name: "summary", weight: 0.8 },
+					{ name: "tags", weight: 0.9 },
+				],
+				includeScore: true,
+				threshold: 0.3,
 				ignoreLocation: true,
 				useExtendedSearch: true,
 				findAllMatches: true,
@@ -142,16 +125,15 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags,
 		})();
 
 		return () => { cancelled = true; };
-	}, [posts, debouncedQuery]);
+	}, [posts]);
 
-	// Update search effect to maintain sort order - use debouncedQuery instead of query
-	useEffect(() => {
-		let searchResults = debouncedQuery.trim()
-			? getInitialResults(posts, debouncedQuery)
+	const results = useMemo(() => {
+		let searchResults = deferredQuery.trim()
+			? getInitialResults(posts, deferredQuery)
 			: [...posts];
 
-		if (debouncedQuery.trim() && fuse) {
-			const fuseResults = fuse.search(debouncedQuery);
+		if (deferredQuery.trim() && fuse) {
+			const fuseResults = fuse.search(deferredQuery);
 			// Sort by score and map to items
 			searchResults = fuseResults
 				.sort((a, b) => (a.score || 0) - (b.score || 0))
@@ -174,8 +156,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({ posts, tags: unsortedTags,
 			return (getPostDate(b) - getPostDate(a)) * modifier;
 		});
 
-		setResults(searchResults);
-	}, [debouncedQuery, selectedTags, sortMethod, sortDirection, posts, fuse]);
+		return searchResults;
+	}, [deferredQuery, selectedTags, sortMethod, sortDirection, posts, fuse]);
 
 	useEffect(() => {
 		const trimmedQuery = debouncedQuery.trim();
