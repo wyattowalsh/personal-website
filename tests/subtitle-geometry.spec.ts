@@ -59,13 +59,19 @@ const VISUAL_SINGLE_CASES: readonly VisualSingleCase[] = [
   { name: 'mobile-320-automation', width: 320, height: 780, theme: 'dark', subtitleId: 'automation-virtuoso' },
 ];
 
-function subtitlesUrl(theme: SubtitleTheme, view: 'matrix' | 'single' = 'matrix', subtitleId?: string) {
+function subtitlesUrl(
+  theme: SubtitleTheme,
+  view: 'matrix' | 'single' = 'matrix',
+  subtitleId?: string,
+  overrides: Record<string, string> = {},
+) {
   return `/lab/subtitles?${new URLSearchParams({
     deck: '0',
     motion: 'reduced',
     ...(subtitleId ? { subtitle: subtitleId } : {}),
     theme,
     view,
+    ...overrides,
   }).toString()}`;
 }
 
@@ -289,6 +295,38 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
   }
 
   expect(failures).toEqual([]);
+  expect(browserIssues).toEqual([]);
+});
+
+test('subtitle audit matrix supports lane filtering with signal deck enabled', async ({ page }) => {
+  const browserIssues = watchBrowserIssues(page);
+  const expectedLaneCounts: Record<string, number> = {
+    arcane: 6,
+    crafted: 6,
+    performance: 3,
+    systems: 7,
+  };
+
+  await page.setViewportSize({ width: 834, height: 1000 });
+
+  for (const [lane, expectedCount] of Object.entries(expectedLaneCounts)) {
+    await page.goto(subtitlesUrl('dark', 'matrix', undefined, { deck: '1', lane }), { waitUntil: 'domcontentloaded' });
+    await page.locator('[data-subtitle-id]').first().waitFor();
+    await page.evaluate(() => document.fonts.ready);
+
+    await expect(page.locator('[data-subtitle-preview]')).toHaveAttribute(
+      'data-subtitle-loaded-count',
+      String(expectedCount),
+    );
+
+    const renderedLanes = await page.locator('[data-subtitle-id]').evaluateAll((nodes) => (
+      nodes.map((node) => (node as HTMLElement).dataset.subtitleLane)
+    ));
+
+    expect(renderedLanes).toHaveLength(expectedCount);
+    expect(new Set(renderedLanes)).toEqual(new Set([lane]));
+  }
+
   expect(browserIssues).toEqual([]);
 });
 
