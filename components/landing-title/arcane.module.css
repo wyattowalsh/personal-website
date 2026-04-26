@@ -1623,3 +1623,36 @@
     opacity: 0.28;
   }
 }
+
+/* Focused audit view: give longer ritual labels enough plate width. */
+
+@container (min-width: 28.01rem) {
+  .cluster:not(.clusterCompact) .sceneMage .titleBlock,
+  .cluster:not(.clusterCompact) .sceneConjurer .titleBlock,
+  .cluster:not(.clusterCompact) .sceneOracle .titleBlock {
+    width: 100%;
+    max-width: 12.75rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneMage .titleLockup,
+  .cluster:not(.clusterCompact) .sceneConjurer .titleLockup,
+  .cluster:not(.clusterCompact) .sceneOracle .titleLockup {
+    width: min(100%, 11.5rem);
+    max-width: 11.5rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneMage .title {
+    font-size: clamp(0.84rem, 1.02vw, 1.08rem);
+    letter-spacing: 0.01em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneConjurer .title {
+    font-size: clamp(0.84rem, 1.02vw, 1.08rem);
+    letter-spacing: 0.01em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneOracle .title {
+    font-size: clamp(0.82rem, 1vw, 1.04rem);
+    letter-spacing: 0.055em;
+  }
+}

@@ -57,6 +57,11 @@ const VISUAL_MATRIX_CASES: readonly VisualMatrixCase[] = [
   { name: 'mobile-320', width: 320, height: 1000, theme: 'dark' },
 ];
 
+const SINGLE_VIEW_GEOMETRY_CASES: readonly ViewportCase[] = [
+  { name: 'desktop', width: 1440, height: 900 },
+  { name: 'mobile-320', width: 320, height: 780 },
+];
+
 const VISUAL_SINGLE_CASES: readonly VisualSingleCase[] = [
   { name: 'desktop-cybernetic', width: 1440, height: 900, theme: 'dark', subtitleId: 'cybernetic-architect' },
   { name: 'mobile-320-automation', width: 320, height: 780, theme: 'dark', subtitleId: 'automation-virtuoso' },
@@ -107,6 +112,201 @@ function watchBrowserIssues(page: Page) {
   });
 
   return issues;
+}
+
+async function collectSubtitleTitleFailures(page: Page, selector = '[data-subtitle-id]') {
+  return page.locator(selector).evaluateAll((controls, thresholds) => {
+    function rectOf(element: Element) {
+      const rect = element.getBoundingClientRect();
+
+      return {
+        bottom: rect.bottom,
+        height: rect.height,
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        width: rect.width,
+      };
+    }
+
+    function unionRect(rects: DOMRect[]) {
+      if (rects.length === 0) {
+        return null;
+      }
+
+      const top = Math.min(...rects.map((rect) => rect.top));
+      const right = Math.max(...rects.map((rect) => rect.right));
+      const bottom = Math.max(...rects.map((rect) => rect.bottom));
+      const left = Math.min(...rects.map((rect) => rect.left));
+
+      return {
+        bottom,
+        height: bottom - top,
+        left,
+        right,
+        top,
+        width: right - left,
+      };
+    }
+
+    function minInset(inner: ReturnType<typeof rectOf>, outer: ReturnType<typeof rectOf>) {
+      return Math.min(
+        inner.top - outer.top,
+        outer.right - inner.right,
+        outer.bottom - inner.bottom,
+        inner.left - outer.left,
+      );
+    }
+
+    function escapes(inner: ReturnType<typeof rectOf>, outer: ReturnType<typeof rectOf>, tolerancePx = 1) {
+      return inner.left < outer.left - tolerancePx
+        || inner.top < outer.top - tolerancePx
+        || inner.right > outer.right + tolerancePx
+        || inner.bottom > outer.bottom + tolerancePx;
+    }
+
+    function textNodesFor(element: Element) {
+      const nodes: Text[] = [];
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      let node = walker.nextNode();
+
+      while (node) {
+        if (node.textContent?.trim()) {
+          nodes.push(node as Text);
+        }
+        node = walker.nextNode();
+      }
+
+      return nodes;
+    }
+
+    function isClipping(element: Element) {
+      const style = getComputedStyle(element);
+
+      return style.clipPath !== 'none'
+        || style.overflowX !== 'visible'
+        || style.overflowY !== 'visible';
+    }
+
+    function assertUnsplitWords(title: HTMLElement, failures: string[]) {
+      for (const textNode of textNodesFor(title)) {
+        const nodeText = textNode.textContent ?? '';
+        const words = nodeText.matchAll(/\S+/g);
+
+        for (const wordMatch of words) {
+          const word = wordMatch[0];
+
+          if (word.length <= 1 || wordMatch.index === undefined) {
+            continue;
+          }
+
+          const wordRange = document.createRange();
+          wordRange.setStart(textNode, wordMatch.index);
+          wordRange.setEnd(textNode, wordMatch.index + word.length);
+          const wordRects = [...wordRange.getClientRects()]
+            .filter((rect) => rect.width > 1 && rect.height > 1);
+          wordRange.detach();
+
+          if (wordRects.length > 1) {
+            failures.push(`word "${word}" splits across ${wordRects.length} lines`);
+          }
+        }
+      }
+    }
+
+    return controls.flatMap((control) => {
+      const element = control as HTMLElement;
+      const id = element.dataset.subtitleId ?? 'unknown';
+      const lane = element.dataset.subtitleLane ?? 'unknown';
+      const title = element.querySelector('h2') as HTMLElement | null;
+      const failures: string[] = [];
+
+      if (!title) {
+        return [`${id} (${lane}): missing h2`];
+      }
+
+      const text = title.textContent?.trim() ?? '';
+      const lockup = title.parentElement;
+      const scene = title.closest('section');
+      const range = document.createRange();
+      range.selectNodeContents(title);
+      const rangeRects = [...range.getClientRects()].filter((rect) => rect.width > 1 && rect.height > 1);
+      const textRect = unionRect(rangeRects) ?? rectOf(title);
+      range.detach();
+
+      const titleStyle = getComputedStyle(title);
+      const fontSize = Number.parseFloat(titleStyle.fontSize);
+      const hyphens = titleStyle.hyphens;
+      const overflowWrap = titleStyle.overflowWrap;
+      const wordBreak = titleStyle.wordBreak;
+
+      if (!text) {
+        failures.push('empty title text');
+      }
+
+      if (hyphens !== 'none') {
+        failures.push(`hyphens ${hyphens} !== none`);
+      }
+
+      if (overflowWrap === 'anywhere' || overflowWrap === 'break-word') {
+        failures.push(`overflow-wrap allows mid-word breaks: ${overflowWrap}`);
+      }
+
+      if (wordBreak === 'break-all' || wordBreak === 'break-word') {
+        failures.push(`word-break allows mid-word breaks: ${wordBreak}`);
+      }
+
+      if (!Number.isFinite(fontSize) || fontSize < thresholds.minReadableFontSizePx) {
+        failures.push(`font-size ${fontSize.toFixed(1)}px < ${thresholds.minReadableFontSizePx}px`);
+      }
+
+      assertUnsplitWords(title, failures);
+
+      if (!lockup) {
+        failures.push('missing title lockup');
+      } else {
+        const lockupRect = rectOf(lockup);
+        const lockupClearance = minInset(textRect, lockupRect);
+
+        if (lockupRect.width < thresholds.minLockupWidthPx) {
+          failures.push(`lockup width ${lockupRect.width.toFixed(1)}px < ${thresholds.minLockupWidthPx}px`);
+        }
+
+        if (lockupClearance < thresholds.minClearancePx) {
+          failures.push(`title clearance ${lockupClearance.toFixed(1)}px < ${thresholds.minClearancePx}px`);
+        }
+
+        if (lockup.scrollWidth > lockup.clientWidth + 1) {
+          failures.push(`lockup horizontal overflow ${lockup.scrollWidth}px > ${lockup.clientWidth}px`);
+        }
+
+        if (lockup.scrollHeight > lockup.clientHeight + 1) {
+          failures.push(`lockup vertical overflow ${lockup.scrollHeight}px > ${lockup.clientHeight}px`);
+        }
+      }
+
+      if (!scene) {
+        failures.push('missing subtitle scene');
+      } else if (escapes(textRect, rectOf(scene), 2)) {
+        failures.push('title escapes subtitle scene');
+      }
+
+      let ancestor: Element | null = title;
+      while (ancestor && ancestor !== element.parentElement) {
+        if (ancestor !== title && isClipping(ancestor) && escapes(textRect, rectOf(ancestor))) {
+          const name = ancestor.className ? String(ancestor.className) : ancestor.tagName.toLowerCase();
+          failures.push(`title escapes clipping ancestor ${name}`);
+        }
+        ancestor = ancestor.parentElement;
+      }
+
+      return failures.map((failure) => `${id} (${text}, ${lane}): ${failure}`);
+    });
+  }, {
+    minClearancePx: MIN_LOCKUP_CLEARANCE_PX,
+    minLockupWidthPx: MIN_LOCKUP_WIDTH_PX,
+    minReadableFontSizePx: MIN_READABLE_FONT_SIZE_PX,
+  });
 }
 
 test('every homepage subtitle matrix preview keeps title text inside its plate', async ({ page }) => {
@@ -365,6 +565,39 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
       for (const geometry of geometries) {
         for (const failure of geometry.failures) {
           failures.push(`${theme}/${viewport.name}/${geometry.id} (${geometry.text}, ${geometry.lane}): ${failure}`);
+        }
+      }
+    }
+  }
+
+  expect(failures).toEqual([]);
+  expect(browserIssues).toEqual([]);
+});
+
+test('every focused homepage subtitle keeps title text inside its plate', async ({ page }) => {
+  const failures: string[] = [];
+  const browserIssues = watchBrowserIssues(page);
+
+  await openSubtitleMatrix(page, SINGLE_VIEW_GEOMETRY_CASES[0], 'dark');
+  const subtitleIds = await page.locator('[data-subtitle-id]').evaluateAll((nodes) => (
+    [...new Set(nodes.map((node) => (node as HTMLElement).dataset.subtitleId ?? 'unknown'))]
+  ));
+
+  expect(subtitleIds).toHaveLength(EXPECTED_SUBTITLE_COUNT);
+
+  for (const theme of THEMES) {
+    for (const viewport of SINGLE_VIEW_GEOMETRY_CASES) {
+      await page.setViewportSize({ width: viewport.width, height: viewport.height });
+
+      for (const subtitleId of subtitleIds) {
+        await page.goto(subtitlesUrl(theme, 'single', subtitleId), { waitUntil: 'domcontentloaded' });
+        await page.locator(`[data-subtitle-id="${subtitleId}"]`).first().waitFor();
+        await page.evaluate(() => document.fonts.ready);
+
+        const subtitleFailures = await collectSubtitleTitleFailures(page, `[data-subtitle-id="${subtitleId}"]`);
+
+        for (const failure of subtitleFailures) {
+          failures.push(`${theme}/${viewport.name}: ${failure}`);
         }
       }
     }

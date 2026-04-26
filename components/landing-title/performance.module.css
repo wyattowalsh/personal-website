@@ -1446,3 +1446,44 @@
     opacity: 0.36;
   }
 }
+
+/* Focused audit view: widen instrument plates for single-subtitle inspection. */
+
+@container (min-width: 28.01rem) {
+  .cluster:not(.clusterCompact) .sceneAutomation .sceneBody {
+    grid-template-columns: minmax(13rem, 14.8rem) minmax(0, 1fr);
+  }
+
+  .cluster:not(.clusterCompact) .sceneRobotics .sceneBody {
+    grid-template-columns: minmax(0, 1fr) minmax(12.6rem, 14.5rem);
+  }
+
+  .cluster:not(.clusterCompact) .sceneNeural .sceneBody {
+    grid-template-columns: minmax(12.2rem, 13.8rem) minmax(0, 1fr);
+  }
+
+  .cluster:not(.clusterCompact) .sceneAutomation .titleBlock,
+  .cluster:not(.clusterCompact) .sceneRobotics .titleBlock,
+  .cluster:not(.clusterCompact) .sceneNeural .titleBlock {
+    width: 100%;
+    max-width: 14.5rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneAutomation .titleLockup,
+  .cluster:not(.clusterCompact) .sceneRobotics .titleLockup,
+  .cluster:not(.clusterCompact) .sceneNeural .titleLockup {
+    width: min(100%, 13rem);
+    max-width: 13rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneAutomation .title {
+    font-size: clamp(0.84rem, 1.02vw, 1.08rem);
+    letter-spacing: 0;
+  }
+
+  .cluster:not(.clusterCompact) .sceneRobotics .title,
+  .cluster:not(.clusterCompact) .sceneNeural .title {
+    font-size: clamp(0.84rem, 1.02vw, 1.08rem);
+    letter-spacing: 0.01em;
+  }
+}

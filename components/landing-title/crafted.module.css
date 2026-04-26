@@ -1838,3 +1838,90 @@
     opacity: 0.32;
   }
 }
+
+/* Focused audit view: keep material labels in their plates without word splitting. */
+
+@container (min-width: 28.01rem) {
+  .cluster:not(.clusterCompact) .sceneAlchemist .sceneBody {
+    grid-template-columns: minmax(13.4rem, 14.8rem) minmax(0, 1fr);
+  }
+
+  .cluster:not(.clusterCompact) .sceneDigitalSculptor .sceneBody,
+  .cluster:not(.clusterCompact) .sceneFrontier .sceneBody {
+    grid-template-columns: minmax(0, 1fr) minmax(12.4rem, 14rem);
+  }
+
+  .cluster:not(.clusterCompact) .sceneAlchemist .titleBlock,
+  .cluster:not(.clusterCompact) .sceneDigitalSculptor .titleBlock,
+  .cluster:not(.clusterCompact) .sceneFrontier .titleBlock {
+    width: 100%;
+    max-width: 14rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneAlchemist .titleLockup,
+  .cluster:not(.clusterCompact) .sceneDigitalSculptor .titleLockup,
+  .cluster:not(.clusterCompact) .sceneFrontier .titleLockup {
+    width: min(100%, 12.5rem);
+    max-width: 12.5rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneAlchemist .title {
+    font-size: clamp(0.86rem, 1.04vw, 1.1rem);
+    letter-spacing: -0.035em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneDigitalSculptor .title {
+    font-size: clamp(0.88rem, 1.08vw, 1.14rem);
+    letter-spacing: -0.035em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneHolographicSculptor .titleBlock {
+    width: min(100%, 16rem);
+    max-width: 16rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneHolographicSculptor .titleLockup {
+    width: min(100%, 13rem);
+    max-width: 13rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneHolographicSculptor .title {
+    font-size: clamp(0.9rem, 1.06vw, 1.16rem);
+    letter-spacing: 0.012em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCyberDefense .titleBlock {
+    width: min(100%, 12.8rem);
+    max-width: 12.8rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCyberDefense .titleLockup {
+    width: min(100%, 10.4rem);
+    max-width: 10.4rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCyberDefense .title {
+    font-size: clamp(0.82rem, 0.98vw, 1.04rem);
+    letter-spacing: 0.01em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneBlockchain .titleBlock {
+    width: min(100%, 11.8rem);
+    max-width: 11.8rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneBlockchain .titleLockup {
+    width: min(100%, 8.5rem);
+    max-width: 8.5rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneBlockchain .title {
+    font-size: clamp(0.82rem, 0.98vw, 1.04rem);
+    letter-spacing: 0.01em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneFrontier .title {
+    font-size: clamp(0.82rem, 1vw, 1.08rem);
+    letter-spacing: 0.01em;
+  }
+}

@@ -2134,3 +2134,54 @@
     opacity: 0.36;
   }
 }
+
+/* Focused audit view: full-width compositions can afford wider nameplates. */
+
+@container (min-width: 28.01rem) {
+  .cluster:not(.clusterCompact) .sceneZeroTrust .sceneBody {
+    grid-template-columns: minmax(13.8rem, 15.5rem) minmax(0, 1fr);
+  }
+
+  .cluster:not(.clusterCompact) .sceneZeroTrust .titleBlock,
+  .cluster:not(.clusterCompact) .sceneQuantum .titleBlock,
+  .cluster:not(.clusterCompact) .sceneCartographer .titleBlock {
+    width: 100%;
+  }
+
+  .cluster:not(.clusterCompact) .sceneZeroTrust .titleLockup {
+    width: min(100%, 14.25rem);
+    max-width: 14.25rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneZeroTrust .title {
+    font-size: clamp(0.82rem, 1.02vw, 1.08rem);
+    letter-spacing: 0.055em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneQuantum .sceneBody,
+  .cluster:not(.clusterCompact) .sceneCartographer .sceneBody {
+    grid-template-columns: minmax(0, 1fr) minmax(13.8rem, 16rem);
+  }
+
+  .cluster:not(.clusterCompact) .sceneQuantum .titleBlock,
+  .cluster:not(.clusterCompact) .sceneCartographer .titleBlock {
+    max-width: 16rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneQuantum .titleLockup,
+  .cluster:not(.clusterCompact) .sceneCartographer .titleLockup {
+    width: min(100%, 14.5rem);
+    max-width: 14.5rem;
+    padding-inline: 0.92rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneQuantum .title {
+    font-size: clamp(0.82rem, 1vw, 1.08rem);
+    letter-spacing: 0.055em;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCartographer .title {
+    font-size: clamp(0.8rem, 0.96vw, 1.04rem);
+    letter-spacing: 0.01em;
+  }
+}
