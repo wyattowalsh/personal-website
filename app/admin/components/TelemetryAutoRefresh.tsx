@@ -36,9 +36,39 @@ export function TelemetryAutoRefresh({ intervalMs = DEFAULT_INTERVAL_MS }: Telem
       return;
     }
 
-    const id = window.setInterval(triggerRefresh, intervalMs);
+    let timeoutId: number | undefined;
 
-    return () => window.clearInterval(id);
+    const clearRefresh = () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+        timeoutId = undefined;
+      }
+    };
+
+    const scheduleRefresh = () => {
+      clearRefresh();
+      if (document.visibilityState === 'hidden') return;
+
+      timeoutId = window.setTimeout(() => {
+        triggerRefresh();
+        scheduleRefresh();
+      }, intervalMs);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        triggerRefresh();
+      }
+      scheduleRefresh();
+    };
+
+    scheduleRefresh();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearRefresh();
+    };
   }, [intervalMs, triggerRefresh]);
 
   return (

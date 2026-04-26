@@ -20,33 +20,78 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [checking, setChecking] = useState(true);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const checkAuth = useCallback(async () => {
+  const checkAuth = useCallback(async (signal?: AbortSignal) => {
     const response = await fetch('/api/admin/auth', {
       cache: 'no-store',
       credentials: 'same-origin',
+      signal,
     });
     return response.ok;
   }, []);
 
   // Check auth on mount
   useEffect(() => {
-    checkAuth()
+    const controller = new AbortController();
+    checkAuth(controller.signal)
       .then(setIsAuthed)
-      .catch(() => {})
+      .catch((err) => {
+        if (err.name !== 'AbortError') {
+          setIsAuthed(false);
+        }
+      })
       .finally(() => setChecking(false));
+
+    return () => controller.abort();
   }, [checkAuth]);
 
   // Poll session validity
   useEffect(() => {
     if (!isAuthed) return;
-    const id = setInterval(async () => {
-      try {
-        if (!(await checkAuth())) setIsAuthed(false);
-      } catch {
-        // Network error — don't log out, may be transient
+    let timeoutId: number | undefined;
+    let controller: AbortController | null = null;
+
+    const clearPoll = () => {
+      if (timeoutId) {
+        window.clearTimeout(timeoutId);
+        timeoutId = undefined;
       }
-    }, SESSION_POLL_MS);
-    return () => clearInterval(id);
+      controller?.abort();
+      controller = null;
+    };
+
+    const schedulePoll = () => {
+      if (document.visibilityState === 'hidden') return;
+      timeoutId = window.setTimeout(runPoll, SESSION_POLL_MS);
+    };
+
+    const runPoll = async () => {
+      if (document.visibilityState === 'hidden') return;
+      controller = new AbortController();
+      try {
+        if (!(await checkAuth(controller.signal))) setIsAuthed(false);
+      } catch (err) {
+        if (err instanceof Error && err.name === 'AbortError') return;
+        // Network error — don't log out, may be transient
+      } finally {
+        controller = null;
+        schedulePoll();
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      clearPoll();
+      if (document.visibilityState === 'visible') {
+        void runPoll();
+      }
+    };
+
+    schedulePoll();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearPoll();
+    };
   }, [checkAuth, isAuthed]);
 
   const handleLogout = useCallback(async () => {
