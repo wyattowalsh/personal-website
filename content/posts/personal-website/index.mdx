@@ -2,7 +2,7 @@
 title: "Personal Website"
 image: "/logo.webp"
 caption: "onelonedatum"
-summary: "How my Next.js 16 personal site turns MDX posts into search, feeds, metadata, homepage updates, admin checks, and a theme-aware particle UI."
+summary: "How my Next.js 16 personal site turns MDX posts into search, feeds, metadata, homepage updates, Admin Intelligence, and a theme-aware particle UI."
 tags: ["Project", "TypeScript", "Next.js", "MDX"]
 created: "2026-04-26"
 updated: "2026-04-26"
@@ -53,7 +53,7 @@ The site is organized around a few shared ownership boundaries.
 | Post metadata | `app/blog/posts/[slug]/layout.tsx` | Generate metadata, JSON-LD, adjacent, related, and series data |
 | Homepage | `app/page.tsx` + `HomePageClient` | Pull recent posts into the front door |
 | Particles | `ParticlesBackground` + particle config metadata | Client-only visual runtime with reduced-motion fallback |
-| Operations | `app/admin/*` and admin libs | Content health, telemetry, provider snapshots, analytics |
+| Admin intelligence | `app/admin/*` and admin libs | Visitors, growth, performance, operations, content health, and setup states |
 
 The important part is not the file list. It is the direction of dependency: authored content flows outward into public surfaces, not the other way around.
 
@@ -70,7 +70,7 @@ flowchart LR
     Model --> Search["Fuse search"]
     Model --> Feeds["RSS / Atom / JSON Feed"]
     Model --> Metadata["Open Graph / Twitter / JSON-LD"]
-    Model --> Admin["Content health"]
+    Model --> Admin["Admin intelligence"]
 `} title="Personal Website content flow" />
 
 `BackendService.preprocess` is the center of the pipeline. It reads every authored post, validates frontmatter with Zod, strips MDX syntax for plain-text consumers, calculates word count and reading time, tracks tags, builds a Fuse search index, and exposes the post collection to routes and APIs.
@@ -143,9 +143,24 @@ The presets are grouped by mood and family: technical mesh, cosmic drift, organi
 
 ---
 
-## Operational Surface
+## Admin Intelligence
 
-The private admin area exists because a publishing system needs feedback loops. It pulls together recent posts, content health, telemetry, provider snapshots, analytics, and rate-limit state. It is not part of the public reading experience, but it checks the same content model that readers see.
+The private admin panel is the feedback loop for the publishing system. It is authenticated, marked `noindex`, and built around free-service plus local-content signals rather than a paid observability stack.
+
+The main dashboard groups checks into six tabs:
+
+| Tab | What it answers |
+|:--|:--|
+| Visitors | PostHog visitors, sessions, pageviews, interactions, searches, outbound links, and reading progress over the last 30 days |
+| Growth | Google Search Console query/page data and IndexNow readiness |
+| Performance | PageSpeed mobile/desktop scores and optional CrUX field data |
+| Operations | Vercel deployments, GitHub workflow/security health, and UptimeRobot status |
+| Content | Local MDX health: posts, tags, metadata gaps, stale posts, and thin posts |
+| Setup | Missing optional provider variables rendered as concrete setup steps |
+
+Each provider card has the same shape: status, last checked time, setup gaps, metric cards, and detail rows. Missing optional services do not break the dashboard; they become setup panels. Secrets stay server-only, and panels read anonymous aggregate data, free provider APIs, or local repository content.
+
+That makes admin less of a control room and more of a content QA surface. It answers whether people are reading, whether search is discovering, whether deploys are healthy, and whether posts are missing metadata before those issues leak into public pages.
 
 The public operational surfaces stay standard and predictable:
 
@@ -158,8 +173,6 @@ The public operational surfaces stay standard and predictable:
 | structured data | Website, person, breadcrumb, and article schema |
 | error/loading pages | Stable route behavior when content or data is missing |
 
-The goal is not to make the site feel like enterprise software. The goal is to make content problems visible before readers find them.
-
 ---
 
 ## Reusable Pattern
@@ -170,7 +183,8 @@ The pattern I would reuse is simple:
 2. Parse it into one typed model.
 3. Derive public surfaces from that model.
 4. Keep decorative client runtime separate from content correctness.
-5. Treat validation as part of publishing, not as a deployment afterthought.
+5. Treat validation and admin feedback as part of publishing, not as deployment afterthoughts.
+6. Let optional provider integrations degrade into setup state instead of blocking local checks.
 
 That is the real shape of this project. The stack is Next.js, React, TypeScript, Tailwind CSS, and MDX, but the useful idea is the ownership boundary.
 
@@ -191,6 +205,8 @@ pnpm typecheck
 pnpm test
 pnpm build
 ```
+
+The admin side adds env-backed integrations, so some panels are intentionally partial until configured. Local content health still works because it reads the same post model as the public routes.
 
 For this repo, that is the right trade. The website is not just a portfolio shell. It is where writing, project notes, identity, and small web-system experiments meet.
 
