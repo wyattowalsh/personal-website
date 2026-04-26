@@ -75,6 +75,18 @@ This value is used for:
 | :--- | :--- | :--- |
 | `NEXT_PUBLIC_POSTHOG_HOST` | PostHog capture host for US/EU/self-hosted projects | `https://us.i.posthog.com` |
 | `POSTHOG_API_HOST` | PostHog app/API host for server-side Query API calls | derived from capture host or `https://us.posthog.com` |
+| `GOOGLE_SEARCH_CONSOLE_SITE_URL` | Verified Search Console property for admin Growth panel | unset |
+| `GOOGLE_CLIENT_EMAIL` | Google service-account email with Search Console read access | unset |
+| `GOOGLE_PRIVATE_KEY` | Google service-account private key for Search Console API | unset |
+| `PAGESPEED_API_KEY` | Optional PageSpeed Insights API key for higher quota | unset |
+| `CRUX_API_KEY` | Chrome UX Report API key for field Web Vitals | unset |
+| `VERCEL_TOKEN` | Vercel REST API token for deployment health | unset |
+| `VERCEL_PROJECT_ID` | Vercel project ID for deployment health | unset |
+| `VERCEL_TEAM_ID` | Optional Vercel team ID when the project is team-owned | unset |
+| `GITHUB_TOKEN` | Optional GitHub token for higher rate limits and Dependabot alerts | unset |
+| `UPTIMEROBOT_API_KEY` | UptimeRobot API key for external uptime status | unset |
+| `UPTIMEROBOT_MONITOR_ID` | Optional UptimeRobot monitor ID to pin the primary monitor | unset |
+| `INDEXNOW_KEY` | IndexNow key used by the admin Growth setup panel | unset |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics property ID | unset |
 | `NEXT_PUBLIC_GTM_ID` | Google Tag Manager container ID | unset |
 | `SENTRY_DSN` | Server/edge Sentry DSN | unset |
@@ -251,7 +263,26 @@ POSTHOG_PERSONAL_API_KEY=<posthog-query-read-key>
 POSTHOG_PROJECT_ID=<posthog-project-id>
 ```
 
-If you do not expose `/admin` in production, the admin-specific variables can remain unset.
+The `/admin` dashboard renders setup states for optional free integrations when their variables are unset. Add only the panels you want live:
+
+```bash
+GOOGLE_SEARCH_CONSOLE_SITE_URL=<verified-search-console-property>
+GOOGLE_CLIENT_EMAIL=<service-account-email>
+GOOGLE_PRIVATE_KEY=<service-account-private-key>
+PAGESPEED_API_KEY=<optional-google-api-key>
+CRUX_API_KEY=<chrome-ux-report-api-key>
+VERCEL_TOKEN=<vercel-access-token>
+VERCEL_PROJECT_ID=<vercel-project-id>
+VERCEL_TEAM_ID=<optional-vercel-team-id>
+GITHUB_TOKEN=<github-token>
+UPTIMEROBOT_API_KEY=<uptimerobot-api-key>
+UPTIMEROBOT_MONITOR_ID=<optional-monitor-id>
+INDEXNOW_KEY=<indexnow-key>
+```
+
+All admin provider secrets must stay server-only in Vercel. Do not put these values in `.env*` files committed to the repository.
+
+When `INDEXNOW_KEY` is set, the app serves the verification file at `/indexnow-key.txt` and exposes an authenticated admin-only submit endpoint at `/api/admin/indexnow`.
 
 ### 2. Analytics
 

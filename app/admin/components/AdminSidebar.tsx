@@ -12,7 +12,7 @@ import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { useAdmin } from './AdminContext';
 
 const NAV_ITEMS = [
-  { href: '/admin', label: 'Visitors', icon: Activity },
+  { href: '/admin', label: 'Dashboard', icon: Activity },
   { href: '/admin/blog-stats', label: 'Blog Stats', icon: BarChart3 },
   { href: '/admin/content', label: 'Content', icon: FileText },
 ] as const;
