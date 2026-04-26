@@ -2,7 +2,7 @@
 title: "Personal Website"
 image: "/logo.webp"
 caption: "onelonedatum"
-summary: "A project deep dive into the Next.js 16, React 19, TypeScript, Tailwind CSS, and MDX system behind my personal website, from homepage identity to publishing, search, feeds, metadata, analytics, and particle backgrounds."
+summary: "How my Next.js 16 personal site turns MDX posts into search, feeds, metadata, homepage updates, admin checks, and a theme-aware particle UI."
 tags: ["Project", "TypeScript", "Next.js", "MDX"]
 created: "2026-04-26"
 updated: "2026-04-26"
@@ -10,9 +10,9 @@ updated: "2026-04-26"
 
 I rebuilt my personal website when it stopped being just a place to put links.
 
-The homepage still has to answer the simple questions: who I am, where to find me, and what I am working on. The harder part is everything around that first screen. A real personal site has posts, tags, feeds, metadata, search, structured data, comments, analytics, operational checks, and visual experiments. If each surface owns its own copy of the truth, the site gets stale fast.
+The homepage still has to answer the basics: who I am, where to find me, and what I am writing. The harder part is everything behind that first screen. A useful personal site needs posts, tags, search, feeds, previews, structured data, comments, analytics, and enough operational feedback that broken content does not quietly ship.
 
-This version makes the site a small publishing system with a homepage attached.
+This version is a small publishing system with a homepage attached.
 
 <div className="flex flex-wrap gap-2 my-4">
   <Badge variant="default">Next.js 16</Badge>
@@ -32,42 +32,58 @@ This version makes the site a small publishing system with a homepage attached.
 ## The Constraint
 
 <Callout type="warning">
-The main failure mode for a personal website is drift: the post body says one thing, the card preview says another, the feed says a third, and the Open Graph metadata keeps pointing at an older version.
+The failure mode is drift: the post body changes, but the card preview, feed item, sitemap, Open Graph metadata, and related-post logic keep describing an older version.
 </Callout>
 
-I wanted the content model to be boring. A post should be one file. The post route should render that file. Search, feeds, tags, related posts, metadata, and JSON-LD should derive from the same parsed object.
+I wanted the authoring model to stay boring. A post should be one file. The route should render that file. Every other public surface should derive from the parsed post data.
 
-That constraint shaped the rest of the site. The homepage can be playful. The particle background can change by theme. The admin area can surface operational health. But the publishing path needs to stay small enough that changing a post title does not become a scavenger hunt.
+That constraint made the rest of the build easier to reason about. The homepage can be playful. The particle background can be optional. The admin area can collect operational signals. But the publishing path has to stay small enough that changing a title does not become a scavenger hunt.
 
 ---
 
-## System Shape
+## Source Map
 
-The core flow is:
+The site is organized around a few shared ownership boundaries.
+
+| Surface | Source of truth | Job |
+|:--|:--|:--|
+| Authored posts | `content/posts/{slug}/index.mdx` | YAML frontmatter plus MDX body |
+| Post model | `lib/server.ts` | Parse, validate, cache, search, tags, reading time |
+| Post route | `app/blog/posts/[slug]/page.tsx` | Compile authored MDX through shared components |
+| Post metadata | `app/blog/posts/[slug]/layout.tsx` | Generate metadata, JSON-LD, adjacent, related, and series data |
+| Homepage | `app/page.tsx` + `HomePageClient` | Pull recent posts into the front door |
+| Particles | `ParticlesBackground` + particle config metadata | Client-only visual runtime with reduced-motion fallback |
+| Operations | `app/admin/*` and admin libs | Content health, telemetry, provider snapshots, analytics |
+
+The important part is not the file list. It is the direction of dependency: authored content flows outward into public surfaces, not the other way around.
+
+---
+
+## Content Flow
 
 <Mermaid chart={`
 flowchart LR
     MDX["content/posts/{slug}/index.mdx"] --> Service["BackendService.preprocess"]
     Service --> Model["Post model"]
     Model --> Pages["Blog pages"]
-    Model --> Tags["Tag pages"]
+    Model --> Cards["Cards + homepage"]
     Model --> Search["Fuse search"]
     Model --> Feeds["RSS / Atom / JSON Feed"]
     Model --> Metadata["Open Graph / Twitter / JSON-LD"]
     Model --> Admin["Content health"]
 `} title="Personal Website content flow" />
 
-`lib/server.ts` is the center of that pipeline. It reads `content/posts/**/index.mdx`, validates frontmatter with Zod, strips MDX syntax for plain-text consumers, calculates word count and reading time, tracks tags, builds a Fuse search index, and exposes the post collection to the app.
+`BackendService.preprocess` is the center of the pipeline. It reads every authored post, validates frontmatter with Zod, strips MDX syntax for plain-text consumers, calculates word count and reading time, tracks tags, builds a Fuse search index, and exposes the post collection to routes and APIs.
 
-The route layer stays generic. `app/blog/posts/[slug]/page.tsx` compiles the MDX. `app/blog/posts/[slug]/layout.tsx` loads the parsed post, generates metadata, injects structured data, and passes adjacent, related, and series navigation into the shared post layout.
+The route layer stays generic. `page.tsx` compiles MDX. `layout.tsx` loads the parsed post and handles metadata, structured data, adjacent navigation, related posts, and series navigation. No individual post owns route code.
 
-That split keeps authored content out of the app router. A post is frontmatter plus MDX, not a private route module.
+That split gives the site a useful invariant: if preprocessing accepts a post, the rest of the app consumes the same post model.
 
 ---
 
 ## Publishing Contract
 
-The authoring contract is intentionally plain:
+The authored file stays intentionally plain:
 
 ```mdx
 ---
@@ -85,35 +101,33 @@ Post content starts here.
 
 There is no per-post `export const metadata`, no hand-written article schema, and no duplicate app-route file. The shared layout owns those concerns.
 
-| Need | Where it comes from |
+| When frontmatter changes | What updates |
 |:--|:--|
-| Post page | Authored MDX compiled by the shared slug route |
-| Blog cards | Parsed frontmatter and reading metadata |
-| Tags | Frontmatter `tags` |
-| Search | Title, summary, tags, and stripped content |
-| Feeds | Shared post model rendered through `feed` |
-| Social previews | `generatePostMetadata()` |
-| Article schema | `generatePostStructuredData()` |
+| `title` | Post header, cards, feeds, metadata, adjacent/related labels |
+| `summary` | Header text, search text, feed summaries, social descriptions |
+| `tags` | Tag pages, search index, related-post scoring, metadata keywords |
+| `created` / `updated` | Sorting, feeds, sitemap data, article schema |
+| `image` / `caption` | Post header media and social preview image selection |
 
-This is the part of the site I care about most. The system can grow around it, but the publishing contract should stay dull, readable, and hard to misuse.
+The contract is not fancy, but it is hard to misuse. The author edits one file, and the app decides how that post appears everywhere else.
 
 ---
 
 ## Homepage Identity
 
-The homepage is built as a server/client split. `app/page.tsx` preprocesses content on the server, selects recent posts, and passes post metadata into `HomePageClient`. The client side handles the animated title, social link grid, latest writing section, and particle background.
+The homepage is deliberately split between server data and client interaction.
 
-The visible result is a link surface, but the implementation treats the blog as first-class. The latest writing section is not hard-coded. It comes from the same post model as the archive, tags, feeds, search, and individual post pages.
+`app/page.tsx` ensures preprocessing has run, gets the full post list, selects the three most recent posts, and passes only metadata into `HomePageClient`. The client component handles the profile image, animated title, social link grid, latest-writing section, and particle background.
 
-That matters because the homepage is usually where personal sites become stale. Here, publishing a post is enough to update the front door.
+That makes the homepage feel like a link surface while still behaving like part of the publishing system. Publishing a post updates the front door without a second edit.
 
 ---
 
 ## Particle Runtime
 
-The particle system is the most decorative part of the site, so it has the strictest boundaries.
+The particle system is decorative, so it has tight boundaries.
 
-Particles run only on the client. The runtime chooses a supported preset for the active theme, fetches the JSON config, merges density and viewport options, and falls back to a static gradient when motion is reduced, disabled, or unavailable.
+It runs only on the client. It chooses a supported preset for the resolved theme, fetches the JSON config, merges runtime density options, and falls back to a static gradient when motion is reduced, disabled, or unavailable.
 
 <Mermaid chart={`
 flowchart TB
@@ -125,15 +139,15 @@ flowchart TB
     Reduced["Reduced motion or off"] --> Fallback["Static gradient"]
 `} title="Particle runtime" />
 
-The presets are grouped by mood and family: technical mesh, cosmic drift, organic motion, atmospheric fields, and a few more dramatic variants. The controls let visitors reduce density, pause motion, or switch styles without making animation a requirement for reading the page.
+The presets are grouped by mood and family: technical mesh, cosmic drift, organic motion, atmospheric fields, and a few dramatic variants. Visitors can reduce density, pause motion, or switch styles. The effect adds identity, but it is never required to read the site.
 
 ---
 
 ## Operational Surface
 
-The site has a private admin layer because publishing systems need feedback loops. The admin area pulls together recent posts, content health, telemetry, provider snapshots, analytics, and rate-limit state. It is not part of the public reading experience, but it checks the same model the public site uses.
+The private admin area exists because a publishing system needs feedback loops. It pulls together recent posts, content health, telemetry, provider snapshots, analytics, and rate-limit state. It is not part of the public reading experience, but it checks the same content model that readers see.
 
-The public operational surfaces are standard but important:
+The public operational surfaces stay standard and predictable:
 
 | Surface | Purpose |
 |:--|:--|
@@ -144,7 +158,21 @@ The public operational surfaces are standard but important:
 | structured data | Website, person, breadcrumb, and article schema |
 | error/loading pages | Stable route behavior when content or data is missing |
 
-The point is not to make the site feel enterprise. The point is to make it observable enough that content problems are visible before readers hit them.
+The goal is not to make the site feel like enterprise software. The goal is to make content problems visible before readers find them.
+
+---
+
+## Reusable Pattern
+
+The pattern I would reuse is simple:
+
+1. Keep authored content in one boring format.
+2. Parse it into one typed model.
+3. Derive public surfaces from that model.
+4. Keep decorative client runtime separate from content correctness.
+5. Treat validation as part of publishing, not as a deployment afterthought.
+
+That is the real shape of this project. The stack is Next.js, React, TypeScript, Tailwind CSS, and MDX, but the useful idea is the ownership boundary.
 
 ---
 
@@ -152,7 +180,7 @@ The point is not to make the site feel enterprise. The point is to make it obser
 
 This is more machinery than a static link page needs. That is deliberate.
 
-The upside is that posts are searchable, feedable, tagged, shareable, and renderable from one source. The homepage can stay expressive without contaminating the content model. The admin area can inspect the same data that the public routes consume.
+The upside is that posts become searchable, tagged, shareable, feed-ready, and renderable from one source. The homepage can stay expressive without contaminating the content model. The admin area can inspect the same data that the public routes consume.
 
 The cost is that even content changes go through a real validation loop:
 
@@ -164,12 +192,12 @@ pnpm test
 pnpm build
 ```
 
-For this repo, that is the right trade. The website is not just a portfolio shell. It is the place where writing, project notes, identity, and small web-system experiments meet.
+For this repo, that is the right trade. The website is not just a portfolio shell. It is where writing, project notes, identity, and small web-system experiments meet.
 
 ---
 
 ## Next
 
-The next improvements are mostly about tightening feedback: better visual regression coverage for the homepage, clearer docs for the publishing pipeline, richer content-health checks, and cleaner examples for feeds and metadata.
+The next improvements are mostly about feedback: stronger visual regression coverage for the homepage, clearer docs for the publishing pipeline, richer content-health checks, and cleaner examples for feeds and metadata.
 
 The ground rule stays the same: one personal website, one authored content model, and no hidden second copy of a post.
