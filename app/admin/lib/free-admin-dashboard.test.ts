@@ -78,24 +78,68 @@ afterEach(() => {
 describe('free admin dashboard providers', () => {
   it('returns Search Console setup state without rendering secret values', async () => {
     delete process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL;
-    delete process.env.GOOGLE_CLIENT_EMAIL;
-    delete process.env.GOOGLE_PRIVATE_KEY;
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+    delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
 
     const snapshot = await getSearchConsoleSnapshot();
 
     expect(snapshot.status).toBe('missing_config');
     expect(snapshot.missingEnv).toEqual([
       'GOOGLE_SEARCH_CONSOLE_SITE_URL',
-      'GOOGLE_CLIENT_EMAIL',
-      'GOOGLE_PRIVATE_KEY',
+      'GOOGLE_OAUTH_CLIENT_ID',
+      'GOOGLE_OAUTH_CLIENT_SECRET',
+      'GOOGLE_OAUTH_REFRESH_TOKEN',
     ]);
     expect(snapshot.setupSteps).toEqual([
       'vercel env add GOOGLE_SEARCH_CONSOLE_SITE_URL production',
-      'vercel env add GOOGLE_CLIENT_EMAIL production',
-      'vercel env add GOOGLE_PRIVATE_KEY production',
+      'vercel env add GOOGLE_OAUTH_CLIENT_ID production',
+      'vercel env add GOOGLE_OAUTH_CLIENT_SECRET production',
+      'vercel env add GOOGLE_OAUTH_REFRESH_TOKEN production',
     ]);
-    expect(snapshot.setupSteps.join('\n')).not.toContain('PRIVATE KEY');
+    expect(snapshot.setupSteps.join('\n')).not.toContain('client_secret');
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('queries Search Console using OAuth refresh-token credentials', async () => {
+    process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL = 'sc-domain:w4w.dev';
+    process.env.GOOGLE_OAUTH_CLIENT_ID = 'client-id';
+    process.env.GOOGLE_OAUTH_CLIENT_SECRET = 'client-secret';
+    process.env.GOOGLE_OAUTH_REFRESH_TOKEN = 'refresh-token';
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(mockJsonResponse({ access_token: 'access-token' }))
+      .mockResolvedValueOnce(mockJsonResponse({
+        rows: [{
+          keys: ['admin dashboard'],
+          clicks: 12,
+          impressions: 100,
+          ctr: 0.12,
+          position: 4.2,
+        }],
+      }))
+      .mockResolvedValueOnce(mockJsonResponse({
+        rows: [{
+          keys: ['https://www.w4w.dev/admin'],
+          clicks: 3,
+          impressions: 40,
+          ctr: 0.075,
+          position: 8.1,
+        }],
+      }));
+
+    const snapshot = await getSearchConsoleSnapshot();
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.cards[0]).toEqual({
+      label: 'Clicks',
+      value: '12',
+      description: 'Top query clicks, 28 days',
+    });
+    const [tokenUrl, tokenInit] = vi.mocked(fetch).mock.calls[0];
+    expect(tokenUrl).toBe('https://oauth2.googleapis.com/token');
+    expect(String((tokenInit as RequestInit).body)).toContain('grant_type=refresh_token');
+    const [queryUrl] = vi.mocked(fetch).mock.calls[1];
+    expect(String(queryUrl)).toContain(encodeURIComponent('sc-domain:w4w.dev'));
   });
 
   it('maps PageSpeed results and treats missing CrUX as partial setup', async () => {
@@ -165,8 +209,9 @@ describe('free admin dashboard providers', () => {
 
   it('builds a dashboard snapshot with content health and setup panels', async () => {
     delete process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL;
-    delete process.env.GOOGLE_CLIENT_EMAIL;
-    delete process.env.GOOGLE_PRIVATE_KEY;
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+    delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
     delete process.env.VERCEL_TOKEN;
     delete process.env.VERCEL_PROJECT_ID;
     delete process.env.UPTIMEROBOT_API_KEY;

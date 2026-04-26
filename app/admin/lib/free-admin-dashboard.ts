@@ -255,10 +255,32 @@ function base64Url(input: string | Buffer): string {
 }
 
 async function getGoogleAccessToken(): Promise<string> {
+  const oauthClientId = process.env.GOOGLE_OAUTH_CLIENT_ID;
+  const oauthClientSecret = process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+  const oauthRefreshToken = process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+  if (oauthClientId && oauthClientSecret && oauthRefreshToken) {
+    const response = await fetch(GOOGLE_TOKEN_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: oauthClientId,
+        client_secret: oauthClientSecret,
+        refresh_token: oauthRefreshToken,
+        grant_type: 'refresh_token',
+      }),
+      next: { revalidate: 3300 },
+    });
+    const payload = (await response.json().catch(() => ({}))) as GoogleTokenResponse;
+    if (!response.ok || !payload.access_token) {
+      throw new Error(payload.error_description || payload.error || `Google OAuth token refresh failed with ${response.status}`);
+    }
+    return payload.access_token;
+  }
+
   const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
   const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
   if (!clientEmail || !privateKey) {
-    throw new Error('Google service-account credentials are missing');
+    throw new Error('Google OAuth refresh-token credentials are missing');
   }
 
   const issuedAt = Math.floor(Date.now() / 1000);
@@ -320,11 +342,18 @@ async function querySearchConsole(accessToken: string, dimension: 'query' | 'pag
 }
 
 export async function getSearchConsoleSnapshot(): Promise<AdminProviderSnapshot> {
-  const missingEnv = [
-    'GOOGLE_SEARCH_CONSOLE_SITE_URL',
-    'GOOGLE_CLIENT_EMAIL',
-    'GOOGLE_PRIVATE_KEY',
-  ].filter((name) => isMissing(process.env[name]));
+  const missingEnv = ['GOOGLE_SEARCH_CONSOLE_SITE_URL'].filter((name) => isMissing(process.env[name]));
+  const oauthEnv = [
+    'GOOGLE_OAUTH_CLIENT_ID',
+    'GOOGLE_OAUTH_CLIENT_SECRET',
+    'GOOGLE_OAUTH_REFRESH_TOKEN',
+  ];
+  const serviceAccountEnv = ['GOOGLE_CLIENT_EMAIL', 'GOOGLE_PRIVATE_KEY'];
+  const hasCompleteOAuthConfig = oauthEnv.every((name) => !isMissing(process.env[name]));
+  const hasCompleteServiceAccountConfig = serviceAccountEnv.every((name) => !isMissing(process.env[name]));
+  if (!hasCompleteOAuthConfig && !hasCompleteServiceAccountConfig) {
+    missingEnv.push(...oauthEnv.filter((name) => isMissing(process.env[name])));
+  }
 
   if (missingEnv.length > 0) {
     return missingProvider({

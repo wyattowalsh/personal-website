@@ -76,8 +76,11 @@ This value is used for:
 | `NEXT_PUBLIC_POSTHOG_HOST` | PostHog capture host for US/EU/self-hosted projects | `https://us.i.posthog.com` |
 | `POSTHOG_API_HOST` | PostHog app/API host for server-side Query API calls | derived from capture host or `https://us.posthog.com` |
 | `GOOGLE_SEARCH_CONSOLE_SITE_URL` | Verified Search Console property for admin Growth panel | unset |
-| `GOOGLE_CLIENT_EMAIL` | Google service-account email with Search Console read access | unset |
-| `GOOGLE_PRIVATE_KEY` | Google service-account private key for Search Console API | unset |
+| `GOOGLE_OAUTH_CLIENT_ID` | OAuth client ID for Search Console API access | unset |
+| `GOOGLE_OAUTH_CLIENT_SECRET` | OAuth client secret for Search Console API access | unset |
+| `GOOGLE_OAUTH_REFRESH_TOKEN` | OAuth refresh token from a Search Console user | unset |
+| `GOOGLE_CLIENT_EMAIL` | Optional service-account fallback email for Search Console API access | unset |
+| `GOOGLE_PRIVATE_KEY` | Optional service-account fallback private key for Search Console API access | unset |
 | `PAGESPEED_API_KEY` | Optional PageSpeed Insights API key for higher quota | unset |
 | `CRUX_API_KEY` | Chrome UX Report API key for field Web Vitals | unset |
 | `VERCEL_TOKEN` | Vercel REST API token for deployment health | unset |
@@ -267,8 +270,9 @@ The `/admin` dashboard renders setup states for optional free integrations when 
 
 ```bash
 GOOGLE_SEARCH_CONSOLE_SITE_URL=<verified-search-console-property>
-GOOGLE_CLIENT_EMAIL=<service-account-email>
-GOOGLE_PRIVATE_KEY=<service-account-private-key>
+GOOGLE_OAUTH_CLIENT_ID=<oauth-client-id>
+GOOGLE_OAUTH_CLIENT_SECRET=<oauth-client-secret>
+GOOGLE_OAUTH_REFRESH_TOKEN=<oauth-refresh-token>
 PAGESPEED_API_KEY=<optional-google-api-key>
 CRUX_API_KEY=<chrome-ux-report-api-key>
 VERCEL_TOKEN=<vercel-access-token>
