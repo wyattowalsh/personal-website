@@ -74,9 +74,12 @@ describe('LandingTitle locked previews', () => {
     render(<LandingTitle forcedSubtitleId="cybernetic-architect" disableRotation />);
 
     expect(screen.queryByText('adaptive command mesh')).toBeNull();
-    expect(
-      screen.getByRole('group', { name: /cyber tactician/i }).getAttribute('data-surface'),
-    ).toBe('homepage');
+    const group = screen.getByRole('group', { name: /cyber tactician/i });
+
+    expect(group.getAttribute('data-surface')).toBe('homepage');
+    expect(group.closest('[data-current-subtitle-id]')?.getAttribute('data-current-subtitle-id')).toBe(
+      'cybernetic-architect',
+    );
   });
 
   it('shows metadata on the audit surface outside the card composition', () => {

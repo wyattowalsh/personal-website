@@ -221,7 +221,7 @@ export function LandingTitle({
   const currentRenderer =
     forcedRenderer ?? rotationSequence[wordIndex] ?? rotationSequence[0] ?? LANDING_TITLE_RENDERERS[0];
   const currentTheme = currentRenderer.theme;
-  const isDark = forcedIsDark ?? resolvedTheme === 'dark';
+  const isDark = forcedIsDark ?? (hasHydrated && resolvedTheme === 'dark');
   const shouldAnimateTagline = hasHydrated && !prefersReducedMotion;
   const positionLabel = String((forcedRendererIndex >= 0 ? forcedRendererIndex : wordIndex) + 1).padStart(2, '0');
   const totalLabel = String(LANDING_TITLE_RENDERERS.length).padStart(2, '0');
@@ -254,6 +254,7 @@ export function LandingTitle({
   return (
     <div
       data-motion-mode={prefersReducedMotion ? 'reduced' : 'animated'}
+      data-current-subtitle-id={currentRenderer.id}
       data-title-surface={surface}
       className={cn(
         'relative z-10',

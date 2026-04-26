@@ -104,6 +104,20 @@ describe('landing title registry contract', () => {
     expect(new Set(texts).size).toBe(texts.length);
   });
 
+  it('preserves the lane distribution used by the subtitle audit matrix', () => {
+    const laneCounts = LANDING_TITLE_SUBTITLE_OPTIONS.reduce<Record<string, number>>((counts, option) => {
+      counts[option.lane] = (counts[option.lane] ?? 0) + 1;
+      return counts;
+    }, {});
+
+    expect(laneCounts).toEqual({
+      arcane: 6,
+      crafted: 6,
+      performance: 3,
+      systems: 7,
+    });
+  });
+
   it('resolves lab selections from stable ids and legacy display text', () => {
     const selected = LANDING_TITLE_SUBTITLE_OPTIONS.find(({ id }) => id === DEFAULT_LANDING_TITLE_SUBTITLE_ID);
     expect(selected).toBeDefined();

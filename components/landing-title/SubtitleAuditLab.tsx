@@ -26,6 +26,7 @@ const THEME_OPTIONS = ['system', 'light', 'dark'] as const;
 const MOTION_OPTIONS = ['system', 'animated', 'reduced'] as const;
 const FRAME_OPTIONS = ['desktop', 'tablet', 'mobile'] as const;
 const LANE_ORDER = ['systems', 'arcane', 'crafted', 'performance'] as const satisfies readonly SubtitleLane[];
+const LANE_FILTER_OPTIONS = ['all', ...LANE_ORDER] as const;
 const LANE_LABELS: Record<SubtitleLane, string> = {
   systems: 'Systems Theatre',
   arcane: 'Arcane Instruments',
@@ -118,6 +119,7 @@ export function SubtitleAuditLab() {
   const themeMode = pickParam(searchParams.get('theme'), THEME_OPTIONS, 'system');
   const motionMode = pickParam(searchParams.get('motion'), MOTION_OPTIONS, 'system');
   const frameMode = pickParam(searchParams.get('frame'), FRAME_OPTIONS, 'desktop');
+  const laneFilter = pickParam(searchParams.get('lane'), LANE_FILTER_OPTIONS, 'all');
   const showSignalDeck = searchParams.get('deck') !== '0';
 
   // Capture initial theme on mount, restore on unmount
@@ -164,12 +166,15 @@ export function SubtitleAuditLab() {
   const forcedPreviewIsDark = themeMode === 'system' ? undefined : themeMode === 'dark';
 
   const matrixGroups = useMemo(
-    () => LANE_ORDER.map((lane) => ({
-      lane,
-      options: LANDING_TITLE_SUBTITLE_OPTIONS.filter((option) => option.lane === lane),
-    })),
-    [],
+    () => LANE_ORDER
+      .filter((lane) => laneFilter === 'all' || lane === laneFilter)
+      .map((lane) => ({
+        lane,
+        options: LANDING_TITLE_SUBTITLE_OPTIONS.filter((option) => option.lane === lane),
+      })),
+    [laneFilter],
   );
+  const visibleSubtitleCount = matrixGroups.reduce((total, { options }) => total + options.length, 0);
 
   const goToRelativeSubtitle = (delta: number) => {
     const total = LANDING_TITLE_SUBTITLE_OPTIONS.length;
@@ -209,7 +214,7 @@ export function SubtitleAuditLab() {
       </header>
 
       <section
-        className="grid gap-4 rounded-[1.75rem] border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,0.75fr))_auto] lg:items-end"
+        className="grid gap-4 rounded-[1.75rem] border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur sm:p-5 lg:grid-cols-[minmax(0,1.4fr)_repeat(5,minmax(0,0.75fr))_auto] lg:items-end"
         data-subtitle-controls
       >
         <ControlSelect
@@ -241,6 +246,12 @@ export function SubtitleAuditLab() {
           value={frameMode}
           options={toSelectOptions(FRAME_OPTIONS)}
           onValueChange={(v) => updateParams({ frame: v })}
+        />
+        <ControlSelect
+          label="Lane"
+          value={laneFilter}
+          options={toSelectOptions(LANE_FILTER_OPTIONS)}
+          onValueChange={(v) => updateParams({ lane: v })}
         />
 
         <div className="flex items-center justify-between gap-3 rounded-xl border border-border/60 px-3 py-2 lg:min-h-10">
@@ -300,6 +311,7 @@ export function SubtitleAuditLab() {
           viewMode === 'single' ? FRAME_CLASS_MAP[frameMode] : 'w-full',
         )}
         data-subtitle-preview
+        data-subtitle-loaded-count={viewMode === 'matrix' ? visibleSubtitleCount : 1}
       >
         {viewMode === 'single' ? (
           <div className="space-y-4">
