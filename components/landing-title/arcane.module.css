@@ -1269,7 +1269,7 @@
   .title {
     font-size: clamp(1rem, 8.8cqi, 1.46rem);
     letter-spacing: 0.035em;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
   }
 
   .titleLockup {

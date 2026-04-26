@@ -53,7 +53,7 @@
   font-size: clamp(1rem, 4.8cqi, 1.58rem);
   line-height: 1.03;
   letter-spacing: clamp(0.018em, 0.38cqi, 0.045em);
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
   hyphens: none;
   text-shadow: 0 1px 10px color-mix(in oklab, var(--sys-glow-soft) 68%, transparent);
 }
@@ -1551,7 +1551,7 @@
   .title {
     font-size: clamp(0.96rem, 7.8cqi, 1.38rem);
     letter-spacing: 0.035em;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
   }
 
   .sceneZeroTrust .title,

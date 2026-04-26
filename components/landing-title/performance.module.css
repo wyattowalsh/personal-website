@@ -1131,7 +1131,7 @@
   .title {
     font-size: clamp(1rem, 8.4cqi, 1.48rem);
     letter-spacing: -0.015em;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
   }
 
   .sceneRobotics .title {

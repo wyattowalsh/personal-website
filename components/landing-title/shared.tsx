@@ -282,7 +282,7 @@ export function getTitleTextStyle(themeConfig: SubtitleTheme, isDark: boolean): 
     fontWeight: themeConfig.fontWeight,
     letterSpacing: themeConfig.letterSpacing,
     hyphens: 'none',
-    overflowWrap: 'break-word',
+    overflowWrap: 'normal',
     textTransform: themeConfig.textTransform,
     textShadow: 'none',
     wordBreak: 'normal',

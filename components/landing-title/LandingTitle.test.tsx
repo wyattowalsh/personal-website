@@ -155,6 +155,7 @@ describe('LandingTitle locked previews', () => {
       expect(css).not.toContain('repeating-linear-gradient');
       expect(css).not.toContain('hyphens: auto');
       expect(css).not.toContain('overflow-wrap: anywhere');
+      expect(css).not.toContain('overflow-wrap: break-word');
     }
   });
 });

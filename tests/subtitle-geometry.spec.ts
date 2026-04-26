@@ -167,6 +167,47 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
             || inner.bottom > outer.bottom + tolerancePx;
         }
 
+        function textNodesFor(element: Element) {
+          const nodes: Text[] = [];
+          const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+          let node = walker.nextNode();
+
+          while (node) {
+            if (node.textContent?.trim()) {
+              nodes.push(node as Text);
+            }
+            node = walker.nextNode();
+          }
+
+          return nodes;
+        }
+
+        function assertUnsplitWords(title: HTMLElement, failures: string[]) {
+          for (const textNode of textNodesFor(title)) {
+            const nodeText = textNode.textContent ?? '';
+            const words = nodeText.matchAll(/\S+/g);
+
+            for (const wordMatch of words) {
+              const word = wordMatch[0];
+
+              if (word.length <= 1 || wordMatch.index === undefined) {
+                continue;
+              }
+
+              const wordRange = document.createRange();
+              wordRange.setStart(textNode, wordMatch.index);
+              wordRange.setEnd(textNode, wordMatch.index + word.length);
+              const wordRects = [...wordRange.getClientRects()]
+                .filter((rect) => rect.width > 1 && rect.height > 1);
+              wordRange.detach();
+
+              if (wordRects.length > 1) {
+                failures.push(`word "${word}" splits across ${wordRects.length} lines`);
+              }
+            }
+          }
+        }
+
         function isClipping(element: Element) {
           const style = getComputedStyle(element);
 
@@ -229,12 +270,12 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
             failures.push(`hyphens ${hyphens} !== none`);
           }
 
-          if (overflowWrap === 'anywhere') {
-            failures.push('overflow-wrap allows anywhere breaks');
+          if (overflowWrap === 'anywhere' || overflowWrap === 'break-word') {
+            failures.push(`overflow-wrap allows mid-word breaks: ${overflowWrap}`);
           }
 
-          if (wordBreak === 'break-all') {
-            failures.push('word-break allows break-all');
+          if (wordBreak === 'break-all' || wordBreak === 'break-word') {
+            failures.push(`word-break allows mid-word breaks: ${wordBreak}`);
           }
 
           if (!Number.isFinite(lineHeightRatio) || lineHeightRatio < 1) {
@@ -244,6 +285,8 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
           if (!Number.isFinite(fontSize) || fontSize < thresholds.minReadableFontSizePx) {
             failures.push(`font-size ${fontSize.toFixed(1)}px < ${thresholds.minReadableFontSizePx}px`);
           }
+
+          assertUnsplitWords(title, failures);
 
           if (card) {
             if (card.scrollWidth > card.clientWidth + 1) {
