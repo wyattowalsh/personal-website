@@ -12,6 +12,7 @@ vi.mock('@vercel/analytics', () => ({
 // Must import after mocks are set up
 import {
   track,
+  trackPageView,
   setAnalyticsOptOut,
   getAnalyticsOptOut,
 } from '@/lib/analytics';
@@ -31,17 +32,35 @@ function createStorageMock(): Storage {
 }
 
 let origLocalStorage: Storage;
+let origSessionStorage: Storage;
+let origFetch: typeof fetch;
 let mockLocalStorage: Storage;
+let mockSessionStorage: Storage;
 
 beforeEach(() => {
   vi.clearAllMocks();
   origLocalStorage = globalThis.localStorage;
+  origSessionStorage = globalThis.sessionStorage;
+  origFetch = globalThis.fetch;
   mockLocalStorage = createStorageMock();
+  mockSessionStorage = createStorageMock();
   Object.defineProperty(globalThis, 'localStorage', {
     value: mockLocalStorage,
     writable: true,
     configurable: true,
   });
+  Object.defineProperty(globalThis, 'sessionStorage', {
+    value: mockSessionStorage,
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(globalThis, 'fetch', {
+    value: vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({}) })),
+    writable: true,
+    configurable: true,
+  });
+  delete process.env.NEXT_PUBLIC_POSTHOG_TOKEN;
+  delete process.env.NEXT_PUBLIC_POSTHOG_HOST;
 });
 
 afterEach(() => {
@@ -50,6 +69,18 @@ afterEach(() => {
     writable: true,
     configurable: true,
   });
+  Object.defineProperty(globalThis, 'sessionStorage', {
+    value: origSessionStorage,
+    writable: true,
+    configurable: true,
+  });
+  Object.defineProperty(globalThis, 'fetch', {
+    value: origFetch,
+    writable: true,
+    configurable: true,
+  });
+  delete process.env.NEXT_PUBLIC_POSTHOG_TOKEN;
+  delete process.env.NEXT_PUBLIC_POSTHOG_HOST;
 });
 
 // ---------- track() ----------
@@ -62,14 +93,41 @@ describe('track()', () => {
     const [event, props] = mockVercelTrack.mock.calls[0];
     expect(event).toBe('share_click');
     expect(props).toMatchObject({ platform: 'twitter' });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('sends anonymous PostHog events when configured', () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test';
+    process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://eu.i.posthog.com/';
+
+    track('share_click', { platform: 'twitter' });
+
+    expect(fetch).toHaveBeenCalledOnce();
+    const [url, init] = vi.mocked(fetch).mock.calls[0];
+    expect(url).toBe('https://eu.i.posthog.com/i/v0/e/');
+
+    const body = JSON.parse(String((init as RequestInit).body));
+    expect(body).toMatchObject({
+      api_key: 'phc_test',
+      event: 'share_click',
+    });
+    expect(body.distinct_id).toMatch(/^anon_/);
+    expect(body.properties).toMatchObject({
+      platform: 'twitter',
+      source: 'w4w.dev',
+      '$process_person_profile': false,
+    });
+    expect(body.properties.session_id).toMatch(/^session_/);
   });
 
   it('respects opt-out', () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test';
     localStorage.setItem('analytics-opt-out', '1');
 
     track('share_click', { platform: 'twitter' });
 
     expect(mockVercelTrack).not.toHaveBeenCalled();
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('sanitizes search queries (strips special chars, truncates to 50 chars)', () => {
@@ -97,6 +155,31 @@ describe('track()', () => {
 
     const [, props] = mockVercelTrack.mock.calls[0];
     expect(props.query).toBe('test');
+  });
+
+  it('captures page views as PostHog pageview events', () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test';
+
+    trackPageView({
+      url: 'https://www.w4w.dev/blog',
+      referrer: '',
+      title: 'Blog',
+    });
+
+    expect(mockVercelTrack).toHaveBeenCalledWith('page_view', {
+      url: 'https://www.w4w.dev/blog',
+      referrer: '',
+      title: 'Blog',
+    });
+
+    const [, init] = vi.mocked(fetch).mock.calls[0];
+    const body = JSON.parse(String((init as RequestInit).body));
+    expect(body.event).toBe('$pageview');
+    expect(body.properties).toMatchObject({
+      url: 'https://www.w4w.dev/blog',
+      title: 'Blog',
+      '$process_person_profile': false,
+    });
   });
 });
 

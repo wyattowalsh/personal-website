@@ -29,7 +29,7 @@ The outermost layout establishes the foundation for the entire application:
 - **Accessibility**: Adds a skip link and keeps the main content region anchored under a fixed header
 - **Metadata**: Sets base OpenGraph, Twitter Card, canonical, and feed autodiscovery metadata
 - **Viewport**: Configures responsive viewport with theme color support
-- **Analytics**: Conditionally integrates Google Tag Manager and Google Analytics, and always mounts Vercel Analytics and Speed Insights
+- **Analytics**: Mounts Vercel Analytics and Speed Insights, conditionally loads Google analytics tags, and captures anonymous PostHog visitor events outside `/admin`
 - **Structured Data**: Includes WebSite JSON-LD schema for SEO
 - **Global Components**: Renders a fixed `Header` and `ScrollIndicator` at the root level
 

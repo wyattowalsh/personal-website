@@ -46,6 +46,14 @@ The root `package.json` serves as the default build target. To deploy the docs s
 | `ADMIN_PASSWORD` | Password accepted by the admin auth route | `use-a-long-random-password` |
 | `SESSION_SIGNING_KEY` | HMAC signing key for admin session cookies | `openssl rand -base64 32` |
 
+### Required for `/admin` visitor analytics
+
+| Variable | Description | Example |
+| :--- | :--- | :--- |
+| `NEXT_PUBLIC_POSTHOG_TOKEN` | Public PostHog project token used for anonymous event capture | `phc_...` |
+| `POSTHOG_PERSONAL_API_KEY` | Server-only PostHog key with `query:read` scope for aggregate admin queries | `phx_...` |
+| `POSTHOG_PROJECT_ID` | PostHog project ID used by the Query API | `12345` |
+
 **Usage in code:**
 
 ```typescript
@@ -65,6 +73,8 @@ This value is used for:
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
+| `NEXT_PUBLIC_POSTHOG_HOST` | PostHog capture host for US/EU/self-hosted projects | `https://us.i.posthog.com` |
+| `POSTHOG_API_HOST` | PostHog app/API host for server-side Query API calls | derived from capture host or `https://us.posthog.com` |
 | `NEXT_PUBLIC_GA_ID` | Google Analytics property ID | unset |
 | `NEXT_PUBLIC_GTM_ID` | Google Tag Manager container ID | unset |
 | `SENTRY_DSN` | Server/edge Sentry DSN | unset |
@@ -99,20 +109,24 @@ No `.env.local` file is required for local development. All variables have sensi
 
 - `NEXT_PUBLIC_SITE_URL` defaults to `https://w4w.dev`
 - `/admin` works locally without env vars, but production should set `ADMIN_PASSWORD` and `SESSION_SIGNING_KEY`
+- `/admin` visitor analytics shows a setup state until PostHog env vars are configured
 - `NODE_ENV` is automatically set to `development` by Next.js
 - `DEBUG` and `LOG_LEVEL` are optional
 
 ## Analytics Integration
 
-The site integrates Google Analytics and Google Tag Manager via `@next/third-parties/google`.
+The site always mounts Vercel Analytics and Speed Insights, and sends anonymous custom interaction events to PostHog when `NEXT_PUBLIC_POSTHOG_TOKEN` is configured. Google Analytics and Google Tag Manager are optional and only load when their public env vars are set.
 
 ### Configuration
 
-Analytics are loaded in the root layout (`app/layout.tsx:111-112`):
+Analytics are loaded in the root layout and through `components/PostHogPageviewTracker.tsx`:
 
 ```tsx
-<GoogleTagManager gtmId="GTM-P7VFKNK6" />
-<GoogleAnalytics gaId="G-17PRGFZN0C" />
+{gtmId && <GoogleTagManager gtmId={gtmId} />}
+{gaId && <GoogleAnalytics gaId={gaId} />}
+<PostHogPageviewTracker />
+<Analytics />
+<SpeedInsights />
 ```
 
 **Why @next/third-parties?**
@@ -124,20 +138,22 @@ Analytics are loaded in the root layout (`app/layout.tsx:111-112`):
 
 ### Tracked Events
 
-The default integration tracks:
+The analytics layer tracks:
 
-- **Page views** — automatic on route change
+- **Page views** — route changes captured as anonymous PostHog `$pageview` events
 - **Core Web Vitals** — LCP, FID, CLS, TTFB, INP
-- **Scroll depth** — via GTM triggers
-- **Click events** — via GTM data layer
+- **Scroll depth** — public page scroll milestones
+- **Time on page** — public page time milestones
+- **Content engagement** — reading progress, site search, share clicks, outbound link clicks, code copies, and theme changes
 
-Custom events can be added via `window.dataLayer` or the GTM interface.
+The `/admin` dashboard reads aggregate PostHog data from the server with `POSTHOG_PERSONAL_API_KEY`.
 
 ### Privacy Considerations
 
-- IP anonymization is enabled by default
-- No cookies are set without user consent (relies on browser settings)
-- Analytics scripts are loaded from Google's CDN (first-party context)
+- Custom PostHog events use random anonymous browser/session IDs
+- PostHog person-profile processing is disabled for site events
+- `/admin` is excluded from public visitor analytics capture
+- Search query analytics are sanitized before capture
 
 ## Security Headers
 
@@ -230,17 +246,22 @@ Set these values in the Vercel dashboard:
 NEXT_PUBLIC_SITE_URL=https://w4w.dev
 ADMIN_PASSWORD=<long-random-password>
 SESSION_SIGNING_KEY=<openssl-rand-base64-32>
+NEXT_PUBLIC_POSTHOG_TOKEN=<posthog-project-token>
+POSTHOG_PERSONAL_API_KEY=<posthog-query-read-key>
+POSTHOG_PROJECT_ID=<posthog-project-id>
 ```
 
 If you do not expose `/admin` in production, the admin-specific variables can remain unset.
 
 ### 2. Analytics
 
-Update GTM and GA IDs in `app/layout.tsx`:
+Set optional analytics hosts or Google analytics IDs when needed:
 
-```tsx
-<GoogleTagManager gtmId="YOUR-GTM-ID" />
-<GoogleAnalytics gaId="YOUR-GA-ID" />
+```bash
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
+POSTHOG_API_HOST=https://us.posthog.com
+NEXT_PUBLIC_GA_ID=G-...
+NEXT_PUBLIC_GTM_ID=GTM-...
 ```
 
 ### 3. Sitemap Configuration
@@ -362,11 +383,12 @@ Executed locally on `2026-03-02` using closure-wave rerun outcomes.
 
 ### Performance
 
-Use Vercel Analytics or Google Analytics to monitor:
+Use Vercel Analytics, Speed Insights, and PostHog to monitor:
 
 - **Core Web Vitals** — LCP, FID, CLS
 - **Page load times** — TTFB, FCP, TTI
 - **Bundle size** — track over time via `ANALYZE=true pnpm build`
+- **Visitor behavior** — top pages, referrers, searches, shares, outbound clicks, and reading progress
 
 ### Errors
 

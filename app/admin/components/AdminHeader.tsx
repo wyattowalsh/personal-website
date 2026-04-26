@@ -9,7 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { useAdmin } from './AdminContext';
 
 const ROUTE_LABELS: Record<string, string> = {
-  admin: 'Telemetry',
+  admin: 'Visitor Analytics',
   'blog-stats': 'Blog Stats',
   content: 'Content',
 };

@@ -5,7 +5,7 @@ import "./tailwind.css";  // Tailwind v4 with config directive
 import "./globals.css";  // Custom styles (no Tailwind directives)
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/Header";
-import { StrictMode } from "react";
+import { StrictMode, Suspense } from "react";
 import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { getDefaultMetadata, getConfig } from "@/lib/config";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PostHogPageviewTracker } from "@/components/PostHogPageviewTracker";
 
 const monaspace = localFont({
 	src: "../public/fonts/MonaspaceArgon-subset.woff2",
@@ -142,11 +143,14 @@ export default function RootLayout({
 							</div>
 						</TooltipProvider>
 					</ThemeProvider>
-					{gtmId && <GoogleTagManager gtmId={gtmId} />}
-					{gaId && <GoogleAnalytics gaId={gaId} />}
-					<Analytics />
-					<SpeedInsights />
-				</body>
+						{gtmId && <GoogleTagManager gtmId={gtmId} />}
+						{gaId && <GoogleAnalytics gaId={gaId} />}
+						<Suspense fallback={null}>
+							<PostHogPageviewTracker />
+						</Suspense>
+						<Analytics />
+						<SpeedInsights />
+					</body>
 			</html>
 		</StrictMode>
 	);
