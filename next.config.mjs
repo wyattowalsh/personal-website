@@ -17,7 +17,7 @@ function buildCsp() {
     ...(isDev ? ["'unsafe-eval'"] : []),
     'https://giscus.app', 'https://www.googletagmanager.com',
     'https://www.google-analytics.com', 'https://*.sentry.io',
-    'https://va.vercel-scripts.com',
+    'https://va.vercel-scripts.com', 'https://static.cloudflareinsights.com',
   ].join(' ')
 
   const connectSrc = [
@@ -26,6 +26,7 @@ function buildCsp() {
     'https://*.analytics.google.com', 'https://vitals.vercel-insights.com',
     'https://*.sentry.io', 'https://va.vercel-scripts.com',
     'https://*.posthog.com', 'https://*.i.posthog.com',
+    'https://cloudflareinsights.com',
   ].join(' ')
 
   return [
