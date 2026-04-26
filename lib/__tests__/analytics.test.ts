@@ -83,12 +83,17 @@ afterEach(() => {
   delete process.env.NEXT_PUBLIC_POSTHOG_HOST;
 });
 
+async function waitForVercelTrack() {
+  await vi.waitFor(() => expect(mockVercelTrack).toHaveBeenCalled());
+}
+
 // ---------- track() ----------
 
 describe('track()', () => {
-  it('calls vercelTrack with provided properties', () => {
+  it('calls vercelTrack with provided properties', async () => {
     track('share_click', { platform: 'twitter' });
 
+    await waitForVercelTrack();
     expect(mockVercelTrack).toHaveBeenCalledOnce();
     const [event, props] = mockVercelTrack.mock.calls[0];
     expect(event).toBe('share_click');
@@ -96,11 +101,12 @@ describe('track()', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('sends anonymous PostHog events when configured', () => {
+  it('sends anonymous PostHog events when configured', async () => {
     process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test';
     process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://eu.i.posthog.com/';
 
     track('share_click', { platform: 'twitter' });
+    await waitForVercelTrack();
 
     expect(fetch).toHaveBeenCalledOnce();
     const [url, init] = vi.mocked(fetch).mock.calls[0];
@@ -120,6 +126,20 @@ describe('track()', () => {
     expect(body.properties.session_id).toMatch(/^session_/);
   });
 
+  it('trims escaped newlines from PostHog browser env values', async () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test\\n';
+    process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://eu.i.posthog.com\\n';
+
+    track('share_click', { platform: 'twitter' });
+    await waitForVercelTrack();
+
+    const [url, init] = vi.mocked(fetch).mock.calls[0];
+    expect(url).toBe('https://eu.i.posthog.com/i/v0/e/');
+    expect(JSON.parse(String((init as RequestInit).body))).toMatchObject({
+      api_key: 'phc_test',
+    });
+  });
+
   it('respects opt-out', () => {
     process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test';
     localStorage.setItem('analytics-opt-out', '1');
@@ -130,10 +150,11 @@ describe('track()', () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it('sanitizes search queries (strips special chars, truncates to 50 chars)', () => {
+  it('sanitizes search queries (strips special chars, truncates to 50 chars)', async () => {
     const longQuery = 'a'.repeat(100);
     track('search_query', { query: longQuery, results_count: 5 });
 
+    await waitForVercelTrack();
     const [, props] = mockVercelTrack.mock.calls[0];
     expect(props.query).toHaveLength(50);
 
@@ -143,6 +164,7 @@ describe('track()', () => {
       query: 'hello <script>alert(1)</script>',
       results_count: 0,
     });
+    await waitForVercelTrack();
     const [, props2] = mockVercelTrack.mock.calls[0];
     expect(props2.query).not.toContain('<');
     expect(props2.query).not.toContain('>');
@@ -150,14 +172,15 @@ describe('track()', () => {
     expect(props2.query).not.toContain(')');
   });
 
-  it('sanitizes search_no_results queries', () => {
+  it('sanitizes search_no_results queries', async () => {
     track('search_no_results', { query: 'test@#$%' });
 
+    await waitForVercelTrack();
     const [, props] = mockVercelTrack.mock.calls[0];
     expect(props.query).toBe('test');
   });
 
-  it('captures page views as PostHog pageview events', () => {
+  it('captures page views as PostHog pageview events', async () => {
     process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_test';
 
     trackPageView({
@@ -166,6 +189,7 @@ describe('track()', () => {
       title: 'Blog',
     });
 
+    await waitForVercelTrack();
     expect(mockVercelTrack).toHaveBeenCalledWith('page_view', {
       url: 'https://www.w4w.dev/blog',
       referrer: '',

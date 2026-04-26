@@ -94,7 +94,7 @@ function getPostHogIds(): { distinctId: string; sessionId: string } | null {
 }
 
 function getPostHogCaptureHost(): string {
-  return (process.env.NEXT_PUBLIC_POSTHOG_HOST || DEFAULT_POSTHOG_CAPTURE_HOST).replace(/\/+$/, '');
+  return (process.env.NEXT_PUBLIC_POSTHOG_HOST?.trim().replace(/\\n$/g, '') || DEFAULT_POSTHOG_CAPTURE_HOST).replace(/\/+$/, '');
 }
 
 function getDeviceCategory(width: number): 'mobile' | 'tablet' | 'desktop' {
@@ -140,7 +140,7 @@ function sanitizeProperties<E extends EventName>(
 function capturePostHog(event: string, properties: FlatProperties): void {
   if (typeof window === 'undefined' || isOptedOut()) return;
 
-  const apiKey = process.env.NEXT_PUBLIC_POSTHOG_TOKEN;
+  const apiKey = process.env.NEXT_PUBLIC_POSTHOG_TOKEN?.trim().replace(/\\n$/g, '');
   if (!apiKey) return;
 
   const ids = getPostHogIds();

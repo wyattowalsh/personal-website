@@ -79,6 +79,36 @@ describe('getVisitorAnalyticsSnapshot()', () => {
     });
   });
 
+  it('normalizes escaped newlines from env values before querying PostHog', async () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_public\\n';
+    process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://eu.i.posthog.com\\n';
+    process.env.POSTHOG_PERSONAL_API_KEY = 'phx_secret\\n';
+    process.env.POSTHOG_PROJECT_ID = '12345\\n';
+
+    vi.mocked(fetch).mockResolvedValue(mockJsonResponse({ results: [] }));
+
+    await getVisitorAnalyticsSnapshot();
+
+    const [url, init] = vi.mocked(fetch).mock.calls[0];
+    expect(url).toBe('https://eu.posthog.com/api/projects/12345/query/');
+    expect((init as RequestInit).headers).toMatchObject({
+      Authorization: 'Bearer phx_secret',
+    });
+  });
+
+  it('returns error state when PostHog returns a non-query response', async () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_public';
+    process.env.POSTHOG_PERSONAL_API_KEY = 'phx_secret';
+    process.env.POSTHOG_PROJECT_ID = '12345';
+
+    vi.mocked(fetch).mockResolvedValue(mockJsonResponse({ html: '<!doctype html>' }));
+
+    const snapshot = await getVisitorAnalyticsSnapshot();
+
+    expect(snapshot.status).toBe('error');
+    expect(snapshot.error).toBe('PostHog query response did not include results');
+  });
+
   it('returns error state when the PostHog query API fails', async () => {
     process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_public';
     process.env.POSTHOG_PERSONAL_API_KEY = 'phx_secret';

@@ -57,6 +57,11 @@ interface PostHogQueryResponse {
   detail?: string;
 }
 
+function cleanEnvValue(value: string | undefined): string | undefined {
+  const cleaned = value?.trim().replace(/\\n$/g, '');
+  return cleaned || undefined;
+}
+
 function deriveApiHostFromCaptureHost(captureHost?: string): string {
   if (!captureHost) return DEFAULT_POSTHOG_API_HOST;
 
@@ -71,15 +76,19 @@ function deriveApiHostFromCaptureHost(captureHost?: string): string {
 
 function getPostHogConfig(): { config: PostHogConfig | null; missingEnv: string[] } {
   const missingEnv: string[] = [];
-  const personalApiKey = process.env.POSTHOG_PERSONAL_API_KEY;
-  const projectId = process.env.POSTHOG_PROJECT_ID;
-  const apiHost = (process.env.POSTHOG_API_HOST || deriveApiHostFromCaptureHost(process.env.NEXT_PUBLIC_POSTHOG_HOST)).replace(/\/+$/, '');
+  const publicToken = cleanEnvValue(process.env.NEXT_PUBLIC_POSTHOG_TOKEN);
+  const personalApiKey = cleanEnvValue(process.env.POSTHOG_PERSONAL_API_KEY);
+  const projectId = cleanEnvValue(process.env.POSTHOG_PROJECT_ID);
+  const apiHost = (
+    cleanEnvValue(process.env.POSTHOG_API_HOST)
+    || deriveApiHostFromCaptureHost(cleanEnvValue(process.env.NEXT_PUBLIC_POSTHOG_HOST))
+  ).replace(/\/+$/, '');
 
-  if (!process.env.NEXT_PUBLIC_POSTHOG_TOKEN) missingEnv.push('NEXT_PUBLIC_POSTHOG_TOKEN');
+  if (!publicToken) missingEnv.push('NEXT_PUBLIC_POSTHOG_TOKEN');
   if (!personalApiKey) missingEnv.push('POSTHOG_PERSONAL_API_KEY');
   if (!projectId) missingEnv.push('POSTHOG_PROJECT_ID');
 
-  if (!personalApiKey || !projectId || !process.env.NEXT_PUBLIC_POSTHOG_TOKEN) {
+  if (!personalApiKey || !projectId || !publicToken) {
     return { config: null, missingEnv };
   }
 
@@ -165,7 +174,11 @@ async function queryPostHog(config: PostHogConfig, name: string, query: string):
     throw new Error(payload.detail || payload.error || `PostHog query failed with ${response.status}`);
   }
 
-  return Array.isArray(payload.results) ? payload.results : [];
+  if (!Array.isArray(payload.results)) {
+    throw new Error('PostHog query response did not include results');
+  }
+
+  return payload.results;
 }
 
 function rowsToAnalyticsRows(
