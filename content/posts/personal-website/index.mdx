@@ -1,0 +1,169 @@
+---
+title: "Personal Website"
+image: "/logo.webp"
+caption: "onelonedatum"
+summary: "A project deep dive into my personal website: a Next.js 16, React 19, TypeScript, Tailwind CSS, and MDX publishing system with search, feeds, structured metadata, analytics, and theme-aware particle backgrounds."
+tags: ["Project", "TypeScript", "Next.js", "MDX"]
+created: "2026-04-26"
+updated: "2026-04-26"
+---
+
+I rebuilt my personal website because a link page was no longer enough.
+
+The site still needs to do the obvious job: show who I am, where to find me, and what I am writing. But it also needs to be a real publishing surface, a reliable metadata source, a search index, a feed generator, a small analytics product, and a place where interactive visual work can live without making the content system fragile.
+
+<div className="flex flex-wrap gap-2 my-4">
+  <Badge variant="default">Next.js 16</Badge>
+  <Badge variant="secondary">React 19</Badge>
+  <Badge variant="outline">TypeScript 5</Badge>
+  <Badge variant="secondary">Tailwind CSS 4</Badge>
+  <Badge variant="outline">MDX Publishing</Badge>
+  <Badge variant="default">Vercel Ready</Badge>
+</div>
+
+- **Site**: [w4w.dev](https://w4w.dev)
+- **GitHub**: [github.com/wyattowalsh/personal-website](https://github.com/wyattowalsh/personal-website)
+- **Blog**: [/blog](/blog)
+
+---
+
+## The Problem
+
+<Callout type="warning">
+A personal website gets messy when every surface owns its own truth: homepage copy, blog metadata, feeds, Open Graph cards, tags, search, structured data, and admin checks all start drifting.
+</Callout>
+
+The old shape was closer to a personal link tree with a blog attached. That worked until the blog became more important than the links. Posts needed frontmatter, math, code, diagrams, tags, related-post navigation, search, RSS, Atom, JSON Feed output, and metadata that stayed consistent across the route, card previews, sitemap, and external readers.
+
+The design goal for this version was to make the website feel simple from the outside and explicit from the inside. Authored content should live in one place. Metadata should be derived from that content. Runtime surfaces should ask the same backend service for the same post model. Visual effects should be expressive, but optional and bounded.
+
+---
+
+## What The Site Does
+
+The homepage is still the front door. It renders a profile image, animated title treatment, social links, and the latest posts from the server-side content pipeline. The link surface covers GitHub, LinkedIn, X, Reddit, Kaggle, CodePen, the blog, and email without making visitors dig through a separate about page.
+
+The blog is the heavier system. Posts are authored as MDX under `content/posts/{slug}/index.mdx`, then parsed into a shared post model that powers the blog index, individual post pages, tags, related posts, feeds, sitemap entries, search results, and metadata.
+
+<Mermaid chart={`
+flowchart LR
+    Author[MDX post] --> Parse[BackendService preprocess]
+    Parse --> Model[Shared post model]
+    Model --> Blog[Blog routes]
+    Model --> Search[Fuse search]
+    Model --> Feeds[RSS / Atom / JSON Feed]
+    Model --> SEO[Metadata + JSON-LD]
+    Model --> Admin[Content health]
+`} title="Content Pipeline" />
+
+That shape matters because the site has several public outputs, but only one authored source. A title change in frontmatter should not require a second metadata file, a hand-written JSON-LD block, or a feed patch.
+
+---
+
+## Authoring Model
+
+The post contract is deliberately small:
+
+```mdx
+---
+title: "Post Title"
+image: "/post-hero.svg"
+caption: "Short tagline"
+summary: "One concise summary sentence."
+tags: ["Project", "TypeScript"]
+created: "2026-04-26"
+updated: "2026-04-26"
+---
+
+Post content starts here.
+```
+
+`lib/server.ts` parses the frontmatter with Zod, strips MDX syntax for search/feed text, calculates word count and reading time, validates dates, warns when a referenced hero image is missing, and caches sorted posts and tag lookups.
+
+The route files stay generic. `app/blog/posts/[slug]/page.tsx` compiles the authored MDX. `app/blog/posts/[slug]/layout.tsx` loads the parsed post, generates route metadata, injects article structured data, and wires adjacent, related, and series navigation into the shared post layout.
+
+<Callout type="info">
+The important rule is that posts do not own route code. A post is frontmatter plus MDX content; the route, layout, metadata, JSON-LD, and rendering behavior are shared.
+</Callout>
+
+---
+
+## Search, Feeds, and Metadata
+
+Preprocessing is part of both development and production builds. `pnpm dev` runs the preprocessing step before starting the Next.js dev server, and `pnpm build` runs the same pipeline before building the app.
+
+That pipeline produces the runtime post collection and search index used by:
+
+| Surface | Source of truth |
+|:--|:--|
+| Blog list and post pages | Parsed MDX frontmatter and content |
+| Tag pages | Post `tags` arrays |
+| Related posts | Shared tags and relative recency |
+| Search | Fuse index over title, summary, content, and tags |
+| Feeds | Shared post model rendered to RSS, Atom, and JSON Feed |
+| SEO metadata | `generatePostMetadata()` from parsed post data |
+| JSON-LD | `generatePostStructuredData()` from parsed post data |
+
+The result is boring in the best way. Search, feeds, metadata, and page rendering all share one interpretation of the post instead of each maintaining a partial copy.
+
+---
+
+## Particle Backgrounds
+
+The homepage uses a theme-aware tsParticles system that can shift between light and dark presets. The current presets are grouped by families such as technical, atmospheric, organic, cosmic, and playful. Each preset has metadata for label, mood, palette, weight, density, feature requirements, and a light/dark counterpart.
+
+The runtime does three things that keep the effect from taking over the page:
+
+- It loads the particle engine only on the client.
+- It respects reduced-motion preferences and exposes density controls.
+- It fetches static JSON configs, then applies runtime options for density, viewport sizing, pause behavior, and mobile counts.
+
+<Mermaid chart={`
+flowchart TB
+    Theme[Resolved theme] --> Preset[Weighted preset selection]
+    Preset --> Config[Fetch JSON config]
+    Config --> Runtime[Merge runtime density options]
+    Runtime --> Canvas[tsParticles canvas]
+    Controls[Particle controls] --> Runtime
+    Motion[Reduced motion] --> Static[Static gradient fallback]
+`} title="Particle Runtime" />
+
+This gives the homepage a little motion and identity without forcing animation on every visitor. If the user disables particles, prefers reduced motion, or a config fails to load, the page falls back to a static gradient and keeps the controls available.
+
+---
+
+## Admin and Operations
+
+The site also has a private operational layer. The admin area pulls together content health, recent posts, telemetry, provider snapshots, analytics, and rate-limit state. It is intentionally separate from the public reading experience, but it uses the same backend model so issues like missing metadata, feed health, or search state are visible in one place.
+
+The public side also includes the operational basics a real site needs: sitemap generation, robots metadata, OpenSearch, feed endpoints, privacy page metadata, route-level error/loading states, and a custom not-found experience.
+
+<Details summary="Validation commands">
+
+```bash
+pnpm preprocess
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+```
+
+</Details>
+
+Those commands cover the build preprocessing path, linting, generated Next route types, TypeScript strict mode, unit and integration tests, and production build behavior.
+
+---
+
+## Trade-offs
+
+The site is intentionally more engineered than a static portfolio. That gives me searchable MDX, structured feeds, reusable metadata, visual experiments, and admin health checks, but it also means content changes run through a real validation pipeline.
+
+I am fine with that trade. This repo is not just a page about my work; it is one of the places where the work happens. The blog system, particle runtime, metadata layer, and admin surfaces are all small enough to inspect, but structured enough that I can keep adding posts and features without turning the site into a pile of one-off pages.
+
+---
+
+## Next
+
+The next pass is less about adding more surfaces and more about tightening the ones that exist: better docs for the content pipeline, cleaner public examples, stronger visual regression coverage for the homepage, and more useful admin signals around search, feeds, and post health.
+
+The main goal stays the same: one personal website, one authored content model, and enough engineering around it that publishing does not require remembering every place a post can appear.
