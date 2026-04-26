@@ -58,7 +58,7 @@ const DATA_SORCERER_THEME = theme(
 );
 
 const WORKFLOW_MAGE_THEME = theme(
-  arcaneSubtitle('workflow-mage', 'workflow mage', 'Weaver', 'ritual sigil-craft'),
+  arcaneSubtitle('workflow-mage', 'workflow mage', 'Weaver', 'ritual sigil craft'),
   {
     gradient: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 40%, #f59e0b 100%)',
     darkGradient: 'linear-gradient(135deg, #ddd6fe 0%, #a78bfa 42%, #fcd34d 100%)',
@@ -122,7 +122,7 @@ const SYSTEMS_SEER_THEME = theme(
 );
 
 const SIGNAL_ORACLE_THEME = theme(
-  arcaneSubtitle('signal-oracle', 'signal oracle', 'Oracle', 'far-signal divination'),
+  arcaneSubtitle('signal-oracle', 'signal oracle', 'Oracle', 'far signal divination'),
   {
     gradient: 'linear-gradient(135deg, #67e8f9 0%, #14b8a6 40%, #fbbf24 100%)',
     darkGradient: 'linear-gradient(135deg, #a5f3fc 0%, #5eead4 40%, #fcd34d 100%)',

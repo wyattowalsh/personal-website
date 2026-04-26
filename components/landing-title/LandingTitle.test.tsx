@@ -1,5 +1,7 @@
 // @vitest-environment jsdom
 
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -7,6 +9,13 @@ import { LandingTitle } from '@/components/LandingTitle';
 import { LANDING_TITLE_SUBTITLE_OPTIONS } from '@/components/landing-title/registry';
 
 const mockUseReducedMotion = vi.fn(() => false);
+const VISIBLE_DASH_PATTERN = /[-\u2010-\u2015]/;
+const LANDING_TITLE_CSS_MODULES = [
+  'systems.module.css',
+  'arcane.module.css',
+  'crafted.module.css',
+  'performance.module.css',
+] as const;
 
 vi.mock('next-themes', () => ({
   useTheme: () => ({
@@ -126,6 +135,26 @@ describe('LandingTitle locked previews', () => {
 
       expect(screen.getByRole('group', { name: new RegExp(option.text, 'i') })).toBeTruthy();
       unmount();
+    }
+  });
+
+  it('keeps visible subtitle copy dashless while retaining kebab-case ids', () => {
+    for (const option of LANDING_TITLE_SUBTITLE_OPTIONS) {
+      expect(option.id).toContain('-');
+      expect(option.text).not.toMatch(VISIBLE_DASH_PATTERN);
+      expect(option.signalDeck.family).not.toMatch(VISIBLE_DASH_PATTERN);
+      expect(option.signalDeck.descriptor).not.toMatch(VISIBLE_DASH_PATTERN);
+    }
+  });
+
+  it('keeps subtitle design CSS free of visible dash primitives', () => {
+    for (const fileName of LANDING_TITLE_CSS_MODULES) {
+      const css = readFileSync(join(process.cwd(), 'components/landing-title', fileName), 'utf8');
+
+      expect(css).not.toMatch(/\bdashed\b/);
+      expect(css).not.toContain('repeating-linear-gradient');
+      expect(css).not.toContain('hyphens: auto');
+      expect(css).not.toContain('overflow-wrap: anywhere');
     }
   });
 });

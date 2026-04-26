@@ -3,10 +3,13 @@ import { expect, test, type ConsoleMessage, type Page } from '@playwright/test';
 type SubtitleGeometry = {
   failures: string[];
   fontSize: number;
+  hyphens: string;
   id: string;
   lane: string;
   lockupWidth: number;
+  overflowWrap: string;
   text: string;
+  wordBreak: string;
 };
 
 type ViewportCase = {
@@ -180,7 +183,17 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
           const failures: string[] = [];
 
           if (!title) {
-            return { failures: ['missing h2'], fontSize: 0, id, lane, lockupWidth: 0, text: '' };
+            return {
+              failures: ['missing h2'],
+              fontSize: 0,
+              hyphens: '',
+              id,
+              lane,
+              lockupWidth: 0,
+              overflowWrap: '',
+              text: '',
+              wordBreak: '',
+            };
           }
 
           const text = title.textContent?.trim() ?? '';
@@ -193,8 +206,12 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
           const textRect = unionRect(rangeRects) ?? rectOf(title);
           range.detach();
 
-          const fontSize = Number.parseFloat(getComputedStyle(title).fontSize);
-          const lineHeightRaw = getComputedStyle(title).lineHeight;
+          const titleStyle = getComputedStyle(title);
+          const fontSize = Number.parseFloat(titleStyle.fontSize);
+          const lineHeightRaw = titleStyle.lineHeight;
+          const hyphens = titleStyle.hyphens;
+          const overflowWrap = titleStyle.overflowWrap;
+          const wordBreak = titleStyle.wordBreak;
           const lineHeight = lineHeightRaw === 'normal'
             ? fontSize * 1.2
             : Number.parseFloat(lineHeightRaw);
@@ -202,6 +219,22 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
 
           if (!text) {
             failures.push('empty title text');
+          }
+
+          if (/[-\u2010-\u2015]/.test(text)) {
+            failures.push('title contains visible dash');
+          }
+
+          if (hyphens !== 'none') {
+            failures.push(`hyphens ${hyphens} !== none`);
+          }
+
+          if (overflowWrap === 'anywhere') {
+            failures.push('overflow-wrap allows anywhere breaks');
+          }
+
+          if (wordBreak === 'break-all') {
+            failures.push('word-break allows break-all');
           }
 
           if (!Number.isFinite(lineHeightRatio) || lineHeightRatio < 1) {
@@ -263,7 +296,7 @@ test('every homepage subtitle matrix preview keeps title text inside its plate',
             ancestor = ancestor.parentElement;
           }
 
-          return { failures, fontSize, id, lane, lockupWidth, text };
+          return { failures, fontSize, hyphens, id, lane, lockupWidth, overflowWrap, text, wordBreak };
         });
       }, {
         minClearancePx: MIN_LOCKUP_CLEARANCE_PX,

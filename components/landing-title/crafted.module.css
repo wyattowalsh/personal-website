@@ -98,7 +98,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 22%),
-    repeating-linear-gradient(
+    linear-gradient(
       -14deg,
       transparent 0 12px,
       rgba(255, 255, 255, 0.03) 12px 13px,
@@ -227,7 +227,7 @@
 .sceneRig::before {
   inset: 0;
   background:
-    repeating-linear-gradient(
+    linear-gradient(
       -18deg,
       transparent 0 14px,
       rgba(255, 255, 255, 0.03) 14px 15px,
@@ -269,7 +269,7 @@
   padding-inline: 0.82rem;
   background:
     linear-gradient(180deg, rgba(255, 223, 164, 0.12), transparent 24%),
-    repeating-linear-gradient(
+    linear-gradient(
       -12deg,
       transparent 0 14px,
       rgba(255, 214, 153, 0.05) 14px 15px,
@@ -291,12 +291,12 @@
 .sceneAlchemist .sceneRig::before {
   background:
     radial-gradient(circle at 70% 28%, rgba(255, 180, 90, 0.08), transparent 18%),
-    repeating-linear-gradient(
+    linear-gradient(
       90deg,
       rgba(0, 0, 0, 0.08) 0 1px,
       transparent 1px 16px
     ),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 18px,
       rgba(255, 255, 255, 0.03) 18px 19px,
@@ -430,7 +430,7 @@
   background:
     radial-gradient(circle at 84% 16%, rgba(165, 243, 252, 0.18), transparent 20%),
     linear-gradient(180deg, rgba(194, 240, 246, 0.14), transparent 22%),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 13px,
       rgba(194, 240, 246, 0.05) 13px 14px,
@@ -449,7 +449,7 @@
 .sceneDigitalSculptor .sceneRig::before {
   background:
     radial-gradient(circle at 14% 78%, rgba(255, 255, 255, 0.08), transparent 24%),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       rgba(255, 255, 255, 0.035) 0 1px,
       transparent 1px 15px
@@ -472,7 +472,7 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.18), transparent 18%),
-    repeating-linear-gradient(
+    linear-gradient(
       -10deg,
       transparent 0 10px,
       rgba(255, 255, 255, 0.04) 10px 11px,
@@ -561,7 +561,7 @@
   max-width: 14.4rem;
   background:
     linear-gradient(180deg, rgba(227, 211, 255, 0.12), transparent 24%),
-    repeating-linear-gradient(
+    linear-gradient(
       -16deg,
       transparent 0 14px,
       rgba(165, 243, 252, 0.03) 14px 15px,
@@ -585,12 +585,12 @@
 .sceneHolographicSculptor .sceneRig::before {
   background:
     radial-gradient(circle at 50% 72%, rgba(34, 211, 238, 0.08), transparent 18%),
-    repeating-linear-gradient(
+    linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.03) 0 1px,
       transparent 1px 20px
     ),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 18px,
       rgba(255, 255, 255, 0.02) 18px 19px,
@@ -714,7 +714,7 @@
   background:
     radial-gradient(circle at 82% 18%, rgba(134, 239, 172, 0.18), transparent 20%),
     linear-gradient(180deg, rgba(189, 247, 205, 0.12), transparent 24%),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 14px,
       rgba(125, 211, 252, 0.04) 14px 15px,
@@ -738,12 +738,12 @@
 
 .sceneCyberDefense .sceneRig::before {
   background:
-    repeating-linear-gradient(
+    linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.03) 0 1px,
       transparent 1px 18px
     ),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 18px,
       rgba(255, 255, 255, 0.02) 18px 19px,
@@ -815,7 +815,7 @@
   margin-left: -1.5rem;
   border-radius: 0.5rem 0.5rem 0 0;
   background:
-    repeating-linear-gradient(
+    linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.2) 0 0.18rem,
       transparent 0.18rem 0.58rem
@@ -854,7 +854,7 @@
   max-width: 9.7rem;
   background:
     linear-gradient(180deg, rgba(255, 223, 182, 0.11), transparent 24%),
-    repeating-linear-gradient(
+    linear-gradient(
       -14deg,
       transparent 0 14px,
       rgba(255, 214, 153, 0.04) 14px 15px,
@@ -876,12 +876,12 @@
 .sceneBlockchain .sceneRig::before {
   background:
     radial-gradient(circle at 58% 52%, rgba(251, 146, 60, 0.1), transparent 18%),
-    repeating-linear-gradient(
+    linear-gradient(
       90deg,
       rgba(0, 0, 0, 0.12) 0 1px,
       transparent 1px 17px
     ),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 18px,
       rgba(255, 255, 255, 0.025) 18px 19px,
@@ -1021,7 +1021,7 @@
   background:
     radial-gradient(circle at 18% 16%, rgba(217, 249, 157, 0.18), transparent 20%),
     linear-gradient(180deg, rgba(214, 245, 180, 0.12), transparent 24%),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 14px,
       rgba(214, 245, 180, 0.04) 14px 15px,
@@ -1044,12 +1044,12 @@
 .sceneFrontier .sceneRig::before {
   background:
     radial-gradient(circle at 76% 72%, rgba(132, 204, 22, 0.1), transparent 16%),
-    repeating-linear-gradient(
+    linear-gradient(
       90deg,
       rgba(255, 255, 255, 0.03) 0 1px,
       transparent 1px 18px
     ),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 18px,
       rgba(255, 255, 255, 0.02) 18px 19px,
@@ -1460,7 +1460,7 @@
   .title {
     font-size: clamp(1rem, 8.4cqi, 1.46rem);
     letter-spacing: -0.015em;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .sceneBlockchain .title,
@@ -1521,7 +1521,7 @@
   border-radius: 0.7rem;
   background:
     linear-gradient(180deg, rgba(255, 244, 214, 0.14), transparent 28%),
-    repeating-linear-gradient(180deg, transparent 0 0.45rem, rgba(255, 255, 255, 0.08) 0.45rem 0.52rem);
+    linear-gradient(180deg, transparent 0 0.45rem, rgba(255, 255, 255, 0.08) 0.45rem 0.52rem);
   opacity: 0.52;
 }
 
@@ -1652,7 +1652,7 @@
   background:
     radial-gradient(circle at 16% 18%, color-mix(in srgb, var(--craft-fill-strong) 28%, transparent), transparent 28%),
     radial-gradient(circle at 82% 16%, color-mix(in srgb, var(--craft-edge) 22%, transparent), transparent 30%),
-    repeating-linear-gradient(102deg, transparent 0 18px, rgba(255, 255, 255, 0.035) 18px 19px, transparent 19px 37px),
+    linear-gradient(102deg, transparent 0 18px, rgba(255, 255, 255, 0.035) 18px 19px, transparent 19px 37px),
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 14%),
     linear-gradient(135deg, rgba(0, 0, 0, 0.3), transparent 38%),
     linear-gradient(155deg, var(--craft-panel), var(--craft-panel-2) 54%, var(--craft-panel-3));
@@ -1677,7 +1677,7 @@
 .sceneFrontier .sceneRig {
   background:
     radial-gradient(circle at 70% 22%, color-mix(in srgb, var(--craft-fill-strong) 24%, transparent), transparent 30%),
-    repeating-linear-gradient(-22deg, transparent 0 16px, rgba(255, 255, 255, 0.04) 16px 17px),
+    linear-gradient(-22deg, transparent 0 16px, rgba(255, 255, 255, 0.04) 16px 17px),
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 18%),
     linear-gradient(160deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.18)),
     rgba(8, 10, 18, 0.45);

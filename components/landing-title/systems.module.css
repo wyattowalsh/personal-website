@@ -53,8 +53,8 @@
   font-size: clamp(1rem, 4.8cqi, 1.58rem);
   line-height: 1.03;
   letter-spacing: clamp(0.018em, 0.38cqi, 0.045em);
-  overflow-wrap: anywhere;
-  hyphens: auto;
+  overflow-wrap: break-word;
+  hyphens: none;
   text-shadow: 0 1px 10px color-mix(in oklab, var(--sys-glow-soft) 68%, transparent);
 }
 
@@ -281,7 +281,7 @@
   right: 3rem;
   height: 0.42rem;
   background:
-    repeating-linear-gradient(90deg, var(--sys-edge) 0 14px, transparent 14px 28px),
+    linear-gradient(90deg, var(--sys-edge) 0 14px, transparent 14px 28px),
     linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
   opacity: 0.42;
   pointer-events: none;
@@ -305,7 +305,7 @@
   bottom: 0.05rem;
   height: 0.4rem;
   background:
-    repeating-linear-gradient(90deg, transparent 0 16px, var(--sys-edge) 16px 18px, transparent 18px 31px),
+    linear-gradient(90deg, transparent 0 16px, var(--sys-edge) 16px 18px, transparent 18px 31px),
     linear-gradient(90deg, transparent, var(--sys-glow-strong), transparent);
   opacity: 0.38;
   pointer-events: none;
@@ -377,7 +377,7 @@
   right: 1.4rem;
   top: 0.5rem;
   height: 0.18rem;
-  background: repeating-linear-gradient(90deg, var(--sys-edge) 0 18px, transparent 18px 28px);
+  background: linear-gradient(90deg, var(--sys-edge) 0 18px, transparent 18px 28px);
   opacity: 0.5;
 }
 
@@ -442,7 +442,7 @@
   right: 0.7rem;
   top: 0.68rem;
   height: 0.28rem;
-  background: repeating-linear-gradient(90deg, var(--sys-edge) 0 12px, transparent 12px 24px);
+  background: linear-gradient(90deg, var(--sys-edge) 0 12px, transparent 12px 24px);
   opacity: 0.42;
   pointer-events: none;
 }
@@ -549,7 +549,7 @@
   background:
     radial-gradient(circle at 78% 14%, rgba(191, 219, 254, 0.46), transparent 26%),
     linear-gradient(180deg, rgba(219, 234, 254, 0.2), transparent 30%),
-    repeating-linear-gradient(
+    linear-gradient(
       0deg,
       transparent 0 12px,
       rgba(59, 130, 246, 0.07) 12px 13px,
@@ -629,7 +629,7 @@
     radial-gradient(circle at 72% 24%, rgba(255, 255, 255, 0.34), transparent 18%),
     radial-gradient(circle at 48% 66%, rgba(125, 211, 252, 0.16), transparent 30%),
     linear-gradient(180deg, rgba(239, 246, 255, 0.98), rgba(207, 222, 243, 0.99)),
-    repeating-linear-gradient(90deg, transparent 0 18px, rgba(59, 130, 246, 0.05) 18px 19px);
+    linear-gradient(90deg, transparent 0 18px, rgba(59, 130, 246, 0.05) 18px 19px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
     inset 0 0 0 1px rgba(59, 130, 246, 0.08),
@@ -640,8 +640,8 @@
 .sceneCloud .sceneRig::before {
   background:
     linear-gradient(90deg, rgba(59, 130, 246, 0.06), transparent 18%, transparent 82%, rgba(59, 130, 246, 0.06)),
-    repeating-linear-gradient(90deg, rgba(59, 130, 246, 0.06) 0 1px, transparent 1px 18px),
-    repeating-linear-gradient(0deg, transparent 0 18px, rgba(59, 130, 246, 0.05) 18px 19px, transparent 19px 36px);
+    linear-gradient(90deg, rgba(59, 130, 246, 0.06) 0 1px, transparent 1px 18px),
+    linear-gradient(0deg, transparent 0 18px, rgba(59, 130, 246, 0.05) 18px 19px, transparent 19px 36px);
   opacity: 0.34;
 }
 
@@ -672,7 +672,7 @@
   border: 1px solid rgba(56, 189, 248, 0.12);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.34), transparent 34%),
-    repeating-linear-gradient(0deg, transparent 0 14px, rgba(56, 189, 248, 0.06) 14px 15px, transparent 15px 28px);
+    linear-gradient(0deg, transparent 0 14px, rgba(56, 189, 248, 0.06) 14px 15px, transparent 15px 28px);
   pointer-events: none;
 }
 
@@ -724,7 +724,7 @@
     radial-gradient(circle at 68% 34%, rgba(56, 189, 248, 0.14), transparent 18%),
     linear-gradient(180deg, rgba(252, 250, 243, 0.98), rgba(223, 231, 238, 0.98)),
     linear-gradient(135deg, rgba(251, 191, 36, 0.06), transparent 32%),
-    repeating-linear-gradient(90deg, transparent 0 24px, rgba(56, 189, 248, 0.05) 24px 25px);
+    linear-gradient(90deg, transparent 0 24px, rgba(56, 189, 248, 0.05) 24px 25px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     inset 0 -18px 24px rgba(148, 163, 184, 0.12);
@@ -809,7 +809,7 @@
     radial-gradient(circle at 72% 22%, rgba(249, 115, 22, 0.14), transparent 18%),
     radial-gradient(circle at 28% 72%, rgba(251, 191, 36, 0.12), transparent 22%),
     linear-gradient(180deg, rgba(247, 242, 236, 0.98), rgba(220, 224, 235, 0.98)),
-    repeating-linear-gradient(0deg, transparent 0 18px, rgba(249, 115, 22, 0.05) 18px 19px);
+    linear-gradient(0deg, transparent 0 18px, rgba(249, 115, 22, 0.05) 18px 19px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.58),
     inset 0 -18px 24px rgba(148, 163, 184, 0.12);
@@ -818,7 +818,7 @@
 .cyberneticRig {
   background:
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel-3)),
-    repeating-linear-gradient(0deg, transparent 0 20px, var(--sys-struct-faint) 20px 21px),
+    linear-gradient(0deg, transparent 0 20px, var(--sys-struct-faint) 20px 21px),
     linear-gradient(90deg, transparent 0 18%, var(--sys-struct) 18% 22%, transparent 22% 78%, var(--sys-struct) 78% 82%, transparent 82% 100%);
 }
 
@@ -908,7 +908,7 @@
 .zeroTrustRig {
   background:
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel)),
-    repeating-linear-gradient(90deg, transparent 0 22px, var(--sys-struct-faint) 22px 23px);
+    linear-gradient(90deg, transparent 0 22px, var(--sys-struct-faint) 22px 23px);
 }
 
 .zeroRing,
@@ -955,7 +955,7 @@
 .zeroRingInner {
   width: 4.75rem;
   height: 4.75rem;
-  border: 1px dashed var(--sys-glow-strong);
+  border: 1px solid var(--sys-glow-strong);
   border-radius: 999px;
   opacity: 0.84;
 }
@@ -973,7 +973,7 @@
   background:
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel)),
     radial-gradient(circle at center, var(--sys-glow-soft), transparent 58%),
-    repeating-linear-gradient(90deg, transparent 0 19px, var(--sys-struct-faint) 19px 20px);
+    linear-gradient(90deg, transparent 0 19px, var(--sys-struct-faint) 19px 20px);
 }
 
 .syntheticCore {
@@ -1059,7 +1059,7 @@
   background:
     linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3)),
     linear-gradient(90deg, transparent 49%, var(--sys-struct) 49% 51%, transparent 51%),
-    repeating-linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
+    linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
 }
 
 .quantumOrbit,
@@ -1131,7 +1131,7 @@
     radial-gradient(circle at 66% 28%, var(--sys-glow-soft), transparent 22%),
     linear-gradient(180deg, var(--sys-panel), var(--sys-panel-3)),
     linear-gradient(0deg, transparent 0 74%, var(--sys-struct-faint) 74% 75%, transparent 75%),
-    repeating-linear-gradient(90deg, transparent 0 24px, var(--sys-struct-faint) 24px 25px);
+    linear-gradient(90deg, transparent 0 24px, var(--sys-struct-faint) 24px 25px);
 }
 
 .cloudMasses {
@@ -1334,7 +1334,7 @@
   background:
     radial-gradient(circle at 72% 22%, rgba(249, 115, 22, 0.12), transparent 18%),
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel-3)),
-    repeating-linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
+    linear-gradient(0deg, transparent 0 18px, var(--sys-struct-faint) 18px 19px);
 }
 
 .orchestratorScore {
@@ -1551,7 +1551,7 @@
   .title {
     font-size: clamp(0.96rem, 7.8cqi, 1.38rem);
     letter-spacing: 0.035em;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .sceneZeroTrust .title,
@@ -1697,7 +1697,7 @@
   width: 5.2rem;
   height: 5.2rem;
   transform: translate(-50%, -50%);
-  border: 1px dashed var(--sys-glow-strong);
+  border: 1px solid var(--sys-glow-strong);
   border-radius: 999px;
   opacity: 0.45;
 }
@@ -1822,8 +1822,8 @@
 
 .mapFold {
   inset: 1.05rem;
-  border-left: 1px dashed color-mix(in srgb, var(--sys-edge) 75%, transparent);
-  border-right: 1px dashed color-mix(in srgb, var(--sys-edge) 55%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--sys-edge) 75%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--sys-edge) 55%, transparent);
   opacity: 0.45;
 }
 
@@ -1847,7 +1847,7 @@
   border-radius: 0.7rem;
   background:
     linear-gradient(180deg, color-mix(in srgb, var(--sys-glow-soft) 36%, transparent), transparent 60%),
-    repeating-linear-gradient(180deg, transparent 0 0.5rem, color-mix(in srgb, var(--sys-edge) 55%, transparent) 0.5rem 0.58rem);
+    linear-gradient(180deg, transparent 0 0.5rem, color-mix(in srgb, var(--sys-edge) 55%, transparent) 0.5rem 0.58rem);
   opacity: 0.48;
 }
 
@@ -1920,7 +1920,7 @@
 .sceneOrchestrator .sceneRig {
   background:
     radial-gradient(circle at 72% 24%, color-mix(in srgb, var(--sys-glow-strong) 20%, transparent), transparent 28%),
-    repeating-linear-gradient(135deg, transparent 0 13px, color-mix(in srgb, var(--sys-struct-faint) 70%, transparent) 13px 14px),
+    linear-gradient(135deg, transparent 0 13px, color-mix(in srgb, var(--sys-struct-faint) 70%, transparent) 13px 14px),
     linear-gradient(180deg, var(--sys-panel-2), var(--sys-panel) 46%, var(--sys-panel-3));
 }
 

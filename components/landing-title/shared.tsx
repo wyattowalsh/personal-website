@@ -281,8 +281,11 @@ export function getTitleTextStyle(themeConfig: SubtitleTheme, isDark: boolean): 
     fontStyle: themeConfig.fontStyle,
     fontWeight: themeConfig.fontWeight,
     letterSpacing: themeConfig.letterSpacing,
+    hyphens: 'none',
+    overflowWrap: 'break-word',
     textTransform: themeConfig.textTransform,
     textShadow: 'none',
+    wordBreak: 'normal',
     WebkitBackgroundClip: 'text',
   };
 }

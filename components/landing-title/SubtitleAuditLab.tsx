@@ -203,7 +203,7 @@ export function SubtitleAuditLab() {
         </p>
         <div className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Inspect every homepage subtitle before the ground-up rebuild
+            Inspect every homepage subtitle before the ground up rebuild
           </h1>
           <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
             Lock any of the {LANDING_TITLE_SUBTITLE_OPTIONS.length} subtitle variants, switch theme
@@ -375,7 +375,7 @@ export function SubtitleAuditLab() {
                               </p>
                             ) : null}
                           </div>
-                          <p className="truncate text-sm font-medium text-foreground">{option.text}</p>
+                          <p className="break-words text-sm font-medium text-foreground">{option.text}</p>
                           {showSignalDeck ? (
                             <p className="line-clamp-2 text-xs text-muted-foreground">{option.signalDeck.descriptor}</p>
                           ) : null}
