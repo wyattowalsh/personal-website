@@ -1,19 +1,7 @@
 import 'server-only';
 
-const DEFAULT_POSTHOG_API_HOST = 'https://us.posthog.com';
-const ANALYTICS_WINDOW_DAYS = 30;
-const POSTHOG_QUERY_TIMEOUT_MS = 10_000;
-const INTERACTION_EVENTS = [
-  'reading_progress',
-  'time_on_page',
-  'search_query',
-  'search_no_results',
-  'share_click',
-  'scroll_depth',
-  'link_click',
-  'code_copied',
-  'theme_changed',
-] as const;
+import { DEFAULT_ANALYTICS_WINDOW_DAYS, type AnalyticsWindowDays } from './analytics-windows';
+import { eventList, getPostHogConfig, queryPostHog } from './posthog-query';
 
 export type AnalyticsStatus = 'configured' | 'missing_config' | 'error';
 
@@ -47,6 +35,7 @@ export interface VisitorAnalyticsSnapshot {
   status: AnalyticsStatus;
   generatedAt: string;
   windowDays: number;
+  source: 'posthog_live' | 'turso_rollup';
   missingEnv: string[];
   error?: string;
   overview: AnalyticsMetric[];
@@ -60,66 +49,32 @@ export interface VisitorAnalyticsSnapshot {
   trafficSeries: TrafficPoint[];
   eventMix: AnalyticsRow[];
   pageEngagement: PageEngagementRow[];
+  rollup?: AnalyticsRollupSummary;
 }
 
-interface PostHogConfig {
-  apiHost: string;
-  personalApiKey: string;
-  projectId: string;
-}
-
-interface PostHogQueryResponse {
-  results?: unknown[][];
+export interface AnalyticsRollupSummary {
+  status: 'configured' | 'missing_config' | 'error';
+  latestDay?: string;
+  coveredDays: number;
+  lastRunStatus?: string;
+  lastRunAt?: string;
+  missingEnv: string[];
   error?: string;
-  detail?: string;
 }
 
-function cleanEnvValue(value: string | undefined): string | undefined {
-  const cleaned = value?.trim().replace(/\\n$/g, '');
-  return cleaned || undefined;
-}
-
-function deriveApiHostFromCaptureHost(captureHost?: string): string {
-  if (!captureHost) return DEFAULT_POSTHOG_API_HOST;
-
-  try {
-    const url = new URL(captureHost);
-    url.hostname = url.hostname.replace('.i.posthog.com', '.posthog.com');
-    return url.origin;
-  } catch {
-    return DEFAULT_POSTHOG_API_HOST;
-  }
-}
-
-function getPostHogConfig(): { config: PostHogConfig | null; missingEnv: string[] } {
-  const missingEnv: string[] = [];
-  const publicToken = cleanEnvValue(process.env.NEXT_PUBLIC_POSTHOG_TOKEN);
-  const personalApiKey = cleanEnvValue(process.env.POSTHOG_PERSONAL_API_KEY);
-  const projectId = cleanEnvValue(process.env.POSTHOG_PROJECT_ID);
-  const apiHost = (
-    cleanEnvValue(process.env.POSTHOG_API_HOST)
-    || deriveApiHostFromCaptureHost(cleanEnvValue(process.env.NEXT_PUBLIC_POSTHOG_HOST))
-  ).replace(/\/+$/, '');
-
-  if (!publicToken) missingEnv.push('NEXT_PUBLIC_POSTHOG_TOKEN');
-  if (!personalApiKey) missingEnv.push('POSTHOG_PERSONAL_API_KEY');
-  if (!projectId) missingEnv.push('POSTHOG_PROJECT_ID');
-
-  if (!personalApiKey || !projectId || !publicToken) {
-    return { config: null, missingEnv };
-  }
-
-  return {
-    config: { apiHost, personalApiKey, projectId },
-    missingEnv,
-  };
-}
-
-function emptySnapshot(status: AnalyticsStatus, missingEnv: string[] = [], error?: string): VisitorAnalyticsSnapshot {
+function emptySnapshot(
+  status: AnalyticsStatus,
+  missingEnv: string[] = [],
+  error?: string,
+  windowDays: AnalyticsWindowDays = DEFAULT_ANALYTICS_WINDOW_DAYS,
+  source: VisitorAnalyticsSnapshot['source'] = 'posthog_live',
+  rollup?: AnalyticsRollupSummary
+): VisitorAnalyticsSnapshot {
   return {
     status,
     generatedAt: new Date().toISOString(),
-    windowDays: ANALYTICS_WINDOW_DAYS,
+    windowDays,
+    source,
     missingEnv,
     error,
     overview: [
@@ -138,6 +93,7 @@ function emptySnapshot(status: AnalyticsStatus, missingEnv: string[] = [], error
     trafficSeries: [],
     eventMix: [],
     pageEngagement: [],
+    rollup,
   };
 }
 
@@ -153,57 +109,9 @@ function asText(value: unknown, fallback = 'Unknown'): string {
   return trimmed || fallback;
 }
 
-function eventList(): string {
-  return INTERACTION_EVENTS.map((event) => `'${event}'`).join(', ');
-}
-
 function toNumber(value: unknown): number {
   const numeric = Number(value ?? 0);
   return Number.isFinite(numeric) ? numeric : 0;
-}
-
-async function queryPostHog(config: PostHogConfig, name: string, query: string): Promise<unknown[][]> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), POSTHOG_QUERY_TIMEOUT_MS);
-  let response: Response;
-
-  try {
-    response = await fetch(`${config.apiHost}/api/projects/${config.projectId}/query/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.personalApiKey}`,
-      },
-      body: JSON.stringify({
-        name,
-        query: {
-          kind: 'HogQLQuery',
-          query,
-        },
-      }),
-      cache: 'no-store',
-      signal: controller.signal,
-    });
-  } catch (error) {
-    if (controller.signal.aborted) {
-      throw new Error(`PostHog query timed out after ${Math.round(POSTHOG_QUERY_TIMEOUT_MS / 1000)}s`);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeout);
-  }
-
-  const payload = (await response.json().catch(() => ({}))) as PostHogQueryResponse;
-
-  if (!response.ok) {
-    throw new Error(payload.detail || payload.error || `PostHog query failed with ${response.status}`);
-  }
-
-  if (!Array.isArray(payload.results)) {
-    throw new Error('PostHog query response did not include results');
-  }
-
-  return payload.results;
 }
 
 function rowsToAnalyticsRows(
@@ -218,9 +126,14 @@ function rowsToAnalyticsRows(
   }));
 }
 
-export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSnapshot> {
+export async function getVisitorAnalyticsSnapshot(windowDays: AnalyticsWindowDays = DEFAULT_ANALYTICS_WINDOW_DAYS): Promise<VisitorAnalyticsSnapshot> {
+  if (windowDays !== DEFAULT_ANALYTICS_WINDOW_DAYS) {
+    const { getRollupAnalyticsSnapshot } = await import('./analytics-rollups');
+    return getRollupAnalyticsSnapshot(windowDays);
+  }
+
   const { config, missingEnv } = getPostHogConfig();
-  if (!config) return emptySnapshot('missing_config', missingEnv);
+  if (!config) return emptySnapshot('missing_config', missingEnv, undefined, windowDays);
 
   try {
     const [
@@ -241,14 +154,14 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin overview',
         `SELECT count() AS pageviews, uniqExact(distinct_id) AS visitors, uniqExact(properties.session_id) AS sessions
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY AND event = '$pageview'`
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY AND event = '$pageview'`
       ),
       queryPostHog(
         config,
         'admin interaction totals',
         `SELECT event, count() AS count
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY AND event IN (${eventList()})
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY AND event IN (${eventList()})
          GROUP BY event
          ORDER BY count DESC`
       ),
@@ -257,7 +170,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin top pages',
         `SELECT properties.$pathname AS path, count() AS views, uniqExact(distinct_id) AS visitors
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY AND event = '$pageview'
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY AND event = '$pageview'
          GROUP BY path
          ORDER BY views DESC
          LIMIT 10`
@@ -267,7 +180,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin referrers',
         `SELECT properties.$referrer AS referrer, count() AS visits
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY
            AND event = '$pageview'
            AND properties.$referrer != ''
          GROUP BY referrer
@@ -279,7 +192,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin devices',
         `SELECT properties.device_category AS device, count() AS views
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY AND event = '$pageview'
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY AND event = '$pageview'
          GROUP BY device
          ORDER BY views DESC
          LIMIT 6`
@@ -289,7 +202,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin searches',
         `SELECT properties.query AS query, count() AS count, event
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY
            AND event IN ('search_query', 'search_no_results')
            AND properties.query != ''
          GROUP BY query, event
@@ -301,7 +214,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin outbound links',
         `SELECT properties.href AS href, count() AS clicks
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY
            AND event = 'link_click'
            AND properties.external = true
          GROUP BY href
@@ -313,7 +226,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin reading progress',
         `SELECT properties.slug AS slug, max(properties.percent) AS max_percent, count() AS events
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY
            AND event = 'reading_progress'
            AND properties.slug != ''
          GROUP BY slug
@@ -325,7 +238,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin traffic series',
         `SELECT toString(toDate(timestamp)) AS date, count() AS pageviews, uniqExact(distinct_id) AS visitors, uniqExact(properties.session_id) AS sessions
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY AND event = '$pageview'
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY AND event = '$pageview'
          GROUP BY date
          ORDER BY date ASC`
       ),
@@ -334,7 +247,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin event mix',
         `SELECT event, count() AS count
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY
          GROUP BY event
          ORDER BY count DESC
          LIMIT 12`
@@ -344,7 +257,7 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         'admin page event matrix',
         `SELECT properties.$pathname AS path, event, count() AS count
          FROM events
-         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         WHERE timestamp >= now() - INTERVAL ${windowDays} DAY
            AND properties.$pathname != ''
            AND (event = '$pageview' OR event IN (${eventList()}))
          GROUP BY path, event
@@ -381,7 +294,8 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
     return {
       status: 'configured',
       generatedAt: new Date().toISOString(),
-      windowDays: ANALYTICS_WINDOW_DAYS,
+      windowDays,
+      source: 'posthog_live',
       missingEnv: [],
       overview: [
         { label: 'Visitors', value: formatCount(overview[1]), description: 'Unique anonymous browsers' },
@@ -415,7 +329,8 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
     return emptySnapshot(
       'error',
       [],
-      error instanceof Error ? error.message : 'PostHog analytics query failed'
+      error instanceof Error ? error.message : 'PostHog analytics query failed',
+      windowDays
     );
   }
 }

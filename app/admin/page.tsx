@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
 import {
   Activity,
@@ -20,7 +21,9 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { validateAdminSession } from './lib/auth';
+import { ANALYTICS_WINDOWS, parseAnalyticsWindowDays } from './lib/analytics-windows';
 import {
   getAdminDashboardSnapshot,
   type AdminProviderSnapshot,
@@ -64,6 +67,27 @@ function EmptyState({ label }: { label: string }) {
   return (
     <div className="rounded-lg border border-dashed border-border/80 bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
       {label}
+    </div>
+  );
+}
+
+function AnalyticsWindowSelector({ activeWindow }: { activeWindow: number }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {ANALYTICS_WINDOWS.map((windowDays) => (
+        <Link
+          key={windowDays}
+          href={`/admin?window=${windowDays}`}
+          className={cn(
+            'rounded-md border px-3 py-1.5 font-mono text-[0.68rem] uppercase tracking-[0.14em] no-underline transition-colors',
+            activeWindow === windowDays
+              ? 'border-[hsl(var(--chart-1)/0.45)] bg-[hsl(var(--chart-1)/0.12)] text-[hsl(var(--chart-1))]'
+              : 'border-border/80 bg-background/55 text-muted-foreground hover:border-[hsl(var(--chart-1)/0.35)] hover:text-foreground'
+          )}
+        >
+          {windowDays}d
+        </Link>
+      ))}
     </div>
   );
 }
@@ -194,19 +218,23 @@ function ProviderCard({ provider }: { provider: AdminProviderSnapshot }) {
 }
 
 function VisitorsSection({ analytics }: { analytics: VisitorAnalyticsSnapshot }) {
+  const isRollup = analytics.source === 'turso_rollup';
+
   return (
     <div className="space-y-6">
       {analytics.status === 'missing_config' && (
         <ProviderCard
           provider={{
             id: 'posthog',
-            title: 'PostHog',
+            title: isRollup ? 'Analytics Rollups' : 'PostHog',
             status: 'missing_config',
             lastCheckedAt: analytics.generatedAt,
-            freeTier: 'Free tier includes product analytics, web analytics, and API access within monthly limits',
+            freeTier: isRollup
+              ? 'Turso stores daily SQLite rollups for longer visitor windows'
+              : 'Free tier includes product analytics, web analytics, and API access within monthly limits',
             missingEnv: analytics.missingEnv,
             setupSteps: analytics.missingEnv.map((name) => `vercel env add ${name} production`),
-            sourceUrl: 'https://posthog.com/pricing',
+            sourceUrl: isRollup ? 'https://turso.tech/pricing' : 'https://posthog.com/pricing',
             cards: [],
             rows: [],
           }}
@@ -225,6 +253,23 @@ function VisitorsSection({ analytics }: { analytics: VisitorAnalyticsSnapshot })
       )}
 
       <MetricGrid metrics={analytics.overview} icons={visitorMetricIcons} />
+
+      {analytics.rollup && (
+        <CyberPanel
+          title="Rollup Store"
+          description={analytics.rollup.status === 'configured'
+            ? 'Daily SQLite snapshots power longer visitor windows.'
+            : 'Longer visitor windows need Turso rollup storage.'}
+          icon={CircleDot}
+        >
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <SignalCard label="Source" value={analytics.source === 'turso_rollup' ? 'Turso' : 'PostHog'} description="Active data path" icon={Radar} tone="blue" />
+            <SignalCard label="Covered Days" value={analytics.rollup.coveredDays} description="Persisted daily rows" icon={BarChart3} tone="emerald" />
+            <SignalCard label="Latest Day" value={analytics.rollup.latestDay ?? 'n/a'} description="Newest rollup snapshot" icon={Activity} tone="violet" />
+            <SignalCard label="Last Run" value={analytics.rollup.lastRunStatus ?? analytics.rollup.status} description={analytics.rollup.lastRunAt ?? 'No recorded run'} icon={ShieldCheck} tone={analytics.rollup.status === 'error' ? 'rose' : analytics.rollup.status === 'missing_config' ? 'amber' : 'emerald'} />
+          </div>
+        </CyberPanel>
+      )}
 
       <div className="grid gap-4 xl:grid-cols-[1.45fr_0.9fr]">
         <CyberPanel title="Traffic Pulse" description="Daily PostHog pageviews, visitors, and sessions." icon={Activity}>
@@ -306,13 +351,19 @@ function SetupSection({ providers }: { providers: AdminProviderSnapshot[] }) {
   );
 }
 
-export default async function AdminPage() {
+type AdminPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function AdminPage({ searchParams }: AdminPageProps) {
   const isAuthed = await validateAdminSession();
   if (!isAuthed) {
     return null;
   }
 
-  const dashboard = await getAdminDashboardSnapshot();
+  const params = searchParams ? await searchParams : {};
+  const windowDays = parseAnalyticsWindowDays(params.window);
+  const dashboard = await getAdminDashboardSnapshot(windowDays);
   const providers = [
     ...dashboard.growth,
     ...dashboard.performance,
@@ -333,15 +384,19 @@ export default async function AdminPage() {
           meta={(
             <>
               <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">Last {dashboard.visitors.windowDays} visitor days</Badge>
+              <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{dashboard.visitors.source === 'turso_rollup' ? 'Rollup store' : 'Live PostHog'}</Badge>
               <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{configuredCount} live</Badge>
               {needsSetupCount > 0 && <Badge variant="secondary">{needsSetupCount} setup</Badge>}
               {errorCount > 0 && <Badge variant="destructive">{errorCount} errors</Badge>}
             </>
           )}
         >
-          <div className="rounded-lg border border-border/80 bg-background/55 px-4 py-3">
-            <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Updated</p>
-            <p className="mt-1 text-sm font-medium">{formatGeneratedAt(dashboard.generatedAt)}</p>
+          <div className="space-y-3">
+            <AnalyticsWindowSelector activeWindow={dashboard.visitors.windowDays} />
+            <div className="rounded-lg border border-border/80 bg-background/55 px-4 py-3">
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Updated</p>
+              <p className="mt-1 text-sm font-medium">{formatGeneratedAt(dashboard.generatedAt)}</p>
+            </div>
           </div>
         </AdminHero>
 
@@ -349,7 +404,7 @@ export default async function AdminPage() {
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <SignalCard label="Provider mesh" value={`${configuredCount}/${providers.length}`} description="Live integrations" icon={CircleDot} tone="emerald" />
-          <SignalCard label="Visitor window" value={`${dashboard.visitors.windowDays}d`} description="PostHog query range" icon={UsersRound} tone="blue" />
+          <SignalCard label="Visitor window" value={`${dashboard.visitors.windowDays}d`} description={dashboard.visitors.source === 'turso_rollup' ? 'Persisted rollup range' : 'PostHog query range'} icon={UsersRound} tone="blue" />
           <SignalCard label="Setup queue" value={needsSetupCount} description="Providers missing configuration" icon={Settings2} tone={needsSetupCount > 0 ? 'amber' : 'emerald'} />
           <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
         </div>

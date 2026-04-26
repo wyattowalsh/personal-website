@@ -1,6 +1,33 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getVisitorAnalyticsSnapshot } from './visitor-analytics';
 
+vi.mock('./analytics-rollups', () => ({
+  getRollupAnalyticsSnapshot: vi.fn((windowDays: number) => Promise.resolve({
+    status: 'configured',
+    generatedAt: '2026-04-26T12:00:00.000Z',
+    windowDays,
+    source: 'turso_rollup',
+    missingEnv: [],
+    overview: [],
+    topPages: [],
+    referrers: [],
+    devices: [],
+    interactions: [],
+    searches: [],
+    outboundLinks: [],
+    readingProgress: [],
+    trafficSeries: [],
+    eventMix: [],
+    pageEngagement: [],
+    rollup: {
+      status: 'configured',
+      latestDay: '2026-04-26',
+      coveredDays: 90,
+      missingEnv: [],
+    },
+  })),
+}));
+
 const ORIGINAL_ENV = process.env;
 
 function mockJsonResponse(payload: unknown, ok = true, status = 200): Response {
@@ -64,6 +91,7 @@ describe('getVisitorAnalyticsSnapshot()', () => {
     const snapshot = await getVisitorAnalyticsSnapshot();
 
     expect(snapshot.status).toBe('configured');
+    expect(snapshot.source).toBe('posthog_live');
     expect(snapshot.overview).toEqual([
       { label: 'Visitors', value: '12', description: 'Unique anonymous browsers' },
       { label: 'Sessions', value: '9', description: 'Per-tab visit sessions' },
@@ -92,6 +120,15 @@ describe('getVisitorAnalyticsSnapshot()', () => {
     expect((init as RequestInit).headers).toMatchObject({
       Authorization: 'Bearer phx_secret',
     });
+  });
+
+  it('uses persisted rollups for visitor windows beyond 30 days', async () => {
+    const snapshot = await getVisitorAnalyticsSnapshot(90);
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.source).toBe('turso_rollup');
+    expect(snapshot.windowDays).toBe(90);
+    expect(fetch).not.toHaveBeenCalled();
   });
 
   it('normalizes escaped newlines from env values before querying PostHog', async () => {

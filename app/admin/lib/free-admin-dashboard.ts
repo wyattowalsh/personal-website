@@ -3,6 +3,8 @@ import 'server-only';
 import { createSign } from 'node:crypto';
 import { BackendService } from '@/lib/server';
 import type { Post } from '@/lib/types';
+import { getAnalyticsRollupHealth } from './analytics-rollups';
+import type { AnalyticsWindowDays } from './analytics-windows';
 import { getVisitorAnalyticsSnapshot, type AnalyticsMetric, type AnalyticsRow, type VisitorAnalyticsSnapshot } from './visitor-analytics';
 
 const DEFAULT_SITE_URL = 'https://www.w4w.dev';
@@ -34,6 +36,7 @@ export interface AdminDashboardSnapshot {
   growth: AdminProviderSnapshot[];
   performance: AdminProviderSnapshot[];
   operations: AdminProviderSnapshot[];
+  rollupStorage: AdminProviderSnapshot;
   contentHealth: AdminProviderSnapshot;
 }
 
@@ -854,7 +857,46 @@ export async function getContentHealthSnapshot(): Promise<AdminProviderSnapshot>
   }
 }
 
-export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapshot> {
+export async function getAnalyticsRollupProviderSnapshot(): Promise<AdminProviderSnapshot> {
+  const health = await getAnalyticsRollupHealth();
+  const base = {
+    id: 'analytics-rollups',
+    title: 'Analytics Rollups',
+    freeTier: 'Turso free tier provides persistent SQLite/libSQL rollups for longer visitor windows',
+    sourceUrl: 'https://turso.tech/pricing',
+  };
+
+  if (health.status === 'missing_config') {
+    return missingProvider({
+      ...base,
+      missingEnv: health.missingEnv,
+    });
+  }
+
+  if (health.status === 'error') {
+    return errorProvider(base, new Error(health.error ?? 'Analytics rollup health check failed'));
+  }
+
+  return configuredProvider({
+    ...base,
+    cards: [
+      { label: 'Covered Days', value: formatNumber(health.coveredDays), description: 'Persisted daily snapshots' },
+      { label: 'Latest Day', value: health.latestDay ?? 'n/a', description: 'Newest stored rollup day' },
+      { label: 'Last Run', value: health.lastRunStatus ?? 'n/a', description: 'Most recent cron/backfill status' },
+      { label: 'Setup Gaps', value: formatNumber(health.missingEnv.length), description: 'Missing rollup env vars' },
+    ],
+    rows: [
+      { label: 'Database', value: 'Turso/libSQL', detail: 'Production-persistent SQLite-compatible store' },
+      { label: 'Cron route', value: '/api/admin/analytics-rollup', detail: 'Daily Vercel Cron refresh endpoint' },
+      { label: 'Latest run', value: health.lastRunStatus ?? 'n/a', detail: health.lastRunAt ?? 'No recorded run yet' },
+      ...(health.missingEnv.length > 0
+        ? health.missingEnv.map((name) => ({ label: name, value: 'Missing', detail: `vercel env add ${name} production` }))
+        : [{ label: 'Environment', value: 'Ready', detail: 'Turso and cron env vars are present' }]),
+    ],
+  });
+}
+
+export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays): Promise<AdminDashboardSnapshot> {
   const [
     visitors,
     searchConsole,
@@ -863,15 +905,17 @@ export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapsho
     vercel,
     github,
     uptimeRobot,
+    rollupStorage,
     contentHealth,
   ] = await Promise.all([
-    getVisitorAnalyticsSnapshot(),
+    getVisitorAnalyticsSnapshot(windowDays),
     getSearchConsoleSnapshot(),
     getIndexNowSnapshot(),
     getPerformanceSnapshot(),
     getVercelSnapshot(),
     getGitHubSnapshot(),
     getUptimeRobotSnapshot(),
+    getAnalyticsRollupProviderSnapshot(),
     getContentHealthSnapshot(),
   ]);
 
@@ -880,7 +924,8 @@ export async function getAdminDashboardSnapshot(): Promise<AdminDashboardSnapsho
     visitors,
     growth: [searchConsole, indexNow],
     performance: [performance],
-    operations: [vercel, github, uptimeRobot],
+    operations: [rollupStorage, vercel, github, uptimeRobot],
+    rollupStorage,
     contentHealth,
   };
 }

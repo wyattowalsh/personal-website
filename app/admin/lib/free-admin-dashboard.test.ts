@@ -44,6 +44,7 @@ vi.mock('./visitor-analytics', () => ({
     status: 'missing_config',
     generatedAt: '2026-04-25T12:00:00.000Z',
     windowDays: 30,
+    source: 'posthog_live',
     missingEnv: ['POSTHOG_PERSONAL_API_KEY'],
     overview: [],
     topPages: [],
@@ -56,6 +57,14 @@ vi.mock('./visitor-analytics', () => ({
     trafficSeries: [],
     eventMix: [],
     pageEngagement: [],
+  })),
+}));
+
+vi.mock('./analytics-rollups', () => ({
+  getAnalyticsRollupHealth: vi.fn(() => Promise.resolve({
+    status: 'missing_config',
+    coveredDays: 0,
+    missingEnv: ['TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN', 'CRON_SECRET'],
   })),
 }));
 
@@ -270,7 +279,8 @@ describe('free admin dashboard providers', () => {
     const dashboard = await getAdminDashboardSnapshot();
 
     expect(dashboard.growth.map((provider) => provider.id)).toEqual(['search-console', 'indexnow']);
-    expect(dashboard.operations.map((provider) => provider.id)).toEqual(['vercel', 'github', 'uptimerobot']);
+    expect(dashboard.operations.map((provider) => provider.id)).toEqual(['analytics-rollups', 'vercel', 'github', 'uptimerobot']);
+    expect(dashboard.rollupStorage.missingEnv).toEqual(['TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN', 'CRON_SECRET']);
     expect(dashboard.contentHealth.cards[0]).toEqual({
       label: 'Posts',
       value: '2',
