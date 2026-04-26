@@ -2,7 +2,7 @@
 title: "Agents"
 image: "/agents-social-card.png"
 caption: "Portable skills and MCP tools for coding agents"
-summary: "A source-controlled catalog of portable AI agent skills, MCP configuration, and shared instructions for keeping coding-agent workflows consistent across tools."
+summary: "A deep dive into Agents, my source-controlled catalog of portable AI agent skills, MCP configuration, shared instructions, docs, and validation tooling."
 tags: ["Project", "Python", "Open Source", "AI Agents", "Developer Tooling"]
 created: "2026-04-26"
 updated: "2026-04-26"
@@ -12,10 +12,10 @@ Prompts drift. Skills fork. Agent configs rot. I built Agents so the operational
 
 <div className="flex flex-wrap gap-2 my-4">
   <Badge variant="default">47 Skills</Badge>
-  <Badge variant="secondary">30 MCP Tools</Badge>
+  <Badge variant="secondary">30 MCP Tools Configured</Badge>
   <Badge variant="outline">MIT Licensed</Badge>
   <Badge variant="secondary">Python 3.13+</Badge>
-  <Badge variant="outline">Claude + Codex Plugins</Badge>
+  <Badge variant="outline">Claude Code + Codex Plugins</Badge>
   <Badge variant="default">Validation Gated</Badge>
 </div>
 
@@ -25,6 +25,8 @@ Prompts drift. Skills fork. Agent configs rot. I built Agents so the operational
 - **Skills**: [agents.w4w.dev/skills](https://agents.w4w.dev/skills/)
 - **CLI**: [agents.w4w.dev/cli](https://agents.w4w.dev/cli/)
 - **MCP**: [agents.w4w.dev/mcp](https://agents.w4w.dev/mcp/)
+
+<CodeFilename>install-all.sh</CodeFilename>
 
 ```bash
 npx skills add github:wyattowalsh/agents --all -y -g --agent claude-code --agent codex --agent gemini-cli --agent antigravity --agent github-copilot --agent opencode
@@ -53,9 +55,9 @@ flowchart LR
     style Rediscover fill:#fff7ed,stroke:#f97316
 `} title="Prompt and config drift" />
 
-That is manageable for one prompt. It breaks down when the setup becomes a working system: review skills, prompt-engineering workflows, MCP server builders, docs stewards, language conventions, install targets, hooks, evals, and public docs.
+That is manageable for one prompt. It breaks down when the setup becomes a working system: review skills, MCP server builders, docs stewards, language conventions, install targets, hooks, evals, and public docs.
 
-Agents is my answer to that problem: make the agent asset layer boring enough to review, validate, install, and update like software.
+Agents is my answer to that problem: make the agent layer concrete enough to review, validate, install, and update like software.
 
 ---
 
@@ -65,9 +67,9 @@ Agents is my answer to that problem: make the agent asset layer boring enough to
 Agents packages reusable agent workflows as source-controlled skills, instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
 </Callout>
 
-The smallest useful unit is a skill: a focused workflow with frontmatter, invocation guidance, references, hooks, evals, or helper scripts when the workflow needs them. The repo currently carries 47 skills, covering everything from code review to MCP creation, release planning, docs stewardship, shell conventions, and prompt engineering.
+The smallest useful unit is a skill: a focused workflow with frontmatter, invocation guidance, references, hooks, evals, or helper scripts when the workflow needs them. The repo currently carries 47 skills, covering code review, MCP creation, release planning, docs stewardship, shell conventions, and prompt engineering.
 
-The important part is not the exact count. The important part is that the workflow is a file. It can be reviewed, tested, linked, installed, and improved without relying on hidden tool state.
+The point is not the exact count. The point is that the workflow is a file. It can be reviewed, tested, linked, installed, and improved without relying on hidden tool state.
 
 | Snapshot | Source-backed state |
 | --- | --- |
@@ -91,11 +93,28 @@ The important part is not the exact count. The important part is that the workfl
 
 </Details>
 
+The catalog follows three rules:
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="font-semibold">Name the job</div>
+    <p className="text-sm text-muted-foreground">Every skill says when to use it, when not to use it, and what artifact it owns.</p>
+  </Card>
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="font-semibold">Keep evidence close</div>
+    <p className="text-sm text-muted-foreground">References, scripts, hooks, and evals travel with the workflow instead of living in memory.</p>
+  </Card>
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="font-semibold">Validate the surface</div>
+    <p className="text-sm text-muted-foreground">Catalog structure, relationships, hooks, docs, and packaging get checked like code.</p>
+  </Card>
+</div>
+
 ---
 
 ## Architecture
 
-At a high level, Agents is a repo-first distribution pipeline. Source files feed `wagents`; `wagents` validates and renders the catalog; docs and install paths expose the same source to different agent runtimes.
+At a high level, Agents is a repo-first distribution pipeline. Source files feed `wagents`; `wagents` validates and renders the catalog; docs and install paths expose the same source to agent runtimes.
 
 <Mermaid chart={`
 flowchart LR
@@ -143,13 +162,13 @@ Every layer is visible:
 | `.github/workflows/ci.yml` | CI validation, tests, typecheck, docs build | [source](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/ci.yml) |
 | `.github/workflows/release-skills.yml` | Strict audit and release packaging | [source](https://github.com/wyattowalsh/agents/blob/main/.github/workflows/release-skills.yml) |
 
-The repo is not trying to hide runtime differences. Claude Code, Codex, Gemini CLI, GitHub Copilot, OpenCode, Cursor, Crush, and Antigravity all have different expectations. Agents keeps the canonical files in one place and exposes the adapters around them.
+The repo does not hide runtime differences. Claude Code, Codex, Gemini CLI, GitHub Copilot, OpenCode, Cursor, Crush, and Antigravity all have different expectations. Agents keeps the canonical files in one place and exposes adapters around them.
 
 ---
 
 ## Skill Catalog
 
-The catalog is intentionally broad, but the pattern is consistent: each skill names the work it owns, says when to use it, says when not to use it, and can carry references, helper scripts, hooks, or evals when plain instructions are not enough.
+The catalog is intentionally broad, but the pattern is consistent: each skill names the work it owns, says when to use it, says when not to use it, and carries references, helper scripts, hooks, or evals when plain instructions are not enough.
 
 <Callout type="info">
 I want skills to behave more like small operational packages than pasted prompts: inspectable, documented, versioned, and validated.
@@ -165,7 +184,7 @@ I want skills to behave more like small operational packages than pasted prompts
 
 </Details>
 
-That source layout matters because the catalog can grow without turning into a private notebook. A new skill can be added, documented, linked to related skills, validated, and packaged from the same repo.
+That source layout keeps growth from turning into a private notebook. A new skill can be added, documented, linked to related skills, validated, and packaged from the same repo.
 
 ---
 
@@ -196,7 +215,7 @@ npx skills add github:wyattowalsh/agents --all -y -g --agent claude-code --agent
 <CodeFilename>install-skill.sh</CodeFilename>
 
 ```bash
-npx skills add github:wyattowalsh/agents --skill honest-review -y -g --agent claude-code --agent codex
+npx skills add github:wyattowalsh/agents --skill honest-review -y -g --agent claude-code --agent codex --agent gemini-cli --agent antigravity --agent github-copilot --agent opencode
 ```
 
   </TabsContent>
@@ -226,7 +245,7 @@ uv run wagents package skill-creator --dry-run
   </TabsContent>
 </Tabs>
 
-The adapter layer is not decorative. It keeps the same source files available through native plugin metadata where that exists and through the portable skills CLI everywhere else.
+The adapter layer is not decorative. It keeps the same source available through native plugin metadata where that exists and through the portable skills CLI everywhere else.
 
 ---
 
@@ -289,7 +308,7 @@ That validation stack is what moves the project from "useful prompts" toward mai
 
 ## Trade-offs
 
-Agents is still early. The public GitHub metadata did not show a latest release when I first wrote this post, and some surfaces are intentionally reserved for future expansion. The repo-level `agents/` directory, for example, is reserved for bundled agent definitions while the current emphasis is skills, shared instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
+Agents is still early. The public GitHub metadata did not show a latest release when I first wrote this post, and some surfaces are intentionally reserved for future expansion. The repo-level `agents/` directory, for example, is reserved for bundled agent definitions; the current emphasis is skills, shared instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
 
 Exact counts also age. The catalog had 47 skills at this snapshot, and the docs described 30 configured MCP tools from `mcp.json`. Those numbers are useful orientation, not the durable claim.
 
@@ -309,24 +328,29 @@ The obvious next posts are more specific:
 
 <div className="grid gap-4 md:grid-cols-2 my-8">
   <Card className="p-4 hover:shadow-lg transition-shadow">
-    <h3 className="text-lg font-semibold mt-0">GitHub</h3>
+    <div className="font-semibold">GitHub</div>
     <p>Source code, workflows, plugin metadata, and skill definitions.</p>
     <a href="https://github.com/wyattowalsh/agents">github.com/wyattowalsh/agents</a>
   </Card>
   <Card className="p-4 hover:shadow-lg transition-shadow">
-    <h3 className="text-lg font-semibold mt-0">Docs</h3>
+    <div className="font-semibold">Docs</div>
     <p>Public catalog, setup guide, CLI reference, and MCP overview.</p>
     <a href="https://agents.w4w.dev">agents.w4w.dev</a>
   </Card>
   <Card className="p-4 hover:shadow-lg transition-shadow">
-    <h3 className="text-lg font-semibold mt-0">Skills Index</h3>
+    <div className="font-semibold">Skills Index</div>
     <p>Browse the current skill catalog and generated skill pages.</p>
     <a href="https://agents.w4w.dev/skills/">agents.w4w.dev/skills</a>
   </Card>
   <Card className="p-4 hover:shadow-lg transition-shadow">
-    <h3 className="text-lg font-semibold mt-0">CLI Reference</h3>
+    <div className="font-semibold">CLI Reference</div>
     <p>Commands for validation, docs, packaging, hooks, evals, and install workflows.</p>
     <a href="https://agents.w4w.dev/cli/">agents.w4w.dev/cli</a>
+  </Card>
+  <Card className="p-4 hover:shadow-lg transition-shadow">
+    <div className="font-semibold">MCP Overview</div>
+    <p>The configured MCP tool surface and how it fits into the agent stack.</p>
+    <a href="https://agents.w4w.dev/mcp/">agents.w4w.dev/mcp</a>
   </Card>
 </div>
 
