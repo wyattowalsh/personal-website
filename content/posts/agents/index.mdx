@@ -11,7 +11,7 @@ updated: "2026-04-26"
 Prompts drift. Skills fork. Agent configs rot. I built Agents so the operational layer around my coding agents would live in git instead of clipboard history.
 
 <div className="flex flex-wrap gap-2 my-4">
-  <Badge variant="default">47 Skills</Badge>
+  <Badge variant="default">48 Skills</Badge>
   <Badge variant="secondary">30 MCP Tools Configured</Badge>
   <Badge variant="outline">MIT Licensed</Badge>
   <Badge variant="secondary">Python 3.13+</Badge>
@@ -67,13 +67,13 @@ Agents is my answer to that problem: make the agent layer durable enough to revi
 Agents packages reusable agent workflows as source-controlled skills, instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
 </Callout>
 
-The smallest useful unit is a skill: a focused workflow with frontmatter, invocation guidance, references, hooks, evals, or helper scripts when the workflow needs them. The repo currently carries 47 skills, covering code review, MCP creation, release planning, docs stewardship, shell conventions, and prompt engineering.
+The smallest useful unit is a skill: a focused workflow with frontmatter, invocation guidance, references, hooks, evals, or helper scripts when the workflow needs them. The repo currently carries 48 skills, covering code review, MCP creation, release planning, docs stewardship, shell conventions, prompt engineering, and document-to-knowledge-graph workflows.
 
 The point is not the exact count. The point is that a workflow becomes a file: reviewable, testable, linkable, installable, and independent of hidden tool state.
 
 | Snapshot | Source-backed state |
 | --- | --- |
-| Skills | 47 `SKILL.md` definitions in [`skills/`](https://github.com/wyattowalsh/agents/tree/main/skills) |
+| Skills | 48 `SKILL.md` definitions in [`skills/`](https://github.com/wyattowalsh/agents/tree/main/skills) |
 | MCP tools | 30 configured tools documented from [`mcp.json`](https://github.com/wyattowalsh/agents/blob/main/mcp.json) |
 | CLI | [`wagents`](https://github.com/wyattowalsh/agents/blob/main/pyproject.toml) package with a `wagents` entry point |
 | Docs | Public reference site at [agents.w4w.dev](https://agents.w4w.dev) |
@@ -196,7 +196,7 @@ I want skills to behave more like small operational packages than pasted prompts
 | Build and conventions | [`python-conventions`](https://agents.w4w.dev/skills/python-conventions/), [`javascript-conventions`](https://agents.w4w.dev/skills/javascript-conventions/), [`shell-conventions`](https://agents.w4w.dev/skills/shell-conventions/) |
 | Docs and publishing | [`docs-steward`](https://agents.w4w.dev/skills/docs-steward/), [`changelog-writer`](https://agents.w4w.dev/skills/changelog-writer/), [`release-pipeline-architect`](https://agents.w4w.dev/skills/release-pipeline-architect/) |
 | Agent/runtime infrastructure | [`skill-creator`](https://agents.w4w.dev/skills/skill-creator/), [`mcp-creator`](https://agents.w4w.dev/skills/mcp-creator/), [`harness-master`](https://agents.w4w.dev/skills/harness-master/) |
-| Research and planning | [`prompt-engineer`](https://agents.w4w.dev/skills/prompt-engineer/), [`host-panel`](https://agents.w4w.dev/skills/host-panel/), [`wargame`](https://agents.w4w.dev/skills/wargame/) |
+| Research and data workflows | [`prompt-engineer`](https://agents.w4w.dev/skills/prompt-engineer/), [`docling-graph`](https://agents.w4w.dev/skills/docling-graph/), [`wargame`](https://agents.w4w.dev/skills/wargame/) |
 
 <Details summary="Source files behind the catalog">
 
@@ -339,7 +339,7 @@ That validation stack is what moves the project from one-off prompts toward main
 
 Agents is still early. The public GitHub metadata did not show a latest release when I last checked this post, and some surfaces are intentionally reserved for future expansion. The repo-level `agents/` directory, for example, is reserved for bundled agent definitions; the current emphasis is skills, shared instructions, MCP configuration, plugin metadata, docs, and CLI tooling.
 
-Exact counts also age. The catalog had 47 skills at this snapshot, and the docs described 30 configured MCP tools from `mcp.json`. Those numbers are useful orientation, not the durable claim.
+Exact counts also age. The catalog had 48 skills at this snapshot, and the docs described 30 configured MCP tools from `mcp.json`. Those numbers are useful orientation, not the durable claim.
 
 The durable claim is simpler: reusable agent workflows need a durable home in git.
 
