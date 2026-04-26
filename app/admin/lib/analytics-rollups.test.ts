@@ -221,6 +221,41 @@ describe('analytics rollups', () => {
       }
     });
 
+    it('uses explicit UTC calendar-day bounds for PostHog chunks', async () => {
+      configureEnv();
+      const bodies: string[] = [];
+      const fetchMock = vi.fn(async (_: unknown, init: RequestInit) => {
+        bodies.push(typeof init.body === 'string' ? init.body : '');
+        return emptyPostHogResponse();
+      });
+      vi.stubGlobal('fetch', fetchMock);
+      mockClient.execute.mockResolvedValue({ rows: [] });
+
+      await refreshAnalyticsRollups(31);
+
+      expect(fetchMock).toHaveBeenCalledTimes(2 * 9);
+      for (const body of bodies) {
+        expect(body).toContain("timestamp >= toDateTime('");
+        expect(body).toContain("AND timestamp < toDateTime('");
+        expect(body).toContain("', 'UTC')");
+        expect(body).not.toContain('now() - INTERVAL');
+        expect(body).not.toContain('BETWEEN now()');
+      }
+
+      const dimensionDeletes = mockClient.execute.mock.calls.filter((call) =>
+        executeSql(call).includes('DELETE FROM analytics_rollup_dimensions'),
+      );
+      expect(dimensionDeletes).toHaveLength(2);
+
+      const [olderStart, olderEnd] = executeArgs(dimensionDeletes[0]) as [string, string];
+      const [newerStart, newerEnd] = executeArgs(dimensionDeletes[1]) as [string, string];
+      expect(new Date(`${olderEnd}T00:00:00.000Z`).getTime() + 86_400_000)
+        .toBe(new Date(`${newerStart}T00:00:00.000Z`).getTime());
+      expect(new Date(`${olderStart}T00:00:00.000Z`).getTime())
+        .toBeLessThanOrEqual(new Date(`${olderEnd}T00:00:00.000Z`).getTime());
+      expect(newerStart).toBe(newerEnd);
+    });
+
     it('does not group dimension queries by day', async () => {
       configureEnv();
       const bodies: string[] = [];

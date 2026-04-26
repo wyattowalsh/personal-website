@@ -252,7 +252,55 @@ describe('free admin dashboard providers', () => {
       value: '1',
       description: 'Recent GitHub Actions runs',
     });
-    expect(snapshot.cards[3].value).toBe('Public');
+    expect(snapshot.cards[2]).toEqual({
+      label: 'Repo Views',
+      value: 'n/a',
+      description: 'GitHub traffic views, token required',
+    });
+  });
+
+  it('adds free GitHub traffic rows when a token is present', async () => {
+    process.env.GITHUB_TOKEN = 'github-token';
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(mockJsonResponse({
+        workflow_runs: [{
+          name: 'Deploy',
+          status: 'completed',
+          conclusion: 'success',
+          head_branch: 'master',
+          head_sha: 'abcdef1234567890',
+          run_started_at: '2026-04-25T12:00:00Z',
+        }],
+      }))
+      .mockResolvedValueOnce(mockJsonResponse([]))
+      .mockResolvedValueOnce(mockJsonResponse({ count: 42, uniques: 20 }))
+      .mockResolvedValueOnce(mockJsonResponse({ count: 7, uniques: 4 }))
+      .mockResolvedValueOnce(mockJsonResponse([{ path: '/wyattowalsh/personal-website', count: 12, uniques: 8 }]))
+      .mockResolvedValueOnce(mockJsonResponse([{ referrer: 'github.com', count: 5, uniques: 3 }]));
+
+    const snapshot = await getGitHubSnapshot();
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.cards[2]).toEqual({
+      label: 'Repo Views',
+      value: '42',
+      description: 'GitHub traffic views, token required',
+    });
+    expect(snapshot.cards[3]).toEqual({
+      label: 'Repo Clones',
+      value: '7',
+      description: 'GitHub traffic clones, token required',
+    });
+    expect(snapshot.rows[0]).toEqual({
+      label: '/wyattowalsh/personal-website',
+      value: '12',
+      detail: '8 unique GitHub visitors',
+    });
+    expect(snapshot.rows[1]).toEqual({
+      label: 'github.com',
+      value: '5',
+      detail: '3 unique GitHub visitors',
+    });
   });
 
   it('builds a dashboard snapshot with content health and setup panels', async () => {
@@ -281,6 +329,13 @@ describe('free admin dashboard providers', () => {
     expect(dashboard.growth.map((provider) => provider.id)).toEqual(['search-console', 'indexnow']);
     expect(dashboard.operations.map((provider) => provider.id)).toEqual(['analytics-rollups', 'vercel', 'github', 'uptimerobot']);
     expect(dashboard.rollupStorage.missingEnv).toEqual(['TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN', 'CRON_SECRET']);
+    expect(dashboard.costLedger.map((item) => item.id)).toContain('cloudflare-analytics');
+    expect(dashboard.costLedger.find((item) => item.id === 'cloudflare-analytics')).toMatchObject({
+      status: 'disabled_paid_risk',
+      usage: '0 calls',
+    });
+    expect(dashboard.signals.some((signal) => signal.id === 'paid-risk-disabled')).toBe(true);
+    expect(dashboard.signals.some((signal) => signal.id === 'provider-setup-search-console')).toBe(true);
     expect(dashboard.contentHealth.cards[0]).toEqual({
       label: 'Posts',
       value: '2',

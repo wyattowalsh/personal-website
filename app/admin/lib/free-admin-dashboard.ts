@@ -30,6 +30,33 @@ export interface AdminProviderSnapshot {
   error?: string;
 }
 
+export type AdminCostStatus = 'free' | 'free_with_limit' | 'optional_unverified' | 'disabled_paid_risk';
+export type AdminSignalSeverity = 'info' | 'watch' | 'action' | 'critical';
+
+export interface AdminCostLedgerItem {
+  id: string;
+  providerId: string;
+  title: string;
+  status: AdminCostStatus;
+  freeTier: string;
+  usage: string;
+  cadence: string;
+  guardrail: string;
+  sourceUrl: string;
+}
+
+export interface AdminSignal {
+  id: string;
+  title: string;
+  severity: AdminSignalSeverity;
+  confidence: number;
+  providerIds: string[];
+  entity: string;
+  evidence: string;
+  recommendation: string;
+  impact: string;
+}
+
 export interface AdminDashboardSnapshot {
   generatedAt: string;
   visitors: VisitorAnalyticsSnapshot;
@@ -38,6 +65,8 @@ export interface AdminDashboardSnapshot {
   operations: AdminProviderSnapshot[];
   rollupStorage: AdminProviderSnapshot;
   contentHealth: AdminProviderSnapshot;
+  costLedger: AdminCostLedgerItem[];
+  signals: AdminSignal[];
 }
 
 interface GoogleTokenResponse {
@@ -206,6 +235,24 @@ async function fetchWithTimeout(
   }
 }
 
+interface GitHubTrafficCountResponse {
+  count?: number;
+  uniques?: number;
+}
+
+interface GitHubTrafficPathItem {
+  path?: string;
+  title?: string;
+  count?: number;
+  uniques?: number;
+}
+
+interface GitHubTrafficReferrerItem {
+  referrer?: string;
+  count?: number;
+  uniques?: number;
+}
+
 function configuredProvider(input: Omit<AdminProviderSnapshot, 'status' | 'lastCheckedAt' | 'missingEnv' | 'setupSteps' | 'error'>): AdminProviderSnapshot {
   return {
     ...input,
@@ -256,6 +303,12 @@ function formatPercent(value: number | undefined): string {
 function formatScore(value: number | undefined): string {
   if (typeof value !== 'number' || !Number.isFinite(value)) return 'n/a';
   return `${Math.round(value * 100)}`;
+}
+
+function parseMetricNumber(value: string | undefined): number {
+  if (!value) return 0;
+  const numeric = Number.parseFloat(value.replace(/,/g, '').replace('%', ''));
+  return Number.isFinite(numeric) ? numeric : 0;
 }
 
 function formatDate(value: string | number | undefined): string {
@@ -623,16 +676,75 @@ export async function getGitHubSnapshot(): Promise<AdminProviderSnapshot> {
 
     let dependabotAlerts: GitHubDependabotResponseItem[] = [];
     let dependabotError: string | undefined;
+    let trafficViews: GitHubTrafficCountResponse | undefined;
+    let trafficClones: GitHubTrafficCountResponse | undefined;
+    let trafficPaths: GitHubTrafficPathItem[] = [];
+    let trafficReferrers: GitHubTrafficReferrerItem[] = [];
+    let trafficError: string | undefined;
+
     if (process.env.GITHUB_TOKEN) {
-      const dependabotResponse = await fetchWithTimeout(`https://api.github.com/repos/${repository}/dependabot/alerts?state=open&per_page=10`, {
-        headers,
-        next: { revalidate: 5 * 60 },
-      });
+      const [
+        dependabotResponse,
+        viewsResponse,
+        clonesResponse,
+        pathsResponse,
+        referrersResponse,
+      ] = await Promise.all([
+        fetchWithTimeout(`https://api.github.com/repos/${repository}/dependabot/alerts?state=open&per_page=10`, {
+          headers,
+          next: { revalidate: 5 * 60 },
+        }),
+        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/views`, {
+          headers,
+          next: { revalidate: 60 * 60 },
+        }),
+        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/clones`, {
+          headers,
+          next: { revalidate: 60 * 60 },
+        }),
+        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/popular/paths`, {
+          headers,
+          next: { revalidate: 60 * 60 },
+        }),
+        fetchWithTimeout(`https://api.github.com/repos/${repository}/traffic/popular/referrers`, {
+          headers,
+          next: { revalidate: 60 * 60 },
+        }),
+      ]);
+
       if (dependabotResponse.ok) {
         dependabotAlerts = (await dependabotResponse.json().catch(() => [])) as GitHubDependabotResponseItem[];
       } else {
         const payload = (await dependabotResponse.json().catch(() => ({}))) as { message?: string };
         dependabotError = payload.message || `Dependabot request failed with ${dependabotResponse.status}`;
+      }
+
+      if (viewsResponse.ok) {
+        trafficViews = (await viewsResponse.json().catch(() => ({}))) as GitHubTrafficCountResponse;
+      } else {
+        const payload = (await viewsResponse.json().catch(() => ({}))) as { message?: string };
+        trafficError = payload.message || `GitHub views request failed with ${viewsResponse.status}`;
+      }
+
+      if (clonesResponse.ok) {
+        trafficClones = (await clonesResponse.json().catch(() => ({}))) as GitHubTrafficCountResponse;
+      } else if (!trafficError) {
+        const payload = (await clonesResponse.json().catch(() => ({}))) as { message?: string };
+        trafficError = payload.message || `GitHub clones request failed with ${clonesResponse.status}`;
+      }
+
+      if (pathsResponse.ok) {
+        trafficPaths = (await pathsResponse.json().catch(() => [])) as GitHubTrafficPathItem[];
+      } else if (!trafficError) {
+        const payload = (await pathsResponse.json().catch(() => ({}))) as { message?: string };
+        trafficError = payload.message || `GitHub popular paths request failed with ${pathsResponse.status}`;
+      }
+
+      if (referrersResponse.ok) {
+        trafficReferrers = (await referrersResponse.json().catch(() => [])) as GitHubTrafficReferrerItem[];
+      } else if (!trafficError) {
+        const payload = (await referrersResponse.json().catch(() => ({}))) as { message?: string };
+        trafficError = payload.message || `GitHub referrers request failed with ${referrersResponse.status}`;
       }
     }
 
@@ -642,20 +754,30 @@ export async function getGitHubSnapshot(): Promise<AdminProviderSnapshot> {
     return {
       id: 'github',
       title: 'GitHub Health',
-      status: process.env.GITHUB_TOKEN ? 'configured' : 'partial',
+      status: process.env.GITHUB_TOKEN && !trafficError ? 'configured' : 'partial',
       lastCheckedAt: nowIso(),
       freeTier: 'Public REST data is free; token raises rate limits and enables security endpoints',
       missingEnv: process.env.GITHUB_TOKEN ? [] : ['GITHUB_TOKEN'],
       setupSteps: process.env.GITHUB_TOKEN ? [] : [setupCommand('GITHUB_TOKEN')],
       sourceUrl: 'https://docs.github.com/v3/actions/workflow-runs/',
-      error: dependabotError,
+      error: dependabotError ?? trafficError,
       cards: [
         { label: 'Workflow Runs', value: formatNumber(runs.length), description: 'Recent GitHub Actions runs' },
         { label: 'Failed Runs', value: formatNumber(failed), description: 'Recent non-success conclusions' },
-        { label: 'Dependabot', value: process.env.GITHUB_TOKEN ? formatNumber(dependabotAlerts.length) : 'n/a', description: 'Open alerts, token required' },
-        { label: 'Rate Mode', value: process.env.GITHUB_TOKEN ? 'Token' : 'Public', description: process.env.GITHUB_TOKEN ? '5,000/hour class' : '60/hour class' },
+        { label: 'Repo Views', value: process.env.GITHUB_TOKEN ? formatNumber(trafficViews?.count) : 'n/a', description: 'GitHub traffic views, token required' },
+        { label: 'Repo Clones', value: process.env.GITHUB_TOKEN ? formatNumber(trafficClones?.count) : 'n/a', description: 'GitHub traffic clones, token required' },
       ],
       rows: [
+        ...trafficPaths.slice(0, 4).map((item) => ({
+          label: item.path ?? item.title ?? 'Repository path',
+          value: formatNumber(item.count),
+          detail: `${formatNumber(item.uniques)} unique GitHub visitors`,
+        })),
+        ...trafficReferrers.slice(0, 4).map((item) => ({
+          label: item.referrer ?? 'GitHub referrer',
+          value: formatNumber(item.count),
+          detail: `${formatNumber(item.uniques)} unique GitHub visitors`,
+        })),
         ...runs.map((run) => ({
           label: run.name ?? 'Workflow run',
           value: run.conclusion ?? run.status ?? 'unknown',
@@ -896,6 +1018,232 @@ export async function getAnalyticsRollupProviderSnapshot(): Promise<AdminProvide
   });
 }
 
+function buildCostLedger(input: {
+  visitors: VisitorAnalyticsSnapshot;
+  providers: AdminProviderSnapshot[];
+}): AdminCostLedgerItem[] {
+  const providerById = new Map(input.providers.map((provider) => [provider.id, provider]));
+  const lookup = (id: string) => providerById.get(id);
+
+  return [
+    {
+      id: 'posthog-events',
+      providerId: 'posthog',
+      title: 'PostHog Events',
+      status: input.visitors.status === 'missing_config' ? 'free_with_limit' : 'free',
+      freeTier: 'Free analytics event allowance; aggregate-only rollups',
+      usage: `${input.visitors.trafficSeries.length} daily rows in current view`,
+      cadence: input.visitors.source === 'posthog_live' ? 'Live 30d reads' : 'Daily long-window rollup',
+      guardrail: 'Anonymous events only; no identify calls, raw PII, or replay links',
+      sourceUrl: 'https://posthog.com/pricing',
+    },
+    {
+      id: 'turso-rollups',
+      providerId: 'analytics-rollups',
+      title: 'Turso Rollups',
+      status: lookup('analytics-rollups')?.status === 'configured' ? 'free' : 'free_with_limit',
+      freeTier: 'Free libSQL storage for aggregate snapshots',
+      usage: lookup('analytics-rollups')?.cards.find((card) => card.label === 'Covered Days')?.value ?? '0',
+      cadence: 'Daily Vercel Cron refresh',
+      guardrail: 'Store aggregates only; do not copy raw PostHog events',
+      sourceUrl: 'https://turso.tech/pricing',
+    },
+    {
+      id: 'vercel-cron',
+      providerId: 'vercel',
+      title: 'Vercel Cron + Deploys',
+      status: lookup('vercel')?.status === 'configured' ? 'free' : 'free_with_limit',
+      freeTier: 'Hobby cron supports daily schedules',
+      usage: lookup('vercel')?.cards.find((card) => card.label === 'Latest')?.value ?? 'n/a',
+      cadence: 'One daily cron, API reads on dashboard load',
+      guardrail: 'Keep scheduled refreshes at one daily job',
+      sourceUrl: 'https://vercel.com/docs/cron-jobs/usage-and-pricing',
+    },
+    {
+      id: 'search-console',
+      providerId: 'search-console',
+      title: 'Search Console',
+      status: lookup('search-console')?.status === 'configured' ? 'free' : 'free_with_limit',
+      freeTier: 'Free API, subject to Google quotas',
+      usage: lookup('search-console')?.cards.find((card) => card.label === 'Queries')?.value ?? '0',
+      cadence: 'Daily query/page/device/country snapshots',
+      guardrail: 'Use row limits and daily snapshots; no paid SEO APIs',
+      sourceUrl: 'https://developers.google.com/webmaster-tools/pricing',
+    },
+    {
+      id: 'pagespeed-crux',
+      providerId: 'pagespeed-crux',
+      title: 'PageSpeed + CrUX',
+      status: lookup('pagespeed-crux')?.status === 'configured' ? 'free' : 'free_with_limit',
+      freeTier: 'Free PageSpeed API with optional free CrUX API key',
+      usage: lookup('pagespeed-crux')?.cards.find((card) => card.label === 'Mobile Perf')?.value ?? 'n/a',
+      cadence: 'Homepage daily; top pages rotate weekly',
+      guardrail: 'Cap URL audits to homepage plus top pages',
+      sourceUrl: 'https://developers.google.com/speed/docs/insights/v5/get-started',
+    },
+    {
+      id: 'github-traffic',
+      providerId: 'github',
+      title: 'GitHub Traffic',
+      status: lookup('github')?.status === 'configured' ? 'free' : 'free_with_limit',
+      freeTier: 'REST traffic and workflow APIs for the repository',
+      usage: lookup('github')?.cards.find((card) => card.label === 'Workflow Runs')?.value ?? '0',
+      cadence: 'Daily traffic/workflow/security snapshots',
+      guardrail: 'Use existing token if present; public fallback stays partial',
+      sourceUrl: 'https://docs.github.com/rest/metrics/traffic',
+    },
+    {
+      id: 'uptimerobot',
+      providerId: 'uptimerobot',
+      title: 'UptimeRobot',
+      status: lookup('uptimerobot')?.status === 'configured' ? 'free' : 'free_with_limit',
+      freeTier: 'Free monitor API for hobby/non-commercial use',
+      usage: lookup('uptimerobot')?.cards.find((card) => card.label === 'Status')?.value ?? 'n/a',
+      cadence: 'Daily incident and response-time snapshot',
+      guardrail: 'Keep monitor count within the free account',
+      sourceUrl: 'https://uptimerobot.com/api/',
+    },
+    {
+      id: 'cloudflare-analytics',
+      providerId: 'cloudflare',
+      title: 'Cloudflare Analytics',
+      status: 'disabled_paid_risk',
+      freeTier: 'Disabled until this account confirms free GraphQL Analytics access',
+      usage: '0 calls',
+      cadence: 'Off',
+      guardrail: 'Do not call optional providers without verified free access',
+      sourceUrl: 'https://developers.cloudflare.com/analytics/graphql-api/',
+    },
+  ];
+}
+
+function buildSignals(input: {
+  visitors: VisitorAnalyticsSnapshot;
+  providers: AdminProviderSnapshot[];
+  costLedger: AdminCostLedgerItem[];
+}): AdminSignal[] {
+  const signals: AdminSignal[] = [];
+  const add = (signal: AdminSignal) => signals.push(signal);
+
+  for (const provider of input.providers) {
+    if (provider.status === 'error') {
+      add({
+        id: `provider-error-${provider.id}`,
+        title: `${provider.title} is failing`,
+        severity: 'critical',
+        confidence: 0.95,
+        providerIds: [provider.id],
+        entity: provider.title,
+        evidence: provider.error ?? 'Provider returned an error state',
+        recommendation: 'Open the provider panel, fix the failing credential or API response, then rerun the dashboard snapshot.',
+        impact: 'Prevents this data source from contributing to recommendations.',
+      });
+    }
+
+    if (provider.status === 'missing_config') {
+      add({
+        id: `provider-setup-${provider.id}`,
+        title: `${provider.title} needs setup`,
+        severity: 'action',
+        confidence: 0.9,
+        providerIds: [provider.id],
+        entity: provider.title,
+        evidence: provider.missingEnv.length > 0 ? `Missing ${provider.missingEnv.join(', ')}` : 'Provider is not configured',
+        recommendation: 'Add only the free-tier environment variables listed in the setup panel.',
+        impact: 'Unlocks a free data source without adding a paid service.',
+      });
+    }
+  }
+
+  const metadataGaps = input.providers
+    .find((provider) => provider.id === 'content-health')
+    ?.cards.find((card) => card.label === 'Metadata Gaps');
+  const stalePosts = input.providers
+    .find((provider) => provider.id === 'content-health')
+    ?.cards.find((card) => card.label === 'Stale Posts');
+  const mobilePerf = input.providers
+    .find((provider) => provider.id === 'pagespeed-crux')
+    ?.cards.find((card) => card.label === 'Mobile Perf');
+  const setupRisk = input.costLedger.filter((item) => item.status === 'disabled_paid_risk');
+
+  if (parseMetricNumber(metadataGaps?.value) > 0) {
+    add({
+      id: 'content-metadata-gaps',
+      title: 'Metadata gaps are reducing content quality',
+      severity: 'action',
+      confidence: 0.86,
+      providerIds: ['content-health'],
+      entity: 'Content metadata',
+      evidence: `${metadataGaps?.value} posts are missing key metadata.`,
+      recommendation: 'Prioritize summaries, images, captions, and tags for posts that also have search impressions or traffic.',
+      impact: 'Improves search previews, social sharing, and internal content quality scoring.',
+    });
+  }
+
+  if (parseMetricNumber(stalePosts?.value) > 0) {
+    add({
+      id: 'content-stale-posts',
+      title: 'Stale posts should be checked against search demand',
+      severity: 'watch',
+      confidence: 0.78,
+      providerIds: ['content-health', 'search-console'],
+      entity: 'Stale content',
+      evidence: `${stalePosts?.value} posts have not been updated in 365+ days.`,
+      recommendation: 'Cross-reference stale posts with Search Console impressions and refresh high-demand pages first.',
+      impact: 'Protects evergreen pages from decay.',
+    });
+  }
+
+  if (mobilePerf && parseMetricNumber(mobilePerf.value) > 0 && parseMetricNumber(mobilePerf.value) < 90) {
+    add({
+      id: 'mobile-performance-watch',
+      title: 'Mobile performance is below the target band',
+      severity: 'watch',
+      confidence: 0.82,
+      providerIds: ['pagespeed-crux', 'vercel'],
+      entity: 'Mobile performance',
+      evidence: `Mobile Perf is ${mobilePerf.value}.`,
+      recommendation: 'Compare the PageSpeed audit list against recent Vercel deploys and fix recurring Lighthouse regressions.',
+      impact: 'Can improve user experience and search quality signals.',
+    });
+  }
+
+  if (input.visitors.searches.length === 0) {
+    add({
+      id: 'search-intent-empty',
+      title: 'Site-search intent is not visible yet',
+      severity: 'info',
+      confidence: 0.72,
+      providerIds: ['posthog'],
+      entity: 'On-site search',
+      evidence: 'No search query rows are present in the current visitor window.',
+      recommendation: 'Keep the no-result and result-click events enabled so future search friction can be ranked.',
+      impact: 'Improves future content prioritization once queries accumulate.',
+    });
+  }
+
+  if (setupRisk.length > 0) {
+    add({
+      id: 'paid-risk-disabled',
+      title: 'Paid-risk providers are safely disabled',
+      severity: 'info',
+      confidence: 0.96,
+      providerIds: setupRisk.map((item) => item.providerId),
+      entity: 'Free-only guardrail',
+      evidence: `${setupRisk.length} optional provider is blocked until free access is verified.`,
+      recommendation: 'Keep optional providers disabled unless their free access is confirmed in the actual account.',
+      impact: 'Preserves the zero-cost operating boundary.',
+    });
+  }
+
+  return signals
+    .sort((a, b) => {
+      const severityRank = { critical: 4, action: 3, watch: 2, info: 1 } satisfies Record<AdminSignalSeverity, number>;
+      return severityRank[b.severity] - severityRank[a.severity] || b.confidence - a.confidence;
+    })
+    .slice(0, 12);
+}
+
 export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays): Promise<AdminDashboardSnapshot> {
   const [
     visitors,
@@ -918,6 +1266,9 @@ export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays
     getAnalyticsRollupProviderSnapshot(),
     getContentHealthSnapshot(),
   ]);
+  const providers = [searchConsole, indexNow, performance, rollupStorage, vercel, github, uptimeRobot, contentHealth];
+  const costLedger = buildCostLedger({ visitors, providers });
+  const signals = buildSignals({ visitors, providers, costLedger });
 
   return {
     generatedAt: nowIso(),
@@ -927,5 +1278,7 @@ export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays
     operations: [rollupStorage, vercel, github, uptimeRobot],
     rollupStorage,
     contentHealth,
+    costLedger,
+    signals,
   };
 }

@@ -151,10 +151,10 @@ function cutoffDay(windowDays: number, now = new Date()): string {
 interface ChunkRange {
   startDay: string;
   endDay: string;
-  daysBack: number;
-  daysAhead: number;
   spanDays: number;
   representativeDay: string;
+  startDateTime: string;
+  endExclusiveDateTime: string;
 }
 
 function utcDayOffset(now: Date, dayOffset: number): string {
@@ -163,27 +163,41 @@ function utcDayOffset(now: Date, dayOffset: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+function nextUtcDay(day: string): string {
+  const date = new Date(`${day}T00:00:00.000Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().slice(0, 10);
+}
+
+function hogQlDateTime(day: string): string {
+  return `${day} 00:00:00`;
+}
+
 function buildChunkRanges(totalDays: number, chunkDays = ROLLUP_CHUNK_DAYS, now = new Date()): ChunkRange[] {
   const total = Math.max(1, Math.floor(totalDays));
   const span = Math.max(1, Math.floor(chunkDays));
   const chunks: ChunkRange[] = [];
-  let daysAhead = 0;
-  while (daysAhead < total) {
-    const remaining = total - daysAhead;
+  let startOffset = -(total - 1);
+
+  while (startOffset <= 0) {
+    const remaining = 1 - startOffset;
     const chunkSpan = Math.min(span, remaining);
-    const daysBack = daysAhead + chunkSpan - 1;
-    const startDay = utcDayOffset(now, -daysBack);
+    const endOffset = startOffset + chunkSpan - 1;
+    const startDay = utcDayOffset(now, startOffset);
+    const endDay = utcDayOffset(now, endOffset);
+    const endExclusiveDay = nextUtcDay(endDay);
     chunks.push({
       startDay,
-      endDay: utcDayOffset(now, -daysAhead),
-      daysBack,
-      daysAhead,
+      endDay,
       spanDays: chunkSpan,
       representativeDay: startDay,
+      startDateTime: hogQlDateTime(startDay),
+      endExclusiveDateTime: hogQlDateTime(endExclusiveDay),
     });
-    daysAhead += chunkSpan;
+    startOffset += chunkSpan;
   }
-  return chunks.reverse();
+
+  return chunks;
 }
 
 function dailyRowsFromPostHog(rows: unknown[][]): RollupDay[] {
@@ -263,7 +277,8 @@ async function insertDimensionRows(client: Client, rows: RollupDimension[], upda
 function dimensionQuery(select: string, where: string, groupBy: string, orderBy = 'value DESC'): string {
   return `SELECT ${select}
     FROM events
-    WHERE timestamp BETWEEN now() - INTERVAL {daysBack} DAY AND now() - INTERVAL {daysAhead} DAY
+    WHERE timestamp >= toDateTime('{startDateTime}', 'UTC')
+      AND timestamp < toDateTime('{endExclusiveDateTime}', 'UTC')
       AND ${where}
     GROUP BY ${groupBy}
     ORDER BY ${orderBy}
@@ -278,8 +293,8 @@ async function fetchPostHogChunk(chunk: ChunkRange): Promise<{ days: RollupDay[]
 
   const interpolate = (query: string) =>
     query
-      .replaceAll('{daysBack}', String(chunk.daysBack))
-      .replaceAll('{daysAhead}', String(chunk.daysAhead));
+      .replaceAll('{startDateTime}', chunk.startDateTime)
+      .replaceAll('{endExclusiveDateTime}', chunk.endExclusiveDateTime);
 
   const [daily, pages, referrers, devices, events, searches, outbound, reading, pageEvents] = await Promise.all([
     queryPostHog(
@@ -293,7 +308,8 @@ async function fetchPostHogChunk(chunk: ChunkRange): Promise<{ days: RollupDay[]
         countIf(event IN ('search_query', 'search_no_results')) AS searches,
         countIf(event = 'link_click' AND properties.external = true) AS outbound_clicks
       FROM events
-      WHERE timestamp BETWEEN now() - INTERVAL ${chunk.daysBack} DAY AND now() - INTERVAL ${chunk.daysAhead} DAY
+      WHERE timestamp >= toDateTime('${chunk.startDateTime}', 'UTC')
+        AND timestamp < toDateTime('${chunk.endExclusiveDateTime}', 'UTC')
       GROUP BY day
       ORDER BY day ASC`,
       POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
