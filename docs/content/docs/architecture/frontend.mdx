@@ -82,6 +82,7 @@ The home page is split cleanly between server data loading and client-side enhan
 - **Idle-loaded particles**: `HomePageClient` delays mounting `ParticlesBackground` with `requestIdleCallback` (or a timeout fallback) so the hero image and title are not competing with particles during early paint
 - **Scroll-linked motion**: The profile image scales, fades, and rotates slightly based on `scrollYProgress`, while still respecting reduced-motion preferences
 - **Animated hero title**: `LandingTitle` starts from a deterministic initial render, shuffles its theme list after mount, and cycles through multiple typography/effect combinations without introducing hydration instability
+- **Subtitle audit lab**: `/lab/subtitles` can lock a subtitle, switch theme/motion/frame modes, filter by renderer lane, and show or hide signal-deck metadata for reproducible visual review
 - **CSS-assisted visual effects**: `app/page.module.css` owns the rotating border glow, animated title gradient, and the larger subtitle effect library used by `LandingTitle`
 - **Recent content surfaced immediately**: The landing page now includes a `Latest Writing` grid backed by the same `PostCard` component used elsewhere in the blog
 
