@@ -29,8 +29,9 @@ export function PostHogPageviewTracker() {
     if (!shouldTrack) return;
 
     const clicked = new Set<number>();
+    let rafId = 0;
 
-    function onScroll() {
+    function measureScroll() {
       const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
       if (scrollableHeight <= 0) return;
 
@@ -43,10 +44,21 @@ export function PostHogPageviewTracker() {
       }
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+    function onScroll() {
+      if (rafId) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = 0;
+        measureScroll();
+      });
+    }
 
-    return () => window.removeEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    measureScroll();
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (rafId) window.cancelAnimationFrame(rafId);
+    };
   }, [pathname, search, shouldTrack]);
 
   useEffect(() => {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import dynamic from "next/dynamic";
@@ -13,6 +14,7 @@ import type { PostMetadata } from "@/lib/types";
 import styles from "@/app/page.module.css";
 
 const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground').then(mod => mod.ParticlesBackground), { ssr: false });
+const PARTICLE_DEFER_MS = 2500;
 
 interface HomePageClientProps {
   recentPosts: PostMetadata[];
@@ -20,6 +22,7 @@ interface HomePageClientProps {
 
 export function HomePageClient({ recentPosts }: HomePageClientProps) {
   const prefersReducedMotion = useReducedMotion();
+  const [showParticles, setShowParticles] = useState(false);
   const { scrollYProgress } = useScroll();
 
   const imageScale = useTransform(scrollYProgress, [0, 0.5], prefersReducedMotion ? [1, 1] : [1, 0.85]);
@@ -49,6 +52,28 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
     }
   };
 
+  useEffect(() => {
+    if (prefersReducedMotion) return;
+
+    const connection = (navigator as Navigator & {
+      connection?: { saveData?: boolean; effectiveType?: string };
+    }).connection;
+    if (connection?.saveData || connection?.effectiveType === "2g") return;
+
+    const win = window as Window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
+    if (typeof win.requestIdleCallback === "function") {
+      const idleId = win.requestIdleCallback(() => setShowParticles(true), { timeout: PARTICLE_DEFER_MS });
+      return () => win.cancelIdleCallback?.(idleId);
+    }
+
+    const timeoutId = window.setTimeout(() => setShowParticles(true), PARTICLE_DEFER_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [prefersReducedMotion]);
+
   return (
     <motion.div
       initial={false}
@@ -61,9 +86,15 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
         styles.mainContainer
       )}
     >
-      <div aria-hidden="true">
-        <ParticlesBackground />
-      </div>
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 bg-linear-to-br from-background via-background to-muted/20"
+      />
+      {showParticles ? (
+        <div aria-hidden="true">
+          <ParticlesBackground />
+        </div>
+      ) : null}
 
         <motion.div
           className={cn(
@@ -103,7 +134,7 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
                        (max-width: 1024px) 200px,
                        (max-width: 1280px) 220px,
                        240px"
-                priority
+                preload
                 fetchPriority="high"
                 quality={85}
               />

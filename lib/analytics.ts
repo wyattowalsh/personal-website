@@ -1,7 +1,5 @@
 "use client";
 
-import { track as vercelTrack } from '@vercel/analytics';
-
 // ---------- Event types ----------
 
 export type EventProperties = {
@@ -27,6 +25,23 @@ const POSTHOG_SESSION_ID_KEY = 'w4w-posthog-session-id';
 const DEFAULT_POSTHOG_CAPTURE_HOST = 'https://us.i.posthog.com';
 
 type FlatProperties = Record<string, string | number | boolean>;
+type VercelTrack = typeof import('@vercel/analytics')['track'];
+
+let vercelTrackPromise: Promise<VercelTrack | null> | null = null;
+
+function trackWithVercel(event: string, properties: FlatProperties): void {
+  if (!vercelTrackPromise) {
+    vercelTrackPromise = import('@vercel/analytics')
+      .then((mod) => mod.track)
+      .catch(() => null);
+  }
+
+  vercelTrackPromise
+    .then((track) => track?.(event, properties))
+    .catch(() => {
+      // Analytics must never affect the site experience.
+    });
+}
 
 function isOptedOut(): boolean {
   if (typeof window === 'undefined') return false;
@@ -182,7 +197,7 @@ export function track<E extends EventName>(
   if (process.env.NODE_ENV === 'development') {
     console.debug('[Analytics]', event, flat);
   }
-  vercelTrack(event, flat);
+  trackWithVercel(event, flat);
   capturePostHog(event, flat);
 }
 
@@ -194,6 +209,6 @@ export function trackPageView(page: EventProperties['page_view']): void {
   if (process.env.NODE_ENV === 'development') {
     console.debug('[Analytics]', '$pageview', flat);
   }
-  vercelTrack('page_view', flat);
+  trackWithVercel('page_view', flat);
   capturePostHog('$pageview', flat);
 }

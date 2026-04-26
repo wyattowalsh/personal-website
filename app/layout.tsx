@@ -5,15 +5,12 @@ import "./tailwind.css";  // Tailwind v4 with config directive
 import "./globals.css";  // Custom styles (no Tailwind directives)
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/Header";
-import { StrictMode, Suspense } from "react";
-import { GoogleTagManager, GoogleAnalytics } from "@next/third-parties/google";
-import { Analytics } from "@vercel/analytics/react";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import { StrictMode } from "react";
 import { cn } from "@/lib/utils";
 import { getDefaultMetadata, getConfig } from "@/lib/config";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { PostHogPageviewTracker } from "@/components/PostHogPageviewTracker";
+import { SiteAnalytics } from "@/components/SiteAnalytics";
 
 const monaspace = localFont({
 	src: "../public/fonts/MonaspaceArgon-subset.woff2",
@@ -33,6 +30,7 @@ const bricolage = Bricolage_Grotesque({
 const siteUrl = getConfig().site.url;
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
+const analyticsEnabled = process.env.NODE_ENV === "production";
 
 // Base metadata configuration
 export const metadata: Metadata = {
@@ -143,13 +141,7 @@ export default function RootLayout({
 							</div>
 						</TooltipProvider>
 					</ThemeProvider>
-						{gtmId && <GoogleTagManager gtmId={gtmId} />}
-						{gaId && <GoogleAnalytics gaId={gaId} />}
-						<Suspense fallback={null}>
-							<PostHogPageviewTracker />
-						</Suspense>
-						<Analytics />
-						<SpeedInsights />
+						<SiteAnalytics gaId={gaId} gtmId={gtmId} enabled={analyticsEnabled} />
 					</body>
 			</html>
 		</StrictMode>
