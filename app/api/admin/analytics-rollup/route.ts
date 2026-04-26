@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { clampRollupRefreshDays } from '@/app/admin/lib/analytics-windows';
 import { refreshAnalyticsRollups } from '@/app/admin/lib/analytics-rollups';
+import { cleanEnvValue } from '@/app/admin/lib/posthog-query';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -11,7 +12,7 @@ const querySchema = z.object({
 });
 
 function isAuthorized(request: Request): boolean {
-  const cronSecret = process.env.CRON_SECRET;
+  const cronSecret = cleanEnvValue(process.env.CRON_SECRET);
   if (!cronSecret) return false;
   return request.headers.get('authorization') === `Bearer ${cronSecret}`;
 }

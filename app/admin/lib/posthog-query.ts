@@ -59,9 +59,14 @@ export function eventList(): string {
   return INTERACTION_EVENTS.map((event) => `'${event}'`).join(', ');
 }
 
-export async function queryPostHog(config: PostHogConfig, name: string, query: string): Promise<unknown[][]> {
+export async function queryPostHog(
+  config: PostHogConfig,
+  name: string,
+  query: string,
+  timeoutMs: number = POSTHOG_QUERY_TIMEOUT_MS,
+): Promise<unknown[][]> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), POSTHOG_QUERY_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   let response: Response;
 
   try {
@@ -83,7 +88,7 @@ export async function queryPostHog(config: PostHogConfig, name: string, query: s
     });
   } catch (error) {
     if (controller.signal.aborted) {
-      throw new Error(`PostHog query timed out after ${Math.round(POSTHOG_QUERY_TIMEOUT_MS / 1000)}s`);
+      throw new Error(`PostHog query timed out after ${Math.round(timeoutMs / 1000)}s`);
     }
     throw error;
   } finally {

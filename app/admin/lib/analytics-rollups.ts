@@ -2,7 +2,7 @@ import 'server-only';
 
 import { randomUUID } from 'node:crypto';
 import { createClient, type Client, type InArgs, type Row } from '@libsql/client';
-import { INTERACTION_EVENTS } from './analytics-constants';
+import { INTERACTION_EVENTS, POSTHOG_ROLLUP_QUERY_TIMEOUT_MS, ROLLUP_CHUNK_DAYS } from './analytics-constants';
 import { MAX_ANALYTICS_WINDOW_DAYS, clampRollupRefreshDays, type AnalyticsWindowDays } from './analytics-windows';
 import { cleanEnvValue, eventList, getPostHogConfig, queryPostHog } from './posthog-query';
 import type { AnalyticsMetric, AnalyticsRollupSummary, AnalyticsRow, PageEngagementRow, TrafficPoint, VisitorAnalyticsSnapshot } from './visitor-analytics';
@@ -148,6 +148,44 @@ function cutoffDay(windowDays: number, now = new Date()): string {
   return date.toISOString().slice(0, 10);
 }
 
+interface ChunkRange {
+  startDay: string;
+  endDay: string;
+  daysBack: number;
+  daysAhead: number;
+  spanDays: number;
+  representativeDay: string;
+}
+
+function utcDayOffset(now: Date, dayOffset: number): string {
+  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  date.setUTCDate(date.getUTCDate() + dayOffset);
+  return date.toISOString().slice(0, 10);
+}
+
+function buildChunkRanges(totalDays: number, chunkDays = ROLLUP_CHUNK_DAYS, now = new Date()): ChunkRange[] {
+  const total = Math.max(1, Math.floor(totalDays));
+  const span = Math.max(1, Math.floor(chunkDays));
+  const chunks: ChunkRange[] = [];
+  let daysAhead = 0;
+  while (daysAhead < total) {
+    const remaining = total - daysAhead;
+    const chunkSpan = Math.min(span, remaining);
+    const daysBack = daysAhead + chunkSpan - 1;
+    const startDay = utcDayOffset(now, -daysBack);
+    chunks.push({
+      startDay,
+      endDay: utcDayOffset(now, -daysAhead),
+      daysBack,
+      daysAhead,
+      spanDays: chunkSpan,
+      representativeDay: startDay,
+    });
+    daysAhead += chunkSpan;
+  }
+  return chunks.reverse();
+}
+
 function dailyRowsFromPostHog(rows: unknown[][]): RollupDay[] {
   return rows.map((row) => ({
     day: toText(row[0], 'unknown'),
@@ -160,22 +198,15 @@ function dailyRowsFromPostHog(rows: unknown[][]): RollupDay[] {
   })).filter((row) => row.day !== 'unknown');
 }
 
-function dimensionRowsFromPostHog(rows: unknown[][], kind: RollupDimensionKind): RollupDimension[] {
+function dimensionRowsFromPostHog(rows: unknown[][], kind: RollupDimensionKind, day: string): RollupDimension[] {
   return rows.map((row) => ({
-    day: toText(row[0], 'unknown'),
+    day,
     kind,
-    label: toText(row[1], 'Unknown'),
-    detailKey: toText(row[2], ''),
-    value: toNumber(row[3]),
-    detail: typeof row[4] === 'string' && row[4] ? row[4] : undefined,
-  })).filter((row) => row.day !== 'unknown' && row.label !== 'Unknown');
-}
-
-async function deleteExistingDimensions(client: Client, days: number): Promise<void> {
-  await client.execute({
-    sql: 'DELETE FROM analytics_rollup_dimensions WHERE day >= ?',
-    args: [cutoffDay(days)],
-  });
+    label: toText(row[0], 'Unknown'),
+    detailKey: toText(row[1], ''),
+    value: toNumber(row[2]),
+    detail: typeof row[3] === 'string' && row[3] ? row[3] : undefined,
+  })).filter((row) => row.label !== 'Unknown');
 }
 
 async function upsertDailyRows(client: Client, rows: RollupDay[], updatedAt: string): Promise<void> {
@@ -229,23 +260,27 @@ async function insertDimensionRows(client: Client, rows: RollupDimension[], upda
   })), 'write');
 }
 
-function dimensionQuery(kind: RollupDimensionKind, select: string, where: string, groupBy: string, orderBy = 'value DESC'): string {
-  return `SELECT toString(toDate(timestamp)) AS day, ${select}
+function dimensionQuery(select: string, where: string, groupBy: string, orderBy = 'value DESC'): string {
+  return `SELECT ${select}
     FROM events
-    WHERE timestamp >= now() - INTERVAL {days} DAY
+    WHERE timestamp BETWEEN now() - INTERVAL {daysBack} DAY AND now() - INTERVAL {daysAhead} DAY
       AND ${where}
-    GROUP BY day, ${groupBy}
-    ORDER BY day ASC, ${orderBy}
-    LIMIT 500`;
+    GROUP BY ${groupBy}
+    ORDER BY ${orderBy}
+    LIMIT 1000`;
 }
 
-async function fetchPostHogRollups(days: number): Promise<{ days: RollupDay[]; dimensions: RollupDimension[] }> {
+async function fetchPostHogChunk(chunk: ChunkRange): Promise<{ days: RollupDay[]; dimensions: RollupDimension[] }> {
   const { config, missingEnv } = getPostHogConfig();
   if (!config) {
     throw new Error(`Missing PostHog env vars: ${missingEnv.join(', ')}`);
   }
 
-  const interpolateDays = (query: string) => query.replaceAll('{days}', String(days));
+  const interpolate = (query: string) =>
+    query
+      .replaceAll('{daysBack}', String(chunk.daysBack))
+      .replaceAll('{daysAhead}', String(chunk.daysAhead));
+
   const [daily, pages, referrers, devices, events, searches, outbound, reading, pageEvents] = await Promise.all([
     queryPostHog(
       config,
@@ -258,104 +293,106 @@ async function fetchPostHogRollups(days: number): Promise<{ days: RollupDay[]; d
         countIf(event IN ('search_query', 'search_no_results')) AS searches,
         countIf(event = 'link_click' AND properties.external = true) AS outbound_clicks
       FROM events
-      WHERE timestamp >= now() - INTERVAL ${days} DAY
+      WHERE timestamp BETWEEN now() - INTERVAL ${chunk.daysBack} DAY AND now() - INTERVAL ${chunk.daysAhead} DAY
       GROUP BY day
-      ORDER BY day ASC`
+      ORDER BY day ASC`,
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup pages',
-      interpolateDays(dimensionQuery(
-        'page',
+      interpolate(dimensionQuery(
         `properties.$pathname AS label, '' AS detail_key, count() AS value, concat(toString(uniqExact(distinct_id)), ' visitors') AS detail`,
         `event = '$pageview' AND properties.$pathname != ''`,
-        'label'
-      ))
+        'label',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup referrers',
-      interpolateDays(dimensionQuery(
-        'referrer',
+      interpolate(dimensionQuery(
         `properties.$referrer AS label, '' AS detail_key, count() AS value, '' AS detail`,
         `event = '$pageview' AND properties.$referrer != ''`,
-        'label'
-      ))
+        'label',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup devices',
-      interpolateDays(dimensionQuery(
-        'device',
+      interpolate(dimensionQuery(
         `properties.device_category AS label, '' AS detail_key, count() AS value, '' AS detail`,
         `event = '$pageview'`,
-        'label'
-      ))
+        'label',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup events',
-      interpolateDays(dimensionQuery(
-        'event',
+      interpolate(dimensionQuery(
         `event AS label, '' AS detail_key, count() AS value, '' AS detail`,
         `event != ''`,
-        'label'
-      ))
+        'label',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup searches',
-      interpolateDays(dimensionQuery(
-        'search',
+      interpolate(dimensionQuery(
         `properties.query AS label, event AS detail_key, count() AS value, event AS detail`,
         `event IN ('search_query', 'search_no_results') AND properties.query != ''`,
-        'label, detail_key'
-      ))
+        'label, detail_key',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup outbound',
-      interpolateDays(dimensionQuery(
-        'outbound',
+      interpolate(dimensionQuery(
         `properties.href AS label, '' AS detail_key, count() AS value, '' AS detail`,
         `event = 'link_click' AND properties.external = true`,
-        'label'
-      ))
+        'label',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup reading',
-      interpolateDays(dimensionQuery(
-        'reading_progress',
+      interpolate(dimensionQuery(
         `properties.slug AS label, '' AS detail_key, max(properties.percent) AS value, concat(toString(count()), ' events') AS detail`,
         `event = 'reading_progress' AND properties.slug != ''`,
         'label',
-        'value DESC'
-      ))
+        'value DESC',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
     queryPostHog(
       config,
       'admin rollup page events',
-      interpolateDays(dimensionQuery(
-        'page_event',
+      interpolate(dimensionQuery(
         `properties.$pathname AS label, event AS detail_key, count() AS value, '' AS detail`,
         `properties.$pathname != '' AND (event = '$pageview' OR event IN (${eventList()}))`,
-        'label, detail_key'
-      ))
+        'label, detail_key',
+      )),
+      POSTHOG_ROLLUP_QUERY_TIMEOUT_MS,
     ),
   ]);
 
+  const day = chunk.representativeDay;
   return {
     days: dailyRowsFromPostHog(daily),
     dimensions: [
-      ...dimensionRowsFromPostHog(pages, 'page'),
-      ...dimensionRowsFromPostHog(referrers, 'referrer'),
-      ...dimensionRowsFromPostHog(devices, 'device'),
-      ...dimensionRowsFromPostHog(events, 'event'),
-      ...dimensionRowsFromPostHog(searches, 'search'),
-      ...dimensionRowsFromPostHog(outbound, 'outbound'),
-      ...dimensionRowsFromPostHog(reading, 'reading_progress'),
-      ...dimensionRowsFromPostHog(pageEvents, 'page_event'),
+      ...dimensionRowsFromPostHog(pages, 'page', day),
+      ...dimensionRowsFromPostHog(referrers, 'referrer', day),
+      ...dimensionRowsFromPostHog(devices, 'device', day),
+      ...dimensionRowsFromPostHog(events, 'event', day),
+      ...dimensionRowsFromPostHog(searches, 'search', day),
+      ...dimensionRowsFromPostHog(outbound, 'outbound', day),
+      ...dimensionRowsFromPostHog(reading, 'reading_progress', day),
+      ...dimensionRowsFromPostHog(pageEvents, 'page_event', day),
     ],
   };
 }
@@ -364,19 +401,52 @@ export async function refreshAnalyticsRollups(inputDays: unknown = undefined): P
   const days = clampRollupRefreshDays(inputDays);
   const startedAt = new Date().toISOString();
   const runId = randomUUID();
+  const chunks = buildChunkRanges(days);
 
   try {
-    const { days: dayRows, dimensions } = await fetchPostHogRollups(days);
-
     return await withRollupClient(async (client) => {
       await ensureAnalyticsRollupSchema(client);
       await client.execute({
         sql: 'INSERT INTO analytics_rollup_runs (id, started_at, status, window_days) VALUES (?, ?, ?, ?)',
         args: [runId, startedAt, 'running', days],
       });
-      await upsertDailyRows(client, dayRows, startedAt);
-      await deleteExistingDimensions(client, days);
-      await insertDimensionRows(client, dimensions, startedAt);
+
+      let totalDayRows = 0;
+      let totalDimensionRows = 0;
+
+      for (const chunk of chunks) {
+        try {
+          const { days: dayRows, dimensions } = await fetchPostHogChunk(chunk);
+          await upsertDailyRows(client, dayRows, startedAt);
+          await client.execute({
+            sql: 'DELETE FROM analytics_rollup_dimensions WHERE day BETWEEN ? AND ?',
+            args: [chunk.startDay, chunk.endDay],
+          });
+          await insertDimensionRows(client, dimensions, startedAt);
+          totalDayRows += dayRows.length;
+          totalDimensionRows += dimensions.length;
+        } catch (chunkError) {
+          const completedAt = new Date().toISOString();
+          const message = chunkError instanceof Error
+            ? chunkError.message
+            : 'Analytics rollup chunk failed';
+          const errorDetail = `${message} (chunk ${chunk.startDay}..${chunk.endDay})`;
+          await client.execute({
+            sql: 'UPDATE analytics_rollup_runs SET completed_at = ?, status = ?, error = ? WHERE id = ?',
+            args: [completedAt, 'error', errorDetail, runId],
+          });
+          return {
+            status: 'error' as const,
+            windowDays: days,
+            dayRows: totalDayRows,
+            dimensionRows: totalDimensionRows,
+            startedAt,
+            completedAt,
+            missingEnv: [],
+            error: errorDetail,
+          };
+        }
+      }
 
       const completedAt = new Date().toISOString();
       await client.execute({
@@ -385,10 +455,10 @@ export async function refreshAnalyticsRollups(inputDays: unknown = undefined): P
       });
 
       return {
-        status: 'configured',
+        status: 'configured' as const,
         windowDays: days,
-        dayRows: dayRows.length,
-        dimensionRows: dimensions.length,
+        dayRows: totalDayRows,
+        dimensionRows: totalDimensionRows,
         startedAt,
         completedAt,
         missingEnv: [],

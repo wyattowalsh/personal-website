@@ -33,6 +33,28 @@ describe('admin analytics rollup route', () => {
     expect(response.status).toBe(401);
   });
 
+  it('rejects requests with the wrong bearer token', async () => {
+    process.env.CRON_SECRET = 'secret';
+    const { GET } = await import('@/app/api/admin/analytics-rollup/route');
+
+    const response = await GET(new Request('http://localhost/api/admin/analytics-rollup', {
+      headers: { authorization: 'Bearer wrong' },
+    }));
+
+    expect(response.status).toBe(401);
+  });
+
+  it('rejects when CRON_SECRET is unset', async () => {
+    delete process.env.CRON_SECRET;
+    const { GET } = await import('@/app/api/admin/analytics-rollup/route');
+
+    const response = await GET(new Request('http://localhost/api/admin/analytics-rollup', {
+      headers: { authorization: 'Bearer anything' },
+    }));
+
+    expect(response.status).toBe(401);
+  });
+
   it('accepts authorized cron requests and clamps oversized backfills', async () => {
     process.env.CRON_SECRET = 'secret';
     const { GET } = await import('@/app/api/admin/analytics-rollup/route');
@@ -48,5 +70,18 @@ describe('admin analytics rollup route', () => {
     expect(response.status).toBe(200);
     expect(payload.status).toBe('configured');
     expect(refreshAnalyticsRollups).toHaveBeenCalledWith(365);
+  });
+
+  it('accepts the trimmed bearer when CRON_SECRET has a trailing newline', async () => {
+    process.env.CRON_SECRET = 'secret\n';
+    const { GET } = await import('@/app/api/admin/analytics-rollup/route');
+
+    const response = await GET(new Request('http://localhost/api/admin/analytics-rollup', {
+      headers: {
+        authorization: 'Bearer secret',
+      },
+    }));
+
+    expect(response.status).toBe(200);
   });
 });
