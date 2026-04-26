@@ -111,7 +111,7 @@ export function PostLayout({
 				{/* Share buttons */}
 				<ErrorBoundary>
 					<div className="not-prose max-w-5xl mx-auto">
-						<PostLayoutShareButtons />
+						<PostLayoutShareButtons slug={post.slug} title={post.title} />
 					</div>
 				</ErrorBoundary>
 
