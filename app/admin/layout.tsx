@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Lock, LogIn } from 'lucide-react';
+import { Lock, LogIn, Radar } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AdminProvider } from './components/AdminContext';
@@ -135,30 +135,35 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="relative flex size-20 items-center justify-center">
+          <div className="absolute inset-0 animate-ping rounded-full border border-[hsl(var(--chart-1)/0.35)]" />
+          <div className="size-8 animate-spin rounded-full border-2 border-[hsl(var(--chart-1))] border-t-transparent" />
+        </div>
       </div>
     );
   }
 
   if (!isAuthed) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-background">
+      <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border)/0.26)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.22)_1px,transparent_1px)] bg-[size:28px_28px] opacity-40" />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(circle_at_50%_0%,hsl(var(--chart-1)/0.18),transparent_42%)]" />
         <form
           onSubmit={handleSubmit}
           className={cn(
-            'w-full max-w-sm p-8 rounded-xl',
-            'bg-card border border-border',
-            'shadow-lg'
+            'relative w-full max-w-sm overflow-hidden rounded-lg p-8',
+            'border border-border/80 bg-card/90 shadow-2xl backdrop-blur'
           )}
         >
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--chart-1))] to-transparent" />
           <div className="flex items-center gap-3 mb-6">
-            <div className="rounded-lg bg-primary/10 p-2.5">
-              <Lock className="h-5 w-5 text-primary" />
+            <div className="rounded-lg border border-[hsl(var(--chart-1)/0.28)] bg-[hsl(var(--chart-1)/0.12)] p-2.5 text-[hsl(var(--chart-1))]">
+              <Radar className="h-5 w-5" />
             </div>
             <div>
+              <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">Secure console</p>
               <h1 className="text-lg font-semibold tracking-tight">Admin Access</h1>
-              <p className="text-xs text-muted-foreground">Enter your password to continue</p>
             </div>
           </div>
 
@@ -167,7 +172,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
-            className="mb-3"
+            className="mb-3 border-border/80 bg-background/70 font-mono"
             autoFocus
           />
 
@@ -179,6 +184,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <LogIn className="h-4 w-4" />
             Sign In
           </Button>
+          <div className="mt-4 flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground">
+            <Lock className="size-3" />
+            Secrets stay server-side
+          </div>
         </form>
       </div>
     );
@@ -198,7 +207,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <AdminSidebar />
         <div className="flex flex-1 flex-col overflow-hidden">
           <AdminHeader />
-          <main className="flex-1 overflow-y-auto p-6 md:p-8">
+          <main className="flex-1 overflow-y-auto p-4 md:p-8">
             {children}
           </main>
         </div>

@@ -54,6 +54,9 @@ describe('getVisitorAnalyticsSnapshot()', () => {
       { results: [['nextjs', 4, 'search_query']] },
       { results: [['https://github.com/wyattowalsh', 3]] },
       { results: [['post-slug', 100, 5]] },
+      { results: [['2026-04-26', 42, 12, 9]] },
+      { results: [['$pageview', 42], ['search_query', 8], ['reading_progress', 6]] },
+      { results: [['/blog', '$pageview', 24], ['/blog', 'search_query', 4]] },
     ];
 
     vi.mocked(fetch).mockImplementation(() => Promise.resolve(mockJsonResponse(payloads.shift())));
@@ -70,8 +73,20 @@ describe('getVisitorAnalyticsSnapshot()', () => {
     expect(snapshot.topPages).toEqual([{ label: '/blog', value: '24', detail: '10 visitors' }]);
     expect(snapshot.searches).toEqual([{ label: 'nextjs', value: '4', detail: 'search_query' }]);
     expect(snapshot.readingProgress).toEqual([{ label: 'post-slug', value: '100%', detail: '5 events' }]);
+    expect(snapshot.trafficSeries).toEqual([{ date: '2026-04-26', pageviews: 42, visitors: 12, sessions: 9 }]);
+    expect(snapshot.eventMix).toEqual([
+      { label: '$pageview', value: '42', detail: undefined },
+      { label: 'search_query', value: '8', detail: undefined },
+      { label: 'reading_progress', value: '6', detail: undefined },
+    ]);
+    expect(snapshot.pageEngagement).toEqual([{
+      page: '/blog',
+      pageviews: 24,
+      visitors: 10,
+      interactions: { search_query: 4 },
+    }]);
 
-    expect(fetch).toHaveBeenCalledTimes(8);
+    expect(fetch).toHaveBeenCalledTimes(11);
     const [url, init] = vi.mocked(fetch).mock.calls[0];
     expect(url).toBe('https://eu.posthog.com/api/projects/12345/query/');
     expect((init as RequestInit).headers).toMatchObject({

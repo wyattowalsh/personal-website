@@ -53,6 +53,9 @@ vi.mock('./visitor-analytics', () => ({
     searches: [],
     outboundLinks: [],
     readingProgress: [],
+    trafficSeries: [],
+    eventMix: [],
+    pageEngagement: [],
   })),
 }));
 

@@ -1,7 +1,22 @@
 'use client';
 
-import { useId } from 'react';
-import { cn } from '@/lib/utils';
+import {
+  Area,
+  AreaChart,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '@/components/ui/chart';
+import { CyberPanel } from '../components/AdminVisuals';
 
 interface ChartsProps {
   postsByYear: Array<{ year: string; count: number }>;
@@ -11,107 +26,104 @@ interface ChartsProps {
   wordTimeline: Array<{ date: string; words: number; title: string }>;
 }
 
-const C = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)'];
-const hsl = (i: number) => `hsl(${C[i % C.length]})`;
-const joinKeyParts = (...parts: Array<string | number>) => parts.map(String).join('::');
-const getChartDatumKey = (d: Record<string, string | number>, labelKey: string) =>
-  String(d[labelKey]);
-const getTimelineDatumKey = ({ date, title }: { date: string; title: string; words: number }) =>
-  joinKeyParts(date, title);
+const colors = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+];
 
-function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
+const countConfig = {
+  count: { label: 'Count', color: 'hsl(var(--chart-1))' },
+} satisfies ChartConfig;
+
+const wordsConfig = {
+  words: { label: 'Words', color: 'hsl(var(--chart-2))' },
+} satisfies ChartConfig;
+
+function EmptyChart() {
   return (
-    <div className="rounded-xl border border-border bg-card p-6">
-      <h2 className="text-sm font-medium text-muted-foreground mb-4">{title}</h2>
-      {children}
+    <div className="flex h-60 items-center justify-center rounded-lg border border-dashed border-border/80 bg-muted/15 text-sm text-muted-foreground">
+      No chart data.
     </div>
   );
 }
 
-function BarChart({ data, labelKey, valueKey, horizontal }: {
+function VerticalBars({
+  data,
+  labelKey,
+  valueKey,
+}: {
   data: Array<Record<string, string | number>>;
-  labelKey: string; valueKey: string; horizontal?: boolean;
+  labelKey: string;
+  valueKey: string;
 }) {
-  const max = Math.max(...data.map(d => Number(d[valueKey])), 1);
-  const bar = (d: Record<string, string | number>, i: number) => {
-    const pct = (Number(d[valueKey]) / max) * 100;
-    const bg = hsl(i);
-    return { pct, bg, val: Number(d[valueKey]).toLocaleString(), label: String(d[labelKey]) };
-  };
-
-  if (horizontal) {
-    return (
-      <div className="flex flex-col gap-2.5 h-64 justify-center">
-        {data.map((d, i) => { const b = bar(d, i); const key = getChartDatumKey(d, labelKey); return (
-          <div key={key} className="flex items-center gap-3 group" aria-label={`${b.label}: ${b.val}`}>
-            <span className="w-24 shrink-0 text-xs text-muted-foreground text-right truncate" title={b.label}>{b.label}</span>
-            <div className="flex-1 relative h-6">
-              <div className="absolute inset-y-0 left-0 rounded-r-md transition-all duration-500"
-                style={{ width: `${b.pct}%`, backgroundColor: b.bg, minWidth: b.pct > 0 ? '4px' : '0' }} />
-            </div>
-            <span className="text-xs font-semibold text-foreground w-8 text-right opacity-60 group-hover:opacity-100 transition-opacity">{b.val}</span>
-          </div>
-        ); })}
-      </div>
-    );
-  }
+  if (data.length === 0) return <EmptyChart />;
 
   return (
-    <div className="h-64 flex flex-col">
-      <div className="flex-1 flex items-end gap-1.5 px-1">
-        {data.map((d, i) => { const b = bar(d, i); const key = getChartDatumKey(d, labelKey); return (
-          <div key={key} className="flex-1 flex flex-col items-center gap-1 group" aria-label={`${b.label}: ${b.val}`}>
-            <span className="text-xs font-semibold text-foreground opacity-60 group-hover:opacity-100 transition-opacity">{b.val}</span>
-            <div className="w-full rounded-t-md transition-all duration-500"
-              style={{ height: `${b.pct}%`, backgroundColor: b.bg, minHeight: b.pct > 0 ? '4px' : '0' }} />
-          </div>
-        ); })}
-      </div>
-      <div className="flex gap-1.5 px-1 mt-2 border-t border-border pt-2">
-        {data.map(d => (
-          <span key={getChartDatumKey(d, labelKey)} className="flex-1 text-[10px] text-muted-foreground text-center truncate">{String(d[labelKey])}</span>
-        ))}
-      </div>
-    </div>
+    <ChartContainer config={{ [valueKey]: { label: valueKey, color: 'hsl(var(--chart-1))' } }} className="h-64 w-full">
+      <BarChart data={data} margin={{ left: 4, right: 8, top: 8, bottom: 0 }}>
+        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        <XAxis dataKey={labelKey} tickLine={false} axisLine={false} tickMargin={10} />
+        <YAxis hide />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <Bar dataKey={valueKey} radius={[4, 4, 0, 0]}>
+          {data.map((entry, index) => (
+            <Cell key={String(entry[labelKey])} fill={colors[index % colors.length]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ChartContainer>
   );
 }
 
-function AreaChart({ data }: { data: Array<{ date: string; words: number; title: string }> }) {
-  const gradId = useId();
-  if (data.length === 0) return null;
-  const max = Math.max(...data.map(d => d.words), 1);
-  const [W, H, pad] = [400, 200, 8];
-  const pts = data.map((d, i) => ({
-    x: pad + (i / Math.max(data.length - 1, 1)) * (W - 2 * pad),
-    y: pad + (1 - d.words / max) * (H - 2 * pad),
-  }));
-  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ');
-  const area = `${line} L${pts.at(-1)!.x},${H} L${pts[0].x},${H} Z`;
-  const color = hsl(4);
+function HorizontalBars({
+  data,
+  labelKey,
+  valueKey,
+}: {
+  data: Array<Record<string, string | number>>;
+  labelKey: string;
+  valueKey: string;
+}) {
+  if (data.length === 0) return <EmptyChart />;
 
   return (
-    <div className="h-64 flex flex-col">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full flex-1" preserveAspectRatio="xMidYMid meet">
+    <ChartContainer config={countConfig} className="h-64 w-full">
+      <BarChart data={data.slice(0, 10)} layout="vertical" margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
+        <XAxis type="number" hide />
+        <YAxis dataKey={labelKey} type="category" tickLine={false} axisLine={false} width={104} tickMargin={8} />
+        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+        <Bar dataKey={valueKey} radius={[0, 4, 4, 0]}>
+          {data.slice(0, 10).map((entry, index) => (
+            <Cell key={String(entry[labelKey])} fill={colors[index % colors.length]} />
+          ))}
+        </Bar>
+      </BarChart>
+    </ChartContainer>
+  );
+}
+
+function TimelineArea({ data }: { data: Array<{ date: string; words: number; title: string }> }) {
+  if (data.length === 0) return <EmptyChart />;
+
+  return (
+    <ChartContainer config={wordsConfig} className="h-64 w-full">
+      <AreaChart data={data} margin={{ left: 4, right: 8, top: 8, bottom: 0 }}>
         <defs>
-          <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity={0.4} />
-            <stop offset="100%" stopColor={color} stopOpacity={0.05} />
+          <linearGradient id="wordTimelineGradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="var(--color-words)" stopOpacity={0.4} />
+            <stop offset="100%" stopColor="var(--color-words)" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        <path d={area} fill={`url(#${gradId})`} />
-        <path d={line} fill="none" stroke={color} strokeWidth="2" vectorEffect="non-scaling-stroke" />
-        {pts.map((p, i) => (
-          <circle key={getTimelineDatumKey(data[i])} cx={p.x} cy={p.y} r="3" fill={color} vectorEffect="non-scaling-stroke">
-            <title>{`${data[i].title}\n${data[i].date} — ${data[i].words.toLocaleString()} words`}</title>
-          </circle>
-        ))}
-      </svg>
-      <div className={cn('flex justify-between mt-2 border-t border-border pt-2')}>
-        {(data.length <= 8 ? data : [data[0], data.at(-1)!]).map(d => (
-          <span key={getTimelineDatumKey(d)} className="text-[10px] text-muted-foreground truncate">{d.date}</span>
-        ))}
-      </div>
-    </div>
+        <CartesianGrid vertical={false} strokeDasharray="3 3" />
+        <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={10} minTickGap={24} />
+        <YAxis hide />
+        <ChartTooltip content={<ChartTooltipContent />} />
+        <Area dataKey="words" type="monotone" fill="url(#wordTimelineGradient)" stroke="var(--color-words)" strokeWidth={2} />
+      </AreaChart>
+    </ChartContainer>
   );
 }
 
@@ -119,23 +131,23 @@ export function Charts({ postsByYear, tagData, wordData, readingTimeDist, wordTi
   return (
     <div className="grid gap-6">
       <div className="grid gap-6 md:grid-cols-2">
-        <ChartCard title="Posts per Year">
-          <BarChart data={postsByYear} labelKey="year" valueKey="count" />
-        </ChartCard>
-        <ChartCard title="Tag Frequency">
-          <BarChart data={tagData} labelKey="tag" valueKey="count" horizontal />
-        </ChartCard>
+        <CyberPanel title="Posts per Year" description="Publishing cadence by year.">
+          <VerticalBars data={postsByYear} labelKey="year" valueKey="count" />
+        </CyberPanel>
+        <CyberPanel title="Tag Frequency" description="Topic distribution across published posts.">
+          <HorizontalBars data={tagData} labelKey="tag" valueKey="count" />
+        </CyberPanel>
       </div>
-      <ChartCard title="Word Count by Post">
-        <BarChart data={wordData} labelKey="name" valueKey="words" />
-      </ChartCard>
+      <CyberPanel title="Word Count by Post" description="Long-form weight by article.">
+        <VerticalBars data={wordData} labelKey="name" valueKey="words" />
+      </CyberPanel>
       <div className="grid gap-6 md:grid-cols-2">
-        <ChartCard title="Reading Time Distribution">
-          <BarChart data={readingTimeDist} labelKey="bucket" valueKey="count" horizontal />
-        </ChartCard>
-        <ChartCard title="Word Count Timeline">
-          <AreaChart data={wordTimeline} />
-        </ChartCard>
+        <CyberPanel title="Reading Time Distribution" description="Reader time commitment buckets.">
+          <HorizontalBars data={readingTimeDist} labelKey="bucket" valueKey="count" />
+        </CyberPanel>
+        <CyberPanel title="Word Count Timeline" description="Chronological content mass.">
+          <TimelineArea data={wordTimeline} />
+        </CyberPanel>
       </div>
     </div>
   );

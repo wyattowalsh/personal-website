@@ -52,7 +52,7 @@ export function AdminHeader() {
     <header
       className={cn(
         'flex h-14 items-center justify-between px-4 md:px-6',
-        'border-b border-border bg-card/50'
+        'border-b border-border/80 bg-card/75 backdrop-blur'
       )}
     >
       <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ export function AdminHeader() {
       </div>
 
       <div className="flex items-center gap-2">
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground mr-2">
+        <div className="hidden sm:flex items-center gap-1.5 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground mr-2">
           <Shield className="h-3.5 w-3.5" />
           <span>Admin</span>
         </div>

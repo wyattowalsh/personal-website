@@ -23,7 +23,8 @@ export default function AdminError({ error, reset }: ErrorProps) {
 
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <Card className="max-w-md w-full">
+      <Card className="max-w-md w-full overflow-hidden border-border/80 bg-card/90">
+        <div className="h-px bg-gradient-to-r from-transparent via-destructive to-transparent" />
         <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
           <div className="rounded-full bg-destructive/10 p-3">
             <AlertTriangle className="h-10 w-10 text-destructive" />

@@ -29,6 +29,20 @@ export interface AnalyticsRow {
   detail?: string;
 }
 
+export interface TrafficPoint {
+  date: string;
+  pageviews: number;
+  visitors: number;
+  sessions: number;
+}
+
+export interface PageEngagementRow {
+  page: string;
+  pageviews: number;
+  visitors: number;
+  interactions: Record<string, number>;
+}
+
 export interface VisitorAnalyticsSnapshot {
   status: AnalyticsStatus;
   generatedAt: string;
@@ -43,6 +57,9 @@ export interface VisitorAnalyticsSnapshot {
   searches: AnalyticsRow[];
   outboundLinks: AnalyticsRow[];
   readingProgress: AnalyticsRow[];
+  trafficSeries: TrafficPoint[];
+  eventMix: AnalyticsRow[];
+  pageEngagement: PageEngagementRow[];
 }
 
 interface PostHogConfig {
@@ -118,6 +135,9 @@ function emptySnapshot(status: AnalyticsStatus, missingEnv: string[] = [], error
     searches: [],
     outboundLinks: [],
     readingProgress: [],
+    trafficSeries: [],
+    eventMix: [],
+    pageEngagement: [],
   };
 }
 
@@ -135,6 +155,11 @@ function asText(value: unknown, fallback = 'Unknown'): string {
 
 function eventList(): string {
   return INTERACTION_EVENTS.map((event) => `'${event}'`).join(', ');
+}
+
+function toNumber(value: unknown): number {
+  const numeric = Number(value ?? 0);
+  return Number.isFinite(numeric) ? numeric : 0;
 }
 
 async function queryPostHog(config: PostHogConfig, name: string, query: string): Promise<unknown[][]> {
@@ -207,6 +232,9 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
       searchRows,
       outboundRows,
       readingRows,
+      trafficRows,
+      eventMixRows,
+      pageEventRows,
     ] = await Promise.all([
       queryPostHog(
         config,
@@ -292,10 +320,63 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
          ORDER BY max_percent DESC, events DESC
          LIMIT 10`
       ),
+      queryPostHog(
+        config,
+        'admin traffic series',
+        `SELECT toString(toDate(timestamp)) AS date, count() AS pageviews, uniqExact(distinct_id) AS visitors, uniqExact(properties.session_id) AS sessions
+         FROM events
+         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY AND event = '$pageview'
+         GROUP BY date
+         ORDER BY date ASC`
+      ),
+      queryPostHog(
+        config,
+        'admin event mix',
+        `SELECT event, count() AS count
+         FROM events
+         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+         GROUP BY event
+         ORDER BY count DESC
+         LIMIT 12`
+      ),
+      queryPostHog(
+        config,
+        'admin page event matrix',
+        `SELECT properties.$pathname AS path, event, count() AS count
+         FROM events
+         WHERE timestamp >= now() - INTERVAL ${ANALYTICS_WINDOW_DAYS} DAY
+           AND properties.$pathname != ''
+           AND (event = '$pageview' OR event IN (${eventList()}))
+         GROUP BY path, event
+         ORDER BY count DESC
+         LIMIT 80`
+      ),
     ]);
 
     const overview = overviewRows[0] ?? [];
     const interactionsTotal = interactionRows.reduce((sum, row) => sum + Number(row[1] ?? 0), 0);
+    const topPageVisitorCounts = new Map(topPageRows.map((row) => [asText(row[0], 'Unknown page'), toNumber(row[2])]));
+    const pageEngagementMap = new Map<string, PageEngagementRow>();
+
+    for (const row of pageEventRows) {
+      const page = asText(row[0], 'Unknown page');
+      const event = asText(row[1], 'unknown_event');
+      const count = toNumber(row[2]);
+      const current = pageEngagementMap.get(page) ?? {
+        page,
+        pageviews: 0,
+        visitors: topPageVisitorCounts.get(page) ?? 0,
+        interactions: {},
+      };
+
+      if (event === '$pageview') {
+        current.pageviews = count;
+      } else {
+        current.interactions[event] = count;
+      }
+
+      pageEngagementMap.set(page, current);
+    }
 
     return {
       status: 'configured',
@@ -319,6 +400,16 @@ export async function getVisitorAnalyticsSnapshot(): Promise<VisitorAnalyticsSna
         value: `${formatCount(row[1])}%`,
         detail: `${formatCount(row[2])} events`,
       })),
+      trafficSeries: trafficRows.map((row) => ({
+        date: asText(row[0], 'Unknown date'),
+        pageviews: toNumber(row[1]),
+        visitors: toNumber(row[2]),
+        sessions: toNumber(row[3]),
+      })),
+      eventMix: rowsToAnalyticsRows(eventMixRows, 'Unknown event'),
+      pageEngagement: Array.from(pageEngagementMap.values())
+        .sort((a, b) => (b.pageviews + Object.values(b.interactions).reduce((sum, value) => sum + value, 0)) - (a.pageviews + Object.values(a.interactions).reduce((sum, value) => sum + value, 0)))
+        .slice(0, 10),
     };
   } catch (error) {
     return emptySnapshot(

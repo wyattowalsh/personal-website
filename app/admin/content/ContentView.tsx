@@ -5,7 +5,8 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ContentFilters, DEFAULT_FILTERS, type ContentFilterValues } from '../components/ContentFilters';
 import { PostCard, type PostCardProps } from '../components/PostCard';
 import { SeriesView } from '../components/SeriesView';
-import { FileText, Layers } from 'lucide-react';
+import { AlertTriangle, BookOpen, FileText, Layers, ListChecks, Tags } from 'lucide-react';
+import { AdminHero, AdminSurface, SignalCard } from '../components/AdminVisuals';
 
 interface ContentViewProps {
   posts: PostCardProps[];
@@ -50,32 +51,40 @@ export function ContentView({ posts, allTags }: ContentViewProps) {
 
     return result;
   }, [posts, filters]);
+  const totalWords = posts.reduce((sum, post) => sum + post.wordCount, 0);
+  const metadataGaps = posts.filter((post) => !post.image || !post.summary || post.tags.length === 0).length;
+  const seriesCount = new Set(posts.map((post) => post.series?.name).filter(Boolean)).size;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Content</h1>
-        <p className="text-muted-foreground mt-1">
-          Manage and browse all posts
-        </p>
-      </div>
+    <AdminSurface>
+      <div className="space-y-6">
+        <AdminHero
+          eyebrow="Content command"
+          title="Content"
+          description="Browse published posts, inspect metadata health, and track series structure."
+        />
 
-      {/* Filters */}
-      <ContentFilters
-        allTags={allTags}
-        filters={filters}
-        onFilterChange={setFilters}
-      />
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <SignalCard label="Posts" value={posts.length} description="Published articles" icon={FileText} tone="blue" />
+          <SignalCard label="Words" value={totalWords.toLocaleString()} description="Total indexed words" icon={BookOpen} tone="violet" />
+          <SignalCard label="Tags" value={allTags.length} description="Available filters" icon={Tags} tone="emerald" />
+          <SignalCard label="Metadata Gaps" value={metadataGaps} description={`${seriesCount} named series`} icon={metadataGaps > 0 ? AlertTriangle : ListChecks} tone={metadataGaps > 0 ? 'amber' : 'emerald'} />
+        </div>
 
-      {/* Result count */}
-      <p className="text-sm text-muted-foreground">
-        {filteredPosts.length} {filteredPosts.length === 1 ? 'post' : 'posts'}
-      </p>
+        <div className="rounded-lg border border-border/80 bg-card/80 p-4">
+          <ContentFilters
+            allTags={allTags}
+            filters={filters}
+            onFilterChange={setFilters}
+          />
+          <p className="mt-3 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-muted-foreground">
+            {filteredPosts.length} {filteredPosts.length === 1 ? 'post' : 'posts'} in current view
+          </p>
+        </div>
 
       {/* Tabs */}
       <Tabs defaultValue="list">
-        <TabsList>
+        <TabsList className="border border-border/80 bg-card/75">
           <TabsTrigger value="list" className="gap-1.5">
             <FileText className="h-3.5 w-3.5" />
             List
@@ -116,6 +125,7 @@ export function ContentView({ posts, allTags }: ContentViewProps) {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </AdminSurface>
   );
 }

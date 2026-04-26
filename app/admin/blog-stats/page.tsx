@@ -2,9 +2,10 @@ import { redirect } from 'next/navigation';
 import { BackendService } from '@/lib/server';
 import { validateAdminSession } from '@/app/admin/lib/auth';
 import { Metadata } from 'next';
-import { StatCard } from '../components/StatCard';
 import { Charts } from './Charts';
 import { PostsTable } from '../components/PostsTable';
+import { AdminHero, AdminSurface, SignalCard } from '../components/AdminVisuals';
+import { BookOpen, Clock, FileText, Hash } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Blog Analytics',
@@ -94,27 +95,19 @@ export default async function BlogStatsPage() {
   }));
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight">Blog Analytics</h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Content statistics and insights
-        </p>
-      </div>
+    <AdminSurface>
+      <div className="mx-auto max-w-7xl space-y-8">
+        <AdminHero
+          eyebrow="Content telemetry"
+          title="Blog Analytics"
+          description="Publishing cadence, topic distribution, reading depth, and content inventory health."
+        />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <StatCard label="Total Posts" value={posts.length} icon="fileText" />
-        <StatCard
-          label="Total Words"
-          value={totalWords}
-          icon="bookOpen"
-        />
-        <StatCard label="Total Tags" value={tags.length} icon="hash" />
-        <StatCard
-          label="Avg Reading Time"
-          value={`${avgReadingTime} min`}
-          icon="clock"
-        />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SignalCard label="Total Posts" value={posts.length} description="Published MDX articles" icon={FileText} tone="blue" />
+        <SignalCard label="Total Words" value={totalWords.toLocaleString()} description="Indexed article copy" icon={BookOpen} tone="violet" />
+        <SignalCard label="Total Tags" value={tags.length} description="Unique topic labels" icon={Hash} tone="emerald" />
+        <SignalCard label="Avg Reading Time" value={`${avgReadingTime} min`} description="Mean estimated read" icon={Clock} tone="amber" />
       </div>
 
       <Charts
@@ -126,9 +119,10 @@ export default async function BlogStatsPage() {
       />
 
       <div className="mt-8">
-        <h2 className="text-lg font-semibold tracking-tight mb-4">All Posts</h2>
+        <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">All Posts</h2>
         <PostsTable posts={postsTableData} />
       </div>
-    </div>
+      </div>
+    </AdminSurface>
   );
 }

@@ -71,13 +71,13 @@ export function PostsTable({ posts }: PostsTableProps) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden border-border/80 bg-card/80">
       <ScrollArea className="w-full">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
+            <tr className="border-b border-border/80 bg-muted/20">
               <th
-                className="cursor-pointer select-none px-4 py-3 text-left font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="cursor-pointer select-none px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
                 onClick={() => handleSort('title')}
               >
                 <span className="inline-flex items-center gap-1">
@@ -86,7 +86,7 @@ export function PostsTable({ posts }: PostsTableProps) {
                 </span>
               </th>
               <th
-                className="cursor-pointer select-none px-4 py-3 text-left font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                className="cursor-pointer select-none px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
                 onClick={() => handleSort('created')}
               >
                 <span className="inline-flex items-center gap-1">
@@ -95,7 +95,7 @@ export function PostsTable({ posts }: PostsTableProps) {
                 </span>
               </th>
               <th
-                className="cursor-pointer select-none px-4 py-3 text-right font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                className="cursor-pointer select-none px-4 py-3 text-right font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
                 onClick={() => handleSort('wordCount')}
               >
                 <span className="inline-flex items-center gap-1 justify-end">
@@ -104,7 +104,7 @@ export function PostsTable({ posts }: PostsTableProps) {
                 </span>
               </th>
               <th
-                className="cursor-pointer select-none px-4 py-3 text-right font-medium text-muted-foreground hover:text-foreground transition-colors whitespace-nowrap"
+                className="cursor-pointer select-none px-4 py-3 text-right font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
                 onClick={() => handleSort('readingTime')}
               >
                 <span className="inline-flex items-center gap-1 justify-end">
@@ -112,7 +112,7 @@ export function PostsTable({ posts }: PostsTableProps) {
                   <SortIcon column="readingTime" />
                 </span>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+              <th className="px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Tags
               </th>
             </tr>

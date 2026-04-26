@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Activity, BarChart3, FileText, PanelLeftClose, PanelLeft, X } from 'lucide-react';
+import { Activity, BarChart3, FileText, PanelLeftClose, PanelLeft, Radar, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -81,13 +81,16 @@ export function AdminSidebar() {
       {/* Desktop sidebar */}
       <aside
         className={cn(
-          'hidden md:flex flex-col border-r border-border bg-card/50 transition-all duration-200',
+        'hidden md:flex flex-col border-r border-border/80 bg-card/75 transition-all duration-200 backdrop-blur',
           desktopSidebarOpen ? 'w-60' : 'w-16'
         )}
       >
         <div className="flex h-14 items-center justify-between px-3">
           {desktopSidebarOpen && (
-            <span className="text-sm font-semibold tracking-tight pl-1">Admin</span>
+            <span className="inline-flex items-center gap-2 pl-1 text-sm font-semibold tracking-tight">
+              <Radar className="size-4 text-[hsl(var(--chart-1))]" />
+              Admin
+            </span>
           )}
           <Button
             variant="ghost"
@@ -137,7 +140,10 @@ export function AdminSidebar() {
               className="fixed inset-y-0 left-0 z-50 w-60 flex flex-col border-r border-border bg-card md:hidden"
             >
               <div className="flex h-14 items-center justify-between px-3">
-                <span className="text-sm font-semibold tracking-tight pl-1">Admin</span>
+                <span className="inline-flex items-center gap-2 pl-1 text-sm font-semibold tracking-tight">
+                  <Radar className="size-4 text-[hsl(var(--chart-1))]" />
+                  Admin
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"

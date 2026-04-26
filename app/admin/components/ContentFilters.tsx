@@ -79,7 +79,7 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
           placeholder="Search posts..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
-          className="pl-9"
+          className="border-border/80 bg-background/70 pl-9"
         />
       </div>
 
@@ -88,7 +88,7 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
         value={filters.tag}
         onValueChange={(value) => onFilterChange({ ...filters, tag: value })}
       >
-        <SelectTrigger className="w-[160px]">
+        <SelectTrigger className="w-[160px] border-border/80 bg-background/70">
           <SelectValue placeholder="All Tags" />
         </SelectTrigger>
         <SelectContent>
@@ -106,7 +106,7 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
         value={filters.sort}
         onValueChange={(value) => onFilterChange({ ...filters, sort: value })}
       >
-        <SelectTrigger className="w-[160px]">
+        <SelectTrigger className="w-[160px] border-border/80 bg-background/70">
           <SelectValue placeholder="Newest" />
         </SelectTrigger>
         <SelectContent>
