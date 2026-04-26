@@ -59,6 +59,7 @@ export interface AnalyticsRollupSummary {
   lastRunStatus?: string;
   lastRunAt?: string;
   missingEnv: string[];
+  schemaHealth?: 'healthy' | 'outdated' | 'unknown';
   error?: string;
 }
 

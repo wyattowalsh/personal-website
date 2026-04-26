@@ -110,7 +110,7 @@ async function withRollupClient<T>(callback: (client: Client) => Promise<T>): Pr
 export async function ensureAnalyticsRollupSchema(client: Client): Promise<void> {
   await client.batch([
     `CREATE TABLE IF NOT EXISTS analytics_rollup_days (
-      day TEXT PRIMARY KEY,
+      day TEXT NOT NULL PRIMARY KEY,
       pageviews INTEGER NOT NULL,
       visitors INTEGER NOT NULL,
       sessions INTEGER NOT NULL,
@@ -132,7 +132,7 @@ export async function ensureAnalyticsRollupSchema(client: Client): Promise<void>
     `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_dimensions_kind_day
       ON analytics_rollup_dimensions(kind, day)`,
     `CREATE TABLE IF NOT EXISTS analytics_rollup_runs (
-      id TEXT PRIMARY KEY,
+      id TEXT NOT NULL PRIMARY KEY,
       started_at TEXT NOT NULL,
       completed_at TEXT,
       status TEXT NOT NULL,
@@ -140,6 +140,77 @@ export async function ensureAnalyticsRollupSchema(client: Client): Promise<void>
       error TEXT
     )`,
   ], 'write');
+}
+
+async function checkAnalyticsRollupSchemaHealth(client: Client): Promise<'healthy' | 'outdated' | 'unknown'> {
+  try {
+    const [daysInfo, runsInfo] = await Promise.all([
+      client.execute('PRAGMA table_info(analytics_rollup_days)'),
+      client.execute('PRAGMA table_info(analytics_rollup_runs)'),
+    ]);
+
+    // Check if tables exist
+    if (daysInfo.rows.length === 0 || runsInfo.rows.length === 0) {
+      return 'unknown';
+    }
+
+    // Find the 'day' column in analytics_rollup_days and 'id' column in analytics_rollup_runs
+    const dayColumn = daysInfo.rows.find((row) => rowText(row, 'name') === 'day');
+    const idColumn = runsInfo.rows.find((row) => rowText(row, 'name') === 'id');
+
+    if (!dayColumn || !idColumn) {
+      return 'unknown';
+    }
+
+    // Check if 'notnull' is set for both primary key columns
+    // PRAGMA table_info returns: cid, name, type, notnull (0|1), dflt_value, pk
+    const dayNotNull = rowNumber(dayColumn, 'notnull') === 1;
+    const idNotNull = rowNumber(idColumn, 'notnull') === 1;
+
+    if (dayNotNull && idNotNull) {
+      return 'healthy';
+    } else {
+      return 'outdated';
+    }
+  } catch {
+    return 'unknown';
+  }
+}
+
+export async function repairAnalyticsRollupSchema(client: Client): Promise<{ success: boolean; message: string }> {
+  try {
+    const health = await checkAnalyticsRollupSchemaHealth(client);
+    if (health === 'healthy') {
+      return { success: true, message: 'Schema is already healthy.' };
+    }
+
+    const dayCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_days');
+    const runCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_runs');
+    const dayDataExists = rowNumber((dayCount.rows[0] || {}), 'count') > 0;
+    const runDataExists = rowNumber((runCount.rows[0] || {}), 'count') > 0;
+
+    if (dayDataExists || runDataExists) {
+      return {
+        success: false,
+        message: 'Cannot auto-repair: data exists. Please manually review or backup before repair.',
+      };
+    }
+
+    await client.batch([
+      'DROP TABLE IF EXISTS analytics_rollup_runs',
+      'DROP TABLE IF EXISTS analytics_rollup_days',
+      'DROP TABLE IF EXISTS analytics_rollup_dimensions',
+      'DROP INDEX IF EXISTS idx_analytics_rollup_dimensions_kind_day',
+    ], 'write');
+
+    await ensureAnalyticsRollupSchema(client);
+    return { success: true, message: 'Schema repaired with hardened NOT NULL constraints.' };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : 'Repair failed',
+    };
+  }
 }
 
 function cutoffDay(windowDays: number, now = new Date()): string {
@@ -563,7 +634,7 @@ function buildPageEngagement(rows: Row[]): PageEngagementRow[] {
     .slice(0, 10);
 }
 
-function buildRollupSummary(status: RollupStatus, missingEnv: string[], dayRows: Row[] = [], runRows: Row[] = [], error?: string): AnalyticsRollupSummary {
+function buildRollupSummary(status: RollupStatus, missingEnv: string[], dayRows: Row[] = [], runRows: Row[] = [], error?: string, schemaHealth?: 'healthy' | 'outdated' | 'unknown'): AnalyticsRollupSummary {
   const latestDay = dayRows.at(-1);
   const latestRun = runRows[0];
 
@@ -574,6 +645,7 @@ function buildRollupSummary(status: RollupStatus, missingEnv: string[], dayRows:
     lastRunStatus: latestRun ? rowText(latestRun, 'status') : undefined,
     lastRunAt: latestRun ? rowText(latestRun, 'completed_at') || rowText(latestRun, 'started_at') : undefined,
     missingEnv,
+    schemaHealth,
     error,
   };
 }
@@ -585,11 +657,12 @@ export async function getAnalyticsRollupHealth(): Promise<AnalyticsRollupSummary
   try {
     return await withRollupClient(async (client) => {
       await ensureAnalyticsRollupSchema(client);
-      const [daysResult, runsResult] = await Promise.all([
+      const [daysResult, runsResult, schemaHealth] = await Promise.all([
         client.execute('SELECT day FROM analytics_rollup_days ORDER BY day ASC'),
         client.execute('SELECT status, started_at, completed_at FROM analytics_rollup_runs ORDER BY started_at DESC LIMIT 1'),
+        checkAnalyticsRollupSchemaHealth(client),
       ]);
-      return buildRollupSummary('configured', getRollupSetupMissingEnv(), daysResult.rows, runsResult.rows);
+      return buildRollupSummary('configured', getRollupSetupMissingEnv(), daysResult.rows, runsResult.rows, undefined, schemaHealth);
     });
   } catch (error) {
     return buildRollupSummary('error', [], [], [], error instanceof Error ? error.message : 'Analytics rollup health check failed');
@@ -633,7 +706,7 @@ export async function getRollupAnalyticsSnapshot(windowDays: AnalyticsWindowDays
       await ensureAnalyticsRollupSchema(client);
       const cutoff = cutoffDay(Math.min(windowDays, MAX_ANALYTICS_WINDOW_DAYS));
       const args: InArgs = [cutoff];
-      const [daysResult, dimensionsResult, runsResult] = await Promise.all([
+      const [daysResult, dimensionsResult, runsResult, schemaHealth] = await Promise.all([
         client.execute({
           sql: `SELECT day, pageviews, visitors, sessions, interactions, searches, outbound_clicks
             FROM analytics_rollup_days
@@ -649,6 +722,7 @@ export async function getRollupAnalyticsSnapshot(windowDays: AnalyticsWindowDays
           args,
         }),
         client.execute('SELECT status, started_at, completed_at FROM analytics_rollup_runs ORDER BY started_at DESC LIMIT 1'),
+        checkAnalyticsRollupSchemaHealth(client),
       ]);
       const totals = aggregateRows(daysResult.rows);
       const dimensions = dimensionsResult.rows;
@@ -684,7 +758,7 @@ export async function getRollupAnalyticsSnapshot(windowDays: AnalyticsWindowDays
         })) satisfies TrafficPoint[],
         eventMix: eventRows,
         pageEngagement: buildPageEngagement(rowsByKind(dimensions, 'page_event')),
-        rollup: buildRollupSummary('configured', getRollupSetupMissingEnv(), daysResult.rows, runsResult.rows),
+        rollup: buildRollupSummary('configured', getRollupSetupMissingEnv(), daysResult.rows, runsResult.rows, undefined, schemaHealth),
       };
     });
   } catch (error) {

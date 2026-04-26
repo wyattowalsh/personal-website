@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { ensureAnalyticsRollupSchema, getRollupAnalyticsSnapshot, refreshAnalyticsRollups } from './analytics-rollups';
+import { ensureAnalyticsRollupSchema, getAnalyticsRollupHealth, getRollupAnalyticsSnapshot, refreshAnalyticsRollups, repairAnalyticsRollupSchema } from './analytics-rollups';
 
 const mockClient = {
   batch: vi.fn(),
@@ -61,16 +61,162 @@ afterEach(() => {
 });
 
 describe('analytics rollups', () => {
-  it('creates the rollup schema idempotently', async () => {
+  it('creates the rollup schema with NOT NULL PRIMARY KEY constraints', async () => {
     await ensureAnalyticsRollupSchema(mockClient as never);
 
     expect(mockClient.batch).toHaveBeenCalledOnce();
     const [statements, mode] = mockClient.batch.mock.calls[0];
     expect(mode).toBe('write');
-    expect(statements.join('\n')).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_days');
-    expect(statements.join('\n')).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_dimensions');
-    expect(statements.join('\n')).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_runs');
+    const schemaStr = statements.join('\n');
+    expect(schemaStr).toContain('day TEXT NOT NULL PRIMARY KEY');
+    expect(schemaStr).toContain('id TEXT NOT NULL PRIMARY KEY');
+    expect(schemaStr).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_days');
+    expect(schemaStr).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_dimensions');
+    expect(schemaStr).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_runs');
   });
+
+  it('detects healthy schema when NOT NULL constraints are present', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({ rows: [] }) // SELECT day FROM analytics_rollup_days
+      .mockResolvedValueOnce({ rows: [] }) // SELECT status FROM analytics_rollup_runs
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 1, dflt_value: null, pk: 1 },
+        ],
+      }) // PRAGMA table_info(analytics_rollup_days)
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 1, dflt_value: null, pk: 1 },
+        ],
+      }); // PRAGMA table_info(analytics_rollup_runs)
+
+    const health = await getAnalyticsRollupHealth();
+
+    expect(health.status).toBe('configured');
+    expect(health.schemaHealth).toBe('healthy');
+  });
+
+  it('detects outdated schema when NOT NULL constraints are missing', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({ rows: [] }) // SELECT day FROM analytics_rollup_days
+      .mockResolvedValueOnce({ rows: [] }) // SELECT status FROM analytics_rollup_runs
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      }) // PRAGMA table_info(analytics_rollup_days)
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      }); // PRAGMA table_info(analytics_rollup_runs)
+
+    const health = await getAnalyticsRollupHealth();
+
+    expect(health.status).toBe('configured');
+    expect(health.schemaHealth).toBe('outdated');
+  });
+
+  it('returns unknown schema health when table introspection fails', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [] });
+
+    const health = await getAnalyticsRollupHealth();
+
+    expect(health.status).toBe('configured');
+    expect(health.schemaHealth).toBe('unknown');
+  });
+
+  it('includes schemaHealth in rollup analytics snapshot', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({
+        rows: [
+          { day: '2026-04-26', pageviews: 4, visitors: 2, sessions: 2, interactions: 5, searches: 2, outbound_clicks: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { day: '2026-04-26', kind: 'event', label: '$pageview', detail_key: '', value: 4, detail: '' },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [{ status: 'success', started_at: '2026-04-26T07:15:00.000Z', completed_at: '2026-04-26T07:16:00.000Z' }],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 1, dflt_value: null, pk: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 1, dflt_value: null, pk: 1 },
+        ],
+      });
+
+    const snapshot = await getRollupAnalyticsSnapshot(90);
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.rollup?.schemaHealth).toBe('healthy');
+  });
+
+  it('repairs empty rollup tables with hardened schema', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [{ count: 0 }] })
+      .mockResolvedValueOnce({ rows: [{ count: 0 }] })
+      .mockResolvedValue({ rows: [] });
+
+    const result = await repairAnalyticsRollupSchema(mockClient as never);
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('repaired');
+    expect(mockClient.batch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.stringContaining('DROP TABLE IF EXISTS analytics_rollup_runs'),
+      ]),
+      'write'
+    );
+  });
+
+  it('refuses to repair rollup tables when data exists', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      }) // PRAGMA table_info(analytics_rollup_days)
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      }) // PRAGMA table_info(analytics_rollup_runs)
+      .mockResolvedValueOnce({ rows: [{ count: 5 }] }) // COUNT analytics_rollup_days
+      .mockResolvedValueOnce({ rows: [{ count: 3 }] }); // COUNT analytics_rollup_runs
+
+    const result = await repairAnalyticsRollupSchema(mockClient as never);
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('Cannot auto-repair');
+  });
+
 
   it('returns missing setup state when Turso env vars are absent', async () => {
     delete process.env.TURSO_DATABASE_URL;
@@ -106,6 +252,16 @@ describe('analytics rollups', () => {
       })
       .mockResolvedValueOnce({
         rows: [{ status: 'success', started_at: '2026-04-26T07:15:00.000Z', completed_at: '2026-04-26T07:16:00.000Z' }],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 1, dflt_value: null, pk: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 1, dflt_value: null, pk: 1 },
+        ],
       });
 
     const snapshot = await getRollupAnalyticsSnapshot(90);
@@ -133,6 +289,7 @@ describe('analytics rollups', () => {
       latestDay: '2026-04-26',
       coveredDays: 2,
       lastRunStatus: 'success',
+      schemaHealth: 'healthy',
     });
   });
 
