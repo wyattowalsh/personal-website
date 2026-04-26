@@ -25,6 +25,7 @@ function buildCsp() {
     'https://www.google-analytics.com', 'https://*.google-analytics.com',
     'https://*.analytics.google.com', 'https://vitals.vercel-insights.com',
     'https://*.sentry.io', 'https://va.vercel-scripts.com',
+    'https://*.posthog.com', 'https://*.i.posthog.com',
   ].join(' ')
 
   return [
