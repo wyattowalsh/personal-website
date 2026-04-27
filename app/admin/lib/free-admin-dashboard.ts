@@ -5,14 +5,22 @@ import { BackendService } from '@/lib/server';
 import type { Post } from '@/lib/types';
 import { getAnalyticsRollupHealth } from './analytics-rollups';
 import type { AnalyticsWindowDays } from './analytics-windows';
+import {
+  FAST_PROVIDER_TIMEOUT_MS,
+  PAGESPEED_QUERY_TIMEOUT_MS,
+  SEARCH_CONSOLE_QUERY_TIMEOUT_MS,
+  SLOW_PROVIDER_TIMEOUT_MS,
+  VERCEL_API_TIMEOUT_MS,
+  GITHUB_API_TIMEOUT_MS,
+} from './analytics-constants';
 import { getVisitorAnalyticsSnapshot, type AnalyticsMetric, type AnalyticsRow, type VisitorAnalyticsSnapshot } from './visitor-analytics';
+import { withTimeout } from './resilience';
 
 const DEFAULT_SITE_URL = 'https://www.w4w.dev';
 const DEFAULT_GITHUB_REPOSITORY = 'wyattowalsh/personal-website';
 const SEARCH_CONSOLE_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
-const DEFAULT_PROVIDER_TIMEOUT_MS = 10_000;
-const PAGESPEED_TIMEOUT_MS = 45_000;
+const DEFAULT_PROVIDER_TIMEOUT_MS = SLOW_PROVIDER_TIMEOUT_MS;
 
 export type AdminProviderStatus = 'configured' | 'missing_config' | 'error' | 'partial';
 
@@ -217,22 +225,13 @@ async function fetchWithTimeout(
   init: (RequestInit & { next?: { revalidate?: number } }) = {},
   timeoutMs = DEFAULT_PROVIDER_TIMEOUT_MS
 ): Promise<Response> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    return await fetch(input, {
-      ...init,
-      signal: init.signal ?? controller.signal,
-    });
-  } catch (error) {
-    if (controller.signal.aborted) {
-      throw new Error(`Provider request timed out after ${Math.round(timeoutMs / 1000)}s`);
-    }
-    throw error;
-  } finally {
-    clearTimeout(timeout);
-  }
+  return withTimeout(
+    async () => {
+      const response = await fetch(input, init);
+      return response;
+    },
+    { timeoutMs, label: `fetch ${String(input).slice(0, 60)}` }
+  );
 }
 
 interface GitHubTrafficCountResponse {
@@ -531,7 +530,7 @@ async function fetchPageSpeed(strategy: 'mobile' | 'desktop'): Promise<PageSpeed
   }
   if (process.env.PAGESPEED_API_KEY) url.searchParams.set('key', process.env.PAGESPEED_API_KEY);
 
-  const response = await fetchWithTimeout(url, { next: { revalidate: 12 * 60 * 60 } }, PAGESPEED_TIMEOUT_MS);
+  const response = await fetchWithTimeout(url, { next: { revalidate: 12 * 60 * 60 } }, PAGESPEED_QUERY_TIMEOUT_MS);
   const payload = (await response.json().catch(() => ({}))) as PageSpeedResponse;
   if (!response.ok) {
     throw new Error(payload.error?.message || `PageSpeed request failed with ${response.status}`);
@@ -1256,27 +1255,34 @@ function buildSignals(input: {
 }
 
 export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays): Promise<AdminDashboardSnapshot> {
-  const [
-    visitors,
-    searchConsole,
-    indexNow,
-    performance,
-    vercel,
-    github,
-    uptimeRobot,
-    rollupStorage,
-    contentHealth,
-  ] = await Promise.all([
-    getVisitorAnalyticsSnapshot(windowDays),
-    getSearchConsoleSnapshot(),
-    getIndexNowSnapshot(),
-    getPerformanceSnapshot(),
-    getVercelSnapshot(),
-    getGitHubSnapshot(),
-    getUptimeRobotSnapshot(),
-    getAnalyticsRollupProviderSnapshot(),
-    getContentHealthSnapshot(),
+  // Fast providers (local data / no external API)
+  const fastProviders = await Promise.allSettled([
+    withTimeout(() => getVisitorAnalyticsSnapshot(windowDays), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'visitor-analytics' }),
+    withTimeout(() => getIndexNowSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'indexnow' }),
+    withTimeout(() => getContentHealthSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'content-health' }),
+    withTimeout(() => getAnalyticsRollupProviderSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'analytics-rollups' }),
   ]);
+
+  // Slow providers (external APIs)
+  const slowProviders = await Promise.allSettled([
+    withTimeout(() => getSearchConsoleSnapshot(), { timeoutMs: SEARCH_CONSOLE_QUERY_TIMEOUT_MS, label: 'search-console' }),
+    withTimeout(() => getPerformanceSnapshot(), { timeoutMs: PAGESPEED_QUERY_TIMEOUT_MS, label: 'pagespeed' }),
+    withTimeout(() => getVercelSnapshot(), { timeoutMs: VERCEL_API_TIMEOUT_MS, label: 'vercel' }),
+    withTimeout(() => getGitHubSnapshot(), { timeoutMs: GITHUB_API_TIMEOUT_MS, label: 'github' }),
+    withTimeout(() => getUptimeRobotSnapshot(), { timeoutMs: SLOW_PROVIDER_TIMEOUT_MS, label: 'uptimerobot' }),
+  ]);
+
+  const visitors = fastProviders[0].status === 'fulfilled' ? fastProviders[0].value : emptyVisitorSnapshot(windowDays);
+  const indexNow = fastProviders[1].status === 'fulfilled' ? fastProviders[1].value : errorProviderSnapshot('indexnow', 'IndexNow', fastProviders[1].reason);
+  const contentHealth = fastProviders[2].status === 'fulfilled' ? fastProviders[2].value : errorProviderSnapshot('content-health', 'Content Health', fastProviders[2].reason);
+  const rollupStorage = fastProviders[3].status === 'fulfilled' ? fastProviders[3].value : errorProviderSnapshot('analytics-rollups', 'Analytics Rollups', fastProviders[3].reason);
+
+  const searchConsole = slowProviders[0].status === 'fulfilled' ? slowProviders[0].value : errorProviderSnapshot('search-console', 'Google Search Console', slowProviders[0].reason);
+  const performance = slowProviders[1].status === 'fulfilled' ? slowProviders[1].value : errorProviderSnapshot('pagespeed-crux', 'PageSpeed + CrUX', slowProviders[1].reason);
+  const vercel = slowProviders[2].status === 'fulfilled' ? slowProviders[2].value : errorProviderSnapshot('vercel', 'Vercel Deployments', slowProviders[2].reason);
+  const github = slowProviders[3].status === 'fulfilled' ? slowProviders[3].value : errorProviderSnapshot('github', 'GitHub Health', slowProviders[3].reason);
+  const uptimeRobot = slowProviders[4].status === 'fulfilled' ? slowProviders[4].value : errorProviderSnapshot('uptimerobot', 'UptimeRobot', slowProviders[4].reason);
+
   const providers = [searchConsole, indexNow, performance, rollupStorage, vercel, github, uptimeRobot, contentHealth];
   const costLedger = buildCostLedger({ visitors, providers });
   const signals = buildSignals({ visitors, providers, costLedger });
@@ -1291,5 +1297,48 @@ export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays
     contentHealth,
     costLedger,
     signals,
+  };
+}
+
+function emptyVisitorSnapshot(windowDays?: AnalyticsWindowDays): VisitorAnalyticsSnapshot {
+  return {
+    status: 'error',
+    generatedAt: nowIso(),
+    windowDays: windowDays ?? 30,
+    source: 'posthog_live',
+    missingEnv: [],
+    error: 'Visitor analytics snapshot failed or timed out',
+    overview: [
+      { label: 'Visitors', value: 'n/a', description: 'Unique anonymous browsers' },
+      { label: 'Sessions', value: 'n/a', description: 'Per-tab visit sessions' },
+      { label: 'Pageviews', value: 'n/a', description: 'Tracked PostHog page views' },
+      { label: 'Interactions', value: 'n/a', description: 'Custom site events' },
+    ],
+    topPages: [],
+    referrers: [],
+    devices: [],
+    interactions: [],
+    searches: [],
+    outboundLinks: [],
+    readingProgress: [],
+    trafficSeries: [],
+    eventMix: [],
+    pageEngagement: [],
+  };
+}
+
+function errorProviderSnapshot(id: string, title: string, reason: unknown): AdminProviderSnapshot {
+  return {
+    id,
+    title,
+    status: 'error',
+    lastCheckedAt: nowIso(),
+    freeTier: 'Provider request failed',
+    missingEnv: [],
+    cards: [],
+    rows: [],
+    setupSteps: [],
+    sourceUrl: '',
+    error: reason instanceof Error ? reason.message : String(reason),
   };
 }
