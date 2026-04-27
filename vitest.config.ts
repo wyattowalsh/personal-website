@@ -10,8 +10,10 @@ export default defineConfig({
     environment: 'node',
     testTimeout: 15_000,
     include: ['**/*.test.{ts,tsx}'],
+    setupFiles: ['./vitest.setup.ts'],
     environmentMatchGlobs: [
       ['components/**/*.test.tsx', 'jsdom'],
+      ['app/admin/components/**/*.test.tsx', 'jsdom'],
       ['lib/__tests__/device.test.ts', 'jsdom'],
       ['lib/__tests__/analytics.test.ts', 'jsdom'],
     ],
