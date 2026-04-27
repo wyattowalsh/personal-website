@@ -128,3 +128,22 @@ export function SignalsSectionSkeleton() {
     </div>
   );
 }
+
+export function ShellProvidersSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="rounded-lg border border-border/60 bg-card/50 p-5 space-y-3">
+        <div className="flex gap-2 flex-wrap">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-6 w-28" />
+          ))}
+        </div>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <MetricCardSkeleton key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}

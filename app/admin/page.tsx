@@ -2,8 +2,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import {
-  CircleDot,
-  Eye,
   Gauge,
   Search,
   Settings2,
@@ -17,26 +15,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { validateAdminSession } from './lib/auth';
 import { ANALYTICS_WINDOWS, parseAnalyticsWindowDays } from './lib/analytics-windows';
-import {
-  getIndexNowSnapshot,
-  getContentHealthSnapshot,
-  getAnalyticsRollupProviderSnapshot,
-  type AdminProviderSnapshot,
-} from './lib/free-admin-dashboard';
 import { getVisitorAnalyticsSnapshot } from './lib/visitor-analytics';
-import { AdminHero, AdminSurface, ProviderSignalStrip, SignalCard } from './components/AdminVisuals';
+import { AdminHero, AdminSurface } from './components/AdminVisuals';
 import { AnimatedContainer } from './components/AnimatedContainer';
 import { AsyncVisitorsSection } from './components/AsyncVisitorsSection';
 import {
   AsyncGrowthSection,
   AsyncPerformanceSection,
   AsyncOperationsSection,
+  AsyncShellProviders,
+  AsyncContentSection,
 } from './components/AsyncProviderSections';
 import {
   VisitorsSectionSkeleton,
   ProviderSectionSkeleton,
+  ShellProvidersSkeleton,
 } from './components/DynamicCharts';
-import { ProviderCard } from './components/page-client';
 
 export const metadata: Metadata = {
   title: 'Admin Intelligence',
@@ -73,42 +67,6 @@ function AnalyticsWindowSelector({ activeWindow }: { activeWindow: number }) {
   );
 }
 
-function SetupSection({ providers }: { providers: AdminProviderSnapshot[] }) {
-  return (
-    <div className="grid gap-3 xl:grid-cols-2">
-      {providers.map((provider) => (
-        <div key={provider.id} className="rounded-lg border border-border/80 bg-card/80 p-5">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="font-medium">{provider.title}</p>
-                <Badge variant={provider.status === 'configured' ? 'default' : provider.status === 'error' ? 'destructive' : 'secondary'}>
-                  {provider.status}
-                </Badge>
-              </div>
-              <p className="text-sm text-muted-foreground text-pretty">{provider.freeTier}</p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {provider.missingEnv.length === 0 ? (
-                <Badge variant="outline" className="gap-1">
-                  <ShieldCheck className="size-3" />
-                  No missing vars
-                </Badge>
-              ) : (
-                provider.missingEnv.map((name) => (
-                  <Badge key={name} variant="outline" className="font-mono">
-                    {name}
-                  </Badge>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 type AdminPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -122,18 +80,8 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
   const params = searchParams ? await searchParams : {};
   const windowDays = parseAnalyticsWindowDays(params.window);
 
-  // Fetch fast providers immediately for the shell
-  const [visitors, indexNow, contentHealth, rollupStorage] = await Promise.all([
-    getVisitorAnalyticsSnapshot(windowDays),
-    getIndexNowSnapshot(),
-    getContentHealthSnapshot(),
-    getAnalyticsRollupProviderSnapshot(),
-  ]);
-
-  const fastProviders = [indexNow, contentHealth, rollupStorage];
-  const configuredCount = fastProviders.filter((p) => p.status === 'configured').length;
-  const needsSetupCount = fastProviders.filter((p) => p.status === 'missing_config').length;
-  const errorCount = fastProviders.filter((p) => p.status === 'error').length;
+  // Fetch visitors for shell (has internal try-catch, always returns safely)
+  const visitors = await getVisitorAnalyticsSnapshot(windowDays);
 
   return (
     <AdminSurface>
@@ -147,9 +95,6 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
               <>
                 <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">Last {visitors.windowDays} visitor days</Badge>
                 <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{visitors.source === 'turso_rollup' ? 'Rollup store' : 'Live PostHog'}</Badge>
-                <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{configuredCount} live</Badge>
-                {needsSetupCount > 0 && <Badge variant="secondary">{needsSetupCount} setup</Badge>}
-                {errorCount > 0 && <Badge variant="destructive">{errorCount} errors</Badge>}
               </>
             )}
           >
@@ -163,18 +108,9 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </AdminHero>
         </AnimatedContainer>
 
-        <AnimatedContainer animation="fade-slide" delay={100}>
-          <ProviderSignalStrip providers={fastProviders} />
-        </AnimatedContainer>
-
-        <AnimatedContainer animation="fade-slide" delay={150}>
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <SignalCard label="Provider mesh" value={`${configuredCount}/${fastProviders.length}`} description="Live integrations" icon={CircleDot} tone="emerald" />
-            <SignalCard label="Visitor window" value={`${visitors.windowDays}d`} description={visitors.source === 'turso_rollup' ? 'Persisted rollup range' : 'PostHog query range'} icon={UsersRound} tone="blue" />
-            <SignalCard label="Visitors" value={visitors.overview[0]?.value ?? 'n/a'} description="Unique anonymous browsers" icon={Eye} tone="violet" />
-            <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
-          </div>
-        </AnimatedContainer>
+        <Suspense fallback={<ShellProvidersSkeleton />}>
+          <AsyncShellProviders visitorsWindowDays={visitors.windowDays} />
+        </Suspense>
 
         <Tabs defaultValue="visitors" className="space-y-6">
           <AnimatedContainer animation="fade-slide" delay={200}>
@@ -213,11 +149,15 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
           </TabsContent>
 
           <TabsContent value="content">
-            <ProviderCard provider={contentHealth} animated />
+            <Suspense fallback={<ProviderSectionSkeleton count={1} />}>
+              <AsyncContentSection />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="setup">
-            <SetupSection providers={fastProviders} />
+            <div className="rounded-lg border border-border/80 bg-card/80 p-8 text-center text-sm text-muted-foreground">
+              Setup configuration is available via the provider panels above.
+            </div>
           </TabsContent>
         </Tabs>
 

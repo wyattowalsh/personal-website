@@ -5,6 +5,7 @@ import {
   getGitHubSnapshot,
   getUptimeRobotSnapshot,
   getIndexNowSnapshot,
+  getContentHealthSnapshot,
   getAnalyticsRollupProviderSnapshot,
   type AdminProviderSnapshot,
 } from '../lib/free-admin-dashboard';
@@ -17,6 +18,9 @@ import {
   SLOW_PROVIDER_TIMEOUT_MS,
 } from '../lib/analytics-constants';
 import { ProviderCard } from './page-client';
+import { ProviderSignalStrip, SignalCard } from './AdminVisuals';
+import { CircleDot, Eye, ShieldCheck, UsersRound } from 'lucide-react';
+import { AnimatedContainer } from './AnimatedContainer';
 
 export async function AsyncGrowthSection() {
   const results = await Promise.allSettled([
@@ -72,6 +76,49 @@ export async function AsyncOperationsSection() {
         <ProviderCard key={provider.id} provider={provider} animated={index > 0} />
       ))}
     </div>
+  );
+}
+
+export async function AsyncContentSection() {
+  const contentHealth = await withTimeout(
+    () => getContentHealthSnapshot(),
+    { timeoutMs: SLOW_PROVIDER_TIMEOUT_MS, label: 'content-health' }
+  ).catch((reason) => errorProvider('content-health', 'Content Health', reason));
+
+  return <ProviderCard provider={contentHealth} animated />;
+}
+
+export async function AsyncShellProviders({ visitorsWindowDays }: { visitorsWindowDays: number }) {
+  const results = await Promise.allSettled([
+    withTimeout(() => getIndexNowSnapshot(), { timeoutMs: SLOW_PROVIDER_TIMEOUT_MS, label: 'indexnow' }),
+    withTimeout(() => getContentHealthSnapshot(), { timeoutMs: SLOW_PROVIDER_TIMEOUT_MS, label: 'content-health' }),
+    withTimeout(() => getAnalyticsRollupProviderSnapshot(), { timeoutMs: SLOW_PROVIDER_TIMEOUT_MS, label: 'analytics-rollups' }),
+  ]);
+
+  const providers: AdminProviderSnapshot[] = [
+    results[0].status === 'fulfilled' ? results[0].value : errorProvider('indexnow', 'IndexNow', results[0].reason),
+    results[1].status === 'fulfilled' ? results[1].value : errorProvider('content-health', 'Content Health', results[1].reason),
+    results[2].status === 'fulfilled' ? results[2].value : errorProvider('analytics-rollups', 'Analytics Rollups', results[2].reason),
+  ];
+
+  const configuredCount = providers.filter((p) => p.status === 'configured').length;
+  const errorCount = providers.filter((p) => p.status === 'error').length;
+
+  return (
+    <>
+      <AnimatedContainer animation="fade-slide" delay={100}>
+        <ProviderSignalStrip providers={providers} />
+      </AnimatedContainer>
+
+      <AnimatedContainer animation="fade-slide" delay={150}>
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <SignalCard label="Provider mesh" value={`${configuredCount}/${providers.length}`} description="Live integrations" icon={CircleDot} tone="emerald" />
+          <SignalCard label="Visitor window" value={`${visitorsWindowDays}d`} description="PostHog query range" icon={UsersRound} tone="blue" />
+          <SignalCard label="Visitors" value="—" description="Unique anonymous browsers" icon={Eye} tone="violet" />
+          <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
+        </div>
+      </AnimatedContainer>
+    </>
   );
 }
 
