@@ -11,7 +11,7 @@ const mockClient = {
   close: vi.fn(),
 };
 
-vi.mock('@libsql/client', () => ({
+vi.mock('@libsql/client/web', () => ({
   createClient: vi.fn(() => mockClient),
 }));
 

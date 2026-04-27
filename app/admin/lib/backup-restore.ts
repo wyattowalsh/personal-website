@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { createClient, type InValue } from '@libsql/client';
+import { createClient, type InValue } from '@libsql/client/web';
 import { getRollupConfig } from './analytics-rollups';
 
 export interface BackupResult {

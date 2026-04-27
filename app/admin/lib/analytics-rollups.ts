@@ -31,7 +31,7 @@ import 'server-only';
  */
 
 import { randomUUID } from 'node:crypto';
-import { createClient, type Client, type InArgs, type Row } from '@libsql/client';
+import { createClient, type Client, type InArgs, type Row } from '@libsql/client/web';
 import { INTERACTION_EVENTS, POSTHOG_ROLLUP_QUERY_TIMEOUT_MS, ROLLUP_CHUNK_DAYS } from './analytics-constants';
 import { MAX_ANALYTICS_WINDOW_DAYS, clampRollupRefreshDays, type AnalyticsWindowDays } from './analytics-windows';
 import { cleanEnvValue, eventList, getPostHogConfig, queryPostHog } from './posthog-query';

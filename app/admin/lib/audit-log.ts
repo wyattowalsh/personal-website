@@ -1,5 +1,5 @@
 import 'server-only';
-import { createClient, type Client } from '@libsql/client';
+import { createClient, type Client } from '@libsql/client/web';
 import { randomUUID } from 'crypto';
 
 export type AuditAction =

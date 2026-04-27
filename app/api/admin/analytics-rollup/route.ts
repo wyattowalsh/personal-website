@@ -38,7 +38,7 @@ export async function GET(request: Request) {
     try {
       const { config } = getRollupConfig();
       if (config) {
-        const { createClient } = await import('@libsql/client');
+        const { createClient } = await import('@libsql/client/web');
         const client = createClient({ url: config.url, authToken: config.authToken });
         try {
           const pruneResult = await pruneAnalyticsData(client, DATA_RETENTION_DAYS);

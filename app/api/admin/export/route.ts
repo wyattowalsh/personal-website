@@ -4,7 +4,7 @@ import { BackendService } from '@/lib/server';
 import { api } from '@/lib/core';
 import { getVisitorAnalyticsSnapshot } from '@/app/admin/lib/visitor-analytics';
 import { getRollupConfig } from '@/app/admin/lib/analytics-rollups';
-import { createClient } from '@libsql/client';
+import { createClient } from '@libsql/client/web';
 
 export const dynamic = 'force-dynamic';
 
