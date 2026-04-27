@@ -1,7 +1,7 @@
 import { configUrls } from "./configUrls";
 import type { ParticleConfig, ParticleFeature, ParticlePreset, Theme } from "./types";
 
-type ParticlePresetMetadata = Omit<ParticlePreset, 'url' | 'hash' | 'lastModified' | 'theme'>;
+type ParticlePresetMetadata = Omit<ParticlePreset, 'url' | 'hash' | 'theme'>;
 
 const PARTICLE_PRESET_METADATA = {
   butterflies: {

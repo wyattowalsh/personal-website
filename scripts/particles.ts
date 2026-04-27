@@ -359,7 +359,6 @@ const TsParticlesConfigSchema = z.object({
 interface ParticleConfig {
   url: string;
   hash: string;
-  lastModified: string;
   theme: string;
 }
 
@@ -368,6 +367,34 @@ type Theme = 'light' | 'dark';
 async function calculateFileHash(filePath: string): Promise<string> {
   const content = await fs.readFile(filePath);
   return crypto.createHash('md5').update(content).digest('hex');
+}
+
+async function readFileIfExists(filePath: string): Promise<string | null> {
+  try {
+    return await fs.readFile(filePath, 'utf-8');
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      return null;
+    }
+    throw error;
+  }
+}
+
+function renderParticleConfigModule(configs: Record<Theme, ParticleConfig[]>): string {
+  return `// This file is auto-generated. Do not edit manually.
+
+type ParticleConfig = {
+  url: string;
+  hash: string;
+  theme: string;
+};
+
+export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = ${JSON.stringify(
+    configs,
+    null,
+    2
+  )} as const;
+`;
 }
 
 // Validate particle config files against the full Zod schema
@@ -413,8 +440,9 @@ export async function validateParticleConfig(filePath: string): Promise<void> {
   }
 }
 
-export async function generateParticleConfigs(): Promise<string> {
+export async function generateParticleConfigs(options?: { write?: boolean }): Promise<string> {
   const startTime = Date.now();
+  const shouldWrite = options?.write ?? false;
   
   try {
     logger.info('Generating particle configurations');
@@ -437,7 +465,9 @@ export async function generateParticleConfigs(): Promise<string> {
       
       try {
         const files = await fs.readdir(themeDir);
-        const jsonFiles = files.filter((file) => file.endsWith('.json'));
+        const jsonFiles = files
+          .filter((file) => file.endsWith('.json'))
+          .sort((left, right) => left.localeCompare(right));
         
         logger.debug(`Found ${jsonFiles.length} configs for ${theme} theme`);
 
@@ -448,13 +478,11 @@ export async function generateParticleConfigs(): Promise<string> {
 
             try {
               await validateParticleConfig(filePath);
-              const stats = await fs.stat(filePath);
               const hash = await calculateFileHash(filePath);
 
               configs[theme].push({
                 url: `/particles/${theme}/${file}`,
                 hash,
-                lastModified: stats.mtime.toISOString(),
                 theme,
               });
 
@@ -478,23 +506,23 @@ export async function generateParticleConfigs(): Promise<string> {
       );
     }
 
-    // Generate TypeScript code
-    const code = `// This file is auto-generated. Do not edit manually.
+    configs.light.sort((left, right) => left.url.localeCompare(right.url));
+    configs.dark.sort((left, right) => left.url.localeCompare(right.url));
 
-type ParticleConfig = {
-  url: string;
-  hash: string;
-  lastModified: string;
-  theme: string;
-};
+    const code = renderParticleConfigModule(configs);
+    const existingCode = await readFileIfExists(outputPath);
 
-export const configUrls: Record<'light' | 'dark', readonly ParticleConfig[]> = ${JSON.stringify(
-      configs,
-      null,
-      2
-    )} as const;`;
+    if (existingCode === code) {
+      logger.info(`Particle config metadata is up to date: ${outputPath}`);
+      return outputPath;
+    }
 
-    // Ensure output directory exists and write file
+    if (!shouldWrite) {
+      throw new Error(
+        `Generated particle config metadata is out of date: ${path.relative(process.cwd(), outputPath)}. Run "pnpm preprocess:write" to update tracked generated files explicitly.`
+      );
+    }
+
     await fs.mkdir(outputDir, { recursive: true });
     await fs.writeFile(outputPath, code, 'utf-8');
     logger.success(`Generated particle configs at ${outputPath}`);

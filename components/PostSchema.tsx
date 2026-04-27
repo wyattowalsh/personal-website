@@ -5,16 +5,7 @@
  */
 
 import { generateWebSiteSchema } from '@/lib/schema';
-import { getConfig } from '@/lib/config';
-
-const SOCIAL_LINKS = [
-  'https://github.com/wyattowalsh',
-  'https://twitter.com/wyattowalsh',
-  'https://linkedin.com/in/wyattowalsh',
-  'https://www.kaggle.com/wyattowalsh',
-  'https://codepen.io/wyattowalsh',
-  'https://www.reddit.com/user/onelonedatum',
-];
+import { getSiteIdentity } from '@/lib/config';
 
 /**
  * WebSite schema for the root layout with SearchAction.
@@ -40,16 +31,16 @@ export function WebSiteJsonLd() {
  * Person and ProfilePage schema for the homepage.
  */
 export function PersonJsonLd() {
-  const siteUrl = getConfig().site.url;
+  const identity = getSiteIdentity();
   const personSchema = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: 'Wyatt Walsh',
-    url: siteUrl,
-    email: 'mail@w4w.dev',
-    jobTitle: 'Software Engineer',
-    description: 'Software engineer writing about software engineering, data science, and technology',
-    sameAs: SOCIAL_LINKS,
+    name: identity.author.name,
+    url: identity.url,
+    email: identity.author.email,
+    jobTitle: identity.author.jobTitle,
+    description: identity.description,
+    sameAs: identity.socialLinks,
   };
 
   const profilePageSchema = {
@@ -59,9 +50,9 @@ export function PersonJsonLd() {
     dateModified: new Date().toISOString(),
     mainEntity: {
       '@type': 'Person',
-      name: 'Wyatt Walsh',
-      url: siteUrl,
-      sameAs: SOCIAL_LINKS,
+      name: identity.author.name,
+      url: identity.url,
+      sameAs: identity.socialLinks,
     },
   };
 

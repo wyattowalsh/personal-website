@@ -279,13 +279,16 @@ describe('getConfig', () => {
 });
 
 describe('getDefaultMetadata', () => {
-  it('returns title, description, url, and author from config', () => {
+  it('returns valid Next metadata fields from config', () => {
     const meta = getDefaultMetadata();
     const config = getConfig();
     expect(meta.title).toBe(config.site.title);
     expect(meta.description).toBe(config.site.description);
-    expect(meta.url).toBe(config.site.url);
-    expect(meta.author).toEqual(config.site.author);
+    expect(meta.metadataBase?.toString()).toBe(`${config.site.url}/`);
+    expect(meta.applicationName).toBe(config.site.brand.name);
+    expect(meta.authors).toEqual([{ name: config.site.author.name, url: config.site.url }]);
+    expect(meta.openGraph?.siteName).toBe(config.site.brand.name);
+    expect(meta.twitter?.creator).toBe(`@${config.site.author.twitter}`);
   });
 });
 

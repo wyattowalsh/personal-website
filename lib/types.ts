@@ -1,16 +1,32 @@
+import type { Metadata } from 'next';
+
 // Core interfaces and types
 
 export interface Config {
   site: {
+    name: string;
     title: string;
     description: string;
     url: string;
+    locale: string;
+    brand: {
+      name: string;
+      shortName: string;
+      domain: string;
+      aliases: string[];
+      ogImagePath: string;
+      logoPath: string;
+    };
     author: {
       name: string;
       email: string;
+      jobTitle: string;
       twitter?: string;
       github?: string;
       linkedin?: string;
+      reddit?: string;
+      kaggle?: string;
+      codepen?: string;
     }
   };
   blog: {
@@ -102,4 +118,25 @@ export interface RateLimitSnapshot {
   lastSeenAt: string;
   blockedCount: number;
   isLimited: boolean;
+}
+
+export interface SiteIdentity {
+  name: string;
+  title: string;
+  description: string;
+  url: string;
+  locale: string;
+  metadataBase: URL;
+  brandName: string;
+  brandShortName: string;
+  brandDomain: string;
+  brandAliases: string[];
+  ogImagePath: string;
+  ogImageUrl: string;
+  logoPath: string;
+  logoUrl: string;
+  author: Config['site']['author'];
+  twitterHandle?: string;
+  socialLinks: string[];
+  feedAlternates: NonNullable<Metadata['alternates']>['types'];
 }

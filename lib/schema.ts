@@ -1,5 +1,5 @@
 import type { Post } from './types';
-import { getConfig } from './config';
+import { getConfig, getSiteIdentity } from './config';
 import { cache } from 'react';
 
 export interface BreadcrumbItem {
@@ -17,39 +17,35 @@ export interface SchemaOptions {
 
 // Cache the generation of the website schema
 export const generateWebSiteSchema = cache(() => {
-  const config = getConfig();
+  const identity = getSiteIdentity();
   const currentYear = new Date().getFullYear();
 
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: config.site.title,
-    alternateName: ['w4w', 'wyattowalsh'],
-    url: config.site.url,
-    description: config.site.description,
+    name: identity.title,
+    alternateName: identity.brandAliases,
+    url: identity.url,
+    description: identity.description,
     author: {
       '@type': 'Person',
-      name: config.site.author.name,
-      url: config.site.url,
-      email: config.site.author.email,
-      sameAs: [
-        `https://github.com/${config.site.author.github}`,
-        `https://twitter.com/${config.site.author.twitter}`,
-        `https://linkedin.com/in/${config.site.author.linkedin}`
-      ]
+      name: identity.author.name,
+      url: identity.url,
+      email: identity.author.email,
+      sameAs: identity.socialLinks,
     },
     publisher: {
       '@type': 'Organization',
-      name: config.site.author.name,
+      name: identity.author.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${config.site.url}/logo.webp`
+        url: identity.logoUrl,
       }
     },
     copyrightYear: currentYear,
     copyrightHolder: {
       '@type': 'Person',
-      name: config.site.author.name
+      name: identity.author.name
     },
     inLanguage: 'en-US',
     license: 'https://creativecommons.org/licenses/by-nc-sa/4.0/',
@@ -63,7 +59,7 @@ export const generateWebSiteSchema = cache(() => {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${config.site.url}/blog?q={search_term_string}`,
+        urlTemplate: `${identity.url}/blog?q={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
@@ -71,8 +67,8 @@ export const generateWebSiteSchema = cache(() => {
 });
 
 export function generateArticleSchema(post: Post, options?: SchemaOptions) {
-  const config = getConfig();
-  const baseUrl = options?.baseUrl || config.site.url;
+  const identity = getSiteIdentity();
+  const baseUrl = options?.baseUrl || identity.url;
 
   return {
     '@context': 'https://schema.org',
@@ -84,15 +80,15 @@ export function generateArticleSchema(post: Post, options?: SchemaOptions) {
     dateModified: post.updated || post.created,
     author: {
       '@type': 'Person',
-      name: config.site.author.name,
-      url: config.site.url
+      name: identity.author.name,
+      url: identity.url
     },
     publisher: {
       '@type': 'Organization',
-      name: config.site.author.name,
+      name: identity.author.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${baseUrl}/logo.webp`
+        url: identity.logoUrl
       }
     },
     mainEntityOfPage: {

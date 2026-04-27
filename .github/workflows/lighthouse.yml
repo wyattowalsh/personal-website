@@ -29,6 +29,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Build
         run: pnpm build
+      - name: Guard tracked files
+        run: git diff --exit-code
       - name: Install Lighthouse CI
         run: npm install -g @lhci/cli@0.14.x
       - name: Run Lighthouse CI

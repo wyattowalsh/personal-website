@@ -1,7 +1,6 @@
 export interface ParticleConfig {
   url: string;
   hash: string;
-  lastModified: string;
   theme: Theme;
 }
 
@@ -29,7 +28,6 @@ export interface ParticlePreset {
   id: string;
   url: string;
   hash: string;
-  lastModified: string;
   theme: Theme;
   label: string;
   family: ParticleFamily;

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getConfig } from './config';
+import { getAbsoluteUrl, getConfig, getSiteIdentity } from './config';
 import { generateArticleSchema, generateBreadcrumbSchema } from './schema';
 import type { Post } from './types';
 
@@ -19,36 +19,32 @@ export interface PostMetadataOptions {
  * - JSON-LD structured data
  */
 export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metadata {
-  const config = getConfig();
-  const postUrl = `${siteUrl}/blog/posts/${slug}`;
+  const identity = getSiteIdentity();
+  const postUrl = getAbsoluteUrl(`/blog/posts/${slug}`);
   const ogImage = post.image 
-    ? (post.image.startsWith('http') ? post.image : `${siteUrl}${post.image}`)
-    : `${siteUrl}/opengraph.png`;
+    ? getAbsoluteUrl(post.image)
+    : identity.ogImageUrl;
 
   return {
     title: post.title,
-    description: post.summary || config.site.description,
-    authors: [{ name: config.site.author.name }],
-    creator: config.site.author.name,
-    publisher: config.site.author.name,
+    description: post.summary || identity.description,
+    authors: [{ name: identity.author.name, url: identity.url }],
+    creator: identity.author.name,
+    publisher: identity.author.name,
     
     // Canonical URL and feed discovery
     alternates: {
       canonical: postUrl,
-      types: {
-        'application/rss+xml': '/feed.xml',
-        'application/atom+xml': '/feed.atom',
-        'application/feed+json': '/feed.json',
-      },
+      types: identity.feedAlternates,
     },
 
     // OpenGraph metadata
     openGraph: {
       type: 'article',
       title: post.title,
-      description: post.summary || config.site.description,
+      description: post.summary || identity.description,
       url: postUrl,
-      siteName: config.site.title,
+      siteName: identity.brandName,
       images: [
         {
           url: ogImage,
@@ -59,7 +55,7 @@ export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metad
       ],
       publishedTime: post.created,
       modifiedTime: post.updated || post.created,
-      authors: [config.site.author.name],
+      authors: [identity.author.name],
       section: post.tags[0],
       tags: post.tags,
     },
@@ -68,9 +64,9 @@ export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metad
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description: post.summary || config.site.description,
+      description: post.summary || identity.description,
       images: [ogImage],
-      creator: `@${config.site.author.twitter}`,
+      ...(identity.twitterHandle ? { creator: identity.twitterHandle } : {}),
     },
 
     // Robots directives

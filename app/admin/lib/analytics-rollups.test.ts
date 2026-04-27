@@ -217,6 +217,62 @@ describe('analytics rollups', () => {
     expect(result.message).toContain('Cannot auto-repair');
   });
 
+  it('initializes schema when repair is called on fresh database with no tables', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({ rows: [] }) // PRAGMA table_info(analytics_rollup_days) - no table
+      .mockResolvedValueOnce({ rows: [] }); // PRAGMA table_info(analytics_rollup_runs) - no table
+
+    const result = await repairAnalyticsRollupSchema(mockClient as never);
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('initialized');
+    expect(mockClient.batch).toHaveBeenCalledOnce();
+    const [statements] = mockClient.batch.mock.calls[0];
+    const schemaStr = (statements as string[]).join('\n');
+    expect(schemaStr).toContain('day TEXT NOT NULL PRIMARY KEY');
+    expect(schemaStr).toContain('id TEXT NOT NULL PRIMARY KEY');
+  });
+
+  it('handles repair when COUNT queries fail gracefully', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      }) // PRAGMA table_info(analytics_rollup_days)
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      }) // PRAGMA table_info(analytics_rollup_runs)
+      .mockRejectedValueOnce(new Error('no such table')); // COUNT fails
+
+    const result = await repairAnalyticsRollupSchema(mockClient as never);
+
+    expect(result.success).toBe(true);
+    expect(result.message).toContain('repaired');
+    expect(mockClient.batch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.stringContaining('DROP TABLE IF EXISTS'),
+      ]),
+      'write'
+    );
+  });
+
+  it('detects PRAGMA query exceptions and returns unknown schema health', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockRejectedValueOnce(new Error('database locked')) // PRAGMA fails
+      .mockResolvedValueOnce({ rows: [] });
+
+    const health = await getAnalyticsRollupHealth();
+
+    expect(health.status).toBe('error');
+    expect(health.schemaHealth).toBeUndefined();
+  });
+
 
   it('returns missing setup state when Turso env vars are absent', async () => {
     delete process.env.TURSO_DATABASE_URL;

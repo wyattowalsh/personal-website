@@ -50,6 +50,8 @@ The root `package.json` serves as the default build target. To deploy the docs s
 
 | Variable | Description | Example |
 | :--- | :--- | :--- |
+| `TURSO_DATABASE_URL` | Turso database URL for admin analytics rollup storage | `libsql://...` |
+| `TURSO_AUTH_TOKEN` | Authentication token for Turso database access | `eyJh...` |
 | `NEXT_PUBLIC_POSTHOG_TOKEN` | Public PostHog project token used for anonymous event capture | `phc_...` |
 | `POSTHOG_PERSONAL_API_KEY` | Server-only PostHog key with `query:read` scope for aggregate admin queries | `phx_...` |
 | `POSTHOG_PROJECT_ID` | PostHog project ID used by the Query API | `12345` |
@@ -169,6 +171,105 @@ The `/admin` dashboard reads aggregate PostHog data from the server with `POSTHO
 - PostHog person-profile processing is disabled for site events
 - `/admin` is excluded from public visitor analytics capture
 - Search query analytics are sanitized before capture
+
+## Admin Dashboard & Analytics
+
+### Overview
+
+The `/admin` dashboard aggregates visitor analytics from PostHog and stores time-series rollup data (pageviews, sessions, engagement by dimension) in a Turso SQLite database. The analytics pipeline runs automatically during deployments and cron jobs, building daily and dimension-level summaries for fast querying.
+
+### Schema Health & Repair
+
+The admin dashboard includes automated database schema management to handle fresh installations and schema evolution:
+
+**Schema Health States:**
+
+- **`healthy`** — Tables exist with hardened NOT NULL constraints on primary keys (safe to use)
+- **`outdated`** — Tables exist but lack NOT NULL constraints (migration needed)
+- **`unknown`** — Tables don't exist or schema can't be determined (initialization needed)
+
+**Automatic Safety Mechanisms:**
+
+1. **Fresh Database Initialization**
+   - If tables don't exist (`health === 'unknown'`), the schema is created with hardened DDL including NOT NULL constraints
+   - No data loss risk — only applies when tables are missing
+   - **When:** On first deploy, after database reset, or during recovery from missing tables
+
+2. **Race Condition Handling**
+   - COUNT queries (used to check if data exists before repair) are wrapped in try-catch
+   - If a COUNT fails (due to concurrent data operations or transient errors), repair treats the table as empty and proceeds safely
+   - **When:** During high-traffic analytics writes or concurrent admin operations
+
+3. **Data-Aware Repair**
+   - Repair only proceeds if tables are empty (checked via COUNT queries)
+   - If tables contain data, repair is blocked with a clear error message recommending manual review
+   - **When:** During schema evolution or version upgrades
+
+### Configuration
+
+The admin dashboard requires Turso database credentials and PostHog API access:
+
+```bash
+# Required: Turso analytics storage
+TURSO_DATABASE_URL=libsql://your-db-name.turso.io
+TURSO_AUTH_TOKEN=eyJh...
+
+# Required: PostHog for aggregate queries
+POSTHOG_PERSONAL_API_KEY=phx_...  # Must have query:read scope
+POSTHOG_PROJECT_ID=12345
+
+# Optional: PostHog host customization (US/EU/self-hosted)
+POSTHOG_API_HOST=https://us.posthog.com
+```
+
+### Local Development
+
+No database configuration needed for local testing. The admin dashboard shows placeholder data and setup states until PostHog env vars are configured.
+
+To test with real analytics:
+
+```bash
+export TURSO_DATABASE_URL=libsql://...
+export TURSO_AUTH_TOKEN=eyJh...
+export POSTHOG_PERSONAL_API_KEY=phx_...
+export POSTHOG_PROJECT_ID=12345
+pnpm dev
+```
+
+Then navigate to `http://localhost:3458/admin` (password: empty in dev mode).
+
+### Production Monitoring
+
+Monitor these in the Vercel dashboard or via logs:
+
+- **Build logs** — schema repair runs during deployment; look for "Schema initialized" or "Schema repaired" messages
+- **Database quota** — Turso usage metrics (rows, queries, storage)
+- **PostHog query errors** — If Analytics panel shows errors, check PostHog API key and `query:read` scope
+- **Lighthouse scores** — Admin dashboard performance tracked in production
+
+### Troubleshooting
+
+**Symptom: "Schema is already healthy" but analytics not showing**
+- Verify `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are set in Vercel
+- Check Turso dashboard for database status and connection limits
+- Confirm PostHog event capture is enabled in production
+
+**Symptom: "Cannot auto-repair: data exists" when deploying**
+- This is intentional—repair is blocked if tables have data
+- If you need to repair a live database, contact your admin or use Turso's backup/restore feature
+- For development/staging, drop the database and redeploy
+
+**Symptom: Analytics panel shows setup state instead of charts**
+- This is normal if PostHog env vars are unset
+- Set `POSTHOG_PERSONAL_API_KEY` and `POSTHOG_PROJECT_ID` in Vercel environment variables
+- Wait for the next build/deployment to propagate changes
+- Check that the PostHog key has `query:read` scope (server-only, not the public token)
+
+**Symptom: Admin authentication not working**
+- Verify `ADMIN_PASSWORD` is set in Vercel (production only; dev mode uses empty password)
+- Check browser dev tools for `admin_session` cookie; should be HttpOnly and Secure
+- Verify `SESSION_SIGNING_KEY` is set and consistent across deployments
+- Clear cookies and retry login
 
 ## Security Headers
 

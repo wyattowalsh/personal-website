@@ -28,9 +28,16 @@ pnpm new-post     # Create blog post
 **Key entry points:**
 - `content/posts/{slug}/index.mdx` — Authored blog post source
 - `lib/server.ts` — `BackendService` for posts, tags, and search
+- `lib/admin-auth.ts` — Admin authentication with session signing
+- `app/admin/` — Admin dashboard (analytics, content, growth metrics)
 - `lib/metadata.ts` — Post metadata + structured data helpers
 - `lib/utils.ts` — cn(), formatDate
 - `components/ui/` — Button, Card, etc.
+
+**Admin dashboard:**
+- Requires `ADMIN_PASSWORD` + `SESSION_SIGNING_KEY` in production; empty password in dev
+- Analytics optional; requires `TURSO_*` and `POSTHOG_*` env vars
+- See AGENTS.md "Admin Dashboard" section for configuration details
 
 **Never modify:** `.env*`, `node_modules/`, `.next/`, `pnpm-lock.yaml`
 

@@ -4,13 +4,19 @@ import { logger, LogLevel } from '../lib/logger';
 import type { PreprocessStats } from '../lib/types';
 import { generateParticleConfigs } from './particles';
 
+interface PreprocessOptions {
+  writeGenerated?: boolean;
+}
+
 // Main preprocessing function
-async function processFiles(isDev = false): Promise<PreprocessStats> {
+async function processFiles(isDev = false, options?: PreprocessOptions): Promise<PreprocessStats> {
   const startTime = Date.now();
+  const writeGenerated = options?.writeGenerated ?? false;
   
   try {
     logger.info('Build Process Started');
     logger.info(`Environment: ${isDev ? 'Development' : 'Production'}`);
+    logger.info(`Generated file mode: ${writeGenerated ? 'write' : 'check'}`);
 
     // Set log level based on environment
     logger.setLevel(isDev ? LogLevel.DEBUG : LogLevel.INFO);
@@ -20,15 +26,8 @@ async function processFiles(isDev = false): Promise<PreprocessStats> {
 
     // Generate particle configs first
     logger.info('Generating particle configurations');
-    let particleConfigPath: string | undefined;
-
-    try {
-      particleConfigPath = await generateParticleConfigs();
-      logger.info(`Generated: ${particleConfigPath}`);
-    } catch (error) {
-      logger.error('Failed to generate particle configs:', error as Error);
-      // Continue with other preprocessing even if particle config fails
-    }
+    const particleConfigPath = await generateParticleConfigs({ write: writeGenerated });
+    logger.info(`Generated: ${particleConfigPath}`);
 
     // Run preprocessing tasks
     logger.info('Running preprocessing pipeline');
@@ -56,6 +55,9 @@ const isMainModule = import.meta.url === `file://${process.argv[1]}` ||
 
 if (isMainModule) {
   const isDev = process.env.NODE_ENV === 'development';
+  const writeGenerated =
+    process.argv.includes('--write-generated') ||
+    process.env.PREPROCESS_WRITE_GENERATED === '1';
   
   // Handle unhandled rejections
   process.on('unhandledRejection', (error: unknown) => {
@@ -64,7 +66,7 @@ if (isMainModule) {
   });
 
   // Run preprocessing
-  processFiles(isDev).then((_stats) => {
+  processFiles(isDev, { writeGenerated }).then((_stats) => {
     logger.success(`${isDev ? 'Development' : 'Production'} preprocessing complete!`);
   }).catch((error) => {
     logger.error(`${isDev ? 'Development' : 'Production'} preprocessing failed!`, error as Error);

@@ -3,21 +3,68 @@ import type { Post } from '@/lib/types';
 
 // Mock getConfig before importing schema module
 vi.mock('@/lib/config', () => {
-  return {
-    getConfig: () => ({
-      site: {
-        url: 'https://test.example.com',
-        title: 'Test Site',
-        description: 'Test description',
-        author: {
-          name: 'Test Author',
-          email: 'test@example.com',
-          twitter: 'testauthor',
-          github: 'testauthor',
-          linkedin: 'testauthor',
-        },
+  const config = {
+    site: {
+      name: 'Test Author',
+      url: 'https://test.example.com',
+      title: 'Test Site',
+      description: 'Test description',
+      locale: 'en_US',
+      brand: {
+        name: 'Test Brand',
+        shortName: 'test',
+        domain: 'test.example.com',
+        aliases: ['test', 'testauthor'],
+        ogImagePath: '/opengraph.png',
+        logoPath: '/logo.webp',
       },
-      blog: { postsPerPage: 10, featuredLimit: 3 },
+      author: {
+        name: 'Test Author',
+        email: 'test@example.com',
+        jobTitle: 'Test Engineer',
+        twitter: 'testauthor',
+        github: 'testauthor',
+        linkedin: 'testauthor',
+        kaggle: 'testauthor',
+        codepen: 'testauthor',
+        reddit: 'testauthor',
+      },
+    },
+    blog: { postsPerPage: 10, featuredLimit: 3 },
+  };
+
+  return {
+    getConfig: () => config,
+    getSiteIdentity: () => ({
+      name: config.site.name,
+      title: config.site.title,
+      description: config.site.description,
+      url: config.site.url,
+      locale: config.site.locale,
+      metadataBase: new URL(config.site.url),
+      brandName: config.site.brand.name,
+      brandShortName: config.site.brand.shortName,
+      brandDomain: config.site.brand.domain,
+      brandAliases: config.site.brand.aliases,
+      ogImagePath: config.site.brand.ogImagePath,
+      ogImageUrl: `${config.site.url}${config.site.brand.ogImagePath}`,
+      logoPath: config.site.brand.logoPath,
+      logoUrl: `${config.site.url}${config.site.brand.logoPath}`,
+      author: config.site.author,
+      twitterHandle: '@testauthor',
+      socialLinks: [
+        'https://github.com/testauthor',
+        'https://twitter.com/testauthor',
+        'https://linkedin.com/in/testauthor',
+        'https://www.kaggle.com/testauthor',
+        'https://codepen.io/testauthor',
+        'https://www.reddit.com/user/testauthor',
+      ],
+      feedAlternates: {
+        'application/rss+xml': '/feed.xml',
+        'application/atom+xml': '/feed.atom',
+        'application/feed+json': '/feed.json',
+      },
     }),
   };
 });

@@ -1,5 +1,35 @@
 import 'server-only';
 
+/**
+ * Analytics Rollup System
+ *
+ * Manages Turso SQLite database for admin analytics time-series aggregation.
+ *
+ * **Tables:**
+ * - `analytics_rollup_days`: Daily aggregates (pageviews, visitors, sessions, interactions)
+ * - `analytics_rollup_runs`: Metadata for each rollup job (started_at, completed_at, status)
+ * - `analytics_rollup_dimensions`: Dimensional breakdown (by page, referrer, device, event type)
+ *
+ * **Schema Health Management:**
+ * - `checkAnalyticsRollupSchemaHealth()`: Detects schema state ('healthy' | 'outdated' | 'unknown')
+ * - `repairAnalyticsRollupSchema()`: Safely initializes or repairs tables
+ *   - Fresh DB case (health='unknown'): Creates tables with hardened NOT NULL constraints
+ *   - Outdated schema (health='outdated'): Repairs if tables are empty; blocks if data exists
+ *   - Already healthy: No action needed
+ *
+ * **Safety Mechanisms:**
+ * 1. Fresh initialization: Tables created only if they don't exist (no data loss risk)
+ * 2. Race condition handling: COUNT queries wrapped in try-catch; treats failures as empty tables
+ * 3. Data-aware repair: Refuses to repair tables with existing data; requires manual intervention
+ * 4. Atomic operations: Uses batch() to ensure DDL atomicity
+ *
+ * **Env Vars (required for analytics):**
+ * - TURSO_DATABASE_URL: Database URL (libsql://...)
+ * - TURSO_AUTH_TOKEN: Authentication token
+ *
+ * See: docs/content/docs/operations/deployment.mdx#admin-dashboard--analytics for operational guide
+ */
+
 import { randomUUID } from 'node:crypto';
 import { createClient, type Client, type InArgs, type Row } from '@libsql/client';
 import { INTERACTION_EVENTS, POSTHOG_ROLLUP_QUERY_TIMEOUT_MS, ROLLUP_CHUNK_DAYS } from './analytics-constants';

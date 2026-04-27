@@ -166,8 +166,57 @@ Create via `pnpm new-post` or manually.
 | `lib/core.ts` | Zod schemas, ApiError, logger (server-only) |
 | `lib/metadata.ts` | SEO: `generatePostMetadata()` |
 | `lib/schema.ts` | JSON-LD: `generateArticleSchema()` |
+| `lib/admin-auth.ts` | Admin authentication, session cookies, rate limiting |
+| `app/admin/` | Admin dashboard (auth, content, blog-stats, telemetry) |
+| `app/admin/lib/analytics-rollups.ts` | Turso DB schema health & repair, analytics aggregation |
 | `next.config.mjs` | MDX plugins, webpack, CSP |
 | `app/tailwind.css` | Theme, fonts, animations (CSS-first v4) |
+
+## Admin Dashboard
+
+The `/admin` dashboard provides visitor analytics, content management, and growth metrics. It requires authentication and database configuration.
+
+### Authentication
+
+- **Local dev:** No password required (empty password)
+- **Production:** Set `ADMIN_PASSWORD` in Vercel environment variables
+- **Session:** Signed with `SESSION_SIGNING_KEY` (HMAC); 24-hour expiry
+- **Rate limit:** 5 login attempts per 15 minutes
+- Cookies are HttpOnly, Secure (production), and SameSite=Strict
+
+See `lib/admin-auth.ts` for session creation, validation, and cookie management.
+
+### Analytics Database
+
+Analytics data is stored in a Turso SQLite database with automatic schema management:
+
+- **Schema health states:** `healthy` (ready), `outdated` (needs migration), `unknown` (not initialized)
+- **Fresh DB init:** Tables created with hardened NOT NULL constraints on first deploy
+- **Race condition safety:** COUNT queries wrapped in try-catch; treats failures as empty tables
+- **Data-aware repair:** Won't repair tables with existing data (requires manual backup/restore)
+- **Required env:** `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` (production only)
+
+The schema repair logic is in `app/admin/lib/analytics-rollups.ts` with full inline documentation.
+
+### PostHog Integration
+
+The admin dashboard queries PostHog for aggregate visitor analytics. Requires:
+
+- `POSTHOG_PERSONAL_API_KEY` (server-only, `query:read` scope, **not** the public token)
+- `POSTHOG_PROJECT_ID` (numeric)
+- `POSTHOG_API_HOST` (optional; defaults to US region)
+
+Without these, the Analytics panel shows a setup state instead of charts.
+
+### Key Panels
+
+| Panel | Data Source | Required Env |
+|-------|-------------|--------------|
+| Analytics | PostHog aggregate queries | `POSTHOG_*` vars |
+| Content | Blog posts, series, tags | None (local) |
+| Blog Stats | Reading time, engagement metrics | None (local) |
+| Growth | Google Search Console, PageSpeed, IndexNow | `GOOGLE_OAUTH_*`, `PAGESPEED_API_KEY`, `INDEXNOW_KEY` |
+| Deployments | Vercel | `VERCEL_TOKEN`, `VERCEL_PROJECT_ID` |
 
 ## Gotchas
 
@@ -182,7 +231,21 @@ Create via `pnpm new-post` or manually.
 | Variable | Required | Purpose |
 |----------|----------|---------|
 | `NEXT_PUBLIC_SITE_URL` | ✅ | Site URL for meta tags, sitemap |
+| `ADMIN_PASSWORD` | ⚠️ | Admin login password (production only; empty in dev) |
+| `SESSION_SIGNING_KEY` | ⚠️ | HMAC key for admin session cookies (production only) |
+| `TURSO_DATABASE_URL` | ⚠️ | Turso DB URL for admin analytics (if using `/admin`) |
+| `TURSO_AUTH_TOKEN` | ⚠️ | Turso auth token (if using `/admin`) |
+| `POSTHOG_PERSONAL_API_KEY` | ⚠️ | PostHog query API key for admin analytics (if using `/admin`) |
+| `POSTHOG_PROJECT_ID` | ⚠️ | PostHog project ID (if using `/admin`) |
 | `ANALYZE` | ❌ | Set `true` for bundle analyzer |
 | `NODE_ENV` | Auto | `development` / `production` |
 
-No `.env.local` needed for local dev (defaults work). For production, set `NEXT_PUBLIC_SITE_URL`.
+**Notes:**
+
+- ✅ = Required for site to function
+- ⚠️ = Required only for specific features (admin, analytics)
+- ❌ = Optional
+
+No `.env.local` needed for local dev. The site works without admin or analytics vars; features that require them show setup states instead.
+
+For production `/admin` access, set `ADMIN_PASSWORD` and `SESSION_SIGNING_KEY`. For analytics, also set `TURSO_*` and `POSTHOG_*` vars.

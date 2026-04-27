@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "preprocess": "tsx --conditions react-server scripts/index.ts",
+    "preprocess:write": "tsx --conditions react-server scripts/index.ts --write-generated",
     "predev": "NODE_ENV=development pnpm preprocess",
     "dev": "DEBUG=true LOG_LEVEL=debug next dev --turbopack --port 3458",
     "prebuild": "NODE_ENV=production pnpm preprocess",
@@ -12,7 +13,9 @@
     "lint": "eslint .",
     "clean": "rimraf .next .cache node_modules/",
     "lclean": "rimraf .next .cache node_modules/.cache",
-    "typecheck": "tsc --noEmit",
+    "typegen": "next typegen",
+    "typecheck": "pnpm typegen && tsc --project tsconfig.json --noEmit",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "new-post": "tsx scripts/new-post.ts",
     "validate:blog-manager": "tsx scripts/validate-blog-manager.ts",
     "generate-icons": "tsx scripts/generate-icons.ts",

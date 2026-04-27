@@ -7,7 +7,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { Header } from "@/components/Header";
 import { StrictMode } from "react";
 import { cn } from "@/lib/utils";
-import { getDefaultMetadata, getConfig } from "@/lib/config";
+import { getDefaultMetadata } from "@/lib/config";
 import { WebSiteJsonLd } from "@/components/PostSchema";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SiteAnalytics } from "@/components/SiteAnalytics";
@@ -27,15 +27,14 @@ const bricolage = Bricolage_Grotesque({
 	fallback: ["system-ui", "arial"],
 });
 
-const siteUrl = getConfig().site.url;
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 const gaId = process.env.NEXT_PUBLIC_GA_ID;
 const analyticsEnabled = process.env.NODE_ENV === "production";
+const defaultMetadata = getDefaultMetadata();
 
 // Base metadata configuration
 export const metadata: Metadata = {
-	metadataBase: new URL(siteUrl),
-	...getDefaultMetadata(),
+	...defaultMetadata,
 	manifest: '/manifest.json',
 	icons: {
 		icon: [
@@ -51,31 +50,10 @@ export const metadata: Metadata = {
 			{ rel: 'icon', url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' },
 		],
 	},
-	// Add root-level OG and Twitter defaults
-	openGraph: {
-		type: "website",
-		siteName: "onelonedatum",
-		title: "Wyatt Walsh",
-		description: "Articles about software engineering, data science, and technology",
-		url: siteUrl,
-		images: [{ url: '/opengraph.png', width: 1200, height: 630, alt: "onelonedatum" }],
-	},
-	twitter: {
-		card: "summary_large_image",
-		site: "@wyattowalsh",
-		creator: "@wyattowalsh",
-		title: "Wyatt Walsh",
-		description: "Articles about software engineering, data science, and technology",
-		images: ['/opengraph.png'],
-	},
 	// Feed autodiscovery links
 	alternates: {
+		...defaultMetadata.alternates,
 		canonical: "/",
-		types: {
-			"application/rss+xml": "/feed.xml",
-			"application/atom+xml": "/feed.atom",
-			"application/feed+json": "/feed.json",
-		},
 	},
 };
 

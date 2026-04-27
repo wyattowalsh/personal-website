@@ -27,7 +27,14 @@
 
 **Key entry points:**
 - `lib/server.ts` — `BackendService` singleton (posts, search, cache)
+- `lib/admin-auth.ts` — Admin session and rate limiting
+- `app/admin/` — Admin dashboard with analytics and content management
 - `lib/utils.ts` — cn(), formatDate
 - `components/ui/` — Button, Card, etc.
+
+**Admin dashboard:**
+- Requires `ADMIN_PASSWORD` and `SESSION_SIGNING_KEY` in production
+- Analytics powered by Turso + PostHog (optional; shows setup state if unconfigured)
+- See AGENTS.md "Admin Dashboard" section for full configuration
 
 <!-- @-imports AGENTS.md as canonical source -->
