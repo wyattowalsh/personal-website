@@ -64,11 +64,13 @@ export function DataList({
   );
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en-US', {
+  dateStyle: 'medium',
+  timeStyle: 'short',
+});
+
 function formatGeneratedAt(timestamp: string): string {
-  return new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(new Date(timestamp));
+  return dateFormatter.format(new Date(timestamp));
 }
 
 export function ProviderCard({ provider, animated = false }: { provider: AdminProviderSnapshot; animated?: boolean }) {

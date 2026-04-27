@@ -155,7 +155,10 @@ export function SignalCard({
   return (
     <div className="group/signal relative overflow-hidden rounded-xl border border-border/50 bg-background/50 p-5 shadow-sm backdrop-blur-sm transition-all duration-500 hover:border-border/70 hover:shadow-md hover:shadow-foreground/[0.03]">
       {/* ambient glow on hover */}
-      <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover/signal:opacity-100" style={{ backgroundColor: `hsl(var(--chart-${tone === 'blue' ? 1 : tone === 'violet' ? 2 : tone === 'emerald' ? 3 : tone === 'amber' ? 4 : 5}) / 0.12)` }} />
+      <div
+        className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover/signal:opacity-100"
+        style={{ backgroundColor: `hsl(var(--chart-${tone === 'blue' ? 1 : tone === 'violet' ? 2 : tone === 'emerald' ? 3 : tone === 'amber' ? 4 : 5})) / 0.12)` }}
+      />
 
       <div className="relative z-10 flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">

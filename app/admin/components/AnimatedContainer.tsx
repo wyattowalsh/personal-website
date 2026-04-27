@@ -24,15 +24,15 @@ export function AnimatedContainer({
 }: AnimatedContainerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const handleIntersect = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries;
       if (entry.isIntersecting) {
-        const timer = setTimeout(() => {
+        timerRef.current = setTimeout(() => {
           setIsVisible(true);
         }, delay);
-        return () => clearTimeout(timer);
       } else if (!once) {
         setIsVisible(false);
       }
@@ -50,7 +50,13 @@ export function AnimatedContainer({
     });
 
     observer.observe(element);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = undefined;
+      }
+    };
   }, [handleIntersect, threshold]);
 
   const animationClasses = {

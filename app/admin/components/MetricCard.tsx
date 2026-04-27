@@ -101,9 +101,11 @@ export function MetricCard({
             <div
               className={cn(
                 'rounded-lg border p-2.5 transition-all duration-300 shadow-sm',
-                variant === 'default'
-                  ? 'border-border/40 bg-muted/30 group-hover/card:bg-muted/50'
-                  : 'border-opacity-30 bg-opacity-10',
+                variant === 'default' && 'border-border/40 bg-muted/30 group-hover/card:bg-muted/50',
+                variant === 'accent' && 'border-[hsl(var(--chart-1)/0.3)] bg-[hsl(var(--chart-1)/0.1)]',
+                variant === 'success' && 'border-emerald-500/30 bg-emerald-500/10',
+                variant === 'warning' && 'border-amber-500/30 bg-amber-500/10',
+                variant === 'destructive' && 'border-destructive/30 bg-destructive/10',
                 interactive && 'group-hover/card:scale-110 group-hover/card:shadow-md'
               )}
             >

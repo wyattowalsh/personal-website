@@ -126,13 +126,11 @@ export function AdminSidebar() {
           {NAV_ITEMS.map((item) => (
             <Tooltip key={item.href} delayDuration={!desktopSidebarOpen ? 0 : 1000}>
               <TooltipTrigger asChild>
-                <div>
-                  <NavItem
-                    {...item}
-                    active={isActive(item.href)}
-                    collapsed={!desktopSidebarOpen}
-                  />
-                </div>
+                <NavItem
+                  {...item}
+                  active={isActive(item.href)}
+                  collapsed={!desktopSidebarOpen}
+                />
               </TooltipTrigger>
               {!desktopSidebarOpen && (
                 <TooltipContent side="right" sideOffset={8}>
