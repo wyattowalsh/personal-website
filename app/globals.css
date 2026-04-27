@@ -576,6 +576,28 @@
 }
 
 
+/* ── Shimmer skeleton (admin dashboard) ─────────────────────────── */
+@keyframes shimmer-sweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer-skeleton {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted) / 0.5) 0%,
+    hsl(var(--muted) / 0.3) 40%,
+    hsl(var(--muted) / 0.5) 80%,
+    hsl(var(--muted) / 0.5) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

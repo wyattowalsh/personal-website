@@ -52,25 +52,37 @@ export function MetricCard({
   return (
     <div
       className={cn(
-        'group relative overflow-hidden rounded-lg border p-5 transition-all duration-300',
-        interactive && 'hover:shadow-md hover:shadow-foreground/10 cursor-default',
+        'group/card relative overflow-hidden rounded-xl border p-5 transition-all duration-500',
+        interactive && 'hover:shadow-lg hover:shadow-foreground/[0.04] cursor-default',
         variantStyles[variant],
         className
       )}
     >
-      {/* Animated gradient overlay on hover */}
+      {/* ambient glow on hover */}
+      <div
+        className={cn(
+          'pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full opacity-0 blur-3xl transition-opacity duration-700 group-hover/card:opacity-100',
+          variant === 'accent' && 'bg-[hsl(var(--chart-1)/0.08)]',
+          variant === 'success' && 'bg-emerald-500/8',
+          variant === 'warning' && 'bg-amber-500/8',
+          variant === 'destructive' && 'bg-destructive/8',
+          variant === 'default' && 'bg-foreground/[0.03]'
+        )}
+      />
+
+      {/* shimmer sweep on hover */}
       {interactive && (
-        <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none">
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+        <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100 pointer-events-none overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent -translate-x-full group-hover/card:translate-x-full transition-transform duration-1000 ease-in-out" />
         </div>
       )}
 
       <div className="relative z-10 flex flex-col gap-3">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground animate-in fade-in duration-500">{label}</p>
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
             <div className="mt-2 flex items-baseline gap-3">
-              <p className={cn('text-2xl font-bold tabular-nums transition-colors duration-300', textColor)}>{value}</p>
+              <p className={cn('text-2xl font-bold tabular-nums tracking-tight transition-colors duration-300', textColor)}>{value}</p>
               {change && (
                 <div
                   className={cn(
@@ -78,7 +90,7 @@ export function MetricCard({
                     change.isPositive ? 'text-emerald-600 dark:text-emerald-400' : 'text-destructive'
                   )}
                 >
-                  {change.isPositive ? <ArrowUp className="size-3 animate-in slide-in-from-bottom duration-500" /> : <ArrowDown className="size-3 animate-in slide-in-from-top duration-500" />}
+                  {change.isPositive ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />}
                   <span>{Math.abs(change.value)}%</span>
                 </div>
               )}
@@ -88,14 +100,14 @@ export function MetricCard({
           {Icon && (
             <div
               className={cn(
-                'rounded-md border p-2.5 transition-all duration-300',
+                'rounded-lg border p-2.5 transition-all duration-300 shadow-sm',
                 variant === 'default'
-                  ? 'border-border/40 bg-muted/30 group-hover:bg-muted/50'
-                  : `border-opacity-30 bg-opacity-10 group-hover:bg-opacity-15`,
-                interactive && 'group-hover:scale-110 group-hover:shadow-md'
+                  ? 'border-border/40 bg-muted/30 group-hover/card:bg-muted/50'
+                  : 'border-opacity-30 bg-opacity-10',
+                interactive && 'group-hover/card:scale-110 group-hover/card:shadow-md'
               )}
             >
-              <Icon className={cn('size-4 transition-transform duration-300 group-hover:scale-125', textColor)} />
+              <Icon className={cn('size-4 transition-all duration-300 group-hover/card:scale-125', textColor)} />
             </div>
           )}
         </div>
@@ -116,7 +128,7 @@ export function MetricCard({
                       : 'currentColor'
             }
             height={20}
-            className={cn('transition-opacity duration-300', interactive && 'opacity-50 group-hover:opacity-100')}
+            className={cn('transition-opacity duration-300', interactive && 'opacity-50 group-hover/card:opacity-100')}
           />
         )}
       </div>

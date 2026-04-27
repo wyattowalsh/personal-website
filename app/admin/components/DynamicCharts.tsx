@@ -50,7 +50,7 @@ export const DynamicStatusTimeline = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="space-y-3">
+      <div className="space-y-2">
         {Array.from({ length: 5 }).map((_, i) => (
           <Skeleton key={i} className="h-12 w-full" />
         ))}
@@ -85,20 +85,25 @@ export function ProviderSectionSkeleton({ count = 2 }: { count?: number }) {
   return (
     <div className="space-y-6">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-lg border border-border/60 bg-card/50 p-5 space-y-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="space-y-3">
-              <Skeleton className="h-5 w-48" />
-              <Skeleton className="h-3 w-72" />
+        <div key={i} className="rounded-xl border border-border/50 bg-card/50 overflow-hidden space-y-0">
+          <div className="p-4 border-b border-border/30 space-y-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-5 w-48" />
+                <Skeleton className="h-3 w-72" />
+              </div>
+              <Skeleton className="h-6 w-24 rounded-md" />
             </div>
-            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-5 w-48 rounded-md" />
           </div>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, j) => (
-              <MetricCardSkeleton key={j} />
-            ))}
+          <div className="p-4 space-y-4">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              {Array.from({ length: 4 }).map((_, j) => (
+                <MetricCardSkeleton key={j} />
+              ))}
+            </div>
+            <Skeleton className="h-40 w-full rounded-xl" />
           </div>
-          <Skeleton className="h-40 w-full" />
         </div>
       ))}
     </div>
@@ -117,7 +122,7 @@ export function SignalsSectionSkeleton() {
         <ChartSkeleton />
         <ChartSkeleton />
       </div>
-      <div className="rounded-lg border border-border/60 bg-card/50 p-5 space-y-3">
+      <div className="rounded-xl border border-border/50 bg-card/50 p-5 space-y-3">
         <Skeleton className="h-5 w-32" />
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -132,7 +137,7 @@ export function SignalsSectionSkeleton() {
 export function ShellProvidersSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-border/60 bg-card/50 p-5 space-y-3">
+      <div className="rounded-xl border border-border/50 bg-card/50 p-5 space-y-3">
         <div className="flex gap-2 flex-wrap">
           {Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-6 w-28" />
