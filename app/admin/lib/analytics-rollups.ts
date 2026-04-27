@@ -149,7 +149,7 @@ async function checkAnalyticsRollupSchemaHealth(client: Client): Promise<'health
       client.execute('PRAGMA table_info(analytics_rollup_runs)'),
     ]);
 
-    // Check if tables exist
+    // Check if tables exist (PRAGMA returns empty rows if table doesn't exist)
     if (daysInfo.rows.length === 0 || runsInfo.rows.length === 0) {
       return 'unknown';
     }
@@ -173,6 +173,7 @@ async function checkAnalyticsRollupSchemaHealth(client: Client): Promise<'health
       return 'outdated';
     }
   } catch {
+    // PRAGMA queries or row access failed (unexpected error)
     return 'unknown';
   }
 }
@@ -184,10 +185,27 @@ export async function repairAnalyticsRollupSchema(client: Client): Promise<{ suc
       return { success: true, message: 'Schema is already healthy.' };
     }
 
-    const dayCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_days');
-    const runCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_runs');
-    const dayDataExists = rowNumber((dayCount.rows[0] || {}), 'count') > 0;
-    const runDataExists = rowNumber((runCount.rows[0] || {}), 'count') > 0;
+    // If schema is unknown (tables don't exist yet), just create with hardened DDL
+    if (health === 'unknown') {
+      await ensureAnalyticsRollupSchema(client);
+      return { success: true, message: 'Schema initialized with hardened NOT NULL constraints.' };
+    }
+
+    // For outdated schema, check if tables have data before attempting repair
+    // Wrap COUNT queries in a try-catch to handle missing tables gracefully
+    let dayDataExists = false;
+    let runDataExists = false;
+    try {
+      const dayCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_days');
+      const runCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_runs');
+      dayDataExists = rowNumber((dayCount.rows[0] || {}), 'count') > 0;
+      runDataExists = rowNumber((runCount.rows[0] || {}), 'count') > 0;
+    } catch {
+      // If COUNT queries fail (table missing despite health check saying outdated),
+      // treat as empty tables and proceed with repair
+      dayDataExists = false;
+      runDataExists = false;
+    }
 
     if (dayDataExists || runDataExists) {
       return {
@@ -196,6 +214,8 @@ export async function repairAnalyticsRollupSchema(client: Client): Promise<{ suc
       };
     }
 
+    // Repair: drop old tables and recreate with hardened DDL
+    // Use batch to ensure atomic operation
     await client.batch([
       'DROP TABLE IF EXISTS analytics_rollup_runs',
       'DROP TABLE IF EXISTS analytics_rollup_days',
@@ -208,7 +228,7 @@ export async function repairAnalyticsRollupSchema(client: Client): Promise<{ suc
   } catch (error) {
     return {
       success: false,
-      message: error instanceof Error ? error.message : 'Repair failed',
+      message: `Repair failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
     };
   }
 }
