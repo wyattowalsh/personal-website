@@ -8,6 +8,7 @@ import { AdminSurface } from '../components/AdminVisuals';
 import { MetricCard } from '../components/MetricCard';
 import { DashboardHeader } from '../components/DashboardHeader';
 import { InsightCard } from '../components/InsightCard';
+import { AnimatedContainer } from '../components/AnimatedContainer';
 import { BookOpen, Clock, FileText, Hash, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -113,91 +114,104 @@ export default async function BlogStatsPage() {
   return (
     <AdminSurface>
       <div className="mx-auto max-w-7xl space-y-8">
-        <DashboardHeader
-          title="Blog Analytics"
-          description="Publishing cadence, topic distribution, reading depth, and content inventory health."
-          stats={[
-            { label: 'Total Posts', value: posts.length, icon: <FileText className="size-4" /> },
-            { label: 'Total Words', value: totalWords.toLocaleString(), icon: <BookOpen className="size-4" /> },
-            { label: 'Avg Words/Post', value: avgWordCount.toLocaleString(), icon: <TrendingUp className="size-4" /> },
-          ]}
-        />
+        <AnimatedContainer delay={0}>
+          <DashboardHeader
+            title="Blog Analytics"
+            description="Publishing cadence, topic distribution, reading depth, and content inventory health."
+            stats={[
+              { label: 'Total Posts', value: posts.length, icon: <FileText className="size-4" /> },
+              { label: 'Total Words', value: totalWords.toLocaleString(), icon: <BookOpen className="size-4" /> },
+              { label: 'Avg Words/Post', value: avgWordCount.toLocaleString(), icon: <TrendingUp className="size-4" /> },
+            ]}
+          />
+        </AnimatedContainer>
 
         {/* Key Metrics */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard
-            label="Total Posts"
-            value={posts.length}
-            description="Published MDX articles"
-            icon={FileText}
-            variant="accent"
-          />
-          <MetricCard
-            label="Unique Tags"
-            value={tags.length}
-            description="Topic categorization"
-            icon={Hash}
-            variant="success"
-          />
-          <MetricCard
-            label="Avg Reading Time"
-            value={`${avgReadingTime}m`}
-            description="Estimated read duration"
-            icon={Clock}
-            variant="warning"
-          />
-          <MetricCard
-            label="Total Words"
-            value={totalWords.toLocaleString()}
-            description="Indexed article content"
-            icon={BookOpen}
-            variant="default"
-          />
-        </div>
+        <AnimatedContainer delay={100}>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <MetricCard
+              label="Total Posts"
+              value={posts.length}
+              description="Published MDX articles"
+              icon={FileText}
+              variant="accent"
+              trend={postsByYear.map(p => p.count)}
+            />
+            <MetricCard
+              label="Unique Tags"
+              value={tags.length}
+              description="Topic categorization"
+              icon={Hash}
+              variant="success"
+              trend={tagData.slice(0, 12).map(t => t.count)}
+            />
+            <MetricCard
+              label="Avg Reading Time"
+              value={`${avgReadingTime}m`}
+              description="Estimated read duration"
+              icon={Clock}
+              variant="warning"
+            />
+            <MetricCard
+              label="Total Words"
+              value={totalWords.toLocaleString()}
+              description="Indexed article content"
+              icon={BookOpen}
+              variant="default"
+              trend={wordTimeline.slice(-12).map(w => w.words)}
+            />
+          </div>
+        </AnimatedContainer>
 
         {/* Insights Section */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <InsightCard
-            type="insight"
-            title="Top Tags"
-            description={`Most frequently used: ${topTags}`}
-            metric={`${tagData.length} total`}
-          />
-          <InsightCard
-            type="action"
-            title="Content Length"
-            description={`Average post: ${avgWordCount.toLocaleString()} words (${minWordCount} – ${maxWordCount.toLocaleString()})`}
-            metric={avgPostsPerYear}
-          />
-          <InsightCard
-            type="insight"
-            title="Publishing Timeline"
-            description={`Oldest: ${oldestPost} • Newest: ${newestPost}`}
-            metric={`${postsByYear.length} years`}
-          />
-        </div>
+        <AnimatedContainer delay={200}>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <InsightCard
+              type="insight"
+              title="Top Tags"
+              description={`Most frequently used: ${topTags}`}
+              metric={`${tagData.length} total`}
+            />
+            <InsightCard
+              type="action"
+              title="Content Length"
+              description={`Average post: ${avgWordCount.toLocaleString()} words (${minWordCount} – ${maxWordCount.toLocaleString()})`}
+              metric={avgPostsPerYear}
+            />
+            <InsightCard
+              type="insight"
+              title="Publishing Timeline"
+              description={`Oldest: ${oldestPost} • Newest: ${newestPost}`}
+              metric={`${postsByYear.length} years`}
+            />
+          </div>
+        </AnimatedContainer>
 
         {/* Charts */}
-        <div>
-          <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            Content Metrics
-          </h2>
-          <EnhancedBlogCharts
-            postsByYear={postsByYear}
-            tagData={tagData}
-            wordData={wordData}
-            readingTimeDist={readingTimeDist}
-            wordTimeline={wordTimeline}
-          />
-        </div>
+        <AnimatedContainer delay={300}>
+          <div>
+            <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Content Metrics
+            </h2>
+            <EnhancedBlogCharts
+              postsByYear={postsByYear}
+              tagData={tagData}
+              wordData={wordData}
+              readingTimeDist={readingTimeDist}
+              wordTimeline={wordTimeline}
+            />
+          </div>
+        </AnimatedContainer>
 
         {/* Posts Table */}
-        <div>
-          <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            All Posts
-          </h2>
-          <PostsTable posts={postsTableData} />
-        </div>
+        <AnimatedContainer delay={400}>
+          <div>
+            <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              All Posts
+            </h2>
+            <PostsTable posts={postsTableData} />
+          </div>
+        </AnimatedContainer>
       </div>
     </AdminSurface>
   );
