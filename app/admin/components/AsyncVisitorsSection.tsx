@@ -1,9 +1,9 @@
 import { getVisitorAnalyticsSnapshot } from '../lib/visitor-analytics';
 import { CyberPanel } from './AdminVisuals';
 import { CircleDot, BarChart3, Activity, ShieldCheck, Radar } from 'lucide-react';
+import { AnimatedContainer } from './AnimatedContainer';
 
 const visitorMetricIcons = [BarChart3, Activity, Radar, ShieldCheck] as const;
-import { AnimatedContainer } from './AnimatedContainer';
 import { MetricCard } from './MetricCard';
 import { SignalCard } from './AdminVisuals';
 import { ChartInteraction } from './ChartInteraction';

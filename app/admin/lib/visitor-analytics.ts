@@ -129,8 +129,17 @@ function rowsToAnalyticsRows(
 
 export async function getVisitorAnalyticsSnapshot(windowDays: AnalyticsWindowDays = DEFAULT_ANALYTICS_WINDOW_DAYS): Promise<VisitorAnalyticsSnapshot> {
   if (windowDays !== DEFAULT_ANALYTICS_WINDOW_DAYS) {
-    const { getRollupAnalyticsSnapshot } = await import('./analytics-rollups');
-    return getRollupAnalyticsSnapshot(windowDays);
+    try {
+      const { getRollupAnalyticsSnapshot } = await import('./analytics-rollups');
+      return await getRollupAnalyticsSnapshot(windowDays);
+    } catch (error) {
+      return emptySnapshot(
+        'error',
+        [],
+        error instanceof Error ? error.message : 'Analytics rollup unavailable',
+        windowDays
+      );
+    }
   }
 
   const { config, missingEnv } = getPostHogConfig();
