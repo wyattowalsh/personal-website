@@ -1,0 +1,370 @@
+---
+title: Admin Dashboard
+description: Admin dashboard authentication, analytics integration, component architecture, and development workflows.
+icon: fa/FaShieldAlt
+---
+
+## Overview
+
+The admin dashboard (`/admin`) is a protected surface for managing site analytics, content, and performance metrics. It requires authentication and supports multi-panel workflows for visitor analytics, blog content management, and growth intelligence.
+
+The dashboard is built with a modular component architecture and integrates PostHog for aggregate visitor analytics and Turso SQLite for time-series rollup storage.
+
+## Authentication
+
+### Overview
+
+Admin authentication uses signed session cookies with rate limiting and automatic expiry.
+
+**Session Details:**
+- **Storage:** Signed HttpOnly cookies (`admin_session`)
+- **Signing:** HMAC with `SESSION_SIGNING_KEY`
+- **Expiry:** 24 hours
+- **Rate limit:** 5 login attempts per 15-minute window
+- **Security:** Secure flag in production; SameSite=Strict
+
+### Local Development
+
+In development, the `/admin` login accepts an **empty password**. No env vars required.
+
+```bash
+pnpm dev  # starts on http://localhost:3458
+# Navigate to http://localhost:3458/admin
+# Leave password blank and submit
+```
+
+### Production Setup
+
+Set these in Vercel environment variables:
+
+```bash
+ADMIN_PASSWORD=<long-random-secure-password>
+SESSION_SIGNING_KEY=<HMAC-signing-key>
+```
+
+Generate a secure session key:
+
+```bash
+openssl rand -base64 32
+```
+
+**Cookie behavior in production:**
+- `HttpOnly` — cannot be accessed via JavaScript
+- `Secure` — only sent over HTTPS
+- `SameSite=Strict` — prevents cross-site request forgery
+
+**Session validation:**
+The session is validated on every `/admin` request. If the cookie is invalid, expired, or the signature doesn't match `SESSION_SIGNING_KEY`, the user is redirected to login.
+
+See `lib/admin-auth.ts` in the main app for cookie creation, validation, and rate-limit logic.
+
+## Component Architecture
+
+The dashboard is built with reusable, modular components:
+
+### Layout Components
+
+| Component | Purpose |
+|-----------|---------|
+| `AdminHeader` | Top navigation bar with title and branding |
+| `AdminSidebar` | Navigation sidebar with active route highlighting |
+| `DashboardHeader` | Section header with title, subtitle, and actions |
+
+### Data Display Components
+
+| Component | Purpose |
+|-----------|---------|
+| `MetricCard` | Single metric display (number, label, trend) |
+| `StatCard` | Variant of MetricCard for key statistics |
+| `DataGrid` | Tabular data display with sorting and filtering |
+| `PostsTable` | Specialized DataGrid for blog post listings |
+| `ActivityCalendar` | Heat map visualization of daily activity |
+
+### Panel Components
+
+| Component | Purpose |
+|-----------|---------|
+| `InsightCard` | Container for analytical insights and takeaways |
+| `PerformanceCard` | Performance metrics (Lighthouse, Web Vitals) |
+| `AdminCharts` | Chart library wrapper for line, bar, and pie charts |
+| `AdminVisuals` | Visual components for dashboards (badges, tags) |
+
+### Specialized Components
+
+| Component | Purpose |
+|-----------|---------|
+| `RecentPostsList` | List of recently published blog posts |
+| `PostCard` | Individual post card with metadata |
+| `SeriesView` | Blog series grouping and navigation |
+| `ContentFilters` | Filter controls for content queries |
+| `TelemetryAutoRefresh` | Auto-refresh timer for live data updates |
+
+### Shared State
+
+`AdminContext` provides shared state across the dashboard:
+
+```tsx
+// app/admin/components/AdminContext.tsx
+type AdminContextType = {
+  isLoading: boolean
+  error: Error | null
+  refreshData: () => Promise<void>
+}
+```
+
+Components consume this context to coordinate loading states and error handling.
+
+## Dashboard Panels
+
+### Analytics Panel
+
+Displays visitor analytics aggregated from PostHog.
+
+**Data source:** PostHog Query API (server-side)  
+**Storage:** Turso SQLite (rollup tables)  
+**Requirements:**
+- `POSTHOG_PERSONAL_API_KEY` (server-only, `query:read` scope)
+- `POSTHOG_PROJECT_ID`
+- `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`
+
+**Metrics:**
+- Pageviews by dimension (page, referrer, device, etc.)
+- Session count and duration
+- User engagement (scroll depth, time on page)
+- Traffic trends (daily, weekly)
+
+**Local dev:**
+Placeholder data shown until PostHog env vars are set. To test with real data:
+
+```bash
+export POSTHOG_PERSONAL_API_KEY=phx_...
+export POSTHOG_PROJECT_ID=12345
+export TURSO_DATABASE_URL=libsql://...
+export TURSO_AUTH_TOKEN=eyJh...
+pnpm dev
+# Visit http://localhost:3458/admin/analytics
+```
+
+### Content Panel
+
+Displays blog posts, series, and tags.
+
+**Data source:** Local filesystem (`content/posts/`)  
+**Processing:** `BackendService` (indexing and caching)  
+**Features:**
+- Post listing with metadata
+- Series grouping and reordering
+- Tag browsing and filtering
+- Search integration (Fuse.js)
+
+**No env vars required** — uses local post sources.
+
+### Blog Stats Panel
+
+Shows reading time, word count, engagement metrics, and post performance.
+
+**Data source:** Post metadata + PostHog analytics  
+**Features:**
+- Top posts by pageviews
+- Reading time distribution
+- Engagement heatmap
+- Series performance
+
+**Local dev:** Works without PostHog; shows limited stats.
+
+### Growth Panel (Optional)
+
+Integrates with external services for SEO and performance insights.
+
+**Integrations:**
+- **Google Search Console** — impressions, clicks, ranking
+- **PageSpeed Insights** — Lighthouse scores
+- **Chrome UX Report** — Field Web Vitals
+- **Vercel** — deployment health and performance
+- **UptimeRobot** — external uptime monitoring
+- **IndexNow** — search engine indexing signals
+
+**Requirements:** Set corresponding env vars for each panel (see [Deployment > Environment Variables](/docs/operations/deployment#optional)).
+
+## Schema Management
+
+The admin dashboard includes automated database schema management for analytics storage.
+
+### Health States
+
+The schema health detection system monitors three states:
+
+| State | Meaning | Action |
+|-------|---------|--------|
+| **healthy** | Tables exist with hardened NOT NULL constraints | Safe to use; no migration needed |
+| **outdated** | Tables exist but lack NOT NULL constraints | Automatic upgrade on next deploy |
+| **unknown** | Tables don't exist or schema cannot be determined | Create new schema with full DDL |
+
+### Automatic Repair
+
+Schema repair runs during deployment and respects these safety rules:
+
+1. **Fresh database** — If tables are missing (`health === 'unknown'`), they are created with hardened NOT NULL constraints
+2. **Race condition safety** — COUNT queries use try-catch; if they fail, repair treats the table as empty
+3. **Data-aware repair** — Repair only proceeds if tables are empty; if data exists, repair is blocked with an error message
+
+### Implementation
+
+Schema repair logic is in `app/admin/lib/analytics-rollups.ts` with full inline documentation.
+
+Example health check flow:
+
+```typescript
+const health = await detectSchemaHealth(db)
+if (health === 'unknown') {
+  // Create fresh schema with NOT NULL constraints
+  await initializeSchema(db)
+} else if (health === 'outdated') {
+  // Migrate existing tables to hardened DDL
+  await repairSchema(db)
+}
+```
+
+## Analytics Data Flow
+
+### Capture Phase
+
+1. **Client-side:** Anonymous PostHog events captured on user interactions (pageviews, scroll depth, clicks, etc.)
+2. **Validation:** Events sanitized before capture (search queries, navigation data)
+3. **Exclusion:** `/admin` routes excluded from public analytics
+
+### Aggregation Phase
+
+Runs during deployments and scheduled cron jobs:
+
+1. **Query PostHog** — Fetch raw events using Query API with time-window filters
+2. **Rollup to Turso** — Aggregate events into time-series tables (daily totals, dimension breakdowns)
+3. **Index creation** — Create indexes for fast dashboard queries
+
+### Dashboard Query Phase
+
+When a user views the Analytics panel:
+
+1. **Fetch rollups** — Query Turso for pre-aggregated data (fast, cacheable)
+2. **Format for UI** — Transform database rows into chart datasets
+3. **Auto-refresh** — TelemetryAutoRefresh component polls for new data every 60 seconds in production
+
+## Development & Testing
+
+### Running the Admin Dashboard Locally
+
+```bash
+# Start the main site with admin enabled
+pnpm dev
+# Navigate to http://localhost:3458/admin
+# Password: (leave blank)
+```
+
+### Testing Admin Routes
+
+Admin routes are in `app/admin/`:
+
+```bash
+# Test with real PostHog + Turso data
+export POSTHOG_PERSONAL_API_KEY=phx_...
+export POSTHOG_PROJECT_ID=12345
+export TURSO_DATABASE_URL=libsql://...
+export TURSO_AUTH_TOKEN=eyJh...
+pnpm dev
+```
+
+### Component Testing
+
+Admin components are tested with Vitest:
+
+```bash
+# Run admin tests
+pnpm test app/admin
+```
+
+Key test files:
+- `app/admin/lib/analytics-rollups.test.ts` — schema health and repair logic
+- `app/admin/lib/free-admin-dashboard.test.ts` — panel data queries
+- `app/admin/lib/visitor-analytics.test.ts` — visitor aggregation
+
+### Debug Logging
+
+Admin operations support verbose logging:
+
+```bash
+# Enable debug mode
+DEBUG=admin pnpm dev
+```
+
+Check browser console and server logs for detailed operational traces.
+
+## Troubleshooting
+
+### Symptom: Admin login not working
+
+**Cause:** Invalid session key or missing ADMIN_PASSWORD in production
+
+**Fix:**
+1. Verify `ADMIN_PASSWORD` is set in Vercel (production only; dev uses empty password)
+2. Verify `SESSION_SIGNING_KEY` is consistent across all deployments
+3. Clear browser cookies and retry login
+4. Check browser DevTools for `admin_session` cookie (should be HttpOnly and Secure)
+
+### Symptom: Analytics panel shows setup state
+
+**Cause:** PostHog env vars not configured
+
+**Fix:**
+1. Set `POSTHOG_PERSONAL_API_KEY` (server-only, `query:read` scope — not the public token)
+2. Set `POSTHOG_PROJECT_ID`
+3. Verify the API key has `query:read` scope in PostHog settings
+4. Redeploy and wait for build to complete
+
+### Symptom: "Cannot auto-repair: data exists" during deploy
+
+**Cause:** Schema repair blocked because tables have existing data
+
+**Fix:**
+1. This is intentional — repair won't touch tables with data
+2. For development/staging, drop the database and redeploy
+3. For production, use Turso's backup/restore feature or contact your database administrator
+
+### Symptom: Lighthouse/performance scores not showing
+
+**Cause:** PageSpeed API or Chrome UX Report API key not set
+
+**Fix:**
+1. Set `PAGESPEED_API_KEY` in Vercel (optional; higher quota for large sites)
+2. Set `CRUX_API_KEY` for field Web Vitals
+3. Verify the keys have the correct API permissions in Google Cloud
+
+### Symptom: Content panel shows no posts
+
+**Cause:** Posts not indexed by BackendService
+
+**Fix:**
+1. Verify posts exist in `content/posts/{slug}/index.mdx`
+2. Verify frontmatter is valid YAML
+3. Run `pnpm preprocess` to rebuild the search index
+4. Restart the dev server if running locally
+
+## Deployment Checklist
+
+Before deploying admin features to production:
+
+- [ ] Set `ADMIN_PASSWORD` in Vercel
+- [ ] Set `SESSION_SIGNING_KEY` in Vercel
+- [ ] Set `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` if using analytics
+- [ ] Set `POSTHOG_PERSONAL_API_KEY` and `POSTHOG_PROJECT_ID` if using analytics
+- [ ] Test login locally with real credentials
+- [ ] Verify schema health is "healthy" in production logs
+- [ ] Test analytics panel data loads correctly
+- [ ] Monitor Turso quota usage in production
+- [ ] Monitor PostHog Query API rate limits
+
+## Related Documentation
+
+- [Deployment > Admin Dashboard & Analytics](/docs/operations/deployment#admin-dashboard--analytics)
+- [Deployment > Environment Variables](/docs/operations/deployment#environment-variables)
+- [Architecture > Backend](/docs/architecture/backend)
+- [Operations > Testing](/docs/operations/testing)

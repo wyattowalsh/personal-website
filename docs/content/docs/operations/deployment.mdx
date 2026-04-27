@@ -178,6 +178,8 @@ The `/admin` dashboard reads aggregate PostHog data from the server with `POSTHO
 
 The `/admin` dashboard aggregates visitor analytics from PostHog and stores time-series rollup data (pageviews, sessions, engagement by dimension) in a Turso SQLite database. The analytics pipeline runs automatically during deployments and cron jobs, building daily and dimension-level summaries for fast querying.
 
+For comprehensive documentation on admin components, architecture, development workflows, and troubleshooting, see [Operations > Admin Dashboard](/docs/operations/admin-dashboard).
+
 ### Schema Health & Repair
 
 The admin dashboard includes automated database schema management to handle fresh installations and schema evolution:

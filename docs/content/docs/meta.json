@@ -56,10 +56,11 @@
       "title": "Operations",
       "icon": "lucide:settings",
       "items": [
-        "operations/scripts-and-tooling",
+        "operations/admin-dashboard",
         "operations/deployment",
-        "operations/testing",
-        "operations/dev-docs"
+        "operations/dev-docs",
+        "operations/scripts-and-tooling",
+        "operations/testing"
       ]
     }
   ]

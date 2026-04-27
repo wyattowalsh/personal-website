@@ -80,14 +80,22 @@ The repository no longer reads best as a strict three-layer `lib/` stack. A more
 - Frontmatter is validated with Zod before posts enter the in-memory maps and search index
 - The service also derives reading time, cleans MDX syntax for search, builds sorted/tagged caches, and exposes helpers such as `getAllPosts()`, `getPostMetadata()`, `getAdjacentPosts()`, and `getRelatedPosts()`
 
-### 3. Shared Runtime Infrastructure (`lib/core.ts`, `lib/metadata.ts`, `lib/feed.ts`, `lib/logger.ts`, `lib/schema.ts`)
+### 3. Admin Dashboard (`app/admin/`, `app/admin/lib/`)
+
+- The `/admin` surface is a protected dashboard for analytics, content management, and growth insights
+- It requires authentication with signed session cookies and optional rate limiting
+- Admin routes connect to PostHog Query API for aggregate visitor analytics and Turso SQLite for time-series rollup storage
+- The admin UI is built with reusable modular components: `MetricCard`, `DataGrid`, `InsightCard`, `DashboardHeader`, and specialized panels for Analytics, Content, Blog Stats, and Growth
+- See [Operations > Admin Dashboard](/docs/operations/admin-dashboard) for full architecture and development guide
+
+### 4. Shared Runtime Infrastructure (`lib/core.ts`, `lib/metadata.ts`, `lib/feed.ts`, `lib/logger.ts`, `lib/schema.ts`)
 
 - `lib/core.ts` owns config, API validation schemas, `ApiError`, and the request-validation / correlation-id middleware used by route handlers
 - `lib/metadata.ts` centralizes metadata generation
 - `lib/feed.ts` powers feed routes
 - `lib/logger.ts`, `lib/constants.ts`, and `lib/utils.ts` provide the smaller but important plumbing that keeps the app consistent
 
-### 4. Documentation Workspace (`docs/`)
+### 5. Documentation Workspace (`docs/`)
 
 - The docs live in a separate Next.js app built with Fumadocs
 - That workspace has its own `package.json`, routing tree, and content source
