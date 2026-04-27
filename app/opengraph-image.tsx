@@ -46,7 +46,6 @@ export default async function Image() {
             alignItems: 'center',
             justifyContent: 'center',
             padding: '80px',
-            zIndex: 1,
           }}
         >
           {/* Title */}

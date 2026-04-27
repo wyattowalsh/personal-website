@@ -57,7 +57,6 @@ function TextCard({ post }: { post: { title: string; tags: string[]; created: st
           flexDirection: 'column',
           justifyContent: 'space-between',
           height: '100%',
-          zIndex: 1,
         }}
       >
         {post.tags.length > 0 && (
