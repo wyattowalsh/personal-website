@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { BackendService } from '@/lib/server';
 import { validateAdminSession } from '@/app/admin/lib/auth';
 import { Metadata } from 'next';
-import { Charts } from './Charts';
+import { EnhancedBlogCharts } from './Charts';
 import { PostsTable } from '../components/PostsTable';
 import { AdminSurface } from '../components/AdminVisuals';
 import { MetricCard } from '../components/MetricCard';
@@ -182,7 +182,7 @@ export default async function BlogStatsPage() {
           <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
             Content Metrics
           </h2>
-          <Charts
+          <EnhancedBlogCharts
             postsByYear={postsByYear}
             tagData={tagData}
             wordData={wordData}

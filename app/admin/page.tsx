@@ -36,13 +36,15 @@ import {
   type AdminSignal,
 } from './lib/free-admin-dashboard';
 import {
-  DonutBreakdown,
   EngagementMatrix,
-  RankedBarChart,
-  ScoreRadials,
   StatusTimeline,
-  TrafficAreaChart,
 } from './components/AdminCharts';
+import {
+  EnhancedTrafficAreaChart,
+  EnhancedRankedBarChart,
+  EnhancedDonutBreakdown,
+  EnhancedScoreRadials,
+} from './components/Charts';
 import {
   AdminHero,
   AdminSurface,
@@ -204,7 +206,7 @@ function ProviderCard({ provider }: { provider: AdminProviderSnapshot }) {
         )}
 
         {provider.id === 'pagespeed-crux' && provider.cards.length > 0 ? (
-          <ScoreRadials metrics={provider.cards} />
+          <EnhancedScoreRadials metrics={provider.cards} />
         ) : provider.cards.length > 0 ? (
           <MetricGrid metrics={provider.cards} />
         ) : null}
@@ -282,19 +284,19 @@ function VisitorsSection({ analytics }: { analytics: VisitorAnalyticsSnapshot })
 
       <div className="grid gap-4 xl:grid-cols-[1.45fr_0.9fr]">
         <CyberPanel title="Traffic Pulse" description="Daily PostHog pageviews, visitors, and sessions." icon={Activity}>
-          <TrafficAreaChart data={analytics.trafficSeries} />
+          <EnhancedTrafficAreaChart data={analytics.trafficSeries} />
         </CyberPanel>
         <CyberPanel title="Event Mix" description="Tracked events across the current visitor window." icon={Radar}>
-          <RankedBarChart rows={analytics.eventMix} emptyLabel="No events have been captured yet." />
+          <EnhancedRankedBarChart rows={analytics.eventMix} emptyLabel="No events have been captured yet." />
         </CyberPanel>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
         <CyberPanel title="Top Pages" description="Pageview leaders with unique visitor context." icon={BarChart3}>
-          <RankedBarChart rows={analytics.topPages} emptyLabel="No pageviews have been captured yet." />
+          <EnhancedRankedBarChart rows={analytics.topPages} emptyLabel="No pageviews have been captured yet." />
         </CyberPanel>
         <CyberPanel title="Device Split" description="Device categories from captured page views." icon={Eye}>
-          <DonutBreakdown rows={analytics.devices} emptyLabel="No device categories have been captured yet." centerLabel="Views" />
+          <EnhancedDonutBreakdown rows={analytics.devices} emptyLabel="No device categories have been captured yet." centerLabel="Views" />
         </CyberPanel>
       </div>
 
