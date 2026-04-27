@@ -20,6 +20,7 @@ pnpm new-post             # Create blog post (interactive)
 pnpm new-post --title "X" --tags "A,B"  # CLI mode
 pnpm preprocess           # Rebuild search index/cache
 pnpm lclean               # Clean .next, .cache
+pnpm admin:preflight      # Validate admin dashboard environment
 ```
 
 ## Project Structure
@@ -175,6 +176,8 @@ Create via `pnpm new-post` or manually.
 ## Admin Dashboard
 
 The `/admin` dashboard provides visitor analytics, content management, and growth metrics. It requires authentication and database configuration.
+
+Run `pnpm admin:preflight` after setting environment variables to validate the admin dashboard environment before deploying.
 
 ### Authentication
 

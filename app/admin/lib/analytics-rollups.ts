@@ -103,7 +103,7 @@ function toText(value: unknown, fallback = 'Unknown'): string {
   return trimmed || fallback;
 }
 
-function getRollupConfig(): { config: RollupConfig | null; missingEnv: string[] } {
+export function getRollupConfig(): { config: RollupConfig | null; missingEnv: string[] } {
   const url = cleanEnvValue(process.env.TURSO_DATABASE_URL);
   const authToken = cleanEnvValue(process.env.TURSO_AUTH_TOKEN);
   const missingEnv = ROLLUP_DATABASE_ENV.filter((name) => !cleanEnvValue(process.env[name]));
@@ -161,6 +161,12 @@ export async function ensureAnalyticsRollupSchema(client: Client): Promise<void>
     )`,
     `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_dimensions_kind_day
       ON analytics_rollup_dimensions(kind, day)`,
+    `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_dimensions_day_kind
+      ON analytics_rollup_dimensions(day, kind)`,
+    `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_dimensions_kind_label
+      ON analytics_rollup_dimensions(kind, label)`,
+    `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_runs_status
+      ON analytics_rollup_runs(status, started_at)`,
     `CREATE TABLE IF NOT EXISTS analytics_rollup_runs (
       id TEXT NOT NULL PRIMARY KEY,
       started_at TEXT NOT NULL,
@@ -839,4 +845,37 @@ export async function getRollupAnalyticsSnapshot(windowDays: AnalyticsWindowDays
       rollup: buildRollupSummary('error', [], [], [], message),
     };
   }
+}
+
+/**
+ * Prune analytics data older than the retention window.
+ * Call this from the daily rollup cron to prevent Turso free tier overflow.
+ * Returns the number of day rows and dimension rows deleted.
+ */
+export async function pruneAnalyticsData(
+  client: Client,
+  retentionDays: number = 90
+): Promise<{ dayRowsDeleted: number; dimensionRowsDeleted: number; runRowsDeleted: number }> {
+  const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  const [dayResult, dimResult, runResult] = await Promise.all([
+    client.execute({
+      sql: 'DELETE FROM analytics_rollup_days WHERE day < ? RETURNING day',
+      args: [cutoff],
+    }).catch(() => ({ rows: [] })),
+    client.execute({
+      sql: 'DELETE FROM analytics_rollup_dimensions WHERE day < ? RETURNING day',
+      args: [cutoff],
+    }).catch(() => ({ rows: [] })),
+    client.execute({
+      sql: 'DELETE FROM analytics_rollup_runs WHERE started_at < ? AND status != ? RETURNING id',
+      args: [cutoff, 'running'],
+    }).catch(() => ({ rows: [] })),
+  ]);
+
+  return {
+    dayRowsDeleted: dayResult.rows.length,
+    dimensionRowsDeleted: dimResult.rows.length,
+    runRowsDeleted: runResult.rows.length,
+  };
 }

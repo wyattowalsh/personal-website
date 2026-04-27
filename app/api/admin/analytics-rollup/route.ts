@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { clampRollupRefreshDays } from '@/app/admin/lib/analytics-windows';
-import { refreshAnalyticsRollups } from '@/app/admin/lib/analytics-rollups';
+import { refreshAnalyticsRollups, pruneAnalyticsData } from '@/app/admin/lib/analytics-rollups';
+import { getRollupConfig } from '@/app/admin/lib/analytics-rollups';
 import { cleanEnvValue } from '@/app/admin/lib/posthog-query';
+import { DATA_RETENTION_DAYS } from '@/app/admin/lib/analytics-constants';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -30,6 +32,26 @@ export async function GET(request: Request) {
 
   const days = clampRollupRefreshDays(parsed.data.days);
   const result = await refreshAnalyticsRollups(days);
+
+  // Prune old analytics data after successful refresh to prevent Turso free tier overflow
+  if (result.status !== 'error') {
+    try {
+      const { config } = getRollupConfig();
+      if (config) {
+        const { createClient } = await import('@libsql/client');
+        const client = createClient({ url: config.url, authToken: config.authToken });
+        try {
+          const pruneResult = await pruneAnalyticsData(client, DATA_RETENTION_DAYS);
+          Object.assign(result, { pruneResult });
+        } finally {
+          client.close();
+        }
+      }
+    } catch {
+      // Pruning failure is non-critical; don't fail the cron
+    }
+  }
+
   const status = result.status === 'error' ? 500 : 200;
 
   return NextResponse.json(result, {
