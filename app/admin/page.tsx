@@ -52,6 +52,7 @@ import {
   SourceLink,
   StatusPill,
 } from './components/AdminVisuals';
+import { MetricCard } from './components/MetricCard';
 import type { AnalyticsMetric, AnalyticsRow, VisitorAnalyticsSnapshot } from './lib/visitor-analytics';
 
 export const metadata: Metadata = {
@@ -110,14 +111,15 @@ function MetricGrid({
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {metrics.map((metric, index) => {
         const Icon = icons?.[index] ?? BarChart3;
+        const variants = ['accent', 'success', 'warning', 'default'] as const;
         return (
-          <SignalCard
+          <MetricCard
             key={metric.label}
             label={metric.label}
             value={metric.value}
             description={metric.description}
             icon={Icon}
-            tone={index === 1 ? 'violet' : index === 2 ? 'emerald' : index === 3 ? 'amber' : 'blue'}
+            variant={variants[index % variants.length]}
           />
         );
       })}

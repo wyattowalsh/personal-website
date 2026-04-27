@@ -4,8 +4,11 @@ import { validateAdminSession } from '@/app/admin/lib/auth';
 import { Metadata } from 'next';
 import { Charts } from './Charts';
 import { PostsTable } from '../components/PostsTable';
-import { AdminHero, AdminSurface, SignalCard } from '../components/AdminVisuals';
-import { BookOpen, Clock, FileText, Hash } from 'lucide-react';
+import { AdminSurface } from '../components/AdminVisuals';
+import { MetricCard } from '../components/MetricCard';
+import { DashboardHeader } from '../components/DashboardHeader';
+import { InsightCard } from '../components/InsightCard';
+import { BookOpen, Clock, FileText, Hash, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Blog Analytics',
@@ -94,34 +97,107 @@ export default async function BlogStatsPage() {
     tags: p.tags,
   }));
 
+  // Calculate additional insights
+  const maxWordCount = Math.max(...posts.map(p => p.wordCount), 0);
+  const minWordCount = Math.min(...posts.map(p => p.wordCount), 0);
+  const avgWordCount = posts.length > 0 ? Math.round(totalWords / posts.length) : 0;
+  const avgPostsPerYear = posts.length > 0 ? (postsByYear.length > 0 ? (posts.length / postsByYear.length).toFixed(1) : '0') : '0';
+
+  // Get most popular tags
+  const topTags = tagData.slice(0, 3).map(t => t.tag).join(', ') || 'None';
+
+  // Newest and oldest posts
+  const newestPost = posts.length > 0 ? new Date(posts[posts.length - 1].created).toLocaleDateString() : 'N/A';
+  const oldestPost = posts.length > 0 ? new Date(posts[0].created).toLocaleDateString() : 'N/A';
+
   return (
     <AdminSurface>
       <div className="mx-auto max-w-7xl space-y-8">
-        <AdminHero
-          eyebrow="Content telemetry"
+        <DashboardHeader
           title="Blog Analytics"
           description="Publishing cadence, topic distribution, reading depth, and content inventory health."
+          stats={[
+            { label: 'Total Posts', value: posts.length, icon: <FileText className="size-4" /> },
+            { label: 'Total Words', value: totalWords.toLocaleString(), icon: <BookOpen className="size-4" /> },
+            { label: 'Avg Words/Post', value: avgWordCount.toLocaleString(), icon: <TrendingUp className="size-4" /> },
+          ]}
         />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SignalCard label="Total Posts" value={posts.length} description="Published MDX articles" icon={FileText} tone="blue" />
-        <SignalCard label="Total Words" value={totalWords.toLocaleString()} description="Indexed article copy" icon={BookOpen} tone="violet" />
-        <SignalCard label="Total Tags" value={tags.length} description="Unique topic labels" icon={Hash} tone="emerald" />
-        <SignalCard label="Avg Reading Time" value={`${avgReadingTime} min`} description="Mean estimated read" icon={Clock} tone="amber" />
-      </div>
+        {/* Key Metrics */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            label="Total Posts"
+            value={posts.length}
+            description="Published MDX articles"
+            icon={FileText}
+            variant="accent"
+          />
+          <MetricCard
+            label="Unique Tags"
+            value={tags.length}
+            description="Topic categorization"
+            icon={Hash}
+            variant="success"
+          />
+          <MetricCard
+            label="Avg Reading Time"
+            value={`${avgReadingTime}m`}
+            description="Estimated read duration"
+            icon={Clock}
+            variant="warning"
+          />
+          <MetricCard
+            label="Total Words"
+            value={totalWords.toLocaleString()}
+            description="Indexed article content"
+            icon={BookOpen}
+            variant="default"
+          />
+        </div>
 
-      <Charts
-        postsByYear={postsByYear}
-        tagData={tagData}
-        wordData={wordData}
-        readingTimeDist={readingTimeDist}
-        wordTimeline={wordTimeline}
-      />
+        {/* Insights Section */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <InsightCard
+            type="insight"
+            title="Top Tags"
+            description={`Most frequently used: ${topTags}`}
+            metric={`${tagData.length} total`}
+          />
+          <InsightCard
+            type="action"
+            title="Content Length"
+            description={`Average post: ${avgWordCount.toLocaleString()} words (${minWordCount} – ${maxWordCount.toLocaleString()})`}
+            metric={avgPostsPerYear}
+          />
+          <InsightCard
+            type="insight"
+            title="Publishing Timeline"
+            description={`Oldest: ${oldestPost} • Newest: ${newestPost}`}
+            metric={`${postsByYear.length} years`}
+          />
+        </div>
 
-      <div className="mt-8">
-        <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">All Posts</h2>
-        <PostsTable posts={postsTableData} />
-      </div>
+        {/* Charts */}
+        <div>
+          <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Content Metrics
+          </h2>
+          <Charts
+            postsByYear={postsByYear}
+            tagData={tagData}
+            wordData={wordData}
+            readingTimeDist={readingTimeDist}
+            wordTimeline={wordTimeline}
+          />
+        </div>
+
+        {/* Posts Table */}
+        <div>
+          <h2 className="mb-4 font-mono text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            All Posts
+          </h2>
+          <PostsTable posts={postsTableData} />
+        </div>
       </div>
     </AdminSurface>
   );
