@@ -79,15 +79,23 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             onMouseEnter={() => setHoveredMetric(key)}
             onMouseLeave={() => setHoveredMetric(null)}
             className={cn(
-              'rounded-lg border border-border/50 bg-muted/30 p-3 transition-all cursor-pointer',
-              hoveredMetric === key && 'border-foreground/30 bg-muted/60 shadow-md'
+              'group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-3 transition-all duration-300 cursor-pointer',
+              hoveredMetric === key && 'border-foreground/40 bg-gradient-to-br from-muted/70 to-muted/40 shadow-lg shadow-foreground/10'
             )}
           >
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{config.label}</p>
-            <p className="mt-1 text-xl font-bold" style={{ color: config.color }}>
-              {key === 'pageviews' ? stats.avgPageviews.toLocaleString() : key === 'visitors' ? stats.avgVisitors.toLocaleString() : stats.avgSessions.toLocaleString()}
-            </p>
-            <p className="text-xs text-muted-foreground">Average</p>
+            {/* Animated gradient overlay */}
+            {hoveredMetric === key && (
+              <div className="absolute inset-0 opacity-50 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse" />
+              </div>
+            )}
+            <div className="relative z-10 space-y-1">
+              <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{config.label}</p>
+              <p className="text-xl font-bold transition-transform duration-300 group-hover:scale-105" style={{ color: config.color }}>
+                {key === 'pageviews' ? stats.avgPageviews.toLocaleString() : key === 'visitors' ? stats.avgVisitors.toLocaleString() : stats.avgSessions.toLocaleString()}
+              </p>
+              <p className="text-xs text-muted-foreground">Average</p>
+            </div>
           </div>
         ))}
       </div>
@@ -116,6 +124,7 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             fill="url(#trafficPageviews)"
             strokeWidth={hoveredMetric === 'pageviews' ? 3 : 2}
             isAnimationActive={true}
+            animationDuration={600}
           />
           <Area
             type="monotone"
@@ -124,6 +133,7 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             fill="url(#trafficVisitors)"
             strokeWidth={hoveredMetric === 'visitors' ? 3 : 2}
             isAnimationActive={true}
+            animationDuration={600}
           />
           <Area
             type="monotone"
@@ -132,6 +142,7 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             fill="transparent"
             strokeWidth={hoveredMetric === 'sessions' ? 3 : 2}
             isAnimationActive={true}
+            animationDuration={600}
           />
         </AreaChart>
       </ChartContainer>
@@ -185,13 +196,17 @@ export function EnhancedRankedBarChart({
     <div className="space-y-4">
       {/* Stats */}
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total</p>
-          <p className="mt-1 text-xl font-bold text-foreground">{total.toLocaleString()}</p>
+        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-3 transition-all duration-300 hover:bg-gradient-to-br hover:from-muted/70 hover:to-muted/40 hover:shadow-lg hover:shadow-foreground/10">
+          <div className="relative z-10">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total</p>
+            <p className="mt-1 text-xl font-bold text-foreground transition-transform duration-300 group-hover:scale-105">{total.toLocaleString()}</p>
+          </div>
         </div>
-        <div className="rounded-lg border border-border/50 bg-muted/30 p-3">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Average</p>
-          <p className="mt-1 text-xl font-bold text-foreground">{average.toLocaleString()}</p>
+        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-3 transition-all duration-300 hover:bg-gradient-to-br hover:from-muted/70 hover:to-muted/40 hover:shadow-lg hover:shadow-foreground/10">
+          <div className="relative z-10">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Average</p>
+            <p className="mt-1 text-xl font-bold text-foreground transition-transform duration-300 group-hover:scale-105">{average.toLocaleString()}</p>
+          </div>
         </div>
       </div>
 
@@ -274,12 +289,12 @@ export function EnhancedDonutBreakdown({
               key={entry.name}
               onClick={() => setActiveIndex(activeIndex === index ? null : index)}
               className={cn(
-                'rounded-lg border border-border/50 bg-muted/30 p-2 text-left transition-all hover:bg-muted/60',
-                activeIndex === index && 'border-foreground/30 bg-muted/60'
+                'group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-2 text-left transition-all duration-300 hover:bg-gradient-to-br hover:from-muted/70 hover:to-muted/40 hover:shadow-md',
+                activeIndex === index && 'border-foreground/40 bg-gradient-to-br from-muted/70 to-muted/40 shadow-lg shadow-foreground/10'
               )}
             >
-              <div className="flex items-center gap-2">
-                <div className="size-3 rounded-full" style={{ backgroundColor: entry.fill }} />
+              <div className="relative z-10 flex items-center gap-2">
+                <div className="size-3 rounded-full transition-transform duration-300 group-hover:scale-125" style={{ backgroundColor: entry.fill }} />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-medium">{entry.name}</p>
                   <p className="text-xs text-muted-foreground">{entry.value.toLocaleString()} ({percentage}%)</p>
