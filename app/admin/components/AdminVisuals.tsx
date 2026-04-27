@@ -71,8 +71,8 @@ export function CyberPanel({
   children: React.ReactNode;
 }) {
   return (
-    <Card className={cn('overflow-hidden border-border/80 bg-card/80 shadow-sm', className)}>
-      <CardHeader className="border-b border-border/70 bg-muted/20 p-4">
+    <Card className={cn('overflow-hidden border border-border/60 bg-card/80 shadow-sm', className)}>
+      <CardHeader className="border-b border-border/60 bg-muted/20 p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
             {Icon ? (
@@ -88,7 +88,7 @@ export function CyberPanel({
           {headerAction}
         </div>
       </CardHeader>
-      <CardContent className="p-4">{children}</CardContent>
+      <CardContent className="p-5">{children}</CardContent>
     </Card>
   );
 }
@@ -115,7 +115,7 @@ export function SignalCard({
   } as const;
 
   return (
-    <div className="rounded-lg border border-border/80 bg-background/55 p-4 shadow-sm">
+    <div className="rounded-lg border border-border/60 bg-background/55 p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-2">
           <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">{label}</p>

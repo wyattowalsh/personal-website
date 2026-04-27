@@ -55,6 +55,9 @@ import {
   StatusPill,
 } from './components/AdminVisuals';
 import { MetricCard } from './components/MetricCard';
+import { AnimatedContainer } from './components/AnimatedContainer';
+import { ChartInteraction } from './components/ChartInteraction';
+import { StatPulse } from './components/StatPulse';
 import type { AnalyticsMetric, AnalyticsRow, VisitorAnalyticsSnapshot } from './lib/visitor-analytics';
 
 export const metadata: Metadata = {
@@ -105,9 +108,11 @@ function AnalyticsWindowSelector({ activeWindow }: { activeWindow: number }) {
 function MetricGrid({
   metrics,
   icons,
+  animated = false,
 }: {
   metrics: AnalyticsMetric[];
   icons?: readonly LucideIcon[];
+  animated?: boolean;
 }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -115,14 +120,19 @@ function MetricGrid({
         const Icon = icons?.[index] ?? BarChart3;
         const variants = ['accent', 'success', 'warning', 'default'] as const;
         return (
-          <MetricCard
+          <AnimatedContainer
             key={metric.label}
-            label={metric.label}
-            value={metric.value}
-            description={metric.description}
-            icon={Icon}
-            variant={variants[index % variants.length]}
-          />
+            delay={animated ? index * 100 : 0}
+            animation="fade-slide"
+          >
+            <MetricCard
+              label={metric.label}
+              value={metric.value}
+              description={metric.description}
+              icon={Icon}
+              variant={variants[index % variants.length]}
+            />
+          </AnimatedContainer>
         );
       })}
     </div>
@@ -134,20 +144,26 @@ function DataList({
   rows,
   emptyLabel,
   icon: Icon,
+  animated = false,
 }: {
   title: string;
   rows: AnalyticsRow[];
   emptyLabel: string;
   icon: LucideIcon;
+  animated?: boolean;
 }) {
   return (
-    <CyberPanel title={title} icon={Icon}>
+    <AnimatedContainer animation="fade-slide" delay={animated ? 100 : 0}>
+      <CyberPanel title={title} icon={Icon}>
         {rows.length === 0 ? (
           <EmptyState label={emptyLabel} />
         ) : (
           <div className="space-y-3">
             {rows.map((row) => (
-              <div key={`${title}-${row.label}-${row.detail ?? ''}`} className="flex items-start justify-between gap-4">
+              <div
+                key={`${title}-${row.label}-${row.detail ?? ''}`}
+                className="flex items-start justify-between gap-4 rounded-md border border-border/40 bg-muted/20 p-3 transition-colors hover:border-border/60 hover:bg-muted/30"
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium">{row.label}</p>
                   {row.detail && <p className="text-xs text-muted-foreground text-pretty">{row.detail}</p>}
@@ -157,74 +173,84 @@ function DataList({
             ))}
           </div>
         )}
-    </CyberPanel>
+      </CyberPanel>
+    </AnimatedContainer>
   );
 }
 
-function ProviderCard({ provider }: { provider: AdminProviderSnapshot }) {
+function ProviderCard({ provider, animated = false }: { provider: AdminProviderSnapshot; animated?: boolean }) {
   const isExternalSource = provider.sourceUrl.startsWith('http');
 
   return (
-    <Card className="overflow-hidden border-border/80 bg-card/80">
-      <CardHeader className="space-y-3 border-b border-border/70 bg-muted/20 p-4">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="space-y-1">
-            <CardTitle className="text-base">{provider.title}</CardTitle>
-            <p className="text-xs text-muted-foreground text-pretty">{provider.freeTier}</p>
-          </div>
-          <StatusPill status={provider.status} />
-        </div>
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">Updated {formatGeneratedAt(provider.lastCheckedAt)}</Badge>
-          {isExternalSource && <SourceLink href={provider.sourceUrl} />}
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-5">
-        {provider.error && (
-          <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
-            {provider.error}
-          </div>
-        )}
-
-        {provider.missingEnv.length > 0 && (
-          <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-3">
-            <div className="flex flex-wrap gap-2">
-              {provider.missingEnv.map((name) => (
-                <Badge key={name} variant="outline" className="font-mono">
-                  {name}
-                </Badge>
-              ))}
+    <AnimatedContainer animation="fade-slide" delay={animated ? 150 : 0}>
+      <Card className="overflow-hidden border-border/80 bg-card/80 transition-all hover:shadow-md hover:border-border">
+        <CardHeader className="space-y-3 border-b border-border/70 bg-muted/20 p-4">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1 flex-1">
+              <div className="flex items-center gap-2">
+                <CardTitle className="text-base">{provider.title}</CardTitle>
+                {provider.status === 'configured' && (
+                  <StatPulse value="●" label="Live" trend="up" />
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground text-pretty">{provider.freeTier}</p>
             </div>
-            {provider.setupSteps.length > 0 && (
-              <div className="rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground">
-                {provider.setupSteps.map((step) => (
-                  <p key={step}>{step}</p>
+            <StatusPill status={provider.status} />
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">Updated {formatGeneratedAt(provider.lastCheckedAt)}</Badge>
+            {isExternalSource && <SourceLink href={provider.sourceUrl} />}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5 p-4">
+          {provider.error && (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+              {provider.error}
+            </div>
+          )}
+
+          {provider.missingEnv.length > 0 && (
+            <div className="space-y-3 rounded-lg border border-border bg-muted/20 p-3">
+              <div className="flex flex-wrap gap-2">
+                {provider.missingEnv.map((name) => (
+                  <Badge key={name} variant="outline" className="font-mono">
+                    {name}
+                  </Badge>
                 ))}
               </div>
-            )}
-          </div>
-        )}
+              {provider.setupSteps.length > 0 && (
+                <div className="rounded-md border border-border bg-background p-3 font-mono text-xs text-foreground">
+                  {provider.setupSteps.map((step) => (
+                    <p key={step}>{step}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-        {provider.id === 'pagespeed-crux' && provider.cards.length > 0 ? (
-          <EnhancedScoreRadials metrics={provider.cards} />
-        ) : provider.cards.length > 0 ? (
-          <MetricGrid metrics={provider.cards} />
-        ) : null}
+          {provider.id === 'pagespeed-crux' && provider.cards.length > 0 ? (
+            <ChartInteraction title={`${provider.title} Metrics`}>
+              <EnhancedScoreRadials metrics={provider.cards} />
+            </ChartInteraction>
+          ) : provider.cards.length > 0 ? (
+            <MetricGrid metrics={provider.cards} animated />
+          ) : null}
 
-        {provider.id === 'vercel' || provider.id === 'github' || provider.id === 'uptimerobot' ? (
-          <CyberPanel title={`${provider.title} Timeline`} icon={Activity}>
-            <StatusTimeline rows={provider.rows} />
-          </CyberPanel>
-        ) : (
-          <DataList
-            title={`${provider.title} Details`}
-            rows={provider.rows}
-            emptyLabel={provider.status === 'missing_config' ? 'Add the missing free-service env vars to activate this panel.' : 'No rows returned.'}
-            icon={Activity}
-          />
-        )}
-      </CardContent>
-    </Card>
+          {provider.id === 'vercel' || provider.id === 'github' || provider.id === 'uptimerobot' ? (
+            <CyberPanel title={`${provider.title} Timeline`} icon={Activity}>
+              <StatusTimeline rows={provider.rows} />
+            </CyberPanel>
+          ) : (
+            <DataList
+              title={`${provider.title} Details`}
+              rows={provider.rows}
+              emptyLabel={provider.status === 'missing_config' ? 'Add the missing free-service env vars to activate this panel.' : 'No rows returned.'}
+              icon={Activity}
+            />
+          )}
+        </CardContent>
+      </Card>
+    </AnimatedContainer>
   );
 }
 
@@ -232,7 +258,7 @@ function VisitorsSection({ analytics }: { analytics: VisitorAnalyticsSnapshot })
   const isRollup = analytics.source === 'turso_rollup';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {analytics.status === 'missing_config' && (
         <ProviderCard
           provider={{
@@ -263,56 +289,82 @@ function VisitorsSection({ analytics }: { analytics: VisitorAnalyticsSnapshot })
         </Card>
       )}
 
-      <MetricGrid metrics={analytics.overview} icons={visitorMetricIcons} />
+      <AnimatedContainer animation="fade-slide" delay={0}>
+        <MetricGrid metrics={analytics.overview} icons={visitorMetricIcons} animated />
+      </AnimatedContainer>
 
       {analytics.rollup && (
-        <CyberPanel
-          title="Rollup Store"
-          description={analytics.rollup.status === 'configured'
-            ? 'Daily SQLite snapshots power longer visitor windows.'
-            : 'Longer visitor windows need Turso rollup storage.'}
-          icon={CircleDot}
-        >
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <SignalCard label="Source" value={analytics.source === 'turso_rollup' ? 'Turso' : 'PostHog'} description="Active data path" icon={Radar} tone="blue" />
-            <SignalCard label="Covered Days" value={analytics.rollup.coveredDays} description="Persisted daily rows" icon={BarChart3} tone="emerald" />
-            <SignalCard label="Latest Day" value={analytics.rollup.latestDay ?? 'n/a'} description="Newest rollup snapshot" icon={Activity} tone="violet" />
-            <SignalCard label="Last Run" value={analytics.rollup.lastRunStatus ?? analytics.rollup.status} description={analytics.rollup.lastRunAt ?? 'No recorded run'} icon={ShieldCheck} tone={analytics.rollup.status === 'error' ? 'rose' : analytics.rollup.status === 'missing_config' ? 'amber' : 'emerald'} />
-          </div>
-        </CyberPanel>
+        <AnimatedContainer animation="fade-slide" delay={200}>
+          <CyberPanel
+            title="Rollup Store"
+            description={analytics.rollup.status === 'configured'
+              ? 'Daily SQLite snapshots power longer visitor windows.'
+              : 'Longer visitor windows need Turso rollup storage.'}
+            icon={CircleDot}
+          >
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+              <SignalCard label="Source" value={analytics.source === 'turso_rollup' ? 'Turso' : 'PostHog'} description="Active data path" icon={Radar} tone="blue" />
+              <SignalCard label="Covered Days" value={analytics.rollup.coveredDays} description="Persisted daily rows" icon={BarChart3} tone="emerald" />
+              <SignalCard label="Latest Day" value={analytics.rollup.latestDay ?? 'n/a'} description="Newest rollup snapshot" icon={Activity} tone="violet" />
+              <SignalCard label="Last Run" value={analytics.rollup.lastRunStatus ?? analytics.rollup.status} description={analytics.rollup.lastRunAt ?? 'No recorded run'} icon={ShieldCheck} tone={analytics.rollup.status === 'error' ? 'rose' : analytics.rollup.status === 'missing_config' ? 'amber' : 'emerald'} />
+            </div>
+          </CyberPanel>
+        </AnimatedContainer>
       )}
 
-      <div className="grid gap-4 xl:grid-cols-[1.45fr_0.9fr]">
-        <CyberPanel title="Traffic Pulse" description="Daily PostHog pageviews, visitors, and sessions." icon={Activity}>
-          <EnhancedTrafficAreaChart data={analytics.trafficSeries} />
-        </CyberPanel>
-        <CyberPanel title="Event Mix" description="Tracked events across the current visitor window." icon={Radar}>
-          <EnhancedRankedBarChart rows={analytics.eventMix} emptyLabel="No events have been captured yet." />
-        </CyberPanel>
-      </div>
+      <div className="space-y-6">
+        <div className="grid gap-4 xl:grid-cols-[1.45fr_0.9fr]">
+          <AnimatedContainer animation="fade-slide" delay={300}>
+            <CyberPanel title="Traffic Pulse" description="Daily PostHog pageviews, visitors, and sessions." icon={Activity}>
+              <ChartInteraction title="Traffic Trends">
+                <EnhancedTrafficAreaChart data={analytics.trafficSeries} />
+              </ChartInteraction>
+            </CyberPanel>
+          </AnimatedContainer>
+          <AnimatedContainer animation="fade-slide" delay={350}>
+            <CyberPanel title="Event Mix" description="Tracked events across the current visitor window." icon={Radar}>
+              <ChartInteraction title="Event Distribution">
+                <EnhancedRankedBarChart rows={analytics.eventMix} emptyLabel="No events have been captured yet." />
+              </ChartInteraction>
+            </CyberPanel>
+          </AnimatedContainer>
+        </div>
 
-      <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
-        <CyberPanel title="Top Pages" description="Pageview leaders with unique visitor context." icon={BarChart3}>
-          <EnhancedRankedBarChart rows={analytics.topPages} emptyLabel="No pageviews have been captured yet." />
-        </CyberPanel>
-        <CyberPanel title="Device Split" description="Device categories from captured page views." icon={Eye}>
-          <EnhancedDonutBreakdown rows={analytics.devices} emptyLabel="No device categories have been captured yet." centerLabel="Views" />
-        </CyberPanel>
-      </div>
+        <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+          <AnimatedContainer animation="fade-slide" delay={400}>
+            <CyberPanel title="Top Pages" description="Pageview leaders with unique visitor context." icon={BarChart3}>
+              <ChartInteraction title="Page Performance">
+                <EnhancedRankedBarChart rows={analytics.topPages} emptyLabel="No pageviews have been captured yet." />
+              </ChartInteraction>
+            </CyberPanel>
+          </AnimatedContainer>
+          <AnimatedContainer animation="fade-slide" delay={450}>
+            <CyberPanel title="Device Split" description="Device categories from captured page views." icon={Eye}>
+              <ChartInteraction title="Device Breakdown">
+                <EnhancedDonutBreakdown rows={analytics.devices} emptyLabel="No device categories have been captured yet." centerLabel="Views" />
+              </ChartInteraction>
+            </CyberPanel>
+          </AnimatedContainer>
+        </div>
 
-      <CyberPanel title="Engagement Matrix" description="Top pages crossed with interaction event families." icon={MousePointerClick}>
-        <EngagementMatrix rows={analytics.pageEngagement} />
-      </CyberPanel>
+        <AnimatedContainer animation="fade-slide" delay={500}>
+          <CyberPanel title="Engagement Matrix" description="Top pages crossed with interaction event families." icon={MousePointerClick}>
+            <ChartInteraction title="Engagement Overview">
+              <EngagementMatrix rows={analytics.pageEngagement} />
+            </ChartInteraction>
+          </CyberPanel>
+        </AnimatedContainer>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        <DataList title="Referrers" rows={analytics.referrers} emptyLabel="No referrer data is available yet." icon={ExternalLink} />
-        <DataList title="Interactions" rows={analytics.interactions} emptyLabel="No interaction events have been captured yet." icon={MousePointerClick} />
-      </div>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <DataList title="Referrers" rows={analytics.referrers} emptyLabel="No referrer data is available yet." icon={ExternalLink} animated />
+          <DataList title="Interactions" rows={analytics.interactions} emptyLabel="No interaction events have been captured yet." icon={MousePointerClick} animated />
+        </div>
 
-      <div className="grid gap-4 xl:grid-cols-3">
-        <DataList title="Searches" rows={analytics.searches} emptyLabel="No site searches have been captured yet." icon={Search} />
-        <DataList title="Outbound Links" rows={analytics.outboundLinks} emptyLabel="No outbound link clicks have been captured yet." icon={ExternalLink} />
-        <DataList title="Reading Progress" rows={analytics.readingProgress} emptyLabel="No reading-progress milestones have been captured yet." icon={BarChart3} />
+        <div className="grid gap-4 xl:grid-cols-3">
+          <DataList title="Searches" rows={analytics.searches} emptyLabel="No site searches have been captured yet." icon={Search} animated />
+          <DataList title="Outbound Links" rows={analytics.outboundLinks} emptyLabel="No outbound link clicks have been captured yet." icon={ExternalLink} animated />
+          <DataList title="Reading Progress" rows={analytics.readingProgress} emptyLabel="No reading-progress milestones have been captured yet." icon={BarChart3} animated />
+        </div>
       </div>
     </div>
   );
@@ -321,8 +373,8 @@ function VisitorsSection({ analytics }: { analytics: VisitorAnalyticsSnapshot })
 function ProviderSection({ providers }: { providers: AdminProviderSnapshot[] }) {
   return (
     <div className="space-y-6">
-      {providers.map((provider) => (
-        <ProviderCard key={provider.id} provider={provider} />
+      {providers.map((provider, index) => (
+        <ProviderCard key={provider.id} provider={provider} animated={index > 0} />
       ))}
     </div>
   );
@@ -571,49 +623,57 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
 
   return (
     <AdminSurface>
-      <div className="space-y-8">
-        <AdminHero
-          eyebrow="Free admin intelligence"
-          title="Admin Intelligence"
-          description="Visitor behavior, search growth, performance, deploy health, uptime, and content quality from free services and local checks."
-          meta={(
-            <>
-              <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">Last {dashboard.visitors.windowDays} visitor days</Badge>
-              <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{dashboard.visitors.source === 'turso_rollup' ? 'Rollup store' : 'Live PostHog'}</Badge>
-              <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{configuredCount} live</Badge>
-              {needsSetupCount > 0 && <Badge variant="secondary">{needsSetupCount} setup</Badge>}
-              {errorCount > 0 && <Badge variant="destructive">{errorCount} errors</Badge>}
-            </>
-          )}
-        >
-          <div className="space-y-3">
-            <AnalyticsWindowSelector activeWindow={dashboard.visitors.windowDays} />
-            <div className="rounded-lg border border-border/80 bg-background/55 px-4 py-3">
-              <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Updated</p>
-              <p className="mt-1 text-sm font-medium">{formatGeneratedAt(dashboard.generatedAt)}</p>
+      <div className="space-y-10">
+        <AnimatedContainer animation="fade-slide" delay={0}>
+          <AdminHero
+            eyebrow="Free admin intelligence"
+            title="Admin Intelligence"
+            description="Visitor behavior, search growth, performance, deploy health, uptime, and content quality from free services and local checks."
+            meta={(
+              <>
+                <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">Last {dashboard.visitors.windowDays} visitor days</Badge>
+                <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{dashboard.visitors.source === 'turso_rollup' ? 'Rollup store' : 'Live PostHog'}</Badge>
+                <Badge variant="outline" className="font-mono uppercase tracking-[0.12em]">{configuredCount} live</Badge>
+                {needsSetupCount > 0 && <Badge variant="secondary">{needsSetupCount} setup</Badge>}
+                {errorCount > 0 && <Badge variant="destructive">{errorCount} errors</Badge>}
+              </>
+            )}
+          >
+            <div className="space-y-3">
+              <AnalyticsWindowSelector activeWindow={dashboard.visitors.windowDays} />
+              <div className="rounded-lg border border-border/80 bg-background/55 px-4 py-3">
+                <p className="font-mono text-[0.65rem] uppercase tracking-[0.18em] text-muted-foreground">Updated</p>
+                <p className="mt-1 text-sm font-medium">{formatGeneratedAt(dashboard.generatedAt)}</p>
+              </div>
             </div>
+          </AdminHero>
+        </AnimatedContainer>
+
+        <AnimatedContainer animation="fade-slide" delay={100}>
+          <ProviderSignalStrip providers={providers} />
+        </AnimatedContainer>
+
+        <AnimatedContainer animation="fade-slide" delay={150}>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <SignalCard label="Provider mesh" value={`${configuredCount}/${providers.length}`} description="Live integrations" icon={CircleDot} tone="emerald" />
+            <SignalCard label="Visitor window" value={`${dashboard.visitors.windowDays}d`} description={dashboard.visitors.source === 'turso_rollup' ? 'Persisted rollup range' : 'PostHog query range'} icon={UsersRound} tone="blue" />
+            <SignalCard label="Signals" value={dashboard.signals.length} description="Ranked recommendations and guardrails" icon={Sparkles} tone="violet" />
+            <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
           </div>
-        </AdminHero>
-
-        <ProviderSignalStrip providers={providers} />
-
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <SignalCard label="Provider mesh" value={`${configuredCount}/${providers.length}`} description="Live integrations" icon={CircleDot} tone="emerald" />
-          <SignalCard label="Visitor window" value={`${dashboard.visitors.windowDays}d`} description={dashboard.visitors.source === 'turso_rollup' ? 'Persisted rollup range' : 'PostHog query range'} icon={UsersRound} tone="blue" />
-          <SignalCard label="Signals" value={dashboard.signals.length} description="Ranked recommendations and guardrails" icon={Sparkles} tone="violet" />
-          <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
-        </div>
+        </AnimatedContainer>
 
         <Tabs defaultValue="visitors" className="space-y-6">
-        <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-lg border border-border/80 bg-card/75 p-1">
-          <TabsTrigger value="visitors" className="gap-2"><UsersRound className="size-4" />Visitors</TabsTrigger>
-          <TabsTrigger value="signals" className="gap-2"><Sparkles className="size-4" />Signals</TabsTrigger>
-          <TabsTrigger value="growth" className="gap-2"><Search className="size-4" />Growth</TabsTrigger>
-          <TabsTrigger value="performance" className="gap-2"><Gauge className="size-4" />Performance</TabsTrigger>
-          <TabsTrigger value="operations" className="gap-2"><Siren className="size-4" />Operations</TabsTrigger>
-          <TabsTrigger value="content" className="gap-2"><ShieldCheck className="size-4" />Content</TabsTrigger>
-          <TabsTrigger value="setup" className="gap-2"><Settings2 className="size-4" />Setup</TabsTrigger>
-        </TabsList>
+        <AnimatedContainer animation="fade-slide" delay={200}>
+          <TabsList className="flex h-auto w-full flex-wrap justify-start gap-1 rounded-lg border border-border/80 bg-card/75 p-1">
+            <TabsTrigger value="visitors" className="gap-2"><UsersRound className="size-4" />Visitors</TabsTrigger>
+            <TabsTrigger value="signals" className="gap-2"><Sparkles className="size-4" />Signals</TabsTrigger>
+            <TabsTrigger value="growth" className="gap-2"><Search className="size-4" />Growth</TabsTrigger>
+            <TabsTrigger value="performance" className="gap-2"><Gauge className="size-4" />Performance</TabsTrigger>
+            <TabsTrigger value="operations" className="gap-2"><Siren className="size-4" />Operations</TabsTrigger>
+            <TabsTrigger value="content" className="gap-2"><ShieldCheck className="size-4" />Content</TabsTrigger>
+            <TabsTrigger value="setup" className="gap-2"><Settings2 className="size-4" />Setup</TabsTrigger>
+          </TabsList>
+        </AnimatedContainer>
 
         <TabsContent value="visitors">
           <VisitorsSection analytics={dashboard.visitors} />
@@ -636,7 +696,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </TabsContent>
 
         <TabsContent value="content">
-          <ProviderCard provider={dashboard.contentHealth} />
+          <ProviderCard provider={dashboard.contentHealth} animated />
         </TabsContent>
 
         <TabsContent value="setup">
@@ -644,11 +704,14 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </TabsContent>
       </Tabs>
 
-      <Separator />
-
-      <p className="text-xs text-muted-foreground text-pretty">
-        Secrets stay server-only. Panels either read anonymous aggregate data, free provider APIs, or local repository content; missing optional services render setup steps instead of blocking the dashboard.
-      </p>
+      <AnimatedContainer animation="fade-slide" delay={300}>
+        <div className="space-y-4">
+          <Separator />
+          <p className="text-xs text-muted-foreground text-pretty">
+            Secrets stay server-only. Panels either read anonymous aggregate data, free provider APIs, or local repository content; missing optional services render setup steps instead of blocking the dashboard.
+          </p>
+        </div>
+      </AnimatedContainer>
       </div>
     </AdminSurface>
   );

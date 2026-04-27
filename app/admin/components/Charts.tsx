@@ -79,8 +79,8 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             onMouseEnter={() => setHoveredMetric(key)}
             onMouseLeave={() => setHoveredMetric(null)}
             className={cn(
-              'group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-3 transition-all duration-300 cursor-pointer',
-              hoveredMetric === key && 'border-foreground/40 bg-gradient-to-br from-muted/70 to-muted/40 shadow-lg shadow-foreground/10'
+              'group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-4 transition-all duration-300 cursor-pointer',
+              hoveredMetric === key && 'border-border/80 bg-gradient-to-br from-muted/60 to-muted/30 shadow-md shadow-foreground/10'
             )}
           >
             {/* Animated gradient overlay */}
@@ -196,13 +196,13 @@ export function EnhancedRankedBarChart({
     <div className="space-y-4">
       {/* Stats */}
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-3 transition-all duration-300 hover:bg-gradient-to-br hover:from-muted/70 hover:to-muted/40 hover:shadow-lg hover:shadow-foreground/10">
+        <div className="group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-4 transition-all duration-300 hover:border-border/80 hover:bg-gradient-to-br hover:from-muted/60 hover:to-muted/30 hover:shadow-md hover:shadow-foreground/10">
           <div className="relative z-10">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Total</p>
             <p className="mt-1 text-xl font-bold text-foreground transition-transform duration-300 group-hover:scale-105">{total.toLocaleString()}</p>
           </div>
         </div>
-        <div className="group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-3 transition-all duration-300 hover:bg-gradient-to-br hover:from-muted/70 hover:to-muted/40 hover:shadow-lg hover:shadow-foreground/10">
+        <div className="group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-4 transition-all duration-300 hover:border-border/80 hover:bg-gradient-to-br hover:from-muted/60 hover:to-muted/30 hover:shadow-md hover:shadow-foreground/10">
           <div className="relative z-10">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Average</p>
             <p className="mt-1 text-xl font-bold text-foreground transition-transform duration-300 group-hover:scale-105">{average.toLocaleString()}</p>
@@ -289,8 +289,8 @@ export function EnhancedDonutBreakdown({
               key={entry.name}
               onClick={() => setActiveIndex(activeIndex === index ? null : index)}
               className={cn(
-                'group relative overflow-hidden rounded-lg border bg-gradient-to-br from-muted/40 to-muted/20 p-2 text-left transition-all duration-300 hover:bg-gradient-to-br hover:from-muted/70 hover:to-muted/40 hover:shadow-md',
-                activeIndex === index && 'border-foreground/40 bg-gradient-to-br from-muted/70 to-muted/40 shadow-lg shadow-foreground/10'
+                'group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-3 text-left transition-all duration-300 hover:border-border/80 hover:bg-gradient-to-br hover:from-muted/60 hover:to-muted/30 hover:shadow-md',
+                activeIndex === index && 'border-border/80 bg-gradient-to-br from-muted/60 to-muted/30 shadow-md shadow-foreground/10'
               )}
             >
               <div className="relative z-10 flex items-center gap-2">

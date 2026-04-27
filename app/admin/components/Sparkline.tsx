@@ -8,9 +8,10 @@ interface SparklineProps {
   color?: string;
   height?: number;
   className?: string;
+  animated?: boolean;
 }
 
-export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, className }: SparklineProps) {
+export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, className, animated = true }: SparklineProps) {
   const chartData = useMemo(() => data.map((value, index) => ({ index, value })), [data]);
 
   if (data.length < 2) {
@@ -36,7 +37,9 @@ export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, cl
             stroke={color}
             strokeWidth={1.5}
             dot={false}
-            isAnimationActive={true}
+            isAnimationActive={animated}
+            animationDuration={800}
+            animationEasing="ease-in-out"
           />
         </LineChart>
       </ResponsiveContainer>

@@ -12,7 +12,7 @@ interface QuickStatProps {
 
 export function QuickStat({ label, value, icon }: QuickStatProps) {
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-muted/40 border border-border/30 backdrop-blur-sm">
+    <div className="flex items-center gap-3 px-5 py-3 rounded-lg bg-muted/40 border border-border/60 backdrop-blur-sm">
       {icon && <div className="text-muted-foreground">{icon}</div>}
       <div className="min-w-0">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
@@ -75,8 +75,8 @@ export function DashboardHeader({
             onClick={onRefresh}
             disabled={isLoading}
             className={cn(
-              'flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors',
-              'border border-border/50 hover:border-border/100 hover:bg-muted/60',
+              'flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium transition-colors',
+              'border border-border/60 hover:border-border/80 hover:bg-muted/60 hover:shadow-sm',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >

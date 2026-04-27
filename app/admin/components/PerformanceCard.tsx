@@ -44,7 +44,7 @@ export function PerformanceCard({
   description,
 }: PerformanceCardProps) {
   return (
-    <div className="rounded-lg border border-border/50 bg-card/40 p-5 backdrop-blur-sm">
+    <div className="rounded-lg border border-border/60 bg-card/40 p-5 backdrop-blur-sm">
       <div className="space-y-1 mb-5">
         <h3 className="font-semibold text-foreground">{title}</h3>
         {description && <p className="text-xs text-muted-foreground">{description}</p>}

@@ -48,7 +48,7 @@ export function PostCard({
   return (
     <Card
       className={cn(
-        'border-border/80 bg-card/80 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200',
+        'border-border/60 bg-card/80 hover:-translate-y-0.5 hover:shadow-md hover:shadow-foreground/10 transition-all duration-300',
       )}
     >
       <CardContent className="space-y-3 p-5">
