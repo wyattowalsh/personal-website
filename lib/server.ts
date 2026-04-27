@@ -2,6 +2,7 @@ import 'server-only';
 import Fuse from 'fuse.js';
 import type { FuseResult, FuseResultMatch } from 'fuse.js';
 import matter from 'gray-matter';
+import { dump, load } from 'js-yaml';
 import path from 'path';
 import fs from 'fs/promises';
 import { glob } from 'glob';
@@ -24,6 +25,11 @@ import {
 } from './constants';
 
 const FRONTMATTER_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+const YAML_ENGINE = {
+  parse: load,
+  stringify: dump,
+};
 
 function isValidFrontmatterDate(value: string): boolean {
   if (!FRONTMATTER_DATE_PATTERN.test(value)) {
@@ -330,7 +336,11 @@ class BackendService {
           logger.info(`Processing ${formatters.path(filePath)}`);
 
           const content = await fs.readFile(filePath, 'utf-8');
-          const { data, content: markdown } = matter(content);
+          const { data, content: markdown } = matter(content, {
+            engines: {
+              yaml: YAML_ENGINE,
+            },
+          });
           const slug = path.basename(path.dirname(relativePath));
 
           const validated = frontmatterSchema.parse(data);
