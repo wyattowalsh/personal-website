@@ -11,7 +11,7 @@ import { InsightCard } from '../components/InsightCard';
 import { AnimatedContainer } from '../components/AnimatedContainer';
 import { ChartInteraction } from '../components/ChartInteraction';
 import { StatPulse } from '../components/StatPulse';
-import { BookOpen, Clock, FileText, Hash, TrendingUp } from 'lucide-react';
+import { FileText, TrendingUp } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Blog Analytics',
@@ -156,9 +156,9 @@ export default async function BlogStatsPage() {
             title="Blog Analytics"
             description="Publishing cadence, topic distribution, reading depth, and content inventory health."
             stats={[
-              { label: 'Total Posts', value: posts.length, icon: <FileText className="size-4" /> },
-              { label: 'Total Words', value: totalWords.toLocaleString(), icon: <BookOpen className="size-4" /> },
-              { label: 'Avg Words/Post', value: avgWordCount.toLocaleString(), icon: <TrendingUp className="size-4" /> },
+              { label: 'Total Posts', value: posts.length, iconName: 'file-text' },
+              { label: 'Total Words', value: totalWords.toLocaleString(), iconName: 'book-open' },
+              { label: 'Avg Words/Post', value: avgWordCount.toLocaleString(), iconName: 'trending-up' },
             ]}
           />
         </AnimatedContainer>
@@ -170,7 +170,7 @@ export default async function BlogStatsPage() {
               label="Total Posts"
               value={posts.length}
               description="Published MDX articles"
-              icon={FileText}
+              iconName="file-text"
               variant={getTotalPostsVariant()}
               trend={postsByYear.map(p => p.count)}
               change={postTrend !== 'neutral' ? { value: 15, isPositive: postTrend === 'up' } : undefined}
@@ -179,7 +179,7 @@ export default async function BlogStatsPage() {
               label="Unique Tags"
               value={tags.length}
               description="Topic categorization"
-              icon={Hash}
+              iconName="hash"
               variant={getTagsVariant()}
               trend={tagData.slice(0, 12).map(t => t.count)}
               change={tagTrend !== 'neutral' ? { value: 8, isPositive: tagTrend === 'up' } : undefined}
@@ -188,7 +188,7 @@ export default async function BlogStatsPage() {
               label="Avg Reading Time"
               value={`${avgReadingTime}m`}
               description="Estimated read duration"
-              icon={Clock}
+              iconName="clock"
               variant={getReadingTimeVariant()}
               change={readingTimeTrend !== 'neutral' ? { value: 12, isPositive: readingTimeTrend === 'up' } : undefined}
             />
@@ -196,7 +196,7 @@ export default async function BlogStatsPage() {
               label="Total Words"
               value={totalWords.toLocaleString()}
               description="Indexed article content"
-              icon={BookOpen}
+              iconName="book-open"
               variant={getWordCountVariant()}
               trend={wordTimeline.slice(-12).map(w => w.words)}
               change={wordCountTrend !== 'neutral' ? { value: 20, isPositive: wordCountTrend === 'up' } : undefined}

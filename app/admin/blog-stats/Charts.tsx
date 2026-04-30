@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { type ComponentProps, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Area,
   Bar,
@@ -18,6 +18,41 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart';
 import { CyberPanel } from '../components/AdminVisuals';
+
+type MeasuredChartContainerProps = ComponentProps<typeof ChartContainer>;
+
+function MeasuredChartContainer({ className, children, ...props }: MeasuredChartContainerProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const updateReadiness = () => {
+      const rect = element.getBoundingClientRect();
+      setIsReady(rect.width > 0 && rect.height > 0);
+    };
+
+    updateReadiness();
+    const resizeObserver = new ResizeObserver(updateReadiness);
+    resizeObserver.observe(element);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
+  return (
+    <div ref={ref} className={className}>
+      {isReady ? (
+        <ChartContainer {...props} className="h-full w-full">
+          {children}
+        </ChartContainer>
+      ) : (
+        <div className="h-full w-full rounded-lg border border-dashed border-border/50 bg-muted/10" aria-hidden="true" />
+      )}
+    </div>
+  );
+}
 
 interface EnhancedBlogChartsProps {
   postsByYear: Array<{ year: string; count: number }>;
@@ -84,7 +119,7 @@ function EnhancedVerticalBars({ data, labelKey, valueKey, showStats = true }: En
         </div>
       )}
 
-      <ChartContainer config={{ [valueKey]: { label: valueKey, color: 'hsl(var(--chart-1))' } }} className="h-64 w-full">
+      <MeasuredChartContainer config={{ [valueKey]: { label: valueKey, color: 'hsl(var(--chart-1))' } }} className="h-64 w-full">
         <BarChart data={data} margin={{ left: 4, right: 8, top: 8, bottom: 0 }}>
           <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="hsl(var(--border) / 0.2)" />
           <XAxis dataKey={labelKey} tickLine={false} axisLine={false} tickMargin={10} />
@@ -105,7 +140,7 @@ function EnhancedVerticalBars({ data, labelKey, valueKey, showStats = true }: En
             ))}
           </Bar>
         </BarChart>
-      </ChartContainer>
+      </MeasuredChartContainer>
     </div>
   );
 }
@@ -154,7 +189,7 @@ function EnhancedHorizontalBars({
         </div>
       )}
 
-      <ChartContainer config={{ [valueKey]: { label: valueKey, color: 'hsl(var(--chart-1))' } }} className="h-64 w-full">
+      <MeasuredChartContainer config={{ [valueKey]: { label: valueKey, color: 'hsl(var(--chart-1))' } }} className="h-64 w-full">
         <BarChart data={sliced} layout="vertical" margin={{ left: 8, right: 8, top: 8, bottom: 8 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.2)" horizontal={true} />
           <XAxis type="number" hide />
@@ -175,7 +210,7 @@ function EnhancedHorizontalBars({
             ))}
           </Bar>
         </BarChart>
-      </ChartContainer>
+      </MeasuredChartContainer>
     </div>
   );
 }
@@ -219,7 +254,7 @@ function EnhancedTimelineArea({ data }: EnhancedTimelineAreaProps) {
         </div>
       </div>
 
-      <ChartContainer config={{ words: { label: 'Words', color: 'hsl(var(--chart-2))' } }} className="h-72 w-full">
+      <MeasuredChartContainer config={{ words: { label: 'Words', color: 'hsl(var(--chart-2))' } }} className="h-72 w-full">
         <ComposedChart data={data} margin={{ left: 4, right: 8, top: 8, bottom: 0 }}>
           <defs>
             <linearGradient id="wordTimelineGradient" x1="0" y1="0" x2="0" y2="1">
@@ -254,7 +289,7 @@ function EnhancedTimelineArea({ data }: EnhancedTimelineAreaProps) {
             isAnimationActive={true}
           />
         </ComposedChart>
-      </ChartContainer>
+      </MeasuredChartContainer>
     </div>
   );
 }

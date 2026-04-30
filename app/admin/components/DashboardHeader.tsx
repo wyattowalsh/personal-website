@@ -1,19 +1,35 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { RefreshCw } from 'lucide-react';
+import { BookOpen, FileText, RefreshCw, TrendingUp } from 'lucide-react';
 import type { ReactNode } from 'react';
+
+type DashboardHeaderIconName = 'book-open' | 'file-text' | 'trending-up';
+
+const dashboardHeaderIconMap = {
+  'book-open': BookOpen,
+  'file-text': FileText,
+  'trending-up': TrendingUp,
+} satisfies Record<DashboardHeaderIconName, typeof BookOpen>;
 
 interface QuickStatProps {
   label: string;
   value: string | number;
   icon?: ReactNode;
+  iconName?: DashboardHeaderIconName;
 }
 
-export function QuickStat({ label, value, icon }: QuickStatProps) {
+export function QuickStat({ label, value, icon, iconName }: QuickStatProps) {
+  const NamedIcon = iconName ? dashboardHeaderIconMap[iconName] : undefined;
+
   return (
     <div className="flex items-center gap-3 px-5 py-3 rounded-lg bg-muted/40 border border-border/60 backdrop-blur-sm">
       {icon && <div className="text-muted-foreground">{icon}</div>}
+      {!icon && NamedIcon ? (
+        <div className="text-muted-foreground">
+          <NamedIcon className="size-4" />
+        </div>
+      ) : null}
       <div className="min-w-0">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">{label}</p>
         <p className="text-base font-semibold text-foreground tabular-nums">{value}</p>

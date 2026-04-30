@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo } from 'react';
-import { AreaChart, Area, ResponsiveContainer, YAxis } from 'recharts';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AreaChart, Area, YAxis } from 'recharts';
 
 interface SparklineProps {
   data: number[];
@@ -12,7 +12,26 @@ interface SparklineProps {
 }
 
 export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, className, animated = true }: SparklineProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const chartData = useMemo(() => data.map((value, index) => ({ index, value })), [data]);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const updateDimensions = () => {
+      const rect = element.getBoundingClientRect();
+      setDimensions(rect.width > 0 && rect.height > 0 ? { width: rect.width, height: rect.height } : null);
+    };
+
+    updateDimensions();
+
+    const observer = new ResizeObserver(updateDimensions);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, []);
 
   if (data.length < 2) {
     return <div className="h-6 w-full rounded-lg bg-muted/30 shimmer-skeleton" />;
@@ -23,9 +42,9 @@ export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, cl
   const range = maxValue - minValue || 1;
 
   return (
-    <div className={className} style={{ height }}>
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={chartData} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
+    <div ref={containerRef} className={className} style={{ height }}>
+      {dimensions && (
+        <AreaChart width={dimensions.width} height={dimensions.height} data={chartData} margin={{ top: 2, right: 2, bottom: 2, left: 2 }}>
           <defs>
             <linearGradient id={`sparkline-${color.replace(/[^a-z0-9]/gi, '')}`} x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor={color} stopOpacity={0.3} />
@@ -45,7 +64,7 @@ export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, cl
             animationEasing="ease-in-out"
           />
         </AreaChart>
-      </ResponsiveContainer>
+      )}
     </div>
   );
 }

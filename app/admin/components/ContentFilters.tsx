@@ -34,6 +34,7 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
   const [searchInput, setSearchInput] = useState(filters.search);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const latestFiltersRef = useRef(filters);
+  const syncedSearchRef = useRef(filters.search);
 
   useEffect(() => {
     latestFiltersRef.current = filters;
@@ -54,10 +55,11 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
 
   // Sync external filter reset back to local input
   useEffect(() => {
-    if (filters.search !== searchInput) {
+    if (filters.search !== syncedSearchRef.current) {
+      syncedSearchRef.current = filters.search;
       setSearchInput(filters.search); // eslint-disable-line react-hooks/set-state-in-effect -- sync from prop
     }
-  }, [filters.search, searchInput]);
+  }, [filters.search]);
 
   const isFiltered =
     filters.tag !== DEFAULT_FILTERS.tag ||

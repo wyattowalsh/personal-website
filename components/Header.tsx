@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export function Header() {
 	const pathname = usePathname();
 	const isTransparent = pathname === "/" || pathname === "/blog";
+	const isAdminRoute = pathname?.startsWith("/admin") ?? false;
 
 	return (
 		<header
@@ -19,7 +20,7 @@ export function Header() {
 					: "bg-background/80 backdrop-blur-md border-b border-border/40"
 			)}
 		>
-			<BlogBackLink />
+			{!isAdminRoute && <BlogBackLink />}
 			<div className="flex items-center space-x-4 ml-auto">
 				<DarkModeToggle />
 			</div>

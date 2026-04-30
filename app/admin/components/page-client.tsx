@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AnimatedContainer } from './AnimatedContainer';
 import { MetricCard } from './MetricCard';
-import { CyberPanel, SourceLink, StatusPill, EmptyState } from './AdminVisuals';
+import { CyberPanel, SourceLink, StatusPill, EmptyState, type AdminIconName } from './AdminVisuals';
 import { StatPulse } from './StatPulse';
 import { ChartInteraction } from './ChartInteraction';
 import { DynamicScoreRadials, DynamicStatusTimeline } from './DynamicCharts';
@@ -18,17 +18,19 @@ export function DataList({
   rows,
   emptyLabel,
   icon: Icon,
+  iconName,
   animated = false,
 }: {
   title: string;
   rows: AnalyticsRow[];
   emptyLabel: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  iconName?: AdminIconName;
   animated?: boolean;
 }) {
   return (
     <AnimatedContainer animation="fade-slide" delay={animated ? 100 : 0}>
-      <CyberPanel title={title} icon={Icon}>
+      <CyberPanel title={title} icon={Icon} iconName={iconName}>
         {rows.length === 0 ? (
           <EmptyState label={emptyLabel} />
         ) : (

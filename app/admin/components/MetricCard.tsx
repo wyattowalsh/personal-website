@@ -1,9 +1,22 @@
 'use client';
 
 import type { LucideIcon } from 'lucide-react';
-import { ArrowDown, ArrowUp } from 'lucide-react';
+import { Activity, ArrowDown, ArrowUp, BarChart3, BookOpen, Clock, FileText, Hash, Radar, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Sparkline } from './Sparkline';
+
+export type MetricIconName = 'activity' | 'bar-chart' | 'book-open' | 'clock' | 'file-text' | 'hash' | 'radar' | 'shield-check';
+
+const metricIconMap = {
+  activity: Activity,
+  'bar-chart': BarChart3,
+  'book-open': BookOpen,
+  clock: Clock,
+  'file-text': FileText,
+  hash: Hash,
+  radar: Radar,
+  'shield-check': ShieldCheck,
+} satisfies Record<MetricIconName, LucideIcon>;
 
 interface MetricCardProps {
   label: string;
@@ -14,6 +27,7 @@ interface MetricCardProps {
   };
   description?: string;
   icon?: LucideIcon;
+  iconName?: MetricIconName;
   trend?: number[];
   variant?: 'default' | 'accent' | 'success' | 'warning' | 'destructive';
   className?: string;
@@ -42,12 +56,14 @@ export function MetricCard({
   change,
   description,
   icon: Icon,
+  iconName,
   trend,
   variant = 'default',
   className,
   interactive = true,
 }: MetricCardProps) {
   const textColor = textVariants[variant];
+  const ResolvedIcon = Icon ?? (iconName ? metricIconMap[iconName] : undefined);
 
   return (
     <div
@@ -97,7 +113,7 @@ export function MetricCard({
             </div>
             {description && <p className="mt-1 text-xs text-muted-foreground">{description}</p>}
           </div>
-          {Icon && (
+          {ResolvedIcon && (
             <div
               className={cn(
                 'rounded-lg border p-2.5 transition-all duration-300 shadow-sm',
@@ -109,7 +125,7 @@ export function MetricCard({
                 interactive && 'group-hover/card:scale-110 group-hover/card:shadow-md'
               )}
             >
-              <Icon className={cn('size-4 transition-all duration-300 group-hover/card:scale-125', textColor)} />
+              <ResolvedIcon className={cn('size-4 transition-all duration-300 group-hover/card:scale-125', textColor)} />
             </div>
           )}
         </div>
@@ -137,4 +153,3 @@ export function MetricCard({
     </div>
   );
 }
-

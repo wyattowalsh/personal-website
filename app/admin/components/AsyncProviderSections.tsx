@@ -19,7 +19,6 @@ import {
 } from '../lib/analytics-constants';
 import { ProviderCard } from './page-client';
 import { ProviderSignalStrip, SignalCard } from './AdminVisuals';
-import { CircleDot, Eye, ShieldCheck, UsersRound } from 'lucide-react';
 import { AnimatedContainer } from './AnimatedContainer';
 
 export async function AsyncGrowthSection() {
@@ -112,10 +111,10 @@ export async function AsyncShellProviders({ visitorsWindowDays }: { visitorsWind
 
       <AnimatedContainer animation="fade-slide" delay={150}>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <SignalCard label="Provider mesh" value={`${configuredCount}/${providers.length}`} description="Live integrations" icon={CircleDot} tone="emerald" />
-          <SignalCard label="Visitor window" value={`${visitorsWindowDays}d`} description="PostHog query range" icon={UsersRound} tone="blue" />
-          <SignalCard label="Visitors" value="—" description="Unique anonymous browsers" icon={Eye} tone="violet" />
-          <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" icon={ShieldCheck} tone={errorCount > 0 ? 'rose' : 'emerald'} />
+          <SignalCard label="Provider mesh" value={`${configuredCount}/${providers.length}`} description="Live integrations" iconName="circle-dot" tone="emerald" />
+          <SignalCard label="Visitor window" value={`${visitorsWindowDays}d`} description="PostHog query range" iconName="users-round" tone="blue" />
+          <SignalCard label="Visitors" value="—" description="Unique anonymous browsers" iconName="eye" tone="violet" />
+          <SignalCard label="Errors" value={errorCount} description="Provider panels currently failing" iconName="shield-check" tone={errorCount > 0 ? 'rose' : 'emerald'} />
         </div>
       </AnimatedContainer>
     </>

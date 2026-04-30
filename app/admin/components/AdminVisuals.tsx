@@ -1,10 +1,60 @@
 import type { LucideIcon } from 'lucide-react';
-import { ArrowUpRight, CheckCircle2, CircleAlert, CircleDot, CircleMinus, Zap } from 'lucide-react';
+import {
+  Activity,
+  ArrowUpRight,
+  BarChart3,
+  BookOpen,
+  CheckCircle2,
+  CircleAlert,
+  CircleDot,
+  CircleMinus,
+  Eye,
+  FileText,
+  Funnel,
+  Radar,
+  Search,
+  ShieldCheck,
+  TrendingUp,
+  Users,
+  UsersRound,
+  Zap,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { AdminProviderSnapshot, AdminProviderStatus } from '../lib/free-admin-dashboard';
 import { AnimatedContainer } from './AnimatedContainer';
+
+export type AdminIconName =
+  | 'activity'
+  | 'bar-chart'
+  | 'book-open'
+  | 'circle-dot'
+  | 'eye'
+  | 'file-text'
+  | 'funnel'
+  | 'radar'
+  | 'search'
+  | 'shield-check'
+  | 'trending-up'
+  | 'users'
+  | 'users-round';
+
+const adminIconMap = {
+  activity: Activity,
+  'bar-chart': BarChart3,
+  'book-open': BookOpen,
+  'circle-dot': CircleDot,
+  eye: Eye,
+  'file-text': FileText,
+  funnel: Funnel,
+  radar: Radar,
+  search: Search,
+  'shield-check': ShieldCheck,
+  'trending-up': TrendingUp,
+  users: Users,
+  'users-round': UsersRound,
+} satisfies Record<AdminIconName, LucideIcon>;
 
 /* ------------------------------------------------------------------ */
 /*  AdminSurface                                                       */
@@ -83,6 +133,7 @@ export function CyberPanel({
   title,
   description,
   icon: Icon,
+  iconName,
   className,
   headerAction,
   children,
@@ -90,10 +141,13 @@ export function CyberPanel({
   title: string;
   description?: string;
   icon?: LucideIcon;
+  iconName?: AdminIconName;
   className?: string;
   headerAction?: React.ReactNode;
   children: React.ReactNode;
 }) {
+  const ResolvedIcon = Icon ?? (iconName ? adminIconMap[iconName] : undefined);
+
   return (
     <Card
       className={cn(
@@ -108,9 +162,9 @@ export function CyberPanel({
       <CardHeader className="relative z-10 border-b border-border/40 bg-muted/[0.08] p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex min-w-0 items-start gap-3">
-            {Icon ? (
+            {ResolvedIcon ? (
               <div className="rounded-lg border border-[hsl(var(--chart-1)/0.22)] bg-[hsl(var(--chart-1)/0.08)] p-2 text-[hsl(var(--chart-1))] shadow-sm transition-all duration-300 group-hover/card:shadow-[0_0_12px_hsl(var(--chart-1)/0.15)] group-hover/card:scale-105">
-                <Icon className="size-4" />
+                <ResolvedIcon className="size-4" />
               </div>
             ) : null}
             <div className="min-w-0 space-y-1">
@@ -136,14 +190,17 @@ export function SignalCard({
   value,
   description,
   icon: Icon,
+  iconName,
   tone = 'blue',
 }: {
   label: string;
   value: string | number;
   description: string;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  iconName?: AdminIconName;
   tone?: 'blue' | 'violet' | 'emerald' | 'amber' | 'rose';
 }) {
+  const ResolvedIcon = Icon ?? (iconName ? adminIconMap[iconName] : undefined);
   const toneClasses = {
     blue: 'bg-[hsl(var(--chart-1)/0.10)] text-[hsl(var(--chart-1))] border-[hsl(var(--chart-1)/0.20)] shadow-[hsl(var(--chart-1)/0.08)]',
     violet: 'bg-[hsl(var(--chart-2)/0.10)] text-[hsl(var(--chart-2))] border-[hsl(var(--chart-2)/0.20)] shadow-[hsl(var(--chart-2)/0.08)]',
@@ -166,9 +223,11 @@ export function SignalCard({
           <p className="text-2xl font-bold tabular-nums tracking-tight text-foreground">{value}</p>
           <p className="text-xs leading-5 text-muted-foreground text-pretty">{description}</p>
         </div>
-        <div className={cn('rounded-lg border p-2.5 shadow-sm transition-all duration-300 group-hover/signal:scale-110', toneClasses[tone])}>
-          <Icon className="size-4" />
-        </div>
+        {ResolvedIcon ? (
+          <div className={cn('rounded-lg border p-2.5 shadow-sm transition-all duration-300 group-hover/signal:scale-110', toneClasses[tone])}>
+            <ResolvedIcon className="size-4" />
+          </div>
+        ) : null}
       </div>
     </div>
   );
