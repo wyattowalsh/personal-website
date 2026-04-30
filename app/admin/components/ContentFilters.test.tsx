@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ContentFilters, DEFAULT_FILTERS } from './ContentFilters';
 
 describe('ContentFilters', () => {
@@ -57,5 +57,34 @@ describe('ContentFilters', () => {
 
     fireEvent.click(screen.getByText('Reset'));
     expect(onChange).toHaveBeenCalledWith(DEFAULT_FILTERS);
+  });
+
+  it('keeps typed search text while debouncing parent filter updates', () => {
+    vi.useFakeTimers();
+    const onChange = vi.fn();
+
+    try {
+      render(
+        <ContentFilters
+          allTags={['Agents', 'Admin']}
+          onFilterChange={onChange}
+          filters={{ ...DEFAULT_FILTERS }}
+        />
+      );
+
+      const searchInput = screen.getByPlaceholderText('Search posts...') as HTMLInputElement;
+      fireEvent.change(searchInput, { target: { value: 'Agents' } });
+
+      expect(searchInput.value).toBe('Agents');
+      expect(onChange).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(300);
+      });
+
+      expect(onChange).toHaveBeenCalledWith({ ...DEFAULT_FILTERS, search: 'Agents' });
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
