@@ -53,6 +53,24 @@ const TOUR_STEPS: TourStep[] = [
 
 const STORAGE_KEY = 'admin_onboarding_complete';
 
+function hasCompletedTour(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function markTourComplete(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(STORAGE_KEY, 'true');
+  } catch {
+    // Storage can be unavailable in private browsing or hardened contexts.
+  }
+}
+
 function getElementCenter(selector: string): { x: number; y: number; width: number; height: number } | null {
   const el = document.querySelector(selector);
   if (!el) return null;
@@ -75,7 +93,7 @@ export function OnboardingWalkthrough() {
 
   useEffect(() => {
     const forced = searchParams?.get('tour') === 'admin';
-    const completed = typeof window !== 'undefined' && localStorage.getItem(STORAGE_KEY) === 'true';
+    const completed = hasCompletedTour();
     if (forced) {
       // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional initialization
       setIsOpen(true);
@@ -107,9 +125,7 @@ export function OnboardingWalkthrough() {
 
   const closeTour = useCallback(() => {
     setIsOpen(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(STORAGE_KEY, 'true');
-    }
+    markTourComplete();
   }, []);
 
   const goNext = useCallback(() => {

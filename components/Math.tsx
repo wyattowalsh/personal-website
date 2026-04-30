@@ -31,19 +31,29 @@ export function Math({ children = '', display = false, options = {}, label, numb
 
   const equationId = equationNumber;
 
-  // Handle clicking equation number
-  const handleEquationClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const activateEquationLink = () => {
     const id = `eq-${equationId}`;
-    
+
     // Update URL hash
     window.history.pushState({}, '', `#${id}`);
-    
+
     // Scroll to equation
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+  };
+
+  // Handle clicking equation number
+  const handleEquationClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    activateEquationLink();
+  };
+
+  const handleEquationKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    activateEquationLink();
   };
 
   const handleCopy = (e: React.MouseEvent) => {
@@ -75,10 +85,10 @@ export function Math({ children = '', display = false, options = {}, label, numb
       displayMode: display,
       throwOnError: false,
       globalGroup: true,
-      trust: true,
       strict: 'ignore',
       fleqn: false,
-      ...options
+      ...options,
+      trust: false,
     });
   }, [children, display, options]);
 
@@ -143,6 +153,7 @@ export function Math({ children = '', display = false, options = {}, label, numb
       {equationId && (
         <div 
           onClick={handleEquationClick}
+          onKeyDown={handleEquationKeyDown}
           className="equation-number"
           title="Click to link to this equation"
           role="button"

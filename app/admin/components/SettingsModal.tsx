@@ -50,17 +50,56 @@ const DEFAULT_SETTINGS: AdminSettings = {
   },
 };
 
+function clampNumber(value: unknown, min: number, max: number, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return fallback;
+  return Math.min(max, Math.max(min, Math.round(value)));
+}
+
+function isAdminTheme(value: unknown): value is AdminTheme {
+  return value === 'system' || value === 'light' || value === 'dark';
+}
+
+function isAdminDensity(value: unknown): value is AdminDensity {
+  return value === 'comfortable' || value === 'compact';
+}
+
+function coerceSettings(value: unknown): AdminSettings {
+  const parsed = value && typeof value === 'object' ? (value as Partial<AdminSettings>) : {};
+
+  return {
+    analytics: {
+      defaultWindowDays: clampNumber(
+        parsed.analytics?.defaultWindowDays,
+        7,
+        90,
+        DEFAULT_SETTINGS.analytics.defaultWindowDays
+      ),
+      autoRefreshIntervalMinutes: clampNumber(
+        parsed.analytics?.autoRefreshIntervalMinutes,
+        1,
+        60,
+        DEFAULT_SETTINGS.analytics.autoRefreshIntervalMinutes
+      ),
+    },
+    notifications: {
+      emailAlerts:
+        typeof parsed.notifications?.emailAlerts === 'boolean'
+          ? parsed.notifications.emailAlerts
+          : DEFAULT_SETTINGS.notifications.emailAlerts,
+    },
+    display: {
+      theme: isAdminTheme(parsed.display?.theme) ? parsed.display.theme : DEFAULT_SETTINGS.display.theme,
+      density: isAdminDensity(parsed.display?.density) ? parsed.display.density : DEFAULT_SETTINGS.display.density,
+    },
+  };
+}
+
 function loadSettings(): AdminSettings {
   if (typeof window === 'undefined') return DEFAULT_SETTINGS;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return DEFAULT_SETTINGS;
-    const parsed = JSON.parse(raw) as Partial<AdminSettings>;
-    return {
-      analytics: { ...DEFAULT_SETTINGS.analytics, ...parsed.analytics },
-      notifications: { ...DEFAULT_SETTINGS.notifications, ...parsed.notifications },
-      display: { ...DEFAULT_SETTINGS.display, ...parsed.display },
-    };
+    return coerceSettings(JSON.parse(raw));
   } catch {
     return DEFAULT_SETTINGS;
   }
@@ -68,7 +107,11 @@ function loadSettings(): AdminSettings {
 
 function saveSettings(settings: AdminSettings): void {
   if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  } catch {
+    // Storage can be unavailable in private browsing or hardened contexts.
+  }
 }
 
 interface SettingsModalProps {

@@ -17,12 +17,15 @@ function toCSV(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return '';
   const headers = Object.keys(rows[0]);
   const lines: string[] = [];
+  const formulaPrefixPattern = /^[=+\-@\t\r]/;
 
   const sanitize = (value: unknown): string => {
     if (value === null || value === undefined) return '';
-    const str = String(value).replace(/"/g, '""');
-    if (/[",\n\r]/.test(String(value))) return `"${str}"`;
-    return str;
+    const raw = String(value);
+    const safeValue = formulaPrefixPattern.test(raw) ? `'${raw}` : raw;
+    const escaped = safeValue.replace(/"/g, '""');
+    if (/[",\n\r]/.test(safeValue)) return `"${escaped}"`;
+    return escaped;
   };
 
   lines.push(headers.map(sanitize).join(','));
