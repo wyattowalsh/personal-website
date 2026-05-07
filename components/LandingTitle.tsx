@@ -94,18 +94,6 @@ export function LandingTitle({
     return () => cancelAnimationFrame(frame);
   }, [disableRotation, forcedRenderer, hasHydrated, prefersReducedMotion]);
 
-  useEffect(() => {
-    if (!isRotationEnabled) {
-      return undefined;
-    }
-
-    const frame = requestAnimationFrame(() => {
-      setRotationSequence(buildRotationSequence(LANDING_TITLE_RENDERERS));
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [isRotationEnabled]);
-
   const advance = useCallback(() => {
     setWordIndex((prev) => {
       if (prev + 1 < rotationSequence.length) return prev + 1;
