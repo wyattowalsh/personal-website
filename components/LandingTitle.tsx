@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'motion/react';
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTheme } from 'next-themes';
 
 import {
@@ -53,11 +53,7 @@ export function LandingTitle({
   compact = false,
   className,
 }: LandingTitleProps = {}) {
-  const hasHydrated = useSyncExternalStore(
-    () => () => {},
-    () => true,
-    () => false,
-  );
+  const [hasHydrated, setHasHydrated] = useState(false);
   const systemPrefersReducedMotion = useReducedMotion();
   const prefersReducedMotion = forceReducedMotion ?? (!hasHydrated || systemPrefersReducedMotion);
   const { resolvedTheme } = useTheme();
@@ -70,6 +66,10 @@ export function LandingTitle({
   const [isShellFocused, setIsShellFocused] = useState(false);
   const [isDocumentVisible, setIsDocumentVisible] = useState(true);
   const [allowAnimatedEntrance, setAllowAnimatedEntrance] = useState(false);
+
+  useEffect(() => {
+    setHasHydrated(true);
+  }, []);
 
   const forcedRenderer = forcedSubtitleId
     ? getSubtitleRendererById(forcedSubtitleId)
