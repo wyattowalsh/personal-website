@@ -54,7 +54,8 @@ export function formatDate(date: string | Date, options?: Intl.DateTimeFormatOpt
   const defaultOptions: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'UTC',
   };
 
   try {

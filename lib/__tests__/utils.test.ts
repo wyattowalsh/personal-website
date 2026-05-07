@@ -56,6 +56,10 @@ describe('formatDate', () => {
     expect(result).toContain('2025');
   });
 
+  it('formats date-only strings in UTC to avoid hydration drift', () => {
+    expect(formatDate('2026-04-26')).toBe('April 26, 2026');
+  });
+
   it('formats a valid Date object', () => {
     // Construct with year/month/day to use local timezone
     const result = formatDate(new Date(2025, 0, 15));
