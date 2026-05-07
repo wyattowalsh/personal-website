@@ -45,10 +45,14 @@ export default async function HomePage() {
 
   // Get the 3 most recent posts
   const recentPosts = allPosts.slice(0, 3).map(({ content: _c, wordCount: _wc, adjacent: _adj, ...meta }) => meta);
+  const profileDateModified = new Date(allPosts.reduce(
+    (latest, post) => Math.max(latest, Date.parse(post.updated ?? post.created)),
+    Date.parse('2024-01-01'),
+  )).toISOString();
 
   return (
     <>
-      <PersonJsonLd />
+      <PersonJsonLd dateModified={profileDateModified} />
       <HomePageClient />
       <LatestWriting recentPosts={recentPosts} />
     </>

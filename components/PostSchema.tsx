@@ -30,7 +30,7 @@ export function WebSiteJsonLd() {
 /**
  * Person and ProfilePage schema for the homepage.
  */
-export function PersonJsonLd() {
+export function PersonJsonLd({ dateModified }: { dateModified: string }) {
   const identity = getSiteIdentity();
   const personSchema = {
     '@context': 'https://schema.org',
@@ -47,7 +47,7 @@ export function PersonJsonLd() {
     '@context': 'https://schema.org',
     '@type': 'ProfilePage',
     dateCreated: '2024-01-01T00:00:00Z',
-    dateModified: new Date().toISOString(),
+    dateModified,
     mainEntity: {
       '@type': 'Person',
       name: identity.author.name,
