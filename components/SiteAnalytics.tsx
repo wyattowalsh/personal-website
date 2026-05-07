@@ -38,16 +38,6 @@ export function SiteAnalytics({ gaId, gtmId, enabled }: SiteAnalyticsProps) {
   useEffect(() => {
     if (!enabled) return;
 
-    const win = window as Window & {
-      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
-      cancelIdleCallback?: (handle: number) => void;
-    };
-
-    if (typeof win.requestIdleCallback === "function") {
-      const idleId = win.requestIdleCallback(() => setActive(true), { timeout: IDLE_TIMEOUT_MS });
-      return () => win.cancelIdleCallback?.(idleId);
-    }
-
     const timeoutId = window.setTimeout(() => setActive(true), IDLE_TIMEOUT_MS);
     return () => window.clearTimeout(timeoutId);
   }, [enabled]);
