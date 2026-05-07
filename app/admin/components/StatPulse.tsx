@@ -27,7 +27,7 @@ export function StatPulse({ value, label, trend = 'neutral', className }: StatPu
       <div className="relative flex items-center justify-center">
         {/* breathing outer glow */}
         <span className={cn(
-          'absolute inline-flex h-full w-full animate-ping rounded-full opacity-40',
+          'absolute inline-flex h-full w-full animate-ping rounded-full opacity-40 motion-reduce:animate-none',
           toneColor
         )} />
         {/* inner glow */}

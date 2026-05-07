@@ -13,7 +13,7 @@ series:
 
 Hello again and hopefully welcome back 👋
 
-In [the last part](./regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the ***Ordinary Least Squares*** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
+In [the last part](/blog/posts/regularized-linear-regression-models-pt1) of this three-part deep-dive exploration into **regularized linear regression** modeling techniques, several topics were covered: the equation between the response and feature variables underlying linear regression models, the sum of squared error (SSE) loss function, the ***Ordinary Least Squares*** (OLS) model, and the necessary optimization steps to find an OLS model estimator that can be trained on sample data to produce predictions of a response given new feature data.
 
 Moving forward, in this part, drawbacks of OLS, potential remedies, and the **_Ridge Regression_** model will be discussed.
 
@@ -29,13 +29,13 @@ Since OLS is a low bias model, it is well-suited to have its variance lowered th
 
 In the next section, I’ll cover **_Ridge Regression_** regularization by the addition of a tuning parameter (λ) coefficient controlled **_L₂_** penalty to the OLS loss function.
 
-> Make sure to check out the next and [final part of the series](./regularized-linear-regression-models-pt3) to learn about the other two forms of regularized linear regression, **the Lasso** and **the Elastic Net.**
+> Make sure to check out the next and [final part of the series](/blog/posts/regularized-linear-regression-models-pt3) to learn about the other two forms of regularized linear regression, **the Lasso** and **the Elastic Net.**
 
 ---
 
 ## Ridge Regression
 
-This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One: Eq. #7](./regularized-linear-regression-models-pt1#eq-7)) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
+This form of regression is also known as **_Tikhonov Regularization_** and modifies the OLS loss function ([Part One: Eq. #7](/blog/posts/regularized-linear-regression-models-pt1#eq-7)) with the addition of an **_L₂_** penalty with an associated tuning parameter, **_λ_**. This loss function can be described using vector notation as:
 
 $$
 L(\beta) = ||y - X\beta||_2^2 + \lambda||\beta||_2^2  \quad \text{with tuning parameter } \lambda \geq 0
@@ -113,9 +113,9 @@ One possible Python implementation of **_Ridge Regression_** with an optional in
 
 Thanks for reading part two of **_Regularized Linear Regression Models_**! 🙌
 
-If you have not already, make sure to check out [**part one**!](./regularized-linear-regression-models-pt1)
+If you have not already, make sure to check out [**part one**!](/blog/posts/regularized-linear-regression-models-pt1)
 
-Continue on to [**part three**](./regularized-linear-regression-models-pt3) to learn about **_the Lasso_** and **_the Elastic Net_**, the last two regularized linear regression techniques!
+Continue on to [**part three**](/blog/posts/regularized-linear-regression-models-pt3) to learn about **_the Lasso_** and **_the Elastic Net_**, the last two regularized linear regression techniques!
 
 See [**here**](https://github.com/wyattowalsh/regularized-linear-regression-deep-dive/blob/master/SOURCES.md) for the different sources utilized to create this series of posts.
 

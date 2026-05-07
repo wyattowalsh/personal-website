@@ -1,10 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { generateKeyPairSync } from 'node:crypto';
 import {
   getAdminDashboardSnapshot,
+  getAdminSetupSnapshot,
+  getAdminShellProviderSnapshots,
   getGitHubSnapshot,
   getPerformanceSnapshot,
   getSearchConsoleSnapshot,
 } from './free-admin-dashboard';
+import { getAnalyticsRollupHealth } from './analytics-rollups';
 
 const ORIGINAL_ENV = process.env;
 
@@ -93,6 +97,8 @@ describe('free admin dashboard providers', () => {
     delete process.env.GOOGLE_OAUTH_CLIENT_ID;
     delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
     delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+    delete process.env.GOOGLE_CLIENT_EMAIL;
+    delete process.env.GOOGLE_PRIVATE_KEY;
 
     const snapshot = await getSearchConsoleSnapshot();
 
@@ -152,6 +158,70 @@ describe('free admin dashboard providers', () => {
     expect(String((tokenInit as RequestInit).body)).toContain('grant_type=refresh_token');
     const [queryUrl] = vi.mocked(fetch).mock.calls[1];
     expect(String(queryUrl)).toContain(encodeURIComponent('sc-domain:w4w.dev'));
+  });
+
+  it('queries Search Console using service-account credentials when OAuth is absent', async () => {
+    const { privateKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+      privateKeyEncoding: { type: 'pkcs8', format: 'pem' },
+      publicKeyEncoding: { type: 'spki', format: 'pem' },
+    });
+    process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL = 'sc-domain:w4w.dev';
+    process.env.GOOGLE_CLIENT_EMAIL = 'search-console@example.iam.gserviceaccount.com';
+    process.env.GOOGLE_PRIVATE_KEY = privateKey.replace(/\n/g, '\\n');
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+    delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+    vi.mocked(fetch)
+      .mockResolvedValueOnce(mockJsonResponse({ access_token: 'service-access-token' }))
+      .mockResolvedValueOnce(mockJsonResponse({ rows: [] }))
+      .mockResolvedValueOnce(mockJsonResponse({ rows: [] }));
+
+    const snapshot = await getSearchConsoleSnapshot();
+
+    expect(snapshot.status).toBe('configured');
+    const [tokenUrl, tokenInit] = vi.mocked(fetch).mock.calls[0];
+    expect(tokenUrl).toBe('https://oauth2.googleapis.com/token');
+    const tokenBody = String((tokenInit as RequestInit).body);
+    expect(tokenBody).toContain('grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer');
+    expect(tokenBody).toContain('assertion=');
+    expect(tokenBody).not.toContain('refresh_token');
+  });
+
+  it('reports missing service-account keys for partial service-account setup', async () => {
+    process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL = 'sc-domain:w4w.dev';
+    process.env.GOOGLE_CLIENT_EMAIL = 'search-console@example.iam.gserviceaccount.com';
+    delete process.env.GOOGLE_PRIVATE_KEY;
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+    delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+
+    const provider = await getSearchConsoleSnapshot();
+    const setup = getAdminSetupSnapshot();
+
+    expect(provider.status).toBe('missing_config');
+    expect(provider.missingEnv).toEqual(['GOOGLE_PRIVATE_KEY']);
+    expect(setup.providers.find((item) => item.id === 'search-console')).toMatchObject({
+      status: 'missing_config',
+      missingEnv: ['GOOGLE_PRIVATE_KEY'],
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('prefers complete service-account setup over stray partial OAuth env', () => {
+    process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL = 'sc-domain:w4w.dev';
+    process.env.GOOGLE_CLIENT_EMAIL = 'search-console@example.iam.gserviceaccount.com';
+    process.env.GOOGLE_PRIVATE_KEY = '-----BEGIN PRIVATE KEY-----\\nfake\\n-----END PRIVATE KEY-----';
+    process.env.GOOGLE_OAUTH_CLIENT_ID = 'stray-client-id';
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+    delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+
+    const setup = getAdminSetupSnapshot();
+
+    expect(setup.providers.find((item) => item.id === 'search-console')).toMatchObject({
+      status: 'configured',
+      missingEnv: [],
+    });
   });
 
   it('maps PageSpeed results and treats missing CrUX as partial setup', async () => {
@@ -375,6 +445,8 @@ describe('free admin dashboard providers', () => {
     delete process.env.GOOGLE_OAUTH_CLIENT_ID;
     delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
     delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+    delete process.env.GOOGLE_CLIENT_EMAIL;
+    delete process.env.GOOGLE_PRIVATE_KEY;
     delete process.env.VERCEL_TOKEN;
     delete process.env.VERCEL_PROJECT_ID;
     delete process.env.UPTIMEROBOT_API_KEY;
@@ -409,5 +481,92 @@ describe('free admin dashboard providers', () => {
       description: 'Published MDX posts',
     });
     expect(dashboard.contentHealth.rows.some((row) => row.label === 'Needs Work')).toBe(true);
+  });
+
+  it('shares shell provider orchestration for dashboard summary providers', async () => {
+    delete process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL;
+    delete process.env.INDEXNOW_KEY;
+    vi.mocked(fetch).mockResolvedValue(mockJsonResponse({
+      lighthouseResult: { categories: { performance: { score: 0.8 }, accessibility: { score: 1 }, seo: { score: 1 } }, audits: {} },
+    }));
+
+    const shell = await getAdminShellProviderSnapshots();
+    const dashboard = await getAdminDashboardSnapshot();
+
+    expect(shell.providers.map((provider) => provider.id)).toEqual(['indexnow', 'content-health', 'analytics-rollups']);
+    expect(dashboard.growth[1]).toMatchObject({ id: shell.indexNow.id, status: shell.indexNow.status });
+    expect(dashboard.contentHealth).toMatchObject({ id: shell.contentHealth.id, status: shell.contentHealth.status });
+    expect(dashboard.rollupStorage).toMatchObject({ id: shell.rollupStorage.id, status: shell.rollupStorage.status });
+  });
+
+  it('marks analytics rollups partial when database env is ready but cron setup is missing', async () => {
+    vi.mocked(getAnalyticsRollupHealth).mockResolvedValueOnce({
+      status: 'configured',
+      latestDay: '2026-04-26',
+      coveredDays: 2,
+      lastRunStatus: 'success',
+      missingEnv: ['CRON_SECRET'],
+    });
+
+    const shell = await getAdminShellProviderSnapshots();
+
+    expect(shell.rollupStorage).toMatchObject({
+      id: 'analytics-rollups',
+      status: 'partial',
+      missingEnv: ['CRON_SECRET'],
+      setupSteps: ['vercel env add CRON_SECRET production'],
+    });
+    expect(shell.rollupStorage.cards.find((card) => card.label === 'Setup Gaps')).toMatchObject({ value: '1' });
+  });
+
+  it('builds setup state from env key presence without calling providers', () => {
+    delete process.env.GOOGLE_SEARCH_CONSOLE_SITE_URL;
+    delete process.env.GOOGLE_OAUTH_CLIENT_ID;
+    delete process.env.GOOGLE_OAUTH_CLIENT_SECRET;
+    delete process.env.GOOGLE_OAUTH_REFRESH_TOKEN;
+    delete process.env.INDEXNOW_KEY;
+    delete process.env.VERCEL_TOKEN;
+    delete process.env.VERCEL_PROJECT_ID;
+    delete process.env.GITHUB_TOKEN;
+    delete process.env.UPTIMEROBOT_API_KEY;
+    delete process.env.TURSO_DATABASE_URL;
+    delete process.env.TURSO_AUTH_TOKEN;
+    delete process.env.CRON_SECRET;
+
+    const snapshot = getAdminSetupSnapshot();
+
+    expect(fetch).not.toHaveBeenCalled();
+    expect(snapshot.totals.missing).toBeGreaterThan(0);
+    expect(snapshot.providers.find((provider) => provider.id === 'search-console')).toMatchObject({
+      status: 'missing_config',
+      missingEnv: [
+        'GOOGLE_SEARCH_CONSOLE_SITE_URL',
+        'GOOGLE_OAUTH_CLIENT_ID',
+        'GOOGLE_OAUTH_CLIENT_SECRET',
+        'GOOGLE_OAUTH_REFRESH_TOKEN',
+      ],
+    });
+    expect(snapshot.providers.find((provider) => provider.id === 'cloudflare-analytics')).toMatchObject({
+      status: 'disabled_paid_risk',
+      missingEnv: [],
+    });
+  });
+
+  it('marks setup providers configured or partial when required keys are present', () => {
+    process.env.INDEXNOW_KEY = 'indexnow-key';
+    process.env.VERCEL_TOKEN = 'vercel-token';
+    process.env.VERCEL_PROJECT_ID = 'vercel-project';
+    delete process.env.VERCEL_TEAM_ID;
+
+    const snapshot = getAdminSetupSnapshot();
+
+    expect(snapshot.providers.find((provider) => provider.id === 'indexnow')).toMatchObject({
+      status: 'configured',
+      missingEnv: [],
+    });
+    expect(snapshot.providers.find((provider) => provider.id === 'vercel')).toMatchObject({
+      status: 'partial',
+      missingEnv: ['VERCEL_TEAM_ID'],
+    });
   });
 });

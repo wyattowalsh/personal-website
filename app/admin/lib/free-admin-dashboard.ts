@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { createSign } from 'node:crypto';
+import { getConfig } from '@/lib/config';
 import { BackendService } from '@/lib/server';
 import type { Post } from '@/lib/types';
 import { getAnalyticsRollupHealth } from './analytics-rollups';
@@ -16,7 +17,6 @@ import {
 import { getVisitorAnalyticsSnapshot, type AnalyticsMetric, type AnalyticsRow, type VisitorAnalyticsSnapshot } from './visitor-analytics';
 import { withTimeout } from './resilience';
 
-const DEFAULT_SITE_URL = 'https://www.w4w.dev';
 const DEFAULT_GITHUB_REPOSITORY = 'wyattowalsh/personal-website';
 const SEARCH_CONSOLE_SCOPE = 'https://www.googleapis.com/auth/webmasters.readonly';
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -40,6 +40,8 @@ export interface AdminProviderSnapshot {
 
 export type AdminCostStatus = 'free' | 'free_with_limit' | 'optional_unverified' | 'disabled_paid_risk';
 export type AdminSignalSeverity = 'info' | 'watch' | 'action' | 'critical';
+export type AdminSetupStatus = AdminProviderStatus | 'disabled_paid_risk';
+export type AdminSetupGroup = 'Growth' | 'Performance' | 'Operations' | 'Content' | 'Guardrails';
 
 export interface AdminCostLedgerItem {
   id: string;
@@ -51,6 +53,30 @@ export interface AdminCostLedgerItem {
   cadence: string;
   guardrail: string;
   sourceUrl: string;
+}
+
+export interface AdminSetupProvider {
+  id: string;
+  title: string;
+  group: AdminSetupGroup;
+  status: AdminSetupStatus;
+  requiredEnv: string[];
+  optionalEnv: string[];
+  missingEnv: string[];
+  setupSteps: string[];
+  freeTier: string;
+  guardrail: string;
+}
+
+export interface AdminSetupSnapshot {
+  generatedAt: string;
+  totals: {
+    configured: number;
+    missing: number;
+    partial: number;
+    disabledPaidRisk: number;
+  };
+  providers: AdminSetupProvider[];
 }
 
 export interface AdminSignal {
@@ -209,7 +235,7 @@ function nowIso(): string {
 }
 
 function getSiteUrl(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL).replace(/\/+$/, '');
+  return getConfig().site.url;
 }
 
 function setupCommand(name: string): string {
@@ -218,6 +244,148 @@ function setupCommand(name: string): string {
 
 function isMissing(value: string | undefined): boolean {
   return !value || value.trim() === '';
+}
+
+function buildSetupProvider(input: Omit<AdminSetupProvider, 'status' | 'missingEnv' | 'setupSteps'> & { disabledPaidRisk?: boolean }): AdminSetupProvider {
+  const { disabledPaidRisk = false, ...provider } = input;
+  const missingRequired = provider.requiredEnv.filter((name) => isMissing(process.env[name]));
+  const missingOptional = provider.optionalEnv.filter((name) => isMissing(process.env[name]));
+  const missingEnv = disabledPaidRisk ? [] : [...missingRequired, ...missingOptional];
+  const status: AdminSetupStatus = disabledPaidRisk
+    ? 'disabled_paid_risk'
+    : missingRequired.length > 0
+      ? 'missing_config'
+      : missingOptional.length > 0
+        ? 'partial'
+        : 'configured';
+
+  return {
+    ...provider,
+    status,
+    missingEnv,
+    setupSteps: missingEnv.map(setupCommand),
+  };
+}
+
+function getSearchConsoleRequiredEnv(): string[] {
+  const oauthEnv = [
+    'GOOGLE_OAUTH_CLIENT_ID',
+    'GOOGLE_OAUTH_CLIENT_SECRET',
+    'GOOGLE_OAUTH_REFRESH_TOKEN',
+  ];
+  const serviceAccountEnv = ['GOOGLE_CLIENT_EMAIL', 'GOOGLE_PRIVATE_KEY'];
+  const hasAnyOAuthConfig = oauthEnv.some((name) => !isMissing(process.env[name]));
+  const hasAnyServiceAccountConfig = serviceAccountEnv.some((name) => !isMissing(process.env[name]));
+  const hasCompleteOAuthConfig = oauthEnv.every((name) => !isMissing(process.env[name]));
+  const hasCompleteServiceAccountConfig = serviceAccountEnv.every((name) => !isMissing(process.env[name]));
+
+  if (hasCompleteServiceAccountConfig || (hasAnyServiceAccountConfig && !hasAnyOAuthConfig)) {
+    return ['GOOGLE_SEARCH_CONSOLE_SITE_URL', ...serviceAccountEnv];
+  }
+
+  if (hasCompleteOAuthConfig || hasAnyOAuthConfig) {
+    return ['GOOGLE_SEARCH_CONSOLE_SITE_URL', ...oauthEnv];
+  }
+
+  return ['GOOGLE_SEARCH_CONSOLE_SITE_URL', ...oauthEnv];
+}
+
+export function getAdminSetupSnapshot(): AdminSetupSnapshot {
+  const providers: AdminSetupProvider[] = [
+    buildSetupProvider({
+      id: 'search-console',
+      title: 'Google Search Console',
+      group: 'Growth',
+      requiredEnv: getSearchConsoleRequiredEnv(),
+      optionalEnv: [],
+      freeTier: 'Free Search Console API data for owned properties',
+      guardrail: 'Read-only scope; no paid SEO provider required',
+    }),
+    buildSetupProvider({
+      id: 'indexnow',
+      title: 'IndexNow',
+      group: 'Growth',
+      requiredEnv: ['INDEXNOW_KEY'],
+      optionalEnv: [],
+      freeTier: 'Free URL submission endpoint',
+      guardrail: 'Only submit canonical site URLs',
+    }),
+    buildSetupProvider({
+      id: 'pagespeed-crux',
+      title: 'PageSpeed + CrUX',
+      group: 'Performance',
+      requiredEnv: [],
+      optionalEnv: ['PAGESPEED_API_KEY', 'CRUX_API_KEY'],
+      freeTier: 'Free PageSpeed and CrUX APIs with quota limits',
+      guardrail: 'Audit homepage and top pages only; avoid broad crawls',
+    }),
+    buildSetupProvider({
+      id: 'analytics-rollups',
+      title: 'Analytics Rollups',
+      group: 'Operations',
+      requiredEnv: ['TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN', 'CRON_SECRET'],
+      optionalEnv: [],
+      freeTier: 'Turso-backed rollups; optional local setup state',
+      guardrail: 'Never expose database credentials client-side',
+    }),
+    buildSetupProvider({
+      id: 'vercel',
+      title: 'Vercel Deployments',
+      group: 'Operations',
+      requiredEnv: ['VERCEL_TOKEN', 'VERCEL_PROJECT_ID'],
+      optionalEnv: ['VERCEL_TEAM_ID'],
+      freeTier: 'Deployment metadata from Vercel API',
+      guardrail: 'Read deployment state only; no deploy mutations from dashboard',
+    }),
+    buildSetupProvider({
+      id: 'github',
+      title: 'GitHub Health',
+      group: 'Operations',
+      requiredEnv: [],
+      optionalEnv: ['GITHUB_TOKEN'],
+      freeTier: 'Public workflows plus optional token-gated traffic data',
+      guardrail: 'Token is optional and should be read-only where possible',
+    }),
+    buildSetupProvider({
+      id: 'uptimerobot',
+      title: 'UptimeRobot',
+      group: 'Operations',
+      requiredEnv: ['UPTIMEROBOT_API_KEY'],
+      optionalEnv: ['UPTIMEROBOT_MONITOR_ID'],
+      freeTier: 'Free monitor API for hobby/non-commercial use',
+      guardrail: 'Keep monitor count within the free account',
+    }),
+    buildSetupProvider({
+      id: 'content-health',
+      title: 'Content Health',
+      group: 'Content',
+      requiredEnv: [],
+      optionalEnv: [],
+      freeTier: 'Local MDX inventory, no external service',
+      guardrail: 'Reads repository content only',
+    }),
+    buildSetupProvider({
+      id: 'cloudflare-analytics',
+      title: 'Cloudflare Analytics',
+      group: 'Guardrails',
+      requiredEnv: [],
+      optionalEnv: [],
+      freeTier: 'Disabled until free GraphQL Analytics access is verified',
+      guardrail: 'Do not call optional providers without verified free access',
+      disabledPaidRisk: true,
+    }),
+  ];
+
+  return {
+    generatedAt: nowIso(),
+    totals: {
+      configured: providers.filter((provider) => provider.status === 'configured').length,
+      missing: providers.filter((provider) => provider.status === 'missing_config').length,
+      partial: providers.filter((provider) => provider.status === 'partial').length,
+      disabledPaidRisk: providers.filter((provider) => provider.status === 'disabled_paid_risk').length,
+    },
+    providers,
+  };
 }
 
 async function fetchWithTimeout(
@@ -459,8 +627,10 @@ export async function getSearchConsoleSnapshot(): Promise<AdminProviderSnapshot>
   const serviceAccountEnv = ['GOOGLE_CLIENT_EMAIL', 'GOOGLE_PRIVATE_KEY'];
   const hasCompleteOAuthConfig = oauthEnv.every((name) => !isMissing(process.env[name]));
   const hasCompleteServiceAccountConfig = serviceAccountEnv.every((name) => !isMissing(process.env[name]));
+  const hasAnyServiceAccountConfig = serviceAccountEnv.some((name) => !isMissing(process.env[name]));
   if (!hasCompleteOAuthConfig && !hasCompleteServiceAccountConfig) {
-    missingEnv.push(...oauthEnv.filter((name) => isMissing(process.env[name])));
+    const credentialEnv = hasAnyServiceAccountConfig ? serviceAccountEnv : oauthEnv;
+    missingEnv.push(...credentialEnv.filter((name) => isMissing(process.env[name])));
   }
 
   if (missingEnv.length > 0) {
@@ -1010,23 +1180,83 @@ export async function getAnalyticsRollupProviderSnapshot(): Promise<AdminProvide
     return errorProvider(base, new Error(health.error ?? 'Analytics rollup health check failed'));
   }
 
+  const cards = [
+    { label: 'Covered Days', value: formatNumber(health.coveredDays), description: 'Persisted daily snapshots' },
+    { label: 'Latest Day', value: health.latestDay ?? 'n/a', description: 'Newest stored rollup day' },
+    { label: 'Last Run', value: health.lastRunStatus ?? 'n/a', description: 'Most recent cron/backfill status' },
+    { label: 'Setup Gaps', value: formatNumber(health.missingEnv.length), description: 'Missing rollup env vars' },
+  ];
+  const rows = [
+    { label: 'Database', value: 'Turso/libSQL', detail: 'Production-persistent SQLite-compatible store' },
+    { label: 'Cron route', value: '/api/admin/analytics-rollup', detail: 'Daily Vercel Cron refresh endpoint' },
+    { label: 'Latest run', value: health.lastRunStatus ?? 'n/a', detail: health.lastRunAt ?? 'No recorded run yet' },
+    ...(health.missingEnv.length > 0
+      ? health.missingEnv.map((name) => ({ label: name, value: 'Missing', detail: `vercel env add ${name} production` }))
+      : [{ label: 'Environment', value: 'Ready', detail: 'Turso and cron env vars are present' }]),
+  ];
+
+  if (health.missingEnv.length > 0) {
+    return {
+      ...base,
+      status: 'partial',
+      lastCheckedAt: nowIso(),
+      missingEnv: health.missingEnv,
+      setupSteps: health.missingEnv.map(setupCommand),
+      cards,
+      rows,
+    };
+  }
+
   return configuredProvider({
     ...base,
-    cards: [
-      { label: 'Covered Days', value: formatNumber(health.coveredDays), description: 'Persisted daily snapshots' },
-      { label: 'Latest Day', value: health.latestDay ?? 'n/a', description: 'Newest stored rollup day' },
-      { label: 'Last Run', value: health.lastRunStatus ?? 'n/a', description: 'Most recent cron/backfill status' },
-      { label: 'Setup Gaps', value: formatNumber(health.missingEnv.length), description: 'Missing rollup env vars' },
-    ],
-    rows: [
-      { label: 'Database', value: 'Turso/libSQL', detail: 'Production-persistent SQLite-compatible store' },
-      { label: 'Cron route', value: '/api/admin/analytics-rollup', detail: 'Daily Vercel Cron refresh endpoint' },
-      { label: 'Latest run', value: health.lastRunStatus ?? 'n/a', detail: health.lastRunAt ?? 'No recorded run yet' },
-      ...(health.missingEnv.length > 0
-        ? health.missingEnv.map((name) => ({ label: name, value: 'Missing', detail: `vercel env add ${name} production` }))
-        : [{ label: 'Environment', value: 'Ready', detail: 'Turso and cron env vars are present' }]),
-    ],
+    cards,
+    rows,
   });
+}
+
+export async function getAdminShellProviderSnapshots(): Promise<{
+  indexNow: AdminProviderSnapshot;
+  contentHealth: AdminProviderSnapshot;
+  rollupStorage: AdminProviderSnapshot;
+  providers: AdminProviderSnapshot[];
+}> {
+  const results = await Promise.allSettled([
+    withTimeout(() => getIndexNowSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'indexnow' }),
+    withTimeout(() => getContentHealthSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'content-health' }),
+    withTimeout(() => getAnalyticsRollupProviderSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'analytics-rollups' }),
+  ]);
+
+  const indexNow = results[0].status === 'fulfilled'
+    ? results[0].value
+    : errorProvider({
+        id: 'indexnow',
+        title: 'IndexNow',
+        freeTier: 'Free URL submission endpoint',
+        sourceUrl: 'https://www.indexnow.org/documentation',
+      }, results[0].reason);
+  const contentHealth = results[1].status === 'fulfilled'
+    ? results[1].value
+    : errorProvider({
+        id: 'content-health',
+        title: 'Content Health',
+        freeTier: 'Computed locally from MDX content and generated site surfaces',
+        sourceUrl: 'local:content/posts',
+      }, results[1].reason);
+  const rollupStorage = results[2].status === 'fulfilled'
+    ? results[2].value
+    : errorProvider({
+        id: 'analytics-rollups',
+        title: 'Analytics Rollups',
+        freeTier: 'Turso free tier provides persistent SQLite/libSQL rollups for longer visitor windows',
+        sourceUrl: 'https://turso.tech/pricing',
+      }, results[2].reason);
+
+  return {
+    indexNow,
+    contentHealth,
+    rollupStorage,
+    providers: [indexNow, contentHealth, rollupStorage],
+  };
 }
 
 function buildCostLedger(input: {
@@ -1256,11 +1486,10 @@ function buildSignals(input: {
 
 export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays): Promise<AdminDashboardSnapshot> {
   // Fast providers (local data / no external API)
-  const fastProviders = await Promise.allSettled([
-    withTimeout(() => getVisitorAnalyticsSnapshot(windowDays), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'visitor-analytics' }),
-    withTimeout(() => getIndexNowSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'indexnow' }),
-    withTimeout(() => getContentHealthSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'content-health' }),
-    withTimeout(() => getAnalyticsRollupProviderSnapshot(), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'analytics-rollups' }),
+  const [visitorsResult, shellProviders] = await Promise.all([
+    withTimeout(() => getVisitorAnalyticsSnapshot(windowDays), { timeoutMs: FAST_PROVIDER_TIMEOUT_MS, label: 'visitor-analytics' })
+      .catch(() => emptyVisitorSnapshot(windowDays)),
+    getAdminShellProviderSnapshots(),
   ]);
 
   // Slow providers (external APIs)
@@ -1272,10 +1501,8 @@ export async function getAdminDashboardSnapshot(windowDays?: AnalyticsWindowDays
     withTimeout(() => getUptimeRobotSnapshot(), { timeoutMs: SLOW_PROVIDER_TIMEOUT_MS, label: 'uptimerobot' }),
   ]);
 
-  const visitors = fastProviders[0].status === 'fulfilled' ? fastProviders[0].value : emptyVisitorSnapshot(windowDays);
-  const indexNow = fastProviders[1].status === 'fulfilled' ? fastProviders[1].value : errorProviderSnapshot('indexnow', 'IndexNow', fastProviders[1].reason);
-  const contentHealth = fastProviders[2].status === 'fulfilled' ? fastProviders[2].value : errorProviderSnapshot('content-health', 'Content Health', fastProviders[2].reason);
-  const rollupStorage = fastProviders[3].status === 'fulfilled' ? fastProviders[3].value : errorProviderSnapshot('analytics-rollups', 'Analytics Rollups', fastProviders[3].reason);
+  const visitors = visitorsResult;
+  const { indexNow, contentHealth, rollupStorage } = shellProviders;
 
   const searchConsole = slowProviders[0].status === 'fulfilled' ? slowProviders[0].value : errorProviderSnapshot('search-console', 'Google Search Console', slowProviders[0].reason);
   const performance = slowProviders[1].status === 'fulfilled' ? slowProviders[1].value : errorProviderSnapshot('pagespeed-crux', 'PageSpeed + CrUX', slowProviders[1].reason);

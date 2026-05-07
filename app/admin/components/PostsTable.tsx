@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ChevronUp, ChevronDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -24,6 +24,13 @@ interface PostsTableProps {
 type SortColumn = 'title' | 'created' | 'wordCount' | 'readingTime';
 type SortDirection = 'asc' | 'desc';
 
+const COLUMN_LABELS: Record<SortColumn, string> = {
+  title: 'Title',
+  created: 'Date',
+  wordCount: 'Words',
+  readingTime: 'Reading Time',
+};
+
 function parseReadingTime(rt?: string): number {
   if (!rt) return 0;
   const match = rt.match(/(\d+)/);
@@ -43,30 +50,68 @@ export function PostsTable({ posts }: PostsTableProps) {
     }
   }
 
-  const sorted = [...posts].sort((a, b) => {
-    const dir = sortDirection === 'asc' ? 1 : -1;
-    switch (sortColumn) {
-      case 'title':
-        return dir * a.title.localeCompare(b.title);
-      case 'created':
-        return dir * (new Date(a.created).getTime() - new Date(b.created).getTime());
-      case 'wordCount':
-        return dir * (a.wordCount - b.wordCount);
-      case 'readingTime':
-        return dir * (parseReadingTime(a.readingTime) - parseReadingTime(b.readingTime));
-      default:
-        return 0;
-    }
-  });
+  const sorted = useMemo(() => {
+    return [...posts].sort((a, b) => {
+      const dir = sortDirection === 'asc' ? 1 : -1;
+      switch (sortColumn) {
+        case 'title':
+          return dir * a.title.localeCompare(b.title);
+        case 'created':
+          return dir * (new Date(a.created).getTime() - new Date(b.created).getTime());
+        case 'wordCount':
+          return dir * (a.wordCount - b.wordCount);
+        case 'readingTime':
+          return dir * (parseReadingTime(a.readingTime) - parseReadingTime(b.readingTime));
+        default:
+          return 0;
+      }
+    });
+  }, [posts, sortColumn, sortDirection]);
+
+  function getAriaSort(column: SortColumn): 'ascending' | 'descending' | 'none' {
+    if (sortColumn !== column) return 'none';
+    return sortDirection === 'asc' ? 'ascending' : 'descending';
+  }
 
   function SortIcon({ column }: { column: SortColumn }) {
     if (sortColumn !== column) {
-      return <ChevronDown className="h-3 w-3 text-muted-foreground/40" />;
+      return <ChevronDown aria-hidden="true" className="h-3 w-3 text-muted-foreground/40" />;
     }
     return sortDirection === 'asc' ? (
-      <ChevronUp className="h-3 w-3 text-foreground" />
+      <ChevronUp aria-hidden="true" className="h-3 w-3 text-foreground" />
     ) : (
-      <ChevronDown className="h-3 w-3 text-foreground" />
+      <ChevronDown aria-hidden="true" className="h-3 w-3 text-foreground" />
+    );
+  }
+
+  function SortHeader({ column, align = 'left' }: { column: SortColumn; align?: 'left' | 'right' }) {
+    const active = sortColumn === column;
+    const sortLabel = active
+      ? `Sort by ${COLUMN_LABELS[column].toLowerCase()}, currently ${sortDirection === 'asc' ? 'ascending' : 'descending'}`
+      : `Sort by ${COLUMN_LABELS[column].toLowerCase()}`;
+
+    return (
+      <th
+        scope="col"
+        aria-sort={getAriaSort(column)}
+        className={cn(
+          'px-4 py-3 font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground whitespace-nowrap',
+          align === 'right' ? 'text-right' : 'text-left'
+        )}
+      >
+        <button
+          type="button"
+          aria-label={sortLabel}
+          className={cn(
+            'inline-flex items-center gap-1 rounded-sm transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+            align === 'right' && 'justify-end'
+          )}
+          onClick={() => handleSort(column)}
+        >
+          {COLUMN_LABELS[column]}
+          <SortIcon column={column} />
+        </button>
+      </th>
     );
   }
 
@@ -74,51 +119,26 @@ export function PostsTable({ posts }: PostsTableProps) {
     <Card className="overflow-hidden border-border/80 bg-card/80">
       <ScrollArea className="w-full">
         <table className="w-full text-sm">
+          <caption className="sr-only">Published post inventory sorted by the selected column.</caption>
           <thead>
             <tr className="border-b border-border/80 bg-muted/20">
-              <th
-                className="cursor-pointer select-none px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground"
-                onClick={() => handleSort('title')}
-              >
-                <span className="inline-flex items-center gap-1">
-                  Title
-                  <SortIcon column="title" />
-                </span>
-              </th>
-              <th
-                className="cursor-pointer select-none px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
-                onClick={() => handleSort('created')}
-              >
-                <span className="inline-flex items-center gap-1">
-                  Date
-                  <SortIcon column="created" />
-                </span>
-              </th>
-              <th
-                className="cursor-pointer select-none px-4 py-3 text-right font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
-                onClick={() => handleSort('wordCount')}
-              >
-                <span className="inline-flex items-center gap-1 justify-end">
-                  Words
-                  <SortIcon column="wordCount" />
-                </span>
-              </th>
-              <th
-                className="cursor-pointer select-none px-4 py-3 text-right font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground transition-colors hover:text-foreground whitespace-nowrap"
-                onClick={() => handleSort('readingTime')}
-              >
-                <span className="inline-flex items-center gap-1 justify-end">
-                  Reading Time
-                  <SortIcon column="readingTime" />
-                </span>
-              </th>
-              <th className="px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              <SortHeader column="title" />
+              <SortHeader column="created" />
+              <SortHeader column="wordCount" align="right" />
+              <SortHeader column="readingTime" align="right" />
+              <th scope="col" className="px-4 py-3 text-left font-mono text-[0.68rem] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 Tags
               </th>
             </tr>
           </thead>
           <tbody>
-            {sorted.map(post => (
+            {sorted.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
+                  No posts available.
+                </td>
+              </tr>
+            ) : sorted.map(post => (
               <tr
                 key={post.slug}
                 className={cn(
@@ -126,16 +146,16 @@ export function PostsTable({ posts }: PostsTableProps) {
                   'hover:bg-muted/50 transition-colors'
                 )}
               >
-                <td className="px-4 py-3">
+                <th scope="row" className="px-4 py-3 text-left">
                   <Link
                     href={`/blog/posts/${post.slug}`}
                     className="font-medium text-foreground hover:text-primary no-underline transition-colors"
                   >
                     {post.title}
                   </Link>
-                </td>
+                </th>
                 <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">
-                  {formatDate(post.created, { year: 'numeric', month: 'short', day: 'numeric' })}
+                  {formatDate(post.created, { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC' })}
                 </td>
                 <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
                   {post.wordCount.toLocaleString()}

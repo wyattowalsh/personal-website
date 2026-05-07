@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { stripMdxSyntax, formatDate, isExternal, cn, extractPostSlug, isDifferentDate } from '@/lib/utils';
+import { stripMdxSyntax, formatDate, isExternal, cn, extractPostSlug, isDifferentDate, getTagHref } from '@/lib/utils';
 
 describe('stripMdxSyntax', () => {
   it('preserves plain text', () => {
@@ -156,6 +156,13 @@ describe('extractPostSlug', () => {
 
   it('returns null for /blog/search', () => {
     expect(extractPostSlug('/blog/search')).toBeNull();
+  });
+});
+
+describe('getTagHref', () => {
+  it('encodes tag routes consistently', () => {
+    expect(getTagHref('Data Science')).toBe('/blog/tags/Data%20Science');
+    expect(getTagHref('AI/ML')).toBe('/blog/tags/AI%2FML');
   });
 });
 

@@ -4,7 +4,7 @@ import { motion, useMotionValue } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, getTagHref } from "@/lib/utils";
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
 
@@ -81,7 +81,7 @@ function TagCard({ tag, count, index }: TagCardProps) {
         animation: `slideUp 0.5s ease-out ${index * 0.12}s backwards`
       }}
     >
-      <Link href={`/blog/tags/${tag}`} className="block">
+      <Link href={getTagHref(tag)} className="block">
         <Card className={cn(
           "group relative overflow-hidden",
           "p-6 sm:p-8",

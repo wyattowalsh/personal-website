@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { BackendService } from '@/lib/server';
-import { api } from '@/lib/core';
+import { api, ApiError } from '@/lib/core';
 import { getVisitorAnalyticsSnapshot } from '@/app/admin/lib/visitor-analytics';
 import { getRollupConfig } from '@/app/admin/lib/analytics-rollups';
+import { validateAdminSession } from '@/app/admin/lib/auth';
 import { createClient } from '@libsql/client/web';
 
 export const dynamic = 'force-dynamic';
@@ -46,6 +47,11 @@ function downloadResponse(data: string, filename: string, contentType: string): 
 }
 
 export const GET = api.middleware.withErrorHandler(async (request: Request) => {
+  const isAuthenticated = await validateAdminSession();
+  if (!isAuthenticated) {
+    throw new ApiError(401, 'Unauthorized');
+  }
+
   const { searchParams } = new URL(request.url);
   const parsed = querySchema.safeParse(Object.fromEntries(searchParams));
 

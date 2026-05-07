@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
 interface AnimatedContainerProps {
   children: React.ReactNode;
@@ -22,18 +23,28 @@ export function AnimatedContainer({
   once = true,
   threshold = 0.1,
 }: AnimatedContainerProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [isVisible, setIsVisible] = useState(false);
+  const visible = prefersReducedMotion || isVisible;
   const ref = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleIntersect = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries;
       if (entry.isIntersecting) {
+        if (timerRef.current) clearTimeout(timerRef.current);
         timerRef.current = setTimeout(() => {
           setIsVisible(true);
         }, delay);
-      } else if (!once) {
+        return;
+      }
+
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = undefined;
+      }
+      if (!once) {
         setIsVisible(false);
       }
     },
@@ -41,6 +52,15 @@ export function AnimatedContainer({
   );
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    if (typeof IntersectionObserver === 'undefined') {
+      const fallbackTimer = setTimeout(() => setIsVisible(true), 0);
+      return () => clearTimeout(fallbackTimer);
+    }
+
     const element = ref.current;
     if (!element) return;
 
@@ -57,7 +77,7 @@ export function AnimatedContainer({
         timerRef.current = undefined;
       }
     };
-  }, [handleIntersect, threshold]);
+  }, [handleIntersect, prefersReducedMotion, threshold]);
 
   const animationClasses = {
     fade: 'opacity-0 data-[visible=true]:opacity-100',
@@ -71,14 +91,14 @@ export function AnimatedContainer({
   return (
     <div
       ref={ref}
-      data-visible={isVisible}
+      data-visible={visible}
       className={cn(
-        'transition-all will-change-transform',
-        animationClasses[animation],
+        'transition-all motion-reduce:opacity-100 motion-reduce:translate-y-0 motion-reduce:scale-100 motion-reduce:blur-0 motion-reduce:transition-none',
+        prefersReducedMotion ? 'opacity-100 motion-reduce:transition-none' : animationClasses[animation],
         className
       )}
       style={{
-        transitionDuration: `${duration}ms`,
+        transitionDuration: prefersReducedMotion ? '0ms' : `${duration}ms`,
         transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
       }}
     >
@@ -140,12 +160,17 @@ export function CountUp({
   className,
   formatter = (v) => Math.round(v).toLocaleString(),
 }: CountUpProps) {
+  const prefersReducedMotion = useReducedMotion();
   const [value, setValue] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLSpanElement>(null);
   const hasAnimated = useRef(false);
 
   useEffect(() => {
+    if (prefersReducedMotion) {
+      return;
+    }
+
     const element = ref.current;
     if (!element) return;
 
@@ -161,10 +186,10 @@ export function CountUp({
 
     observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  }, [end, prefersReducedMotion]);
 
   useEffect(() => {
-    if (!isVisible) return;
+    if (!isVisible || prefersReducedMotion) return;
 
     let startTime: number;
     let animationFrame: number;
@@ -183,11 +208,11 @@ export function CountUp({
 
     animationFrame = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animationFrame);
-  }, [isVisible, end, duration]);
+  }, [isVisible, end, duration, prefersReducedMotion]);
 
   return (
     <span ref={ref} className={className}>
-      {prefix}{formatter(value)}{suffix}
+      {prefix}{formatter(prefersReducedMotion ? end : value)}{suffix}
     </span>
   );
 }
@@ -204,18 +229,19 @@ interface TextRevealProps {
 
 export function TextReveal({ text, className, delay = 0, charDelay = 20 }: TextRevealProps) {
   return (
-    <span className={className} aria-label={text}>
-      {text.split('').map((char, index) => (
-        <AnimatedContainer
-          key={index}
-          delay={delay + index * charDelay}
-          animation="fade"
-          duration={400}
-          className="inline-block"
-        >
-          {char === ' ' ? '\u00A0' : char}
-        </AnimatedContainer>
-      ))}
+    <span className={className}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">
+        {text.split('').map((char, index) => (
+          <span
+            key={index}
+            className="inline-block opacity-0 animate-in fade-in-0 motion-reduce:opacity-100 motion-reduce:animate-none"
+            style={{ animationDelay: `${delay + index * charDelay}ms`, animationDuration: '400ms', animationFillMode: 'forwards' }}
+          >
+            {char === ' ' ? '\u00A0' : char}
+          </span>
+        ))}
+      </span>
     </span>
   );
 }

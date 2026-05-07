@@ -1,4 +1,4 @@
-import { getVisitorAnalyticsSnapshot } from '../lib/visitor-analytics';
+import { getVisitorAnalyticsSnapshot, type VisitorAnalyticsSnapshot } from '../lib/visitor-analytics';
 import { CyberPanel } from './AdminVisuals';
 import { AnimatedContainer } from './AnimatedContainer';
 
@@ -12,10 +12,11 @@ import type { AnalyticsWindowDays } from '../lib/analytics-windows';
 
 interface AsyncVisitorsSectionProps {
   windowDays?: AnalyticsWindowDays;
+  analytics?: VisitorAnalyticsSnapshot;
 }
 
-export async function AsyncVisitorsSection({ windowDays }: AsyncVisitorsSectionProps) {
-  const analytics = await getVisitorAnalyticsSnapshot(windowDays);
+export async function AsyncVisitorsSection({ windowDays, analytics: analyticsSnapshot }: AsyncVisitorsSectionProps) {
+  const analytics = analyticsSnapshot ?? await getVisitorAnalyticsSnapshot(windowDays);
 
   return (
     <div className="space-y-8">
@@ -68,14 +69,32 @@ export async function AsyncVisitorsSection({ windowDays }: AsyncVisitorsSectionP
         <div className="grid gap-4 xl:grid-cols-[1.45fr_0.9fr]">
           <AnimatedContainer animation="fade-slide" delay={300}>
             <CyberPanel title="Traffic Pulse" description="Daily PostHog pageviews, visitors, and sessions." iconName="activity">
-              <ChartInteraction title="Traffic Trends">
+              <ChartInteraction
+                title="Traffic Trends"
+                summary={`Daily traffic chart for ${analytics.windowDays} days with ${analytics.trafficSeries.length} data points.`}
+                dataDescription={{
+                  caption: 'Daily traffic values',
+                  rows: analytics.trafficSeries.map((point) => ({
+                    label: point.date,
+                    value: `${point.pageviews} pageviews`,
+                    detail: `${point.visitors} visitors, ${point.sessions} sessions`,
+                  })),
+                }}
+              >
                 <DynamicTrafficAreaChart data={analytics.trafficSeries} />
               </ChartInteraction>
             </CyberPanel>
           </AnimatedContainer>
           <AnimatedContainer animation="fade-slide" delay={350}>
             <CyberPanel title="Event Mix" description="Tracked events across the current visitor window." iconName="radar">
-              <ChartInteraction title="Event Distribution">
+              <ChartInteraction
+                title="Event Distribution"
+                summary={`Event distribution chart with ${analytics.eventMix.length} event rows.`}
+                dataDescription={{
+                  caption: 'Event distribution values',
+                  rows: analytics.eventMix,
+                }}
+              >
                 <DynamicRankedBarChart rows={analytics.eventMix} emptyLabel="No events have been captured yet." />
               </ChartInteraction>
             </CyberPanel>
@@ -85,14 +104,28 @@ export async function AsyncVisitorsSection({ windowDays }: AsyncVisitorsSectionP
         <div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
           <AnimatedContainer animation="fade-slide" delay={400}>
             <CyberPanel title="Top Pages" description="Pageview leaders with unique visitor context." iconName="bar-chart">
-              <ChartInteraction title="Page Performance">
+              <ChartInteraction
+                title="Page Performance"
+                summary={`Top pages chart with ${analytics.topPages.length} page rows.`}
+                dataDescription={{
+                  caption: 'Top page performance values',
+                  rows: analytics.topPages,
+                }}
+              >
                 <DynamicRankedBarChart rows={analytics.topPages} emptyLabel="No pageviews have been captured yet." />
               </ChartInteraction>
             </CyberPanel>
           </AnimatedContainer>
           <AnimatedContainer animation="fade-slide" delay={450}>
             <CyberPanel title="Device Split" description="Device categories from captured page views." iconName="activity">
-              <ChartInteraction title="Device Breakdown">
+              <ChartInteraction
+                title="Device Breakdown"
+                summary={`Device breakdown chart with ${analytics.devices.length} device rows.`}
+                dataDescription={{
+                  caption: 'Device breakdown values',
+                  rows: analytics.devices,
+                }}
+              >
                 <DynamicDonutBreakdown rows={analytics.devices} emptyLabel="No device categories have been captured yet." centerLabel="Views" />
               </ChartInteraction>
             </CyberPanel>
@@ -101,9 +134,20 @@ export async function AsyncVisitorsSection({ windowDays }: AsyncVisitorsSectionP
 
         <AnimatedContainer animation="fade-slide" delay={500}>
           <CyberPanel title="Engagement Matrix" description="Top pages crossed with interaction event families." iconName="activity">
-            <ChartInteraction title="Engagement Overview">
-              <DynamicEngagementMatrix rows={analytics.pageEngagement} />
-            </ChartInteraction>
+              <ChartInteraction
+                title="Engagement Overview"
+                summary={`Engagement matrix with ${analytics.pageEngagement.length} page rows.`}
+                dataDescription={{
+                  caption: 'Page engagement values',
+                  rows: analytics.pageEngagement.map((row) => ({
+                    label: row.page,
+                    value: `${row.pageviews} pageviews`,
+                    detail: `${row.visitors} visitors, ${Object.entries(row.interactions).map(([name, count]) => `${name}: ${count}`).join(', ') || 'no interactions'}`,
+                  })),
+                }}
+              >
+                <DynamicEngagementMatrix rows={analytics.pageEngagement} />
+              </ChartInteraction>
           </CyberPanel>
         </AnimatedContainer>
 

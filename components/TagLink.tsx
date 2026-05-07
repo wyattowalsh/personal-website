@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+import { cn, getTagHref } from "@/lib/utils";
 
 interface TagLinkProps {
   tag: string;
@@ -32,7 +32,7 @@ export function TagLink({ tag, count, showCount = false, isNested = false }: Tag
 
   return isNested ? content : (
     <Link
-      href={`/blog/tags/${tag}`}
+      href={getTagHref(tag)}
       className={cn(
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-md"
       )}

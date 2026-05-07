@@ -11,18 +11,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  CONTENT_SEARCH_SCOPES,
+  DEFAULT_FILTERS,
+  type ContentFilterValues,
+} from '../content/filter-utils';
 
-export interface ContentFilterValues {
-  tag: string;
-  sort: string;
-  search: string;
-}
-
-export const DEFAULT_FILTERS: ContentFilterValues = {
-  tag: 'all',
-  sort: 'newest',
-  search: '',
-};
+export { DEFAULT_FILTERS, type ContentFilterValues } from '../content/filter-utils';
 
 interface ContentFiltersProps {
   allTags: string[];
@@ -64,7 +59,8 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
   const isFiltered =
     filters.tag !== DEFAULT_FILTERS.tag ||
     filters.sort !== DEFAULT_FILTERS.sort ||
-    filters.search !== DEFAULT_FILTERS.search;
+    filters.search !== DEFAULT_FILTERS.search ||
+    filters.scope !== DEFAULT_FILTERS.scope;
 
   const handleReset = () => {
     setSearchInput('');
@@ -72,12 +68,21 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <form
+      role="search"
+      aria-label="Filter posts"
+      className="flex flex-wrap items-center gap-3"
+      onSubmit={(event) => event.preventDefault()}
+    >
       {/* Search */}
       <div className="relative min-w-[200px] flex-1 sm:max-w-xs">
-        <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Search aria-hidden="true" className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          type="text"
+          id="admin-content-search"
+          name="search"
+          type="search"
+          aria-label="Search posts"
+          autoComplete="off"
           placeholder="Search posts..."
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
@@ -90,7 +95,7 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
         value={filters.tag}
         onValueChange={(value) => onFilterChange({ ...filters, tag: value })}
       >
-        <SelectTrigger className="w-[160px] border-border/80 bg-background/70">
+        <SelectTrigger aria-label="Filter by tag" className="w-[160px] border-border/80 bg-background/70">
           <SelectValue placeholder="All Tags" />
         </SelectTrigger>
         <SelectContent>
@@ -103,12 +108,29 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
         </SelectContent>
       </Select>
 
+      {/* Search scope */}
+      <Select
+        value={filters.scope}
+        onValueChange={(value) => onFilterChange({ ...filters, scope: value as ContentFilterValues['scope'] })}
+      >
+        <SelectTrigger aria-label="Search scope" className="w-[160px] border-border/80 bg-background/70">
+          <SelectValue placeholder="Title" />
+        </SelectTrigger>
+        <SelectContent>
+          {CONTENT_SEARCH_SCOPES.map((scope) => (
+            <SelectItem key={scope} value={scope}>
+              {scope === 'all' ? 'All Fields' : scope[0].toUpperCase() + scope.slice(1)}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
       {/* Sort */}
       <Select
         value={filters.sort}
-        onValueChange={(value) => onFilterChange({ ...filters, sort: value })}
+        onValueChange={(value) => onFilterChange({ ...filters, sort: value as ContentFilterValues['sort'] })}
       >
-        <SelectTrigger className="w-[160px] border-border/80 bg-background/70">
+        <SelectTrigger aria-label="Sort posts" className="w-[160px] border-border/80 bg-background/70">
           <SelectValue placeholder="Newest" />
         </SelectTrigger>
         <SelectContent>
@@ -122,11 +144,11 @@ export function ContentFilters({ allTags, onFilterChange, filters }: ContentFilt
 
       {/* Reset */}
       {isFiltered && (
-        <Button variant="ghost" size="sm" onClick={handleReset} className="gap-1.5">
-          <X className="h-3.5 w-3.5" />
+        <Button type="button" variant="ghost" size="sm" onClick={handleReset} className="gap-1.5">
+          <X aria-hidden="true" className="h-3.5 w-3.5" />
           Reset
         </Button>
       )}
-    </div>
+    </form>
   );
 }

@@ -15,8 +15,57 @@ describe('ContentFilters', () => {
     );
 
     expect(screen.getByPlaceholderText('Search posts...')).toBeInTheDocument();
-    expect(screen.getByText('All Tags')).toBeInTheDocument();
-    expect(screen.getByText('Newest')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Filter by tag' })).toHaveTextContent('All Tags');
+    expect(screen.getByRole('combobox', { name: 'Sort posts' })).toHaveTextContent('Newest');
+  });
+
+  it('exposes search as a named search field with form metadata', () => {
+    const onChange = vi.fn();
+    render(
+      <ContentFilters
+        allTags={['react', 'typescript', 'nextjs']}
+        onFilterChange={onChange}
+        filters={DEFAULT_FILTERS}
+      />
+    );
+
+    expect(screen.getByRole('search', { name: 'Filter posts' })).toBeInTheDocument();
+    const searchInput = screen.getByRole('searchbox', { name: 'Search posts' });
+
+    expect(searchInput).toHaveAttribute('id', 'admin-content-search');
+    expect(searchInput).toHaveAttribute('name', 'search');
+  });
+
+  it('does not submit the filter form when pressing Enter in search', () => {
+    const onChange = vi.fn();
+    render(
+      <ContentFilters
+        allTags={['react', 'typescript', 'nextjs']}
+        onFilterChange={onChange}
+        filters={DEFAULT_FILTERS}
+      />
+    );
+
+    const form = screen.getByRole('search', { name: 'Filter posts' });
+    const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+    form.dispatchEvent(submitEvent);
+
+    expect(submitEvent.defaultPrevented).toBe(true);
+  });
+
+  it('names tag and sort filter controls', () => {
+    const onChange = vi.fn();
+    render(
+      <ContentFilters
+        allTags={['react', 'typescript', 'nextjs']}
+        onFilterChange={onChange}
+        filters={DEFAULT_FILTERS}
+      />
+    );
+
+    expect(screen.getByRole('combobox', { name: 'Filter by tag' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Sort posts' })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Search scope' })).toBeInTheDocument();
   });
 
   it('shows reset button when filtered', () => {

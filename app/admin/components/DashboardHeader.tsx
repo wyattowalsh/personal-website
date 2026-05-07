@@ -96,7 +96,7 @@ export function DashboardHeader({
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
           >
-            <RefreshCw className={cn('size-3.5', isLoading && 'animate-spin')} />
+            <RefreshCw aria-hidden="true" className={cn('size-3.5', isLoading && 'animate-spin motion-reduce:animate-none')} />
             {isLoading ? 'Refreshing...' : 'Refresh'}
           </button>
         )}

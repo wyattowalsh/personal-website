@@ -344,3 +344,50 @@ export async function getVisitorAnalyticsSnapshot(windowDays: AnalyticsWindowDay
     );
   }
 }
+
+export async function getVisitorAnalyticsShellSnapshot(windowDays: AnalyticsWindowDays = DEFAULT_ANALYTICS_WINDOW_DAYS): Promise<VisitorAnalyticsSnapshot> {
+  if (windowDays !== DEFAULT_ANALYTICS_WINDOW_DAYS) {
+    try {
+      const { getRollupAnalyticsSnapshot } = await import('./analytics-rollups');
+      return await getRollupAnalyticsSnapshot(windowDays);
+    } catch (error) {
+      return emptySnapshot(
+        'error',
+        [],
+        error instanceof Error ? error.message : 'Analytics rollup unavailable',
+        windowDays
+      );
+    }
+  }
+
+  const { config, missingEnv } = getPostHogConfig();
+  if (!config) return emptySnapshot('missing_config', missingEnv, undefined, windowDays);
+
+  try {
+    const overviewRows = await queryPostHog(
+      config,
+      'admin shell overview',
+      `SELECT count() AS pageviews, uniqExact(distinct_id) AS visitors, uniqExact(properties.session_id) AS sessions
+       FROM events
+       WHERE timestamp >= now() - INTERVAL ${windowDays} DAY AND event = '$pageview'`
+    );
+    const overview = overviewRows[0] ?? [];
+
+    return {
+      ...emptySnapshot('configured', [], undefined, windowDays),
+      overview: [
+        { label: 'Visitors', value: formatCount(overview[1]), description: 'Unique anonymous browsers' },
+        { label: 'Sessions', value: formatCount(overview[2]), description: 'Per-tab visit sessions' },
+        { label: 'Pageviews', value: formatCount(overview[0]), description: 'Tracked PostHog page views' },
+        { label: 'Interactions', value: 'n/a', description: 'Open Visitors for detailed event totals' },
+      ],
+    };
+  } catch (error) {
+    return emptySnapshot(
+      'error',
+      [],
+      error instanceof Error ? error.message : 'PostHog shell analytics query failed',
+      windowDays
+    );
+  }
+}

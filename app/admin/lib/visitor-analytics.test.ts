@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { getVisitorAnalyticsSnapshot } from './visitor-analytics';
+import { getVisitorAnalyticsShellSnapshot, getVisitorAnalyticsSnapshot } from './visitor-analytics';
 
 vi.mock('./analytics-rollups', () => ({
   getRollupAnalyticsSnapshot: vi.fn((windowDays: number) => Promise.resolve({
@@ -122,8 +122,36 @@ describe('getVisitorAnalyticsSnapshot()', () => {
     });
   });
 
+  it('queries only the overview needed for the admin shell snapshot', async () => {
+    process.env.NEXT_PUBLIC_POSTHOG_TOKEN = 'phc_public';
+    process.env.POSTHOG_PERSONAL_API_KEY = 'phx_secret';
+    process.env.POSTHOG_PROJECT_ID = '12345';
+    vi.mocked(fetch).mockResolvedValue(mockJsonResponse({ results: [[42, 12, 9]] }));
+
+    const snapshot = await getVisitorAnalyticsShellSnapshot();
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.overview).toEqual([
+      { label: 'Visitors', value: '12', description: 'Unique anonymous browsers' },
+      { label: 'Sessions', value: '9', description: 'Per-tab visit sessions' },
+      { label: 'Pageviews', value: '42', description: 'Tracked PostHog page views' },
+      { label: 'Interactions', value: 'n/a', description: 'Open Visitors for detailed event totals' },
+    ]);
+    expect(snapshot.trafficSeries).toEqual([]);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it('uses persisted rollups for visitor windows beyond 30 days', async () => {
     const snapshot = await getVisitorAnalyticsSnapshot(90);
+
+    expect(snapshot.status).toBe('configured');
+    expect(snapshot.source).toBe('turso_rollup');
+    expect(snapshot.windowDays).toBe(90);
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('uses persisted rollups for shell visitor windows beyond 30 days', async () => {
+    const snapshot = await getVisitorAnalyticsShellSnapshot(90);
 
     expect(snapshot.status).toBe('configured');
     expect(snapshot.source).toBe('turso_rollup');

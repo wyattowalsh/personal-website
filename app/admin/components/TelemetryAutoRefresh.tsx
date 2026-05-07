@@ -85,7 +85,7 @@ export function TelemetryAutoRefresh({ intervalMs = DEFAULT_INTERVAL_MS }: Telem
         disabled={isPending}
         onClick={triggerRefresh}
       >
-        <RefreshCw className={isPending ? 'size-4 animate-spin' : 'size-4'} />
+        <RefreshCw aria-hidden="true" className={isPending ? 'size-4 animate-spin motion-reduce:animate-none' : 'size-4'} />
       </Button>
     </div>
   );

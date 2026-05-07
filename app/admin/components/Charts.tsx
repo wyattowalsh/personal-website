@@ -23,6 +23,7 @@ import {
   type ChartConfig,
 } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import type { AnalyticsMetric, AnalyticsRow } from '../lib/visitor-analytics';
 
 const chartColors = [
@@ -32,6 +33,13 @@ const chartColors = [
   'hsl(var(--chart-4))',
   'hsl(var(--chart-5))',
 ];
+
+function parseMetricValue(value: string | number | undefined): number {
+  if (typeof value === 'number') return value;
+  if (!value) return 0;
+  const numeric = Number.parseFloat(value.replace(/,/g, ''));
+  return Number.isFinite(numeric) ? numeric : 0;
+}
 
 interface EnhancedTrafficAreaChartProps {
   data: Array<{
@@ -44,6 +52,7 @@ interface EnhancedTrafficAreaChartProps {
 
 export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps) {
   const [hoveredMetric, setHoveredMetric] = useState<string | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const chartConfig = {
     pageviews: { label: 'Pageviews', color: 'hsl(var(--chart-1))' },
@@ -79,7 +88,7 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             onMouseEnter={() => setHoveredMetric(key)}
             onMouseLeave={() => setHoveredMetric(null)}
             className={cn(
-              'group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-4 transition-all duration-300 cursor-pointer',
+              'group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-4 transition-all duration-300',
               hoveredMetric === key && 'border-border/80 bg-gradient-to-br from-muted/60 to-muted/30 shadow-md shadow-foreground/10'
             )}
           >
@@ -123,8 +132,8 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             stroke="var(--color-pageviews)"
             fill="url(#trafficPageviews)"
             strokeWidth={hoveredMetric === 'pageviews' ? 3 : 2}
-            isAnimationActive={true}
-            animationDuration={600}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
           />
           <Area
             type="monotone"
@@ -132,8 +141,8 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             stroke="var(--color-visitors)"
             fill="url(#trafficVisitors)"
             strokeWidth={hoveredMetric === 'visitors' ? 3 : 2}
-            isAnimationActive={true}
-            animationDuration={600}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
           />
           <Area
             type="monotone"
@@ -141,8 +150,8 @@ export function EnhancedTrafficAreaChart({ data }: EnhancedTrafficAreaChartProps
             stroke="var(--color-sessions)"
             fill="transparent"
             strokeWidth={hoveredMetric === 'sessions' ? 3 : 2}
-            isAnimationActive={true}
-            animationDuration={600}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
           />
         </AreaChart>
       </ChartContainer>
@@ -164,13 +173,7 @@ export function EnhancedRankedBarChart({
   maxItems = 10,
 }: EnhancedRankedBarChartProps) {
   const [selectedBar, setSelectedBar] = useState<number | null>(null);
-
-  function parseMetricValue(value: string | number | undefined): number {
-    if (typeof value === 'number') return value;
-    if (!value) return 0;
-    const numeric = Number.parseFloat(value.replace(/,/g, ''));
-    return Number.isFinite(numeric) ? numeric : 0;
-  }
+  const prefersReducedMotion = useReducedMotion();
 
   const data = useMemo(() => {
     return rows.slice(0, maxItems).map((row, index) => ({
@@ -220,6 +223,8 @@ export function EnhancedRankedBarChart({
           <Bar
             dataKey="value"
             radius={[0, 8, 8, 0]}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
             onMouseEnter={(_, index) => setSelectedBar(index)}
             onMouseLeave={() => setSelectedBar(null)}
           >
@@ -249,13 +254,7 @@ export function EnhancedDonutBreakdown({
   centerLabel = 'Total',
 }: EnhancedDonutBreakdownProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-
-  function parseMetricValue(value: string | number | undefined): number {
-    if (typeof value === 'number') return value;
-    if (!value) return 0;
-    const numeric = Number.parseFloat(value.replace(/,/g, ''));
-    return Number.isFinite(numeric) ? numeric : 0;
-  }
+  const prefersReducedMotion = useReducedMotion();
 
   const data = useMemo(() => {
     return rows
@@ -287,6 +286,8 @@ export function EnhancedDonutBreakdown({
           return (
             <button
               key={entry.name}
+              type="button"
+              aria-pressed={activeIndex === index}
               onClick={() => setActiveIndex(activeIndex === index ? null : index)}
               className={cn(
                 'group relative overflow-hidden rounded-lg border border-border/60 bg-gradient-to-br from-muted/40 to-muted/20 p-3 text-left transition-all duration-300 hover:border-border/80 hover:bg-gradient-to-br hover:from-muted/60 hover:to-muted/30 hover:shadow-md',
@@ -316,6 +317,8 @@ export function EnhancedDonutBreakdown({
             innerRadius={56}
             outerRadius={92}
             paddingAngle={2}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
             onMouseEnter={(_, index) => setActiveIndex(index)}
             onMouseLeave={() => setActiveIndex(null)}
           >
@@ -347,13 +350,7 @@ interface EnhancedScoreRadialsProps {
 
 export function EnhancedScoreRadials({ metrics }: EnhancedScoreRadialsProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
-  function parseMetricValue(value: string | number | undefined): number {
-    if (typeof value === 'number') return value;
-    if (!value) return 0;
-    const numeric = Number.parseFloat(value.replace(/,/g, ''));
-    return Number.isFinite(numeric) ? numeric : 0;
-  }
+  const prefersReducedMotion = useReducedMotion();
 
   const data = useMemo(() => {
     return metrics.slice(0, 4).map((metric, index) => ({
@@ -378,7 +375,7 @@ export function EnhancedScoreRadials({ metrics }: EnhancedScoreRadialsProps) {
           <ChartContainer config={{ score: { label: metric.label, color: metric.fill } }} className="mx-auto aspect-square h-40">
             <RadialBarChart data={[metric]} startAngle={90} endAngle={-270} innerRadius={52} outerRadius={72}>
               <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-              <RadialBar dataKey="score" background cornerRadius={12} fill={metric.fill} isAnimationActive={true} />
+              <RadialBar dataKey="score" background cornerRadius={12} fill={metric.fill} isAnimationActive={!prefersReducedMotion} />
               <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
                 <tspan x="50%" y="45%" className="fill-foreground text-2xl font-bold">
                   {metric.score}

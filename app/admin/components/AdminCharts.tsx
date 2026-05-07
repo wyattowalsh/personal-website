@@ -21,6 +21,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from '@/lib/utils';
 import type { AnalyticsMetric, AnalyticsRow, PageEngagementRow, TrafficPoint } from '../lib/visitor-analytics';
 import { EmptyState } from './AdminVisuals';
@@ -48,6 +49,7 @@ function emptyChart(label: string) {
 
 /* ── TrafficAreaChart ────────────────────────────────────────────── */
 export function TrafficAreaChart({ data }: { data: TrafficPoint[] }) {
+  const prefersReducedMotion = useReducedMotion();
   const chartConfig = {
     pageviews: { label: 'Pageviews', color: 'hsl(var(--chart-1))' },
     visitors: { label: 'Visitors', color: 'hsl(var(--chart-3))' },
@@ -78,9 +80,9 @@ export function TrafficAreaChart({ data }: { data: TrafficPoint[] }) {
         <XAxis dataKey="date" tickLine={false} axisLine={false} minTickGap={24} tickMargin={10} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
         <YAxis hide />
         <ChartTooltip content={<ChartTooltipContent indicator="line" />} />
-        <Area type="monotone" dataKey="pageviews" stroke="var(--color-pageviews)" fill="url(#trafficPageviews)" strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: 'var(--color-pageviews)' }} />
-        <Area type="monotone" dataKey="visitors" stroke="var(--color-visitors)" fill="url(#trafficVisitors)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: 'var(--color-visitors)' }} />
-        <Area type="monotone" dataKey="sessions" stroke="var(--color-sessions)" fill="url(#trafficSessions)" strokeWidth={1.5} dot={false} activeDot={{ r: 3, strokeWidth: 0, fill: 'var(--color-sessions)' }} />
+        <Area type="monotone" dataKey="pageviews" stroke="var(--color-pageviews)" fill="url(#trafficPageviews)" strokeWidth={2.5} dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: 'var(--color-pageviews)' }} isAnimationActive={!prefersReducedMotion} animationDuration={prefersReducedMotion ? 0 : 600} />
+        <Area type="monotone" dataKey="visitors" stroke="var(--color-visitors)" fill="url(#trafficVisitors)" strokeWidth={2} dot={false} activeDot={{ r: 4, strokeWidth: 0, fill: 'var(--color-visitors)' }} isAnimationActive={!prefersReducedMotion} animationDuration={prefersReducedMotion ? 0 : 600} />
+        <Area type="monotone" dataKey="sessions" stroke="var(--color-sessions)" fill="url(#trafficSessions)" strokeWidth={1.5} dot={false} activeDot={{ r: 3, strokeWidth: 0, fill: 'var(--color-sessions)' }} isAnimationActive={!prefersReducedMotion} animationDuration={prefersReducedMotion ? 0 : 600} />
       </AreaChart>
     </ChartContainer>
   );
@@ -96,6 +98,7 @@ export function RankedBarChart({
   emptyLabel: string;
   className?: string;
 }) {
+  const prefersReducedMotion = useReducedMotion();
   const data = rows.slice(0, 8).map((row, index) => ({
     label: row.label.length > 28 ? `${row.label.slice(0, 28)}...` : row.label,
     fullLabel: row.label,
@@ -111,7 +114,7 @@ export function RankedBarChart({
         <XAxis type="number" hide />
         <YAxis dataKey="label" type="category" tickLine={false} axisLine={false} width={120} tickMargin={8} tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
         <ChartTooltip content={<ChartTooltipContent hideLabel />} cursor={{ fill: 'hsl(var(--muted) / 0.3)', radius: 4 }} />
-        <Bar dataKey="value" radius={[0, 6, 6, 0]}>
+        <Bar dataKey="value" radius={[0, 6, 6, 0]} isAnimationActive={!prefersReducedMotion} animationDuration={prefersReducedMotion ? 0 : 600}>
           {data.map((entry) => (
             <Cell key={entry.fullLabel} fill={entry.fill} className="transition-opacity duration-200 hover:opacity-80" />
           ))}
@@ -131,6 +134,7 @@ export function DonutBreakdown({
   emptyLabel: string;
   centerLabel?: string;
 }) {
+  const prefersReducedMotion = useReducedMotion();
   const data = rows.slice(0, 6).map((row, index) => ({
     name: row.label,
     value: parseMetricValue(row.value),
@@ -144,7 +148,7 @@ export function DonutBreakdown({
     <ChartContainer config={{ value: { label: centerLabel, color: 'hsl(var(--chart-1))' } }} className="h-64 w-full">
       <PieChart>
         <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-        <Pie data={data} dataKey="value" nameKey="name" innerRadius={56} outerRadius={88} paddingAngle={3} strokeWidth={2} stroke="hsl(var(--card))">
+        <Pie data={data} dataKey="value" nameKey="name" innerRadius={56} outerRadius={88} paddingAngle={3} strokeWidth={2} stroke="hsl(var(--card))" isAnimationActive={!prefersReducedMotion} animationDuration={prefersReducedMotion ? 0 : 600}>
           {data.map((entry) => (
             <Cell key={entry.name} fill={entry.fill} className="transition-all duration-300 hover:opacity-80" />
           ))}
@@ -171,6 +175,7 @@ export function DonutBreakdown({
 
 /* ── ScoreRadials ────────────────────────────────────────────────── */
 export function ScoreRadials({ metrics }: { metrics: AnalyticsMetric[] }) {
+  const prefersReducedMotion = useReducedMotion();
   const data = metrics.slice(0, 4).map((metric, index) => ({
     ...metric,
     score: Math.max(0, Math.min(100, parseMetricValue(metric.value))),
@@ -186,7 +191,7 @@ export function ScoreRadials({ metrics }: { metrics: AnalyticsMetric[] }) {
             <ChartContainer config={{ score: { label: metric.label, color: metric.fill } }} className="mx-auto aspect-square h-36">
               <RadialBarChart data={[metric]} startAngle={90} endAngle={-270} innerRadius={46} outerRadius={64}>
                 <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-                <RadialBar dataKey="score" background={{ fill: 'hsl(var(--muted) / 0.3)' }} cornerRadius={8} fill={metric.fill} className="transition-all duration-500" />
+                <RadialBar dataKey="score" background={{ fill: 'hsl(var(--muted) / 0.3)' }} cornerRadius={8} fill={metric.fill} className="transition-all duration-500" isAnimationActive={!prefersReducedMotion} animationDuration={prefersReducedMotion ? 0 : 600} />
                 <Label
                   content={({ viewBox }) => {
                     if (!viewBox || !('cx' in viewBox) || !('cy' in viewBox)) return null;

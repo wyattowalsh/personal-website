@@ -21,9 +21,7 @@ export interface PostMetadataOptions {
 export function generatePostMetadata({ post, slug }: PostMetadataOptions): Metadata {
   const identity = getSiteIdentity();
   const postUrl = getAbsoluteUrl(`/blog/posts/${slug}`);
-  const ogImage = post.image 
-    ? getAbsoluteUrl(post.image)
-    : identity.ogImageUrl;
+  const ogImage = getAbsoluteUrl(`/blog/posts/${slug}/opengraph-image`);
 
   return {
     title: post.title,

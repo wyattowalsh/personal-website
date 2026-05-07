@@ -3,6 +3,7 @@ import { PostCard } from "@/components/PostCard";
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
 import { getConfig } from "@/lib/config";
+import { getTagHref } from "@/lib/utils";
 
 const siteUrl = getConfig().site.url;
 
@@ -10,7 +11,7 @@ export async function generateStaticParams() {
     await BackendService.ensurePreprocessed();
     const tags = await BackendService.getInstance().getAllTags();
     return tags.map((tag) => ({
-        tag: encodeURIComponent(tag),
+        tag,
     }));
 }
 
@@ -19,7 +20,7 @@ export async function generateMetadata({
 }: { params: Promise<{ tag: string }> }): Promise<Metadata> {
     const { tag } = await params;
     const decodedTag = decodeURIComponent(tag);
-    const canonicalUrl = `${siteUrl}/blog/tags/${encodeURIComponent(decodedTag)}`;
+    const canonicalUrl = `${siteUrl}${getTagHref(decodedTag)}`;
 
     return {
         title: `Posts tagged with #${decodedTag}`,

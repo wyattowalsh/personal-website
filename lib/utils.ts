@@ -87,3 +87,7 @@ export function extractPostSlug(pathname: string): string | null {
   const match = pathname.match(/\/blog\/posts\/([^/]+)/);
   return match?.[1] || null;
 }
+
+export function getTagHref(tag: string): string {
+  return `/blog/tags/${encodeURIComponent(tag)}`;
+}

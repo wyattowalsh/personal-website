@@ -58,31 +58,32 @@ describe('generatePostMetadata', () => {
     expect(og?.images).toHaveLength(1);
   });
 
-  it('uses post image for OpenGraph when available', () => {
+  it('uses the generated post OpenGraph image route for social cards', () => {
     const post = createMockPost({ image: '/custom-image.png' });
     const meta = generatePostMetadata({ post, slug: 'test-post' });
     const og = meta.openGraph;
     const images = og?.images as Array<{ url: string }>;
 
-    expect(images?.[0]?.url).toContain('/custom-image.png');
+    expect(images?.[0]?.url).toContain('/blog/posts/test-post/opengraph-image');
+    expect(meta.twitter?.images).toEqual([images[0].url]);
   });
 
-  it('falls back to default OG image when post has no image', () => {
+  it('uses the generated post OpenGraph image route even when post has no image', () => {
     const post = createMockPost({ image: undefined });
     const meta = generatePostMetadata({ post, slug: 'test-post' });
     const og = meta.openGraph;
     const images = og?.images as Array<{ url: string }>;
 
-    expect(images?.[0]?.url).toContain('/opengraph.png');
+    expect(images?.[0]?.url).toContain('/blog/posts/test-post/opengraph-image');
   });
 
-  it('uses absolute URL for external post images', () => {
+  it('does not expose arbitrary external post images as social card metadata', () => {
     const post = createMockPost({ image: 'https://cdn.example.com/hero.jpg' });
     const meta = generatePostMetadata({ post, slug: 'test-post' });
     const og = meta.openGraph;
     const images = og?.images as Array<{ url: string }>;
 
-    expect(images?.[0]?.url).toBe('https://cdn.example.com/hero.jpg');
+    expect(images?.[0]?.url).toContain('/blog/posts/test-post/opengraph-image');
   });
 
   it('sets OpenGraph published and modified times', () => {

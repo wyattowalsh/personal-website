@@ -123,7 +123,7 @@ export const ParticlesBackground: FC<ParticlesBackgroundProps> = ({ className = 
   const [configOptions, setConfigOptions] = useState<ISourceOptions | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
-  const [density, setDensity] = useState<DensityLevel>('full');
+  const [density, setDensity] = useState<DensityLevel>('reduced');
 
   // Initialize theme
   const currentTheme: "light" | "dark" = resolvedTheme === 'dark' ? 'dark' : 'light';

@@ -11,6 +11,8 @@ export function Header() {
 	const isTransparent = pathname === "/" || pathname === "/blog";
 	const isAdminRoute = pathname?.startsWith("/admin") ?? false;
 
+	if (isAdminRoute) return null;
+
 	return (
 		<header
 			className={cn(
@@ -20,7 +22,7 @@ export function Header() {
 					: "bg-background/80 backdrop-blur-md border-b border-border/40"
 			)}
 		>
-			{!isAdminRoute && <BlogBackLink />}
+			<BlogBackLink />
 			<div className="flex items-center space-x-4 ml-auto">
 				<DarkModeToggle />
 			</div>

@@ -20,6 +20,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [checking, setChecking] = useState(true);
   const [desktopSidebarOpen, setDesktopSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const passwordInputId = 'admin-password';
+  const passwordErrorId = 'admin-password-error';
   const checkAuth = useCallback(async (signal?: AbortSignal) => {
     const response = await fetch('/api/admin/auth', {
       cache: 'no-store',
@@ -136,9 +138,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   if (checking) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
-        <div className="relative flex size-20 items-center justify-center">
-          <div className="absolute inset-0 animate-ping rounded-full border border-[hsl(var(--chart-1)/0.35)]" />
-          <div className="size-8 animate-spin rounded-full border-2 border-[hsl(var(--chart-1))] border-t-transparent" />
+        <div className="relative flex size-20 items-center justify-center" role="status" aria-label="Checking admin session">
+          <div className="absolute inset-0 animate-ping rounded-full border border-[hsl(var(--chart-1)/0.35)] motion-reduce:animate-none" />
+          <div className="size-8 animate-spin rounded-full border-2 border-[hsl(var(--chart-1))] border-t-transparent motion-reduce:animate-none" />
         </div>
       </div>
     );
@@ -159,7 +161,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[hsl(var(--chart-1))] to-transparent" />
           <div className="flex items-center gap-3 mb-6">
             <div className="rounded-lg border border-[hsl(var(--chart-1)/0.28)] bg-[hsl(var(--chart-1)/0.12)] p-2.5 text-[hsl(var(--chart-1))]">
-              <Radar className="h-5 w-5" />
+              <Radar aria-hidden="true" className="h-5 w-5" />
             </div>
             <div>
               <p className="font-mono text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">Secure console</p>
@@ -167,8 +169,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
+          <label htmlFor={passwordInputId} className="sr-only">
+            Admin password
+          </label>
           <Input
+            id={passwordInputId}
+            name="password"
             type="password"
+            autoComplete="current-password"
+            aria-invalid={error ? 'true' : undefined}
+            aria-describedby={error ? passwordErrorId : undefined}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password"
@@ -177,15 +187,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           />
 
           {error && (
-            <p className="text-sm text-destructive mb-3">{error}</p>
+            <p id={passwordErrorId} className="text-sm text-destructive mb-3" role="alert">
+              {error}
+            </p>
           )}
 
           <Button type="submit" className="w-full gap-2">
-            <LogIn className="h-4 w-4" />
+            <LogIn aria-hidden="true" className="h-4 w-4" />
             Sign In
           </Button>
           <div className="mt-4 flex items-center gap-2 font-mono text-[0.62rem] uppercase tracking-[0.16em] text-muted-foreground">
-            <Lock className="size-3" />
+            <Lock aria-hidden="true" className="size-3" />
             Secrets stay server-side
           </div>
         </form>
@@ -203,13 +215,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         setMobileSidebarOpen,
       }}
     >
-      <div className="flex h-screen overflow-hidden bg-background">
+      <div className="flex h-[calc(100dvh-3.5rem)] overflow-hidden bg-background sm:h-[calc(100dvh-4rem)]">
         <AdminSidebar />
-        <div className="flex flex-1 flex-col overflow-hidden">
+        <div
+          aria-hidden={mobileSidebarOpen ? 'true' : undefined}
+          inert={mobileSidebarOpen ? true : undefined}
+          className="flex flex-1 flex-col overflow-hidden"
+        >
+          <a
+            href="#admin-main"
+            className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          >
+            Skip admin navigation
+          </a>
           <AdminHeader />
-          <main className="flex-1 overflow-y-auto p-4 md:p-8">
+          <div id="admin-main" role="region" aria-label="Admin content" tabIndex={-1} className="flex-1 overflow-y-auto p-4 md:p-8">
             {children}
-          </main>
+          </div>
         </div>
       </div>
     </AdminProvider>

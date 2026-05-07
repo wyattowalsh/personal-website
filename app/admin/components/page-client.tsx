@@ -101,7 +101,7 @@ export function ProviderCard({ provider, animated = false }: { provider: AdminPr
             <Badge variant="outline" className="font-mono uppercase tracking-[0.12em] border-border/40 transition-colors duration-200 group-hover/card:border-border/60">
               Updated {formatGeneratedAt(provider.lastCheckedAt)}
             </Badge>
-            {isExternalSource && <SourceLink href={provider.sourceUrl} />}
+            {isExternalSource && <SourceLink href={provider.sourceUrl} label={provider.title} />}
           </div>
         </CardHeader>
         <CardContent className="relative z-10 space-y-5 p-5">
@@ -131,7 +131,14 @@ export function ProviderCard({ provider, animated = false }: { provider: AdminPr
           )}
 
           {provider.id === 'pagespeed-crux' && provider.cards.length > 0 ? (
-            <ChartInteraction title={`${provider.title} Metrics`}>
+            <ChartInteraction
+              title={`${provider.title} Metrics`}
+              summary={`${provider.title} score chart with ${provider.cards.length} metrics.`}
+              dataDescription={{
+                caption: `${provider.title} score values`,
+                rows: provider.cards,
+              }}
+            >
               <DynamicScoreRadials metrics={provider.cards} />
             </ChartInteraction>
           ) : provider.cards.length > 0 ? (

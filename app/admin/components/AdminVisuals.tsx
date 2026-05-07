@@ -201,6 +201,7 @@ export function SignalCard({
   tone?: 'blue' | 'violet' | 'emerald' | 'amber' | 'rose';
 }) {
   const ResolvedIcon = Icon ?? (iconName ? adminIconMap[iconName] : undefined);
+  const chartTone = tone === 'blue' ? 1 : tone === 'violet' ? 2 : tone === 'emerald' ? 3 : tone === 'amber' ? 4 : 5;
   const toneClasses = {
     blue: 'bg-[hsl(var(--chart-1)/0.10)] text-[hsl(var(--chart-1))] border-[hsl(var(--chart-1)/0.20)] shadow-[hsl(var(--chart-1)/0.08)]',
     violet: 'bg-[hsl(var(--chart-2)/0.10)] text-[hsl(var(--chart-2))] border-[hsl(var(--chart-2)/0.20)] shadow-[hsl(var(--chart-2)/0.08)]',
@@ -214,7 +215,7 @@ export function SignalCard({
       {/* ambient glow on hover */}
       <div
         className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full opacity-0 blur-2xl transition-opacity duration-500 group-hover/signal:opacity-100"
-        style={{ backgroundColor: `hsl(var(--chart-${tone === 'blue' ? 1 : tone === 'violet' ? 2 : tone === 'emerald' ? 3 : tone === 'amber' ? 4 : 5})) / 0.12)` }}
+        style={{ backgroundColor: `hsl(var(--chart-${chartTone}) / 0.12)` }}
       />
 
       <div className="relative z-10 flex items-start justify-between gap-3">
@@ -276,7 +277,7 @@ export function StatusPill({ status }: { status: AdminProviderStatus }) {
     >
       {item.pulse && (
         <span className="relative flex h-2 w-2">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--chart-3))] opacity-60" />
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[hsl(var(--chart-3))] opacity-60 motion-reduce:animate-none" />
           <span className="relative inline-flex h-2 w-2 rounded-full bg-[hsl(var(--chart-3))]" />
         </span>
       )}
@@ -312,7 +313,7 @@ export function ProviderSignalStrip({ providers }: { providers: AdminProviderSna
 /* ------------------------------------------------------------------ */
 /*  SourceLink                                                         */
 /* ------------------------------------------------------------------ */
-export function SourceLink({ href }: { href: string }) {
+export function SourceLink({ href, label = 'Source' }: { href: string; label?: string }) {
   if (!href.startsWith('http')) return null;
 
   return (
@@ -320,10 +321,11 @@ export function SourceLink({ href }: { href: string }) {
       href={href}
       target="_blank"
       rel="noreferrer"
+      aria-label={`Open ${label} source`}
       className="group/link inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-muted-foreground no-underline transition-all duration-300 hover:border-[hsl(var(--chart-1)/0.45)] hover:text-[hsl(var(--chart-1))] hover:shadow-sm"
     >
       Source
-      <ArrowUpRight className="size-3 transition-transform duration-300 group-hover/link:translate-x-[1px] group-hover/link:-translate-y-[1px]" />
+      <ArrowUpRight aria-hidden="true" className="size-3 transition-transform duration-300 group-hover/link:translate-x-[1px] group-hover/link:-translate-y-[1px]" />
     </a>
   );
 }
@@ -334,7 +336,7 @@ export function SourceLink({ href }: { href: string }) {
 export function LiveIndicator({ className }: { className?: string }) {
   return (
     <span className={cn('relative inline-flex h-2.5 w-2.5', className)}>
-      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75 motion-reduce:animate-none" />
       <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
     </span>
   );

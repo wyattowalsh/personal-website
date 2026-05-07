@@ -93,15 +93,15 @@
     0 14px 34px var(--sys-glow-soft);
 }
 
-.sceneCognitive.sceneCognitive .sceneBody {
+.sceneSynthetic.sceneSynthetic .sceneBody {
   grid-template-columns: minmax(0, 1fr) minmax(6.05rem, 7.15rem);
 }
 
-.sceneCognitive.sceneCognitive .titleBlock {
+.sceneSynthetic.sceneSynthetic .titleBlock {
   max-width: 14.6rem;
 }
 
-.sceneCognitive.sceneCognitive .titleLockup {
+.sceneSynthetic.sceneSynthetic .titleLockup {
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 78%, white 10%), color-mix(in oklab, var(--sys-panel-3) 92%, black 7%)),
     radial-gradient(circle at 12% 20%, var(--sys-glow-soft), transparent 58%);
@@ -120,15 +120,15 @@
   letter-spacing: clamp(0.02em, 0.34cqi, 0.038em);
 }
 
-.scenePlatform.scenePlatform .sceneBody {
+.sceneCloud.sceneCloud .sceneBody {
   grid-template-columns: minmax(6.3rem, 7.55rem) minmax(0, 1fr);
 }
 
-.scenePlatform.scenePlatform .titleBlock {
+.sceneCloud.sceneCloud .titleBlock {
   max-width: 14.75rem;
 }
 
-.scenePlatform.scenePlatform .titleLockup {
+.sceneCloud.sceneCloud .titleLockup {
   background:
     linear-gradient(180deg, color-mix(in oklab, var(--sys-panel-2) 80%, white 9%), var(--sys-panel-3)),
     linear-gradient(90deg, color-mix(in oklab, var(--sys-struct) 70%, transparent), transparent 64%);
@@ -164,9 +164,9 @@
   .sceneBody.sceneBody,
   .sceneCybernetic.sceneCybernetic .sceneBody,
   .sceneZeroTrust.sceneZeroTrust .sceneBody,
-  .sceneCognitive.sceneCognitive .sceneBody,
+  .sceneSynthetic.sceneSynthetic .sceneBody,
   .sceneQuantum.sceneQuantum .sceneBody,
-  .scenePlatform.scenePlatform .sceneBody,
+  .sceneCloud.sceneCloud .sceneBody,
   .sceneCartographer.sceneCartographer .sceneBody,
   .sceneOrchestrator.sceneOrchestrator .sceneBody {
     grid-template-columns: 1fr;
@@ -2024,6 +2024,48 @@
 
 .sceneCybernetic .titleBlock {
   max-width: 16.2rem;
+}
+
+/* Focused guard fix: single-card systems variants need enough plate width for unsplit labels. */
+
+@container (min-width: 23.001rem) {
+  .cluster:not(.clusterCompact) .sceneSynthetic .sceneBody {
+    grid-template-columns: minmax(0, 0.7fr) minmax(12.9rem, 1fr);
+  }
+
+  .cluster:not(.clusterCompact) .sceneSynthetic .titleBlock {
+    max-width: 15.1rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneSynthetic .titleLockup {
+    min-width: min(100%, 12.9rem);
+    padding: 1rem 1.04rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneSynthetic .title {
+    font-size: clamp(0.92rem, 1.2vw, 1.18rem);
+    letter-spacing: 0.008em;
+    line-height: 1.08;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCloud .sceneBody {
+    grid-template-columns: minmax(11.55rem, 0.86fr) minmax(0, 1fr);
+  }
+
+  .cluster:not(.clusterCompact) .sceneCloud .titleBlock {
+    max-width: 12.7rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCloud .titleLockup {
+    min-width: min(100%, 11.55rem);
+    padding: 1rem 0.98rem;
+  }
+
+  .cluster:not(.clusterCompact) .sceneCloud .title {
+    font-size: clamp(0.86rem, 1.12vw, 1.08rem);
+    letter-spacing: 0.008em;
+    line-height: 1.08;
+  }
 }
 
 .sceneCybernetic .titleLockup {

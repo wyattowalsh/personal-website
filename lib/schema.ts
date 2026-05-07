@@ -15,6 +15,11 @@ export interface SchemaOptions {
   dateModified?: string;
 }
 
+function toAbsoluteUrl(url: string, baseUrl: string): string {
+  if (/^https?:\/\//.test(url)) return url;
+  return new URL(url, `${baseUrl}/`).toString();
+}
+
 // Cache the generation of the website schema
 export const generateWebSiteSchema = cache(() => {
   const identity = getSiteIdentity();
@@ -75,7 +80,7 @@ export function generateArticleSchema(post: Post, options?: SchemaOptions) {
     '@type': 'BlogPosting',
     headline: post.title,
     description: post.summary,
-    image: post.image ? [`${baseUrl}${post.image}`] : options?.images || [],
+    image: post.image ? [toAbsoluteUrl(post.image, baseUrl)] : options?.images || [],
     datePublished: post.created,
     dateModified: post.updated || post.created,
     author: {

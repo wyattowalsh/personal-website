@@ -1,5 +1,6 @@
 import { BackendService } from "@/lib/server";
 import { HomePageClient } from "@/components/HomePageClient";
+import { LatestWriting } from "@/components/LatestWriting";
 import { Metadata } from 'next';
 import { getConfig } from '@/lib/config';
 import { PersonJsonLd } from '@/components/PostSchema';
@@ -48,7 +49,8 @@ export default async function HomePage() {
   return (
     <>
       <PersonJsonLd />
-      <HomePageClient recentPosts={recentPosts} />
+      <HomePageClient />
+      <LatestWriting recentPosts={recentPosts} />
     </>
   );
 }

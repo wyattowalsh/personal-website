@@ -141,6 +141,12 @@
   filter: blur(26px);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .imageContainer::before {
+    animation: none;
+  }
+}
+
 .imageContainer {
   width: 100%;
   margin: 0 auto;

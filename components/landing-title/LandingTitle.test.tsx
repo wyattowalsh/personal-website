@@ -121,7 +121,7 @@ describe('LandingTitle locked previews', () => {
     expect(screen.queryByText('adaptive command mesh')).toBeNull();
   });
 
-  it('renders every subtitle variant in compact audit mode without throwing', () => {
+  it('renders every subtitle variant with registry-aligned DOM metadata', () => {
     for (const option of LANDING_TITLE_SUBTITLE_OPTIONS) {
       const { unmount } = render(
         <LandingTitle
@@ -133,9 +133,37 @@ describe('LandingTitle locked previews', () => {
         />,
       );
 
-      expect(screen.getByRole('group', { name: new RegExp(option.text, 'i') })).toBeTruthy();
+      const group = screen.getByRole('group', { name: new RegExp(option.text, 'i') });
+
+      expect(group.getAttribute('data-subtitle-id')).toBe(option.id);
+      expect(group.getAttribute('data-subtitle-lane')).toBe(option.lane);
+      expect(group.getAttribute('data-surface')).toBe('audit');
+      expect(group.closest('[data-current-subtitle-id]')?.getAttribute('data-current-subtitle-id')).toBe(
+        option.id,
+      );
+      expect(screen.getByText(option.signalDeck.family)).toBeTruthy();
+      expect(screen.getByText(option.signalDeck.descriptor)).toBeTruthy();
       unmount();
     }
+  });
+
+  it('keeps reduced-motion title transitions transform-free', () => {
+    render(<LandingTitle forcedSubtitleId="cybernetic-architect" forceReducedMotion />);
+
+    const root = screen.getByText('Wyatt Walsh').closest('[data-motion-mode]');
+    const title = screen.getByRole('heading', { name: 'Wyatt Walsh', level: 1 });
+    const group = screen.getByRole('group', { name: /cyber tactician/i });
+
+    expect(root?.getAttribute('data-motion-mode')).toBe('reduced');
+    expect(title.getAttribute('style')).toContain('transition: filter 0.6s ease');
+    expect(title.getAttribute('style')).not.toContain('transform');
+    expect(group.querySelector('[data-motion="reduced"]')).toBeTruthy();
+  });
+
+  it('keeps title gradient animation disabled under reduced motion CSS', () => {
+    const css = readFileSync(join(process.cwd(), 'components/landing-title/subtitle.module.css'), 'utf8');
+
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*\.enhancedTitleLanding \{[\s\S]*animation: none/);
   });
 
   it('keeps visible subtitle copy dashless while retaining kebab-case ids', () => {

@@ -6,13 +6,14 @@ import {
   validateRequestOrigin,
   validateSessionToken,
 } from '@/lib/admin-auth';
+import { getConfig } from '@/lib/config';
 
 const indexNowSchema = z.object({
   urls: z.array(z.string().url()).min(1).max(100),
 });
 
 function getSiteUrl(): URL {
-  return new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.w4w.dev');
+  return new URL(getConfig().site.url);
 }
 
 export const POST = coreApi.middleware.withErrorHandler(
@@ -35,9 +36,9 @@ export const POST = coreApi.middleware.withErrorHandler(
 
     const body = await coreApi.middleware.validateRequest(request, indexNowSchema);
     const siteUrl = getSiteUrl();
-    const invalidUrl = body.urls.find((url) => new URL(url).hostname !== siteUrl.hostname);
+    const invalidUrl = body.urls.find((url) => new URL(url).origin !== siteUrl.origin);
     if (invalidUrl) {
-      throw new ApiError(400, 'IndexNow URLs must belong to the configured site host', { invalidUrl });
+      throw new ApiError(400, 'IndexNow URLs must belong to the configured site origin', { invalidUrl });
     }
 
     const response = await fetch('https://api.indexnow.org/indexnow', {

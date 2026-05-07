@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import { formatDate, isDifferentDate, cn } from "@/lib/utils";
+import { formatDate, isDifferentDate, cn, getTagHref } from "@/lib/utils";
 import Image from "next/image";
 import type { PostMetadata } from "@/lib/types";
 import { Calendar, Clock, Tag, Edit } from "lucide-react";
@@ -72,7 +72,7 @@ function MetadataTags({ tags }: MetadataTagsProps) {
           <TagPill
             key={tag}
             tag={tag}
-            href={`/blog/tags/${tag}`}
+            href={getTagHref(tag)}
             className="pointer-events-auto"
           />
         ))}

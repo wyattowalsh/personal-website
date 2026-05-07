@@ -46,6 +46,20 @@ function executeArgs(call: unknown[]): unknown[] {
   return [];
 }
 
+function batchSqlStatements(): string[] {
+  return mockClient.batch.mock.calls.flatMap((call) => {
+    const statements = call[0];
+    if (!Array.isArray(statements)) return [];
+    return statements.map((statement) => {
+      if (typeof statement === 'string') return statement;
+      if (statement && typeof statement === 'object' && 'sql' in statement) {
+        return String((statement as { sql: string }).sql);
+      }
+      return '';
+    });
+  });
+}
+
 beforeEach(() => {
   vi.restoreAllMocks();
   process.env = { ...ORIGINAL_ENV };
@@ -73,6 +87,8 @@ describe('analytics rollups', () => {
     expect(schemaStr).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_days');
     expect(schemaStr).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_dimensions');
     expect(schemaStr).toContain('CREATE TABLE IF NOT EXISTS analytics_rollup_runs');
+    expect(schemaStr.indexOf('CREATE TABLE IF NOT EXISTS analytics_rollup_runs'))
+      .toBeLessThan(schemaStr.indexOf('CREATE INDEX IF NOT EXISTS idx_analytics_rollup_runs_status'));
   });
 
   it('detects healthy schema when NOT NULL constraints are present', async () => {
@@ -181,6 +197,7 @@ describe('analytics rollups', () => {
       })
       .mockResolvedValueOnce({ rows: [{ count: 0 }] })
       .mockResolvedValueOnce({ rows: [{ count: 0 }] })
+      .mockResolvedValueOnce({ rows: [{ count: 0 }] })
       .mockResolvedValue({ rows: [] });
 
     const result = await repairAnalyticsRollupSchema(mockClient as never);
@@ -209,12 +226,37 @@ describe('analytics rollups', () => {
         ],
       }) // PRAGMA table_info(analytics_rollup_runs)
       .mockResolvedValueOnce({ rows: [{ count: 5 }] }) // COUNT analytics_rollup_days
-      .mockResolvedValueOnce({ rows: [{ count: 3 }] }); // COUNT analytics_rollup_runs
+      .mockResolvedValueOnce({ rows: [{ count: 3 }] }) // COUNT analytics_rollup_runs
+      .mockResolvedValueOnce({ rows: [{ count: 0 }] }); // COUNT analytics_rollup_dimensions
 
     const result = await repairAnalyticsRollupSchema(mockClient as never);
 
     expect(result.success).toBe(false);
     expect(result.message).toContain('Cannot auto-repair');
+  });
+
+  it('refuses to repair rollup tables when only dimension data exists', async () => {
+    configureEnv();
+    mockClient.execute
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'day', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({
+        rows: [
+          { cid: 0, name: 'id', type: 'TEXT', notnull: 0, dflt_value: null, pk: 1 },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [{ count: 0 }] })
+      .mockResolvedValueOnce({ rows: [{ count: 0 }] })
+      .mockResolvedValueOnce({ rows: [{ count: 2 }] });
+
+    const result = await repairAnalyticsRollupSchema(mockClient as never);
+
+    expect(result.success).toBe(false);
+    expect(result.message).toContain('Cannot auto-repair');
+    expect(batchSqlStatements().some((sql) => sql.includes('DROP TABLE'))).toBe(false);
   });
 
   it('initializes schema when repair is called on fresh database with no tables', async () => {
@@ -374,10 +416,28 @@ describe('analytics rollups', () => {
       expect(runUpdates).toHaveLength(1);
       expect(executeArgs(runUpdates[0])).toContain('success');
 
-      const dimensionDeletes = mockClient.execute.mock.calls.filter((call) =>
-        executeSql(call).includes('DELETE FROM analytics_rollup_dimensions'),
+      const dimensionDeletes = batchSqlStatements().filter((sql) =>
+        sql.includes('DELETE FROM analytics_rollup_dimensions'),
       );
       expect(dimensionDeletes).toHaveLength(13);
+      const dayDeletes = batchSqlStatements().filter((sql) =>
+        sql.includes('DELETE FROM analytics_rollup_days'),
+      );
+      expect(dayDeletes).toHaveLength(13);
+    });
+
+    it('returns setup state before opening Turso when rollup env vars are missing', async () => {
+      delete process.env.TURSO_DATABASE_URL;
+      delete process.env.TURSO_AUTH_TOKEN;
+      delete process.env.CRON_SECRET;
+
+      const result = await refreshAnalyticsRollups(30);
+
+      expect(result.status).toBe('missing_config');
+      expect(result.windowDays).toBe(30);
+      expect(result.missingEnv).toEqual(['TURSO_DATABASE_URL', 'TURSO_AUTH_TOKEN', 'CRON_SECRET']);
+      expect(mockClient.execute).not.toHaveBeenCalled();
+      expect(mockClient.batch).not.toHaveBeenCalled();
     });
 
     it('isolates a chunk failure and records the failing range in the run error', async () => {
@@ -399,8 +459,8 @@ describe('analytics rollups', () => {
       expect(result.error).toContain('PostHog timeout');
       expect(result.error).toMatch(/chunk \d{4}-\d{2}-\d{2}\.\.\d{4}-\d{2}-\d{2}/);
 
-      const dimensionDeletes = mockClient.execute.mock.calls.filter((call) =>
-        executeSql(call).includes('DELETE FROM analytics_rollup_dimensions'),
+      const dimensionDeletes = batchSqlStatements().filter((sql) =>
+        sql.includes('DELETE FROM analytics_rollup_dimensions'),
       );
       expect(dimensionDeletes).toHaveLength(1);
 
@@ -455,18 +515,83 @@ describe('analytics rollups', () => {
         expect(body).not.toContain('BETWEEN now()');
       }
 
-      const dimensionDeletes = mockClient.execute.mock.calls.filter((call) =>
-        executeSql(call).includes('DELETE FROM analytics_rollup_dimensions'),
-      );
+      const dimensionDeleteCalls = mockClient.batch.mock.calls.filter((call) => {
+        const statements = call[0];
+        return Array.isArray(statements)
+          && statements.some((statement) => String(statement.sql).includes('DELETE FROM analytics_rollup_dimensions'));
+      });
+      const dimensionDeletes = dimensionDeleteCalls.map((call) => {
+        const statements = call[0] as Array<{ sql: string; args?: unknown[] }>;
+        return statements.find((statement) => statement.sql.includes('DELETE FROM analytics_rollup_dimensions'))!;
+      });
       expect(dimensionDeletes).toHaveLength(2);
 
-      const [olderStart, olderEnd] = executeArgs(dimensionDeletes[0]) as [string, string];
-      const [newerStart, newerEnd] = executeArgs(dimensionDeletes[1]) as [string, string];
+      const [olderStart, olderEnd] = dimensionDeletes[0].args as [string, string];
+      const [newerStart, newerEnd] = dimensionDeletes[1].args as [string, string];
       expect(new Date(`${olderEnd}T00:00:00.000Z`).getTime() + 86_400_000)
         .toBe(new Date(`${newerStart}T00:00:00.000Z`).getTime());
       expect(new Date(`${olderStart}T00:00:00.000Z`).getTime())
         .toBeLessThanOrEqual(new Date(`${olderEnd}T00:00:00.000Z`).getTime());
       expect(newerStart).toBe(newerEnd);
+    });
+
+    it('replaces daily rows, deletes dimensions, and inserts replacement dimensions in one write batch', async () => {
+      configureEnv();
+      const jsonResponse = (results: unknown[][]) => ({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ results }),
+      }) as Response;
+      const fetchMock = vi.fn()
+        .mockResolvedValueOnce(jsonResponse([
+          ['2026-03-28', 3, 2, 2, 1, 0, 0],
+        ]))
+        .mockResolvedValueOnce(jsonResponse([
+          ['2026-03-28', '/newer', '', 3, '2 visitors'],
+        ]));
+      for (let index = 0; index < 7; index += 1) {
+        fetchMock.mockResolvedValueOnce(emptyPostHogResponse());
+      }
+      vi.stubGlobal('fetch', fetchMock);
+      mockClient.execute.mockResolvedValue({ rows: [] });
+
+      await refreshAnalyticsRollups(1);
+
+      const replacementBatch = mockClient.batch.mock.calls.find((call) => {
+        const statements = call[0];
+        return Array.isArray(statements)
+          && statements.some((statement) => String(statement.sql).includes('INSERT INTO analytics_rollup_days'))
+          && statements.some((statement) => String(statement.sql).includes('DELETE FROM analytics_rollup_days'))
+          && statements.some((statement) => String(statement.sql).includes('DELETE FROM analytics_rollup_dimensions'))
+          && statements.some((statement) => String(statement.sql).includes('INSERT INTO analytics_rollup_dimensions'));
+      });
+      expect(replacementBatch).toBeTruthy();
+      expect(replacementBatch?.[1]).toBe('write');
+
+      const statements = replacementBatch?.[0] as Array<{ sql: string; args: unknown[] }>;
+      const dayDelete = statements.find((statement) => statement.sql.includes('DELETE FROM analytics_rollup_days'));
+      expect(dayDelete?.sql).toContain('day NOT IN (?)');
+      expect(dayDelete?.args).toEqual(expect.arrayContaining(['2026-03-28']));
+    });
+
+    it('deletes all stale daily rows in a refreshed chunk with no returned days', async () => {
+      configureEnv();
+      const fetchMock = vi.fn(async () => emptyPostHogResponse());
+      vi.stubGlobal('fetch', fetchMock);
+      mockClient.execute.mockResolvedValue({ rows: [] });
+
+      const result = await refreshAnalyticsRollups(1);
+
+      expect(result.status).toBe('configured');
+      const replacementBatch = mockClient.batch.mock.calls.find((call) => {
+        const statements = call[0];
+        return Array.isArray(statements)
+          && statements.some((statement) => String(statement.sql).includes('DELETE FROM analytics_rollup_days'));
+      });
+      const statements = replacementBatch?.[0] as Array<{ sql: string; args: unknown[] }>;
+      const dayDelete = statements.find((statement) => statement.sql.includes('DELETE FROM analytics_rollup_days'));
+      expect(dayDelete?.sql).toBe('DELETE FROM analytics_rollup_days WHERE day BETWEEN ? AND ?');
+      expect(dayDelete?.args).toHaveLength(2);
     });
 
     it('groups dimension queries by actual UTC event day', async () => {
@@ -520,7 +645,9 @@ describe('analytics rollups', () => {
           && statements.some((statement) => String(statement.sql).includes('INSERT INTO analytics_rollup_dimensions'));
       });
       expect(dimensionInsert).toBeTruthy();
-      const statements = dimensionInsert?.[0] as Array<{ args: unknown[] }>;
+      const statements = (dimensionInsert?.[0] as Array<{ sql: string; args: unknown[] }>).filter((statement) => (
+        statement.sql.includes('INSERT INTO analytics_rollup_dimensions')
+      ));
       expect(statements.map((statement) => statement.args.slice(0, 5))).toEqual([
         ['2026-03-27', 'page', '/older', '', 2],
         ['2026-03-28', 'page', '/newer', '', 3],

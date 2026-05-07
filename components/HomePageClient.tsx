@@ -2,25 +2,18 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { Links } from "@/components/Links";
 import { LandingTitle } from "@/components/LandingTitle";
-import { PostCard } from "@/components/PostCard";
 import { motion, useScroll, useTransform, Variants } from "motion/react";
 import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { cn } from "@/lib/utils";
-import type { PostMetadata } from "@/lib/types";
 import styles from "@/app/page.module.css";
 
 const ParticlesBackground = dynamic(() => import('@/components/ParticlesBackground').then(mod => mod.ParticlesBackground), { ssr: false });
 const PARTICLE_DEFER_MS = 2500;
 
-interface HomePageClientProps {
-  recentPosts: PostMetadata[];
-}
-
-export function HomePageClient({ recentPosts }: HomePageClientProps) {
+export function HomePageClient() {
   const prefersReducedMotion = useReducedMotion();
   const [showParticles, setShowParticles] = useState(false);
   const { scrollYProgress } = useScroll();
@@ -130,30 +123,6 @@ export function HomePageClient({ recentPosts }: HomePageClientProps) {
             <div className={styles.linksStage}>
               <Links />
             </div>
-
-            {/* Latest Writing Section */}
-            {recentPosts.length > 0 && (
-              <section
-                className={styles.latestWritingSection}
-              >
-                <h2 className={styles.latestWritingHeading}>
-                  Latest Writing
-                </h2>
-                <div className={styles.latestWritingGrid}>
-                  {recentPosts.map((post) => (
-                    <div key={post.slug}>
-                      <PostCard post={post} />
-                    </div>
-                  ))}
-                </div>
-                <Link
-                  href="/blog"
-                  className={styles.latestWritingLink}
-                >
-                  View all posts →
-                </Link>
-              </section>
-            )}
         </motion.div>
       </motion.div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AreaChart, Area, YAxis } from 'recharts';
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 
 interface SparklineProps {
   data: number[];
@@ -13,8 +14,10 @@ interface SparklineProps {
 
 export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, className, animated = true }: SparklineProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
   const [dimensions, setDimensions] = useState<{ width: number; height: number } | null>(null);
   const chartData = useMemo(() => data.map((value, index) => ({ index, value })), [data]);
+  const shouldAnimate = animated && !prefersReducedMotion;
 
   useEffect(() => {
     const element = containerRef.current;
@@ -59,8 +62,8 @@ export function Sparkline({ data, color = 'hsl(var(--chart-1))', height = 24, cl
             strokeWidth={1.5}
             fill={`url(#sparkline-${color.replace(/[^a-z0-9]/gi, '')})`}
             dot={false}
-            isAnimationActive={animated}
-            animationDuration={1000}
+            isAnimationActive={shouldAnimate}
+            animationDuration={shouldAnimate ? 1000 : 0}
             animationEasing="ease-in-out"
           />
         </AreaChart>

@@ -4,7 +4,7 @@
 
 import { Card } from "@/components/ui/card";
 import Link from "next/link";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getTagHref } from "@/lib/utils";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -139,7 +139,7 @@ export const PostCard = ({ post, className: _className }: PostCardProps) => {
 									<TagPill
 										key={tag}
 										tag={tag}
-										href={`/blog/tags/${tag}`}
+										href={getTagHref(tag)}
 										onClick={(e) => {
 											e.stopPropagation();
 										}}

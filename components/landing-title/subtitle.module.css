@@ -47,6 +47,13 @@
   position: relative;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .enhancedTitleLanding {
+    animation: none;
+    background-position: 50% 50%;
+  }
+}
+
 .auditMeta {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

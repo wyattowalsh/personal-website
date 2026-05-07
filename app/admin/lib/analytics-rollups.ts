@@ -31,7 +31,7 @@ import 'server-only';
  */
 
 import { randomUUID } from 'node:crypto';
-import { createClient, type Client, type InArgs, type Row } from '@libsql/client/web';
+import { createClient, type Client, type InArgs, type InStatement, type Row } from '@libsql/client/web';
 import { INTERACTION_EVENTS, POSTHOG_ROLLUP_QUERY_TIMEOUT_MS, ROLLUP_CHUNK_DAYS } from './analytics-constants';
 import { MAX_ANALYTICS_WINDOW_DAYS, clampRollupRefreshDays, type AnalyticsWindowDays } from './analytics-windows';
 import { cleanEnvValue, eventList, getPostHogConfig, queryPostHog } from './posthog-query';
@@ -165,8 +165,6 @@ export async function ensureAnalyticsRollupSchema(client: Client): Promise<void>
       ON analytics_rollup_dimensions(day, kind)`,
     `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_dimensions_kind_label
       ON analytics_rollup_dimensions(kind, label)`,
-    `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_runs_status
-      ON analytics_rollup_runs(status, started_at)`,
     `CREATE TABLE IF NOT EXISTS analytics_rollup_runs (
       id TEXT NOT NULL PRIMARY KEY,
       started_at TEXT NOT NULL,
@@ -175,6 +173,8 @@ export async function ensureAnalyticsRollupSchema(client: Client): Promise<void>
       window_days INTEGER NOT NULL,
       error TEXT
     )`,
+    `CREATE INDEX IF NOT EXISTS idx_analytics_rollup_runs_status
+      ON analytics_rollup_runs(status, started_at)`,
   ], 'write');
 }
 
@@ -231,19 +231,23 @@ export async function repairAnalyticsRollupSchema(client: Client): Promise<{ suc
     // Wrap COUNT queries in a try-catch to handle missing tables gracefully
     let dayDataExists = false;
     let runDataExists = false;
+    let dimensionDataExists = false;
     try {
       const dayCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_days');
       const runCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_runs');
+      const dimensionCount = await client.execute('SELECT COUNT(*) as count FROM analytics_rollup_dimensions');
       dayDataExists = rowNumber((dayCount.rows[0] || {}), 'count') > 0;
       runDataExists = rowNumber((runCount.rows[0] || {}), 'count') > 0;
+      dimensionDataExists = rowNumber((dimensionCount.rows[0] || {}), 'count') > 0;
     } catch {
       // If COUNT queries fail (table missing despite health check saying outdated),
       // treat as empty tables and proceed with repair
       dayDataExists = false;
       runDataExists = false;
+      dimensionDataExists = false;
     }
 
-    if (dayDataExists || runDataExists) {
+    if (dayDataExists || runDataExists || dimensionDataExists) {
       return {
         success: false,
         message: 'Cannot auto-repair: data exists. Please manually review or backup before repair.',
@@ -348,10 +352,8 @@ function dimensionRowsFromPostHog(rows: unknown[][], kind: RollupDimensionKind):
   })).filter((row) => row.day !== 'unknown' && row.label !== 'Unknown');
 }
 
-async function upsertDailyRows(client: Client, rows: RollupDay[], updatedAt: string): Promise<void> {
-  if (rows.length === 0) return;
-
-  await client.batch(rows.map((row) => ({
+function dailyRowStatements(rows: RollupDay[], updatedAt: string): InStatement[] {
+  return rows.map((row) => ({
     sql: `INSERT INTO analytics_rollup_days
       (day, pageviews, visitors, sessions, interactions, searches, outbound_clicks, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -372,14 +374,12 @@ async function upsertDailyRows(client: Client, rows: RollupDay[], updatedAt: str
       row.searches,
       row.outboundClicks,
       updatedAt,
-    ],
-  })), 'write');
+    ] as InArgs,
+  }));
 }
 
-async function insertDimensionRows(client: Client, rows: RollupDimension[], updatedAt: string): Promise<void> {
-  if (rows.length === 0) return;
-
-  await client.batch(rows.map((row) => ({
+function dimensionRowStatements(rows: RollupDimension[], updatedAt: string): InStatement[] {
+  return rows.map((row) => ({
     sql: `INSERT INTO analytics_rollup_dimensions
       (day, kind, label, detail_key, value, detail, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -395,8 +395,38 @@ async function insertDimensionRows(client: Client, rows: RollupDimension[], upda
       row.value,
       row.detail ?? null,
       updatedAt,
-    ],
-  })), 'write');
+    ] as InArgs,
+  }));
+}
+
+function staleDailyRowsDeleteStatement(chunk: ChunkRange, dayRows: RollupDay[]): InStatement {
+  const retainedDays = dayRows.map((row) => row.day);
+
+  if (retainedDays.length === 0) {
+    return {
+      sql: 'DELETE FROM analytics_rollup_days WHERE day BETWEEN ? AND ?',
+      args: [chunk.startDay, chunk.endDay] as InArgs,
+    };
+  }
+
+  return {
+    sql: `DELETE FROM analytics_rollup_days
+      WHERE day BETWEEN ? AND ?
+        AND day NOT IN (${retainedDays.map(() => '?').join(', ')})`,
+    args: [chunk.startDay, chunk.endDay, ...retainedDays] as InArgs,
+  };
+}
+
+async function replaceChunkRollupRows(client: Client, chunk: ChunkRange, dayRows: RollupDay[], dimensions: RollupDimension[], updatedAt: string): Promise<void> {
+  await client.batch([
+    staleDailyRowsDeleteStatement(chunk, dayRows),
+    ...dailyRowStatements(dayRows, updatedAt),
+    {
+      sql: 'DELETE FROM analytics_rollup_dimensions WHERE day BETWEEN ? AND ?',
+      args: [chunk.startDay, chunk.endDay] as InArgs,
+    },
+    ...dimensionRowStatements(dimensions, updatedAt),
+  ], 'write');
 }
 
 function dimensionQuery(select: string, where: string, groupBy: string, orderBy = 'value DESC'): string {
@@ -542,6 +572,21 @@ export async function refreshAnalyticsRollups(inputDays: unknown = undefined): P
   const startedAt = new Date().toISOString();
   const runId = randomUUID();
   const chunks = buildChunkRanges(days);
+  const { config, missingEnv } = getRollupConfig();
+
+  if (!config) {
+    const completedAt = new Date().toISOString();
+
+    return {
+      status: 'missing_config' as const,
+      windowDays: days,
+      dayRows: 0,
+      dimensionRows: 0,
+      startedAt,
+      completedAt,
+      missingEnv: getRollupSetupMissingEnv().length ? getRollupSetupMissingEnv() : missingEnv,
+    };
+  }
 
   try {
     return await withRollupClient(async (client) => {
@@ -557,12 +602,7 @@ export async function refreshAnalyticsRollups(inputDays: unknown = undefined): P
       for (const chunk of chunks) {
         try {
           const { days: dayRows, dimensions } = await fetchPostHogChunk(chunk);
-          await upsertDailyRows(client, dayRows, startedAt);
-          await client.execute({
-            sql: 'DELETE FROM analytics_rollup_dimensions WHERE day BETWEEN ? AND ?',
-            args: [chunk.startDay, chunk.endDay],
-          });
-          await insertDimensionRows(client, dimensions, startedAt);
+          await replaceChunkRollupRows(client, chunk, dayRows, dimensions, startedAt);
           totalDayRows += dayRows.length;
           totalDimensionRows += dimensions.length;
         } catch (chunkError) {

@@ -17,6 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { useReducedMotion } from '@/components/hooks/useReducedMotion';
 import { CyberPanel } from '../components/AdminVisuals';
 
 type MeasuredChartContainerProps = ComponentProps<typeof ChartContainer>;
@@ -87,6 +88,7 @@ interface EnhancedVerticalBarsProps {
 
 function EnhancedVerticalBars({ data, labelKey, valueKey, showStats = true }: EnhancedVerticalBarsProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const prefersReducedMotion = useReducedMotion();
 
   const stats = useMemo(() => {
     if (data.length === 0) return { total: 0, average: 0, max: 0 };
@@ -128,6 +130,8 @@ function EnhancedVerticalBars({ data, labelKey, valueKey, showStats = true }: En
           <Bar
             dataKey={valueKey}
             radius={[8, 8, 0, 0]}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
             onMouseEnter={(_, index) => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
@@ -161,6 +165,7 @@ function EnhancedHorizontalBars({
   showStats = true,
 }: EnhancedHorizontalBarsProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const prefersReducedMotion = useReducedMotion();
   const sliced = useMemo(() => data.slice(0, maxItems), [data, maxItems]);
 
   const stats = useMemo(() => {
@@ -198,6 +203,8 @@ function EnhancedHorizontalBars({
           <Bar
             dataKey={valueKey}
             radius={[0, 8, 8, 0]}
+            isAnimationActive={!prefersReducedMotion}
+            animationDuration={prefersReducedMotion ? 0 : 600}
             onMouseEnter={(_, index) => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
@@ -220,6 +227,7 @@ interface EnhancedTimelineAreaProps {
 }
 
 function EnhancedTimelineArea({ data }: EnhancedTimelineAreaProps) {
+  const prefersReducedMotion = useReducedMotion();
   const stats = useMemo(() => {
     if (data.length === 0) return { total: 0, average: 0, max: 0, min: 0 };
     const words = data.map(d => d.words);
@@ -286,7 +294,7 @@ function EnhancedTimelineArea({ data }: EnhancedTimelineAreaProps) {
             fill="url(#wordTimelineGradient)"
             stroke="var(--color-words)"
             strokeWidth={2}
-            isAnimationActive={true}
+            isAnimationActive={!prefersReducedMotion}
           />
         </ComposedChart>
       </MeasuredChartContainer>

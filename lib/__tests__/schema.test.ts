@@ -137,6 +137,19 @@ describe('generateArticleSchema', () => {
     expect(schema.image).toEqual(['https://test.example.com/test-hero.svg']);
   });
 
+  it('preserves absolute image URLs', () => {
+    const schema = generateArticleSchema({ ...mockPost, image: 'https://cdn.example.com/test-hero.jpg' });
+    expect(schema.image).toEqual(['https://cdn.example.com/test-hero.jpg']);
+  });
+
+  it('uses fallback images when a post image is absent', () => {
+    const schema = generateArticleSchema(
+      { ...mockPost, image: undefined },
+      { images: ['https://test.example.com/og-16x9.jpg', 'https://test.example.com/og-1x1.jpg'] }
+    );
+    expect(schema.image).toEqual(['https://test.example.com/og-16x9.jpg', 'https://test.example.com/og-1x1.jpg']);
+  });
+
   it('includes keywords and wordCount', () => {
     const schema = generateArticleSchema(mockPost);
     expect(schema.keywords).toEqual(['Testing', 'Vitest']);

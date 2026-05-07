@@ -14,7 +14,7 @@ const mockGetAllPosts = vi.fn(() => Promise.resolve([
     readingTime: '1 min read',
   },
 ]));
-const mockGetAllTags = vi.fn(() => Promise.resolve(['Data Science']));
+const mockGetAllTags = vi.fn(() => Promise.resolve(['Data Science', 'AI/ML']));
 
 vi.mock('@/lib/server', () => ({
   BackendService: {
@@ -42,6 +42,15 @@ describe('sitemap', () => {
     expect(urls).toContain(`${siteUrl}/blog/archive`);
     expect(urls).toContain(`${siteUrl}/privacy`);
     expect(urls).toContain(`${siteUrl}/blog/tags/${encodeURIComponent('Data Science')}`);
+    expect(urls).toContain(`${siteUrl}/blog/tags/${encodeURIComponent('AI/ML')}`);
+  });
+
+  it('uses content-derived stable lastModified dates for index and tag routes', async () => {
+    const entries = await sitemap();
+    const latestContentDate = new Date('2025-03-16');
+
+    expect(entries.find((entry) => entry.url === siteUrl)?.lastModified).toEqual(latestContentDate);
+    expect(entries.find((entry) => entry.url === `${siteUrl}/blog/tags/${encodeURIComponent('Data Science')}`)?.lastModified).toEqual(latestContentDate);
   });
 
   it('ensures content is preprocessed before sitemap generation', async () => {
