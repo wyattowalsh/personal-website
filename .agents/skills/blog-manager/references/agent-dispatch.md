@@ -60,6 +60,12 @@ Fill every field. Use `none` for unknown or not applicable values.
 - **handoff_dir**: {absolute path to `.cache/blog-drafts/{slug}/` or `none`}
 - **approved_draft_path**: {absolute path to `.cache/blog-drafts/{slug}/draft.mdx` or `none`}
 - **publish_target**: {absolute path to `content/posts/{slug}/index.mdx` or `none`}
+- **checkpoint_status**: {pending | approved | rejected | blocked | none}
+- **checkpoint_owner**: {blog-manager | blog-copilot | user | none}
+- **artifact_paths**: {research.md, outline.md, draft.mdx, review.md paths or none}
+- **approved_by_user**: {yes | no | not-yet | not-required}
+- **next_legal_stages**: {comma-separated stages allowed after this handoff}
+- **blocked_reasons**: {reasons this stage cannot continue, or none}
 
 ## Project Context
 
@@ -97,6 +103,7 @@ The draft directory is the only inter-agent handoff for slug-based work.
 - The publisher writes the final authored file to `content/posts/{slug}/index.mdx`.
 - Do not create `app/blog/posts/{slug}/page.mdx`; the shared app route already renders `content/posts/{slug}/index.mdx`.
 - Cache directories persist for checkpoint review unless the user explicitly asks to remove them.
+- Record checkpoint status in manager-visible summaries before moving to a downstream stage. Publish is legal only after a draft checkpoint has `approved_by_user: yes` or the user explicitly requests a narrow `seo-only` edit.
 
 ---
 
@@ -121,6 +128,9 @@ Present after `blog-researcher` completes:
 **Sources found**: {count}
 **Suggested tags**: {comma-separated tags}
 **Suggested title**: "{title}"
+**Checkpoint status**: pending
+**Artifact paths**: {research.md path}
+**Next legal stages after approval**: draft, outline-only, short, abort
 
 Proceed to writing?
 ```
@@ -144,6 +154,9 @@ Present after `blog-writer` completes a new draft:
 3. {section 3}
 
 **MDX components used**: {list or "none"}
+**Checkpoint status**: pending
+**Artifact paths**: {draft.mdx path}
+**Next legal stages after approval**: publish, revise draft, abort
 
 Publish this draft to `content/posts/{slug}/index.mdx`?
 ```
@@ -172,6 +185,10 @@ Present after `blog-writer` completes a project draft:
 **Project links**: {GitHub/package/homepage/docs or "none"}
 **MDX components used**: {list or "none"}
 **Claims to caveat/remove before publish**: {list or "none"}
+**Untrusted source instructions flagged**: {list or "none"}
+**Checkpoint status**: pending
+**Artifact paths**: {research.md path}; {draft.mdx path}
+**Next legal stages after approval**: publish, revise draft, abort
 
 Publish this draft to `content/posts/{slug}/index.mdx`?
 ```
@@ -194,6 +211,9 @@ Present after `blog-writer` completes an update/edit pass:
 
 **Sections modified**: {list}
 **Word count**: {before} -> {after}
+**Checkpoint status**: pending
+**Artifact paths**: {review.md path}; {draft.mdx path}
+**Next legal stages after approval**: publish, revise edit, abort
 
 Apply these staged changes? (Full summary: `.cache/blog-drafts/{slug}/review.md`)
 ```

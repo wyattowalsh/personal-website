@@ -19,15 +19,15 @@ reference subset needed for Copilot packaging resilience.
 
 ## Dispatch
 
-| Request | Action |
-|---------|--------|
-| Topic, URL, or project link | Follow canonical `compose` flow |
-| Existing slug/title + edit/change/fix request | Follow canonical `update` flow |
-| `list`, `status`, `show posts`, `what posts`, `how many` | Follow canonical `list` flow |
-| `audit`, `check SEO`, `validate`, `health check` | Follow canonical `audit` flow |
-| `refresh`, `update outdated`, `check if current` | Follow canonical `refresh` flow |
-| `brainstorm`, `ideas`, `suggest`, `what should I write` | Follow canonical `ideate` flow |
-| Empty | Show the menu/examples from the canonical skill |
+| Request                                                  | Action                                          |
+| -------------------------------------------------------- | ----------------------------------------------- |
+| Topic, URL, or project link                              | Follow canonical `compose` flow                 |
+| Existing slug/title + edit/change/fix request            | Follow canonical `update` flow                  |
+| `list`, `status`, `show posts`, `what posts`, `how many` | Follow canonical `list` flow                    |
+| `audit`, `check SEO`, `validate`, `health check`         | Follow canonical `audit` flow                   |
+| `refresh`, `update outdated`, `check if current`         | Follow canonical `refresh` flow                 |
+| `brainstorm`, `ideas`, `suggest`, `what should I write`  | Follow canonical `ideate` flow                  |
+| Empty                                                    | Show the menu/examples from the canonical skill |
 
 Treat the current user request as the canonical skill's input string;
 slash-command examples in the canonical source are examples, not a Copilot-only
@@ -37,13 +37,15 @@ requirement.
 
 Read these local copied references first for runtime-critical guidance:
 
-| File | Content | Load when |
-|------|---------|-----------|
-| `references/agent-dispatch.md` | Correction block, dispatch context, checkpoint templates | Every worker handoff |
-| `references/worker-contracts.md` | Stage ownership, allowed edits, artifact paths | compose, update, refresh, audit |
-| `references/validation-checklist.md` | Pre-dispatch and pre-publish checks | publish, audit, final validation |
-| `references/style-profile.md` | Full-corpus style and taxonomy profile | project compose |
-| `references/project-post-blueprint.md` | Project-intake evidence and post blueprint | project compose |
+| File                                   | Content                                                  | Load when                        |
+| -------------------------------------- | -------------------------------------------------------- | -------------------------------- |
+| `references/agent-dispatch.md`         | Correction block, dispatch context, checkpoint templates | Every worker handoff             |
+| `references/worker-contracts.md`       | Stage ownership, allowed edits, artifact paths           | compose, update, refresh, audit  |
+| `references/validation-checklist.md`   | Pre-dispatch and pre-publish checks                      | publish, audit, final validation |
+| `references/style-profile.md`          | Full-corpus style and taxonomy profile                   | project compose                  |
+| `references/project-post-blueprint.md` | Project-intake evidence and post blueprint               | project compose                  |
+| `references/post-conventions.md`       | Frontmatter, authored-post rules, image conventions      | compose, update, refresh         |
+| `references/mdx-components.md`         | Auto-available MDX components                            | draft/edit work only             |
 
 These files are copied from `.agents/skills/blog-manager/references/` so the
 Copilot wrapper can still operate if only the `.github` skill payload is
@@ -62,13 +64,6 @@ Read `.agents/skills/blog-manager/SKILL.md` for:
 - pipeline stages and checkpoints
 - repo truth and publish target
 - scope boundaries
-
-Then load non-mirrored canonical references on demand:
-
-| File | Content | Load when |
-|------|---------|-----------|
-| `.agents/skills/blog-manager/references/post-conventions.md` | Frontmatter, authored-post rules, image conventions | compose, update, refresh |
-| `.agents/skills/blog-manager/references/mdx-components.md` | Auto-available MDX components | draft/edit work only |
 
 Do not load all references at once.
 

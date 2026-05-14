@@ -1,10 +1,15 @@
 {
-  "version": 1,
-  "skills": {
-    "docs-steward": {
-      "source": "wyattowalsh/agents",
-      "sourceType": "github",
-      "computedHash": "b5e03af0dbc327b59f7a64b4451e89ab928297564a33f9b3a45636b76b18aa90"
-    }
-  }
+	"version": 1,
+	"skills": {
+		"blog-manager": {
+			"source": ".agents/skills/blog-manager",
+			"sourceType": "local",
+			"computedHash": "bd65169cb25aabe06cc8fb2a2523addbf2afcb8884e612bb5c1c94838c83e743"
+		},
+		"docs-steward": {
+			"source": "wyattowalsh/agents",
+			"sourceType": "github",
+			"computedHash": "b5e03af0dbc327b59f7a64b4451e89ab928297564a33f9b3a45636b76b18aa90"
+		}
+	}
 }

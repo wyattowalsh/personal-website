@@ -10,7 +10,10 @@ Use this reference before project compose and whenever an update must preserve t
 | `content/posts/regularized-linear-regression-models-pt1/index.mdx` | Long-form tutorial pacing, mathematical setup, code-backed explanation, series framing | Secondary for deep technical exposition |
 | `content/posts/regularized-linear-regression-models-pt2/index.mdx` | Continuation of technical argument, implementation detail, drawback/remedy framing | Secondary for analytical sections |
 | `content/posts/regularized-linear-regression-models-pt3/index.mdx` | Advanced technical closeout, algorithmic explanation, series conclusion | Secondary for dense algorithmic posts |
-| `content/posts/w4w-v6/index.mdx` | Frontmatter and taxonomy signal only | Weak placeholder; do not copy as writing quality |
+| `content/posts/agents/index.mdx` | Meta-project framing, agent/tooling vocabulary, practical systems perspective | Secondary for AI/tooling project posts |
+| `content/posts/personal-website/index.mdx` | Site-build narrative, personal infrastructure framing, design/build trade-offs | Secondary for site or portfolio-adjacent posts |
+
+This table is interpretive guidance, not a replacement for the live corpus scan. If current `content/posts/*/index.mdx` files differ from this table, trust the live scan and note the mismatch in `research.md`.
 
 ## Voice
 
@@ -53,7 +56,7 @@ Only use helpers documented in `mdx-components.md`.
 Every project draft checkpoint must name the exemplar blend:
 
 ```md
-**Exemplar blend:** ProxyWhirl for project-post shape; regression series for technical depth; w4w-v6 ignored as placeholder except frontmatter/tag convention.
+**Exemplar blend:** ProxyWhirl for project-post shape; regression series for technical depth; agents and personal-website for meta-project/site-building voice where relevant.
 ```
 
 Adjust the sentence to match the actual blend, but include every current post in the scan.
