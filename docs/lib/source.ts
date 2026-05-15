@@ -1,13 +1,13 @@
 import { loader } from 'fumadocs-core/source';
-import { createMDXSource } from 'fumadocs-mdx';
-import { docs, meta } from '@/.source';
+import { toFumadocsSource } from 'fumadocs-mdx/runtime/server';
+import { docs, meta } from '@/.source/server';
 import { createElement, type ReactElement } from 'react';
 
 // See https://fumadocs.vercel.app/docs/headless/source-api for more info
 export const source = loader({
   // it assigns a URL to your pages
   baseUrl: '/docs',
-  source: createMDXSource(docs, meta),
+  source: toFumadocsSource(docs, meta),
   icon(icon) {
     if (!icon) return;
 
@@ -112,7 +112,9 @@ export const source = loader({
           throw new Error(`Unknown icon set: ${set}`);
       }
 
-      const Component = lib[name] as (props: Record<string, unknown>) => ReactElement;
+      const Component = lib[name] as (
+        props: Record<string, unknown>,
+      ) => ReactElement;
 
       if (Component) {
         return createElement(Component);

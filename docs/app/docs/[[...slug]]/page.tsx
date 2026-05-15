@@ -8,6 +8,13 @@ import {
 import { notFound } from 'next/navigation';
 import { createRelativeLink } from 'fumadocs-ui/mdx';
 import { getMDXComponents } from '@/mdx-components';
+import type { DocData } from 'fumadocs-mdx/runtime/types';
+
+type PageRuntimeData = DocData & {
+  title?: string;
+  description?: string;
+  full?: boolean;
+};
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -16,12 +23,13 @@ export default async function Page(props: {
   const page = source.getPage(params.slug);
   if (!page) notFound();
 
-  const MDXContent = page.data.body;
+  const data = page.data as unknown as PageRuntimeData;
+  const MDXContent = data.body;
 
   return (
-    <DocsPage toc={page.data.toc} full={page.data.full}>
-      <DocsTitle>{page.data.title}</DocsTitle>
-      <DocsDescription>{page.data.description}</DocsDescription>
+    <DocsPage toc={data.toc} full={data.full}>
+      <DocsTitle>{data.title}</DocsTitle>
+      <DocsDescription>{data.description}</DocsDescription>
       <DocsBody>
         <MDXContent
           components={getMDXComponents({
